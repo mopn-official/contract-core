@@ -1,15 +1,39 @@
 {
-	"dependencies": {
-		"@openzeppelin/contracts": "^4.8.0",
-		"@openzeppelin/contracts-upgradeable": "^4.8.0"
-	},
-	"devDependencies": {
-		"@nomicfoundation/hardhat-toolbox": "^2.0.0",
-		"@nomiclabs/hardhat-ethers": "^2.2.1",
-		"@openzeppelin/hardhat-upgrades": "^1.21.0",
-		"chai": "^4.3.7",
-		"dotenv": "^16.0.3",
-		"ethers": "^5.7.2",
-		"hardhat": "^2.12.2"
-	}
+  "name": "core",
+  "description": "This project is the core of mopn.",
+  "version": "0.0.1",
+  "main": "hardhat.config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "npx hardhat test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mopn-official/core.git"
+  },
+  "keywords": [
+    "mopn",
+    "core",
+    "web3game",
+    "gamefi"
+  ],
+  "author": "cyanface",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mopn-official/core/issues"
+  },
+  "homepage": "https://github.com/mopn-official/core#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.1",
+    "chai": "^4.3.7",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.12.2"
+  }
 }

@@ -1,5 +1,4 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("@openzeppelin/hardhat-upgrades");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -23,9 +22,6 @@ module.exports = {
       sepolia: process.env.ETHERSCAN_API_KEY,
       goerli: process.env.ETHERSCAN_API_KEY,
       rinkeby: process.env.ETHERSCAN_API_KEY,
-      ftmTestnet: process.env.FTMSCAN_API_KEY,
-      polygonMumbai: process.env.POLYSCAN_API_KEY,
-      bscTestnet: process.env.BSCSCAN_API_KEY,
     },
   },
 };

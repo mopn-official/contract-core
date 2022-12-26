@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./interfaces/IAvatar.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract Map is Initializable {
     // x => y => avatarId
     mapping(uint256 => mapping(uint256 => uint256)) public blocks;
 
-    address public avatarContract;
+    IAvatar public Avatar;
 
     function initialize(address avatarContract_) public initializer {
-        avatarContract = avatarContract_;
+        Avatar = IAvatar(avatarContract_);
     }
 
     function getBlocksAvatars(uint256[] memory xs, uint256[] memory ys) public view returns (uint256[] memory) {
