@@ -7,7 +7,7 @@ import "./libraries/HexGridsMath.sol";
 contract Map {
     using BlockMath for Block;
     // Block => avatarId
-    mapping(bytes9 => uint256) public blocks;
+    mapping(uint256 => uint256) public blocks;
 
     IAvatar public Avatar;
 
@@ -60,7 +60,7 @@ contract Map {
     ) public view returns (uint256[] memory) {
         uint256[] memory avatarIds = new uint256[](blocks_.length);
         uint256 j = 0;
-        bytes9 coordinate;
+        uint256 coordinate;
         uint256 i;
         for (i = 0; i < blocks_.length; i++) {
             coordinate = blocks_[i].coordinateBytes();

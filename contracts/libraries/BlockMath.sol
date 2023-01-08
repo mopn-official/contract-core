@@ -43,16 +43,19 @@ library BlockMath {
     }
 
     function direction(uint256 direction_) public pure returns (Block memory) {
-        Block[] memory cube_direction_vectors = new Block[](6);
-
-        cube_direction_vectors[0] = Block(1, -1, 0);
-        cube_direction_vectors[1] = Block(0, -1, 1);
-        cube_direction_vectors[2] = Block(-1, 0, 1);
-        cube_direction_vectors[3] = Block(-1, 1, 0);
-        cube_direction_vectors[4] = Block(0, 1, -1);
-        cube_direction_vectors[5] = Block(1, 0, -1);
-
-        return cube_direction_vectors[direction_];
+        if (direction_ == 0) {
+            return Block(1, -1, 0);
+        } else if (direction_ == 1) {
+            return Block(0, -1, 1);
+        } else if (direction_ == 2) {
+            return Block(-1, 0, 1);
+        } else if (direction_ == 3) {
+            return Block(-1, 1, 0);
+        } else if (direction_ == 4) {
+            return Block(0, 1, -1);
+        } else {
+            return Block(1, 0, -1);
+        }
     }
 
     function neighbor(
@@ -62,26 +65,40 @@ library BlockMath {
         return add(block_, direction(direction_));
     }
 
-    function coordinateBytes(Block memory block_) public pure returns (bytes9) {
-        bytes memory serializedMessage = new bytes(9);
+    // function coordinateBytes(Block memory block_) public pure returns (bytes9) {
+    //     bytes memory serializedMessage = new bytes(9);
 
-        uint256 x = uint256(int256(int16abs(block_.x)));
-        uint256 y = uint256(int256(int16abs(block_.y)));
-        uint256 z = uint256(int256(int16abs(block_.z)));
+    //     uint256 x = uint256(int256(int16abs(block_.x)));
+    //     uint256 y = uint256(int256(int16abs(block_.y)));
+    //     uint256 z = uint256(int256(int16abs(block_.z)));
 
-        serializedMessage[0] = block_.x >= 0 ? bytes1(uint8(1)) : bytes1(0);
-        serializedMessage[1] = bytes1(uint8(x / (2 ** 8)));
-        serializedMessage[2] = bytes1(uint8(x));
+    //     serializedMessage[0] = block_.x >= 0 ? bytes1(uint8(1)) : bytes1(0);
+    //     serializedMessage[1] = bytes1(uint8(x / (2 ** 8)));
+    //     serializedMessage[2] = bytes1(uint8(x));
 
-        serializedMessage[3] = block_.y >= 0 ? bytes1(uint8(1)) : bytes1(0);
-        serializedMessage[4] = bytes1(uint8(y / (2 ** 8)));
-        serializedMessage[5] = bytes1(uint8(y));
+    //     serializedMessage[3] = block_.y >= 0 ? bytes1(uint8(1)) : bytes1(0);
+    //     serializedMessage[4] = bytes1(uint8(y / (2 ** 8)));
+    //     serializedMessage[5] = bytes1(uint8(y));
 
-        serializedMessage[6] = block_.z >= 0 ? bytes1(uint8(1)) : bytes1(0);
-        serializedMessage[7] = bytes1(uint8(z / (2 ** 8)));
-        serializedMessage[8] = bytes1(uint8(z));
+    //     serializedMessage[6] = block_.z >= 0 ? bytes1(uint8(1)) : bytes1(0);
+    //     serializedMessage[7] = bytes1(uint8(z / (2 ** 8)));
+    //     serializedMessage[8] = bytes1(uint8(z));
 
-        return bytes9(serializedMessage);
+    //     return bytes9(serializedMessage);
+    // }
+
+    // xxxxyyyyzzzz
+    function coordinateBytes(
+        Block memory block_
+    ) public pure returns (uint256 ckey) {
+        ckey = uint256(int256(int16abs(block_.x))) * 100000000;
+        ckey = block_.x >= 0 ? ckey : ckey + 100000000000;
+
+        ckey += uint256(int256(int16abs(block_.y))) * 10000;
+        ckey = block_.y >= 0 ? ckey : ckey + 10000000;
+
+        ckey += uint256(int256(int16abs(block_.z)));
+        ckey = block_.z >= 0 ? ckey : ckey + 1000;
     }
 
     function int16abs(int16 n) internal pure returns (int16) {
