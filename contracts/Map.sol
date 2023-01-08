@@ -1,24 +1,83 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
-import "./interfaces/IAvatar.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "./interfaces/IMOPN.sol";
+import "./libraries/HexGridsMath.sol";
 
-contract Map is Initializable {
-    // x => y => avatarId
-    mapping(uint256 => mapping(uint256 => uint256)) public blocks;
+contract Map {
+    using BlockMath for Block;
+    // Block => avatarId
+    mapping(bytes9 => uint256) public blocks;
 
     IAvatar public Avatar;
 
-    function initialize(address avatarContract_) public initializer {
+    function setAvatarContract(address avatarContract_) public {
         Avatar = IAvatar(avatarContract_);
     }
 
-    function getBlocksAvatars(uint256[] memory xs, uint256[] memory ys) public view returns (uint256[] memory) {
-        uint256[] memory avatarIds = new uint256[](xs.length);
-        for (uint256 i = 0; i < xs.length; i++) {
-            avatarIds[i] = blocks[xs[i]][ys[i]];
+    function avatarMove(
+        Block memory blockFrom,
+        Block memory blockTo
+    ) public onlyAvatar {
+        blocks[blockTo.coordinateBytes()] = blocks[blockFrom.coordinateBytes()];
+        blocks[blockFrom.coordinateBytes()] = 0;
+    }
+
+    function avatarSet(
+        uint256 avatarId,
+        Block memory blockTo
+    ) public onlyAvatar {
+        blocks[blockTo.coordinateBytes()] = avatarId;
+    }
+
+    function avatarRemove(Block memory block_) public {
+        blocks[block_.coordinateBytes()] = 0;
+    }
+
+    function getBlockAvatar(Block memory block_) public view returns (uint256) {
+        return blocks[block_.coordinateBytes()];
+    }
+
+    function getBlockAttackRangeAvatars(
+        Block memory block_
+    ) public view returns (uint256[] memory) {
+        uint256[] memory ringNums = new uint256[](2);
+        ringNums[0] = 1;
+        ringNums[0] = 2;
+        return getBlocksAvatars(HexGridsMath.blockRingBlocks(block_, ringNums));
+    }
+
+    function getBlockSpheres(
+        Block memory block_
+    ) public pure returns (Block[] memory) {
+        uint256[] memory ringNums = new uint256[](1);
+        ringNums[0] = 1;
+        return HexGridsMath.blockRingBlocks(block_, ringNums);
+    }
+
+    function getBlocksAvatars(
+        Block[] memory blocks_
+    ) public view returns (uint256[] memory) {
+        uint256[] memory avatarIds = new uint256[](blocks_.length);
+        uint256 j = 0;
+        bytes9 coordinate;
+        uint256 i;
+        for (i = 0; i < blocks_.length; i++) {
+            coordinate = blocks_[i].coordinateBytes();
+            if (blocks[coordinate] > 0) {
+                avatarIds[j] = blocks[coordinate];
+                j++;
+            }
         }
-        return avatarIds;
+        uint256[] memory nonzeroAvatarIds = new uint256[](j);
+        for (i = 0; i < j; i++) {
+            nonzeroAvatarIds[i] = avatarIds[i];
+        }
+        return nonzeroAvatarIds;
+    }
+
+    modifier onlyAvatar() {
+        require(msg.sender == address(Avatar), "not allowed");
+        _;
     }
 }

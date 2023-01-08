@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.17;
 
+import "./BlockMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
@@ -12,11 +13,7 @@ error RandomSeedInvalid();
 bytes constant initBlockLevels = "678851ac687a239ab7ba923c49bcbb995c45accb6b508c4c6897a59cbcba98853ab3bca69c7c6878a967742b4a1";
 
 library HexGridsMath {
-    struct Block {
-        int256 x;
-        int256 y;
-        int256 z;
-    }
+    using BlockMath for Block;
 
     function PassIdRingNum(uint256 PassId) public pure returns (uint256 n) {
         // PassId = 3 * n * n + 3 * n + 1;
@@ -33,10 +30,10 @@ library HexGridsMath {
         return PassId - (3 * ringNum * ringNum + 3 * ringNum + 1);
     }
 
-    function PassIdRingStartCenterPoint(
+    function PassIdRingStartCenterBlock(
         uint256 PassIdRingNum_
     ) public pure returns (Block memory) {
-        int256 PassIdRingNum__ = int256(PassIdRingNum_);
+        int16 PassIdRingNum__ = int16(uint16(PassIdRingNum_));
         return
             Block(
                 -PassIdRingNum__ * 5,
@@ -45,7 +42,7 @@ library HexGridsMath {
             );
     }
 
-    function PassIdCenterPoint(
+    function PassIdCenterBlock(
         uint256 PassId
     ) public pure returns (Block memory block_) {
         if (PassId == 1) {
@@ -54,14 +51,14 @@ library HexGridsMath {
 
         uint256 PassIdRingNum_ = PassIdRingNum(PassId);
         int256 PassIdRingNum__ = int256(PassIdRingNum_);
-        Block memory startblock = PassIdRingStartCenterPoint(PassIdRingNum_);
+        Block memory startblock = PassIdRingStartCenterBlock(PassIdRingNum_);
         uint256 PassIdRingPos_ = PassIdRingPos(PassId);
         int256 PassIdRingPos__ = int256(PassIdRingPos_) - 1;
 
         uint256 side = Math.ceilDiv(PassIdRingPos_, PassIdRingNum_);
-        int256 sidepos = 0;
+        int16 sidepos = 0;
         if (PassIdRingNum__ > 1) {
-            sidepos = PassIdRingPos__ % PassIdRingNum__;
+            sidepos = int16(PassIdRingPos__ % PassIdRingNum__);
         }
 
         if (side == 1) {
@@ -91,68 +88,49 @@ library HexGridsMath {
         }
     }
 
-    function PassIdCenterPointRange(
-        Block memory block_
-    ) public pure returns (int256[] memory, int256[] memory, int256[] memory) {
-        int256[] memory xrange = new int256[](11);
-        int256[] memory yrange = new int256[](11);
-        int256[] memory zrange = new int256[](11);
+    function PassIdBlockRange(
+        Block memory centerBlock_
+    ) public pure returns (int16[] memory, int16[] memory, int16[] memory) {
+        int16[] memory xrange = new int16[](11);
+        int16[] memory yrange = new int16[](11);
+        int16[] memory zrange = new int16[](11);
         for (uint256 i = 1; i < 6; i++) {
-            xrange[i * 2] = block_.x + int256(i);
-            xrange[i * 2 - 1] = block_.x - int256(i);
-            yrange[i * 2] = block_.y + int256(i);
-            yrange[i * 2 - 1] = block_.y - int256(i);
-            zrange[i * 2] = block_.z + int256(i);
-            zrange[i * 2 - 1] = block_.z - int256(i);
+            xrange[i * 2] = centerBlock_.x + int16(uint16(i));
+            xrange[i * 2 - 1] = centerBlock_.x - int16(uint16(i));
+            yrange[i * 2] = centerBlock_.y + int16(uint16(i));
+            yrange[i * 2 - 1] = centerBlock_.y - int16(uint16(i));
+            zrange[i * 2] = centerBlock_.z + int16(uint16(i));
+            zrange[i * 2 - 1] = centerBlock_.z - int16(uint16(i));
         }
-        xrange[0] = block_.x;
-        yrange[0] = block_.y;
-        zrange[0] = block_.z;
+        xrange[0] = centerBlock_.x;
+        yrange[0] = centerBlock_.y;
+        zrange[0] = centerBlock_.z;
         return (xrange, yrange, zrange);
     }
 
     function blockIndex(
         Block memory block_,
         uint256 PassId
-    ) public pure returns (int256 blockIndex_) {
-        Block memory centerPointBlock = PassIdCenterPoint(PassId);
-        int256 dis = block_distance(centerPointBlock, block_);
+    ) public pure returns (int16 blockIndex_) {
+        Block memory centerPointBlock = PassIdCenterBlock(PassId);
+        int16 dis = centerPointBlock.distance(block_);
         if (dis > 5) revert BlockNotInPass();
         dis--;
         blockIndex_ = 3 * dis * dis + 3 * dis;
         dis++;
-        block_ = block_subtract(block_, centerPointBlock);
+        block_ = block_.subtract(centerPointBlock);
         if (block_.x >= 0 && block_.y > 0 && block_.z < 0) {
-            blockIndex_ += block_distance(Block(0, dis, -dis), block_) + 1;
+            blockIndex_ += Block(0, dis, -dis).distance(block_) + 1;
         } else if (block_.x > 0 && block_.y <= 0 && block_.z < 0) {
-            blockIndex_ +=
-                block_distance(Block(dis, 0, -dis), block_) +
-                1 +
-                dis;
+            blockIndex_ += Block(dis, 0, -dis).distance(block_) + 1 + dis;
         } else if (block_.x > 0 && block_.y < 0 && block_.z >= 0) {
-            blockIndex_ +=
-                block_distance(Block(dis, -dis, 0), block_) +
-                1 +
-                dis *
-                2;
+            blockIndex_ += Block(dis, -dis, 0).distance(block_) + 1 + dis * 2;
         } else if (block_.x <= 0 && block_.y < 0 && block_.z > 0) {
-            blockIndex_ +=
-                block_distance(Block(0, -dis, dis), block_) +
-                1 +
-                dis *
-                3;
+            blockIndex_ += Block(0, -dis, dis).distance(block_) + 1 + dis * 3;
         } else if (block_.x < 0 && block_.y >= 0 && block_.z > 0) {
-            blockIndex_ +=
-                block_distance(Block(-dis, 0, dis), block_) +
-                1 +
-                dis *
-                4;
+            blockIndex_ += Block(-dis, 0, dis).distance(block_) + 1 + dis * 4;
         } else {
-            blockIndex_ +=
-                block_distance(Block(-dis, dis, 0), block_) +
-                1 +
-                dis *
-                5;
+            blockIndex_ += Block(-dis, dis, 0).distance(block_) + 1 + dis * 5;
         }
     }
 
@@ -219,6 +197,35 @@ library HexGridsMath {
         }
     }
 
+    function blockRingBlocks(
+        Block memory block_,
+        uint256[] memory ringNums
+    ) public pure returns (Block[] memory) {
+        uint256 blockNum;
+        uint256 i;
+        for (i = 0; i < ringNums.length; i++) {
+            blockNum += ringNums[i] * 6;
+        }
+        Block[] memory blocks = new Block[](blockNum);
+
+        for (i = 0; i < ringNums.length; i++) {
+            Block memory startBlock = Block(
+                block_.x,
+                block_.y + int16(int256(ringNums[i])),
+                block_.z - int16(int256(ringNums[i]))
+            );
+
+            for (uint256 j = 0; j < 6; j++) {
+                for (uint256 k = 0; k < ringNums[i]; k++) {
+                    blocks[j * ringNums[i] + k] = startBlock;
+                    startBlock = startBlock.neighbor(j);
+                }
+            }
+        }
+
+        return blocks;
+    }
+
     function convertBytes1level(bytes1 level) public pure returns (uint8) {
         uint8 uint8level = uint8(level);
         if (uint8level < 97) {
@@ -226,55 +233,5 @@ library HexGridsMath {
         } else {
             return uint8level - 87;
         }
-    }
-
-    function block_add(
-        Block memory a,
-        Block memory b
-    ) public pure returns (Block memory) {
-        return Block(a.x + b.x, a.y + b.y, a.z + b.z);
-    }
-
-    function block_subtract(
-        Block memory a,
-        Block memory b
-    ) public pure returns (Block memory) {
-        return Block(a.x - b.x, a.y - b.y, a.z - b.z);
-    }
-
-    function block_length(Block memory a) public pure returns (int256) {
-        return
-            int256(
-                (SignedMath.abs(a.x) +
-                    SignedMath.abs(a.y) +
-                    SignedMath.abs(a.z)) / 2
-            );
-    }
-
-    function block_distance(
-        Block memory a,
-        Block memory b
-    ) public pure returns (int256) {
-        return block_length(block_subtract(a, b));
-    }
-
-    function block_direction(
-        uint256 direction
-    ) public pure returns (Block memory) {
-        Block[] memory cube_direction_vectors = new Block[](6);
-        cube_direction_vectors[0] = Block(1, 0, -1);
-        cube_direction_vectors[1] = Block(1, -1, 0);
-        cube_direction_vectors[2] = Block(0, -1, 1);
-        cube_direction_vectors[3] = Block(-1, 0, 1);
-        cube_direction_vectors[4] = Block(-1, 1, 0);
-        cube_direction_vectors[5] = Block(0, 1, -1);
-        return cube_direction_vectors[direction];
-    }
-
-    function block_neighbor(
-        Block memory block_,
-        uint256 direction
-    ) public pure returns (Block memory) {
-        return block_add(block_, block_direction(direction));
     }
 }

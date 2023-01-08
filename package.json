@@ -26,7 +26,9 @@
   },
   "homepage": "https://github.com/mopn-official/core#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.8.0"
+    "@openzeppelin/contracts": "^4.8.0",
+    "axios": "^1.2.1",
+    "json2csv": "^5.0.7"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",

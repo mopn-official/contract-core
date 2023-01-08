@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
-struct CollectionData {
-    uint256 colour;
-    string thumbDirCid;
-}
+import "../structs/Structs.sol";
 
 interface IGovernance {
     function stakePass(uint256 tokenId) external;
 
-    function isInWhiteList(address collectionContract, bytes32[] memory proofs) external view returns (bool);
+    function isInWhiteList(
+        address collectionContract,
+        bytes32[] memory proofs
+    ) external view returns (bool);
 
-    function getCollectionData(address collectionContract) external view returns (CollectionData memory);
+    function getCollectionData(
+        address collectionContract
+    ) external view returns (CollectionData memory);
 }

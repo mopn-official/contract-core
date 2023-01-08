@@ -1,17 +1,26 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
+
+import "../structs/Structs.sol";
 
 interface IMap {
-    struct Block {
-        uint256 x;
-        uint256 y;
-    }
+    function getBlocksAvatars(
+        Block[] memory blocks
+    ) external view returns (uint256[] memory);
 
-    function getBlocksAvatars(uint256[] memory xs, uint256[] memory ys) external view returns (uint256[] memory);
+    function avatarMove(Block memory blockFrom, Block memory blockTo) external;
 
-    function getBlockAvatar(uint256[] memory xs, uint256[] memory ys) external view returns (uint256[] memory);
+    function avatarSet(uint256 avatarId, Block memory blockTo) external;
 
-    function getBlocksSpheres(uint256[] memory xs, uint256[] memory ys) external view returns (uint256[] memory);
+    function getBlockAvatar(
+        Block memory block_
+    ) external view returns (uint256);
 
-    function getBlockSphere(Block memory) external view returns (Block[] memory);
+    function getBlockAttackRangeAvatars(
+        Block memory block_
+    ) external view returns (uint256[] memory);
+
+    function getBlockSpheres(
+        Block memory block_
+    ) external view returns (Block[] memory);
 }
