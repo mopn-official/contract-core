@@ -4,14 +4,19 @@ pragma solidity ^0.8.17;
 import "../structs/Structs.sol";
 
 interface IGovernance {
-    function stakePass(uint256 tokenId) external;
+    function checkWhitelistCOID(
+        address collectionContract,
+        bytes32[] memory proofs
+    ) external returns (uint256);
 
     function isInWhiteList(
         address collectionContract,
         bytes32[] memory proofs
     ) external view returns (bool);
 
-    function getCollectionData(
+    function updateWhiteList(bytes32 whiteListRoot_) external;
+
+    function getCOID(
         address collectionContract
-    ) external view returns (CollectionData memory);
+    ) external view returns (uint256);
 }

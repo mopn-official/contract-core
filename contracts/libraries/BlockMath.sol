@@ -65,40 +65,25 @@ library BlockMath {
         return add(block_, direction(direction_));
     }
 
-    // function coordinateBytes(Block memory block_) public pure returns (bytes9) {
-    //     bytes memory serializedMessage = new bytes(9);
-
-    //     uint256 x = uint256(int256(int16abs(block_.x)));
-    //     uint256 y = uint256(int256(int16abs(block_.y)));
-    //     uint256 z = uint256(int256(int16abs(block_.z)));
-
-    //     serializedMessage[0] = block_.x >= 0 ? bytes1(uint8(1)) : bytes1(0);
-    //     serializedMessage[1] = bytes1(uint8(x / (2 ** 8)));
-    //     serializedMessage[2] = bytes1(uint8(x));
-
-    //     serializedMessage[3] = block_.y >= 0 ? bytes1(uint8(1)) : bytes1(0);
-    //     serializedMessage[4] = bytes1(uint8(y / (2 ** 8)));
-    //     serializedMessage[5] = bytes1(uint8(y));
-
-    //     serializedMessage[6] = block_.z >= 0 ? bytes1(uint8(1)) : bytes1(0);
-    //     serializedMessage[7] = bytes1(uint8(z / (2 ** 8)));
-    //     serializedMessage[8] = bytes1(uint8(z));
-
-    //     return bytes9(serializedMessage);
-    // }
-
-    // xxxxyyyyzzzz
-    function coordinateBytes(
+    function coordinateInt(
         Block memory block_
     ) public pure returns (uint256 ckey) {
-        ckey = uint256(int256(int16abs(block_.x))) * 100000000;
-        ckey = block_.x >= 0 ? ckey : ckey + 100000000000;
+        unchecked {
+            ckey = uint256(int256(int16abs(block_.x))) * 100000000;
+            ckey = block_.x >= 0 ? ckey : ckey + 100000000000;
 
-        ckey += uint256(int256(int16abs(block_.y))) * 10000;
-        ckey = block_.y >= 0 ? ckey : ckey + 10000000;
+            ckey += uint256(int256(int16abs(block_.y))) * 10000;
+            ckey = block_.y >= 0 ? ckey : ckey + 10000000;
 
-        ckey += uint256(int256(int16abs(block_.z)));
-        ckey = block_.z >= 0 ? ckey : ckey + 1000;
+            ckey += uint256(int256(int16abs(block_.z)));
+            ckey = block_.z >= 0 ? ckey : ckey + 1000;
+        }
+    }
+
+    function fromCoordinateInt(
+        uint256 coordinateInt_
+    ) public pure returns (Block memory) {
+        uint256 xdata = coordinateInt_ / 100000000;
     }
 
     function int16abs(int16 n) internal pure returns (int16) {

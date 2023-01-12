@@ -9,71 +9,80 @@ contract Map {
     // Block => avatarId
     mapping(uint256 => uint256) public blocks;
 
+    mapping(uint256 => uint256) public coblocks;
+
+    uint256[12] blockLevel = [
+        125000000000000000,
+        250000000000000000,
+        375000000000000000,
+        500000000000000000,
+        625000000000000000,
+        750000000000000000,
+        875000000000000000,
+        1000000000000000000,
+        1125000000000000000,
+        1250000000000000000,
+        1375000000000000000,
+        1500000000000000000
+    ];
+
     IAvatar public Avatar;
 
     function setAvatarContract(address avatarContract_) public {
         Avatar = IAvatar(avatarContract_);
     }
 
-    function avatarMove(
-        Block memory blockFrom,
-        Block memory blockTo
-    ) public onlyAvatar {
-        blocks[blockTo.coordinateBytes()] = blocks[blockFrom.coordinateBytes()];
-        blocks[blockFrom.coordinateBytes()] = 0;
-    }
-
     function avatarSet(
         uint256 avatarId,
+        uint256 COID,
         Block memory blockTo
     ) public onlyAvatar {
-        blocks[blockTo.coordinateBytes()] = avatarId;
+        blocks[blockTo.coordinateInt()] = avatarId;
+        coBlockAdd(blockTo.coordinateInt(), COID);
+        Block[] memory blockSpheres = HexGridsMath.blockSpheres(blockTo);
+        for (uint256 i; i < blockSpheres.length; i++) {
+            coBlockAdd(blockSpheres[i].coordinateInt(), COID);
+        }
     }
 
-    function avatarRemove(Block memory block_) public {
-        blocks[block_.coordinateBytes()] = 0;
+    function avatarRemove(Block memory block_, uint256 COID) public {
+        blocks[block_.coordinateInt()] = 0;
+        coBlockSub(block_.coordinateInt(), COID);
+        Block[] memory blockSpheres = HexGridsMath.blockSpheres(block_);
+        for (uint256 i; i < blockSpheres.length; i++) {
+            coBlockSub(blockSpheres[i].coordinateInt(), COID);
+        }
+    }
+
+    function coBlockAdd(uint256 blockcoordinate, uint256 COID) private {
+        coblocks[blockcoordinate] =
+            COID *
+            10 +
+            (coblocks[blockcoordinate] % 10) +
+            1;
+    }
+
+    function coBlockSub(uint256 blockcoordinate, uint256 COID) private {
+        uint256 left = (coblocks[blockcoordinate] % 10);
+        if (left == 0 || left == 1) {
+            coblocks[blockcoordinate] = 0;
+        } else {
+            coblocks[blockcoordinate] = COID * 10 + left - 1;
+        }
     }
 
     function getBlockAvatar(Block memory block_) public view returns (uint256) {
-        return blocks[block_.coordinateBytes()];
-    }
-
-    function getBlockAttackRangeAvatars(
-        Block memory block_
-    ) public view returns (uint256[] memory) {
-        uint256[] memory ringNums = new uint256[](2);
-        ringNums[0] = 1;
-        ringNums[0] = 2;
-        return getBlocksAvatars(HexGridsMath.blockRingBlocks(block_, ringNums));
-    }
-
-    function getBlockSpheres(
-        Block memory block_
-    ) public pure returns (Block[] memory) {
-        uint256[] memory ringNums = new uint256[](1);
-        ringNums[0] = 1;
-        return HexGridsMath.blockRingBlocks(block_, ringNums);
+        return blocks[block_.coordinateInt()];
     }
 
     function getBlocksAvatars(
         Block[] memory blocks_
     ) public view returns (uint256[] memory) {
         uint256[] memory avatarIds = new uint256[](blocks_.length);
-        uint256 j = 0;
-        uint256 coordinate;
-        uint256 i;
-        for (i = 0; i < blocks_.length; i++) {
-            coordinate = blocks_[i].coordinateBytes();
-            if (blocks[coordinate] > 0) {
-                avatarIds[j] = blocks[coordinate];
-                j++;
-            }
+        for (uint256 i = 0; i < blocks_.length; i++) {
+            avatarIds[i] = blocks[blocks_[i].coordinateInt()];
         }
-        uint256[] memory nonzeroAvatarIds = new uint256[](j);
-        for (i = 0; i < j; i++) {
-            nonzeroAvatarIds[i] = avatarIds[i];
-        }
-        return nonzeroAvatarIds;
+        return avatarIds;
     }
 
     modifier onlyAvatar() {

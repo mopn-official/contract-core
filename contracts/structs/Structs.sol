@@ -9,7 +9,11 @@ struct Block {
 
 struct AvatarData {
     Block block_;
-    NFToken token_;
+    uint256 COID;
+    uint256 tokenId;
+    uint256 HP;
+    uint256 ATT;
+    uint256 STA;
 }
 
 struct CollectionData {

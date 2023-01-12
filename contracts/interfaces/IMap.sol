@@ -8,19 +8,15 @@ interface IMap {
         Block[] memory blocks
     ) external view returns (uint256[] memory);
 
-    function avatarMove(Block memory blockFrom, Block memory blockTo) external;
+    function avatarSet(
+        uint256 avatarId,
+        uint256 COID,
+        Block memory blockTo
+    ) external;
 
-    function avatarSet(uint256 avatarId, Block memory blockTo) external;
+    function avatarRemove(Block memory block_, uint256 COID) external;
 
     function getBlockAvatar(
         Block memory block_
     ) external view returns (uint256);
-
-    function getBlockAttackRangeAvatars(
-        Block memory block_
-    ) external view returns (uint256[] memory);
-
-    function getBlockSpheres(
-        Block memory block_
-    ) external view returns (Block[] memory);
 }

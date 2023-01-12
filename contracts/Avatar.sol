@@ -3,37 +3,35 @@ pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
 import "./interfaces/IMOPN.sol";
-import "./libraries/BlockMath.sol";
+import "./libraries/HexGridsMath.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
-struct MoveParams {
-    Block block_;
-    uint256 linkedAvatarId;
-    uint256 avatarId;
-    NFToken token_;
-}
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
 error linkBlockError();
 
-contract Avatar is ERC721 {
+contract Avatar is ERC721, Multicall {
     using BlockMath for Block;
 
     mapping(uint256 => AvatarData) public avatarNoumenon;
 
-    mapping(address => mapping(uint256 => uint256)) public tokenMap;
+    mapping(uint256 => mapping(uint256 => uint256)) public tokenMap;
 
-    mapping(address => uint256) public collectionMap;
+    mapping(uint256 => uint256) public collectionMap;
 
     IMap public Map;
+
+    IGovernance public Governance;
 
     uint256 public currentTokenId;
 
     constructor(
         string memory name_,
         string memory symbol_,
+        address governanceContract_,
         address mapContract_
     ) ERC721(name_, symbol_) {
         Map = IMap(mapContract_);
+        Governance = IGovernance(governanceContract_);
     }
 
     function getAvatarOccupiedBlock(
@@ -42,74 +40,86 @@ contract Avatar is ERC721 {
         return avatarNoumenon[avatarId].block_;
     }
 
-    function getAvatarSphereBlocks(
-        uint256 avatarId
-    ) public view returns (Block[] memory) {
-        return Map.getBlockSpheres(getAvatarOccupiedBlock(avatarId));
-    }
+    function mintAvatar(
+        NFToken calldata token_,
+        bytes32[] memory proofs
+    ) public returns (uint256) {
+        uint256 COID = Governance.checkWhitelistCOID(
+            token_.collectionContract,
+            proofs
+        );
+        require(tokenMap[COID][token_.tokenId] == 0, "avatar exist");
 
-    function mintAvatar(NFToken calldata token_) public returns (uint256) {
         currentTokenId++;
         _mint(msg.sender, currentTokenId);
-        avatarNoumenon[currentTokenId].token_ = token_;
-        tokenMap[token_.collectionContract][token_.tokenId] = currentTokenId;
+
+        avatarNoumenon[currentTokenId].COID = COID;
+        avatarNoumenon[currentTokenId].tokenId = token_.tokenId;
+
+        tokenMap[COID][token_.tokenId] = currentTokenId;
         return currentTokenId;
     }
 
     function moveTo(
-        MoveParams calldata moveParams
-    ) public linkBlockCheck(moveParams) blockCheck(moveParams.block_) {
-        attackEnemies(
-            moveParams.avatarId,
-            Map.getBlockAttackRangeAvatars(moveParams.block_)
-        );
-
-        Map.avatarMove(
-            avatarNoumenon[moveParams.avatarId].block_,
-            moveParams.block_
-        );
-        avatarNoumenon[moveParams.avatarId].block_ = moveParams.block_;
-    }
-
-    function jumpIn(
-        MoveParams calldata moveParams
-    ) public linkBlockCheck(moveParams) blockCheck(moveParams.block_) {
-        uint256 avatarId = tokenMap[moveParams.token_.collectionContract][
-            moveParams.token_.tokenId
-        ];
-        if (avatarId == 0) {
-            avatarId = mintAvatar(moveParams.token_);
-        } else {
-            require(
-                avatarNoumenon[avatarId].block_.equals(Block(0, 0, 0)),
-                "avatar is in map"
-            );
+        Block memory block_,
+        uint256 linkedAvatarId,
+        uint256 avatarId
+    ) public blockCheck(block_) {
+        if (linkedAvatarId > 0) {
+            if (block_.distance(avatarNoumenon[linkedAvatarId].block_) > 3) {
+                revert linkBlockError();
+            }
+        } else if (collectionMap[avatarNoumenon[avatarId].COID] > 0) {
+            revert linkBlockError();
         }
 
-        attackEnemies(
-            avatarId,
-            Map.getBlockAttackRangeAvatars(moveParams.block_)
-        );
+        Block[] memory blockAttackRange = getBlockAttackRange(block_);
+        BattleResult battleRes = attackEnemies(avatarId, blockAttackRange);
+        require(battleRes != BattleResult.Draw, "draw battle");
+        if (battleRes == BattleResult.Victory) {
+            if (!avatarNoumenon[avatarId].block_.equals(Block(0, 0, 0))) {
+                Map.avatarRemove(
+                    avatarNoumenon[avatarId].block_,
+                    avatarNoumenon[avatarId].COID
+                );
+            }
 
-        Map.avatarSet(avatarId, moveParams.block_);
-        collectionMap[moveParams.token_.collectionContract]++;
-        avatarNoumenon[avatarId].block_ = moveParams.block_;
+            Map.avatarSet(avatarId, avatarNoumenon[avatarId].COID, block_);
+            avatarNoumenon[avatarId].block_ = block_;
+        } else {
+            removeOut(avatarId);
+        }
+    }
+
+    function test(uint256 a) public pure returns (uint256) {
+        return a / 10000;
+    }
+
+    enum BattleResult {
+        Defeat,
+        Victory,
+        NoWin,
+        Draw
     }
 
     function attackEnemies(
         uint256 avatarId,
-        uint256[] memory attachAvatarIds
-    ) public {
+        Block[] memory blockAttackRange
+    ) internal returns (BattleResult battleRes) {
         AvatarData memory avatarData = avatarNoumenon[avatarId];
-        for (uint256 i = 0; i < attachAvatarIds.length; i++) {
+        uint256[] memory attackAvatarIds = Map.getBlocksAvatars(
+            blockAttackRange
+        );
+        battleRes = BattleResult.Victory;
+        for (uint256 i = 0; i < attackAvatarIds.length; i++) {
             if (
-                avatarNoumenon[attachAvatarIds[i]].token_.collectionContract ==
-                avatarData.token_.collectionContract
+                attackAvatarIds[i] == 0 ||
+                avatarNoumenon[attackAvatarIds[i]].COID == avatarData.COID
             ) {
                 continue;
             }
-            if (!attackEnemy(avatarId, attachAvatarIds[i])) {
-                avatarNoumenon[avatarId].block_ = Block(0, 0, 0);
+            battleRes = attackEnemy(avatarId, attackAvatarIds[i]);
+            if (BattleResult.Victory != battleRes) {
                 break;
             }
         }
@@ -118,31 +128,42 @@ contract Avatar is ERC721 {
     function attackEnemy(
         uint256 avatarId,
         uint256 enemyAvatarId
-    ) public returns (bool) {
+    ) public returns (BattleResult batteRes) {
         //todo battle
-        avatarNoumenon[enemyAvatarId].block_ = Block(0, 0, 0);
-        return true;
+        if (
+            avatarNoumenon[avatarId].ATT == 0 &&
+            avatarNoumenon[enemyAvatarId].ATT == 0
+        ) {
+            return BattleResult.Draw;
+        }
+        removeOut(enemyAvatarId);
+        return BattleResult.Victory;
+    }
+
+    function removeOut(uint256 avatarId) internal {
+        Map.avatarRemove(
+            avatarNoumenon[avatarId].block_,
+            avatarNoumenon[avatarId].COID
+        );
+        avatarNoumenon[avatarId].block_ = Block(0, 0, 0);
+        claimEnergy(avatarId);
     }
 
     function claimEnergy(uint256 avatarId) public {}
 
-    modifier linkBlockCheck(MoveParams calldata moveParams) {
-        if (moveParams.linkedAvatarId > 0) {
-            if (
-                moveParams.block_.distance(
-                    avatarNoumenon[moveParams.linkedAvatarId].block_
-                ) > 2
-            ) {
-                revert linkBlockError();
-            }
-        } else if (moveParams.token_.collectionContract != address(0)) {
-            if (collectionMap[moveParams.token_.collectionContract] > 0) {
-                revert linkBlockError();
-            }
-        } else {
-            revert linkBlockError();
-        }
-        _;
+    function getBlockAttackRange(
+        Block memory block_
+    ) public pure returns (Block[] memory) {
+        uint256[] memory ringNums = new uint256[](2);
+        ringNums[0] = 1;
+        ringNums[0] = 2;
+        return HexGridsMath.blockRingBlocks(block_, ringNums);
+    }
+
+    function getBlockSpheres(
+        Block memory block_
+    ) public pure returns (Block[] memory) {
+        return HexGridsMath.blockSpheres(block_);
     }
 
     modifier blockCheck(Block memory block_) {

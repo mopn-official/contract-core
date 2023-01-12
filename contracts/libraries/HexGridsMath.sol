@@ -15,8 +15,7 @@ bytes constant initBlockLevels = "678851ac687a239ab7ba923c49bcbb995c45accb6b508c
 library HexGridsMath {
     using BlockMath for Block;
 
-    function PassIdRingNum(uint256 PassId) public pure returns (uint256 n) {
-        // PassId = 3 * n * n + 3 * n + 1;
+    function PassRingNum(uint256 PassId) public pure returns (uint256 n) {
         n = (Math.sqrt(9 + 12 * (PassId - 1)) - 3) / (6);
         if ((3 * n * n + 3 * n + 1) == PassId) {
             return n;
@@ -25,12 +24,12 @@ library HexGridsMath {
         }
     }
 
-    function PassIdRingPos(uint256 PassId) public pure returns (uint256) {
-        uint256 ringNum = PassIdRingNum(PassId) - 1;
+    function PassRingPos(uint256 PassId) public pure returns (uint256) {
+        uint256 ringNum = PassRingNum(PassId) - 1;
         return PassId - (3 * ringNum * ringNum + 3 * ringNum + 1);
     }
 
-    function PassIdRingStartCenterBlock(
+    function PassRingStartCenterBlock(
         uint256 PassIdRingNum_
     ) public pure returns (Block memory) {
         int16 PassIdRingNum__ = int16(uint16(PassIdRingNum_));
@@ -42,17 +41,17 @@ library HexGridsMath {
             );
     }
 
-    function PassIdCenterBlock(
+    function PassCenterBlock(
         uint256 PassId
     ) public pure returns (Block memory block_) {
         if (PassId == 1) {
             return block_;
         }
 
-        uint256 PassIdRingNum_ = PassIdRingNum(PassId);
+        uint256 PassIdRingNum_ = PassRingNum(PassId);
         int256 PassIdRingNum__ = int256(PassIdRingNum_);
-        Block memory startblock = PassIdRingStartCenterBlock(PassIdRingNum_);
-        uint256 PassIdRingPos_ = PassIdRingPos(PassId);
+        Block memory startblock = PassRingStartCenterBlock(PassIdRingNum_);
+        uint256 PassIdRingPos_ = PassRingPos(PassId);
         int256 PassIdRingPos__ = int256(PassIdRingPos_) - 1;
 
         uint256 side = Math.ceilDiv(PassIdRingPos_, PassIdRingNum_);
@@ -88,7 +87,7 @@ library HexGridsMath {
         }
     }
 
-    function PassIdBlockRange(
+    function PassBlockRange(
         Block memory centerBlock_
     ) public pure returns (int16[] memory, int16[] memory, int16[] memory) {
         int16[] memory xrange = new int16[](11);
@@ -112,7 +111,7 @@ library HexGridsMath {
         Block memory block_,
         uint256 PassId
     ) public pure returns (int16 blockIndex_) {
-        Block memory centerPointBlock = PassIdCenterBlock(PassId);
+        Block memory centerPointBlock = PassCenterBlock(PassId);
         int16 dis = centerPointBlock.distance(block_);
         if (dis > 5) revert BlockNotInPass();
         dis--;
@@ -221,6 +220,21 @@ library HexGridsMath {
                     startBlock = startBlock.neighbor(j);
                 }
             }
+        }
+
+        return blocks;
+    }
+
+    function blockSpheres(
+        Block memory block_
+    ) public pure returns (Block[] memory) {
+        Block[] memory blocks = new Block[](6);
+
+        Block memory startBlock = Block(block_.x, block_.y + 1, block_.z - 1);
+
+        for (uint256 i = 0; i < 6; i++) {
+            blocks[i] = startBlock;
+            startBlock = startBlock.neighbor(i);
         }
 
         return blocks;
