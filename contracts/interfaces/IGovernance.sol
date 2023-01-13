@@ -19,4 +19,10 @@ interface IGovernance {
     function getCOID(
         address collectionContract
     ) external view returns (uint256);
+
+    function addCollectionBLER(uint256 COID, uint256 bler) external;
+
+    function SubCollectionBLER(uint256 COID, uint256 bler) external;
+
+    function passContract() external view returns (address);
 }

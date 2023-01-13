@@ -8,7 +8,7 @@ struct Block {
 }
 
 struct AvatarData {
-    Block block_;
+    uint64 blockCoordinatInt;
     uint256 COID;
     uint256 tokenId;
     uint256 HP;

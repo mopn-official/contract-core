@@ -67,23 +67,34 @@ library BlockMath {
 
     function coordinateInt(
         Block memory block_
-    ) public pure returns (uint256 ckey) {
+    ) public pure returns (uint64 ckey) {
         unchecked {
-            ckey = uint256(int256(int16abs(block_.x))) * 100000000;
+            ckey = uint64(int64(int16abs(block_.x))) * 100000000;
             ckey = block_.x >= 0 ? ckey : ckey + 100000000000;
 
-            ckey += uint256(int256(int16abs(block_.y))) * 10000;
+            ckey += uint64(int64(int16abs(block_.y))) * 10000;
             ckey = block_.y >= 0 ? ckey : ckey + 10000000;
 
-            ckey += uint256(int256(int16abs(block_.z)));
+            ckey += uint64(int64(int16abs(block_.z)));
             ckey = block_.z >= 0 ? ckey : ckey + 1000;
         }
     }
 
     function fromCoordinateInt(
-        uint256 coordinateInt_
-    ) public pure returns (Block memory) {
-        uint256 xdata = coordinateInt_ / 100000000;
+        uint64 coordinateInt_
+    ) public pure returns (Block memory block_) {
+        int64 coordinateInt__ = int64(coordinateInt_);
+        int16 xdata = int16(int64(coordinateInt__) / 100000000);
+        block_.x = xdata % 1000;
+        if (xdata > 1000) block_.x = -block_.x;
+
+        int16 ydata = int16((coordinateInt__ % 100000000) / 10000);
+        block_.y = ydata % 1000;
+        if (ydata > 1000) block_.y = -block_.y;
+
+        int16 zdata = int16(coordinateInt__ % 10000);
+        block_.z = zdata % 1000;
+        if (zdata > 1000) block_.z = -block_.z;
     }
 
     function int16abs(int16 n) internal pure returns (int16) {

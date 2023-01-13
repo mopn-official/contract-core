@@ -4,12 +4,11 @@ pragma solidity ^0.8.17;
 import "hardhat/console.sol";
 import "./interfaces/IMOPN.sol";
 import "./libraries/HexGridsMath.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 error linkBlockError();
 
-contract Avatar is ERC721, Multicall {
+contract Avatar is Multicall {
     using BlockMath for Block;
 
     mapping(uint256 => AvatarData) public avatarNoumenon;
@@ -22,14 +21,9 @@ contract Avatar is ERC721, Multicall {
 
     IGovernance public Governance;
 
-    uint256 public currentTokenId;
+    uint256 public currentAvatarId;
 
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        address governanceContract_,
-        address mapContract_
-    ) ERC721(name_, symbol_) {
+    constructor(address governanceContract_, address mapContract_) {
         Map = IMap(mapContract_);
         Governance = IGovernance(governanceContract_);
     }
@@ -37,7 +31,16 @@ contract Avatar is ERC721, Multicall {
     function getAvatarOccupiedBlock(
         uint256 avatarId
     ) public view returns (Block memory) {
-        return avatarNoumenon[avatarId].block_;
+        return
+            BlockMath.fromCoordinateInt(
+                avatarNoumenon[avatarId].blockCoordinatInt
+            );
+    }
+
+    function getAvatarOccupiedBlockInt(
+        uint256 avatarId
+    ) public view returns (uint64) {
+        return avatarNoumenon[avatarId].blockCoordinatInt;
     }
 
     function mintAvatar(
@@ -50,49 +53,83 @@ contract Avatar is ERC721, Multicall {
         );
         require(tokenMap[COID][token_.tokenId] == 0, "avatar exist");
 
-        currentTokenId++;
-        _mint(msg.sender, currentTokenId);
+        currentAvatarId++;
 
-        avatarNoumenon[currentTokenId].COID = COID;
-        avatarNoumenon[currentTokenId].tokenId = token_.tokenId;
+        avatarNoumenon[currentAvatarId].COID = COID;
+        avatarNoumenon[currentAvatarId].tokenId = token_.tokenId;
 
-        tokenMap[COID][token_.tokenId] = currentTokenId;
-        return currentTokenId;
+        tokenMap[COID][token_.tokenId] = currentAvatarId;
+        return currentAvatarId;
     }
 
     function moveTo(
         Block memory block_,
+        uint16[] memory PassIds,
+        uint8[] memory spheresPassIds,
         uint256 linkedAvatarId,
         uint256 avatarId
     ) public blockCheck(block_) {
         if (linkedAvatarId > 0) {
-            if (block_.distance(avatarNoumenon[linkedAvatarId].block_) > 3) {
+            if (
+                block_.distance(
+                    BlockMath.fromCoordinateInt(
+                        avatarNoumenon[linkedAvatarId].blockCoordinatInt
+                    )
+                ) > 3
+            ) {
                 revert linkBlockError();
             }
         } else if (collectionMap[avatarNoumenon[avatarId].COID] > 0) {
             revert linkBlockError();
         }
 
-        Block[] memory blockAttackRange = getBlockAttackRange(block_);
-        BattleResult battleRes = attackEnemies(avatarId, blockAttackRange);
-        require(battleRes != BattleResult.Draw, "draw battle");
-        if (battleRes == BattleResult.Victory) {
-            if (!avatarNoumenon[avatarId].block_.equals(Block(0, 0, 0))) {
-                Map.avatarRemove(
-                    avatarNoumenon[avatarId].block_,
-                    avatarNoumenon[avatarId].COID
+        uint64[] memory blockIntAttackRange = getBlockAttackRange(block_);
+
+        if (
+            attackEnemies(avatarId, blockIntAttackRange) == BattleResult.Victory
+        ) {
+            bytes32[] memory randomseed = new bytes32[](3);
+            Block[] memory centerBlocks = new Block[](3);
+
+            uint256 i;
+            for (i = 0; i < PassIds.length; i++) {
+                randomseed[i] = keccak256(
+                    abi.encodePacked(Governance.passContract(), PassIds[i])
+                );
+                centerBlocks[i] = HexGridsMath.PassCenterBlock(PassIds[i]);
+            }
+
+            uint8[] memory blockLevels = new uint8[](7);
+            blockLevels[0] = HexGridsMath.blockLevel(
+                randomseed[spheresPassIds[0]],
+                HexGridsMath.blockIndex(block_, centerBlocks[spheresPassIds[0]])
+            );
+            for (i = 1; i < 7; i++) {
+                blockLevels[i] = HexGridsMath.blockLevel(
+                    randomseed[spheresPassIds[i]],
+                    HexGridsMath.blockIndex(
+                        BlockMath.fromCoordinateInt(blockIntAttackRange[i]),
+                        centerBlocks[spheresPassIds[i]]
+                    )
                 );
             }
 
-            Map.avatarSet(avatarId, avatarNoumenon[avatarId].COID, block_);
-            avatarNoumenon[avatarId].block_ = block_;
-        } else {
-            removeOut(avatarId);
-        }
-    }
+            if (avatarNoumenon[avatarId].blockCoordinatInt != 0) {
+                Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt);
+            }
 
-    function test(uint256 a) public pure returns (uint256) {
-        return a / 10000;
+            avatarNoumenon[avatarId].blockCoordinatInt = block_.coordinateInt();
+
+            Map.avatarSet(
+                avatarId,
+                avatarNoumenon[avatarId].COID,
+                avatarNoumenon[avatarId].blockCoordinatInt,
+                blockIntAttackRange,
+                blockLevels
+            );
+        } else {
+            deFeat(avatarId);
+        }
     }
 
     enum BattleResult {
@@ -104,7 +141,7 @@ contract Avatar is ERC721, Multicall {
 
     function attackEnemies(
         uint256 avatarId,
-        Block[] memory blockAttackRange
+        uint64[] memory blockAttackRange
     ) internal returns (BattleResult battleRes) {
         AvatarData memory avatarData = avatarNoumenon[avatarId];
         uint256[] memory attackAvatarIds = Map.getBlocksAvatars(
@@ -123,6 +160,7 @@ contract Avatar is ERC721, Multicall {
                 break;
             }
         }
+        require(battleRes != BattleResult.Draw, "draw battle");
     }
 
     function attackEnemy(
@@ -136,16 +174,13 @@ contract Avatar is ERC721, Multicall {
         ) {
             return BattleResult.Draw;
         }
-        removeOut(enemyAvatarId);
+        deFeat(enemyAvatarId);
         return BattleResult.Victory;
     }
 
-    function removeOut(uint256 avatarId) internal {
-        Map.avatarRemove(
-            avatarNoumenon[avatarId].block_,
-            avatarNoumenon[avatarId].COID
-        );
-        avatarNoumenon[avatarId].block_ = Block(0, 0, 0);
+    function deFeat(uint256 avatarId) internal {
+        Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt);
+        avatarNoumenon[avatarId].blockCoordinatInt = 0;
         claimEnergy(avatarId);
     }
 
@@ -153,22 +188,16 @@ contract Avatar is ERC721, Multicall {
 
     function getBlockAttackRange(
         Block memory block_
-    ) public pure returns (Block[] memory) {
-        uint256[] memory ringNums = new uint256[](2);
-        ringNums[0] = 1;
-        ringNums[0] = 2;
-        return HexGridsMath.blockRingBlocks(block_, ringNums);
-    }
-
-    function getBlockSpheres(
-        Block memory block_
-    ) public pure returns (Block[] memory) {
-        return HexGridsMath.blockSpheres(block_);
+    ) public pure returns (uint64[] memory) {
+        return HexGridsMath.blockSpiralRingBlockInts(block_, 2);
     }
 
     modifier blockCheck(Block memory block_) {
         block_.check();
-        require(Map.getBlockAvatar(block_) == 0, "block not available");
+        require(
+            Map.getBlockAvatar(block_.coordinateInt()) == 0,
+            "block not available"
+        );
         _;
     }
 }

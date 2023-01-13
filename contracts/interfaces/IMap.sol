@@ -5,18 +5,18 @@ import "../structs/Structs.sol";
 
 interface IMap {
     function getBlocksAvatars(
-        Block[] memory blocks
+        uint64[] memory blocks
     ) external view returns (uint256[] memory);
 
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
-        Block memory blockTo
+        uint64 blockTo,
+        uint64[] memory blockSphere,
+        uint8[] memory blockLevels
     ) external;
 
-    function avatarRemove(Block memory block_, uint256 COID) external;
+    function avatarRemove(uint64 blockcoordinate) external;
 
-    function getBlockAvatar(
-        Block memory block_
-    ) external view returns (uint256);
+    function getBlockAvatar(uint64 block_) external view returns (uint256);
 }

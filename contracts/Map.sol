@@ -7,11 +7,11 @@ import "./libraries/HexGridsMath.sol";
 contract Map {
     using BlockMath for Block;
     // Block => avatarId
-    mapping(uint256 => uint256) public blocks;
+    mapping(uint64 => uint256) public blocks;
 
-    mapping(uint256 => uint256) public coblocks;
+    mapping(uint64 => uint256) public coblocks;
 
-    uint256[12] blockLevel = [
+    uint256[12] blers = [
         125000000000000000,
         250000000000000000,
         375000000000000000,
@@ -27,60 +27,82 @@ contract Map {
     ];
 
     IAvatar public Avatar;
+    IGovernance public Governance;
 
     function setAvatarContract(address avatarContract_) public {
         Avatar = IAvatar(avatarContract_);
     }
 
+    function setGovernanceContract(address governanceContract) public {
+        Governance = IGovernance(governanceContract);
+    }
+
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
-        Block memory blockTo
-    ) public onlyAvatar {
-        blocks[blockTo.coordinateInt()] = avatarId;
-        coBlockAdd(blockTo.coordinateInt(), COID);
-        Block[] memory blockSpheres = HexGridsMath.blockSpheres(blockTo);
-        for (uint256 i; i < blockSpheres.length; i++) {
-            coBlockAdd(blockSpheres[i].coordinateInt(), COID);
+        uint64 blockTo,
+        uint64[] memory blockSpheres,
+        uint8[] memory blockLevels
+    ) public onlyAvatar returns (uint256 bler) {
+        blocks[blockTo] = avatarId;
+        bler += coBlockAdd(blockTo, COID, blockLevels[0]);
+        for (uint256 i = 0; i < 6; i++) {
+            bler += coBlockAdd(blockSpheres[i], COID, blockLevels[i + 1]);
+        }
+        if (bler > 0) {
+            Governance.addCollectionBLER(COID, bler);
         }
     }
 
-    function avatarRemove(Block memory block_, uint256 COID) public {
-        blocks[block_.coordinateInt()] = 0;
-        coBlockSub(block_.coordinateInt(), COID);
-        Block[] memory blockSpheres = HexGridsMath.blockSpheres(block_);
-        for (uint256 i; i < blockSpheres.length; i++) {
-            coBlockSub(blockSpheres[i].coordinateInt(), COID);
+    function avatarRemove(uint64 block_) public {
+        blocks[block_] = 0;
+        coBlockSub(block_);
+        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
+            BlockMath.fromCoordinateInt(block_)
+        );
+        for (uint256 i = 0; i < 6; i++) {
+            coBlockSub(blockSpheres[i]);
         }
     }
 
-    function coBlockAdd(uint256 blockcoordinate, uint256 COID) private {
+    function coBlockAdd(
+        uint64 blockcoordinate,
+        uint256 COID,
+        uint8 blockLevel
+    ) private returns (uint256 bler) {
+        if (coblocks[blockcoordinate] == 0) {
+            bler = blers[blockLevel - 1];
+        }
         coblocks[blockcoordinate] =
             COID *
+            1000 +
+            blockLevel *
             10 +
             (coblocks[blockcoordinate] % 10) +
             1;
     }
 
-    function coBlockSub(uint256 blockcoordinate, uint256 COID) private {
+    function coBlockSub(uint64 blockcoordinate) private returns (uint256 bler) {
         uint256 left = (coblocks[blockcoordinate] % 10);
         if (left == 0 || left == 1) {
+            uint256 blockLevel = (coblocks[blockcoordinate] % 1000) / 10;
+            bler = blers[blockLevel - 1];
             coblocks[blockcoordinate] = 0;
         } else {
-            coblocks[blockcoordinate] = COID * 10 + left - 1;
+            coblocks[blockcoordinate] -= 1;
         }
     }
 
-    function getBlockAvatar(Block memory block_) public view returns (uint256) {
-        return blocks[block_.coordinateInt()];
+    function getBlockAvatar(uint64 block_) public view returns (uint256) {
+        return blocks[block_];
     }
 
     function getBlocksAvatars(
-        Block[] memory blocks_
+        uint64[] memory blockcoordinates
     ) public view returns (uint256[] memory) {
-        uint256[] memory avatarIds = new uint256[](blocks_.length);
-        for (uint256 i = 0; i < blocks_.length; i++) {
-            avatarIds[i] = blocks[blocks_[i].coordinateInt()];
+        uint256[] memory avatarIds = new uint256[](blockcoordinates.length);
+        for (uint256 i = 0; i < blockcoordinates.length; i++) {
+            avatarIds[i] = blocks[blockcoordinates[i]];
         }
         return avatarIds;
     }

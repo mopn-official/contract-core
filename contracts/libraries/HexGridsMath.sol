@@ -4,7 +4,6 @@ pragma solidity ^0.8.17;
 import "./BlockMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
-import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 
 error BlockIndexOverFlow();
 error BlockNotInPass();
@@ -15,8 +14,8 @@ bytes constant initBlockLevels = "678851ac687a239ab7ba923c49bcbb995c45accb6b508c
 library HexGridsMath {
     using BlockMath for Block;
 
-    function PassRingNum(uint256 PassId) public pure returns (uint256 n) {
-        n = (Math.sqrt(9 + 12 * (PassId - 1)) - 3) / (6);
+    function PassRingNum(uint16 PassId) public pure returns (uint16 n) {
+        n = uint16((Math.sqrt(9 + 12 * (PassId - 1)) - 3) / (6));
         if ((3 * n * n + 3 * n + 1) == PassId) {
             return n;
         } else {
@@ -24,15 +23,15 @@ library HexGridsMath {
         }
     }
 
-    function PassRingPos(uint256 PassId) public pure returns (uint256) {
-        uint256 ringNum = PassRingNum(PassId) - 1;
+    function PassRingPos(uint16 PassId) public pure returns (uint16) {
+        uint16 ringNum = PassRingNum(PassId) - 1;
         return PassId - (3 * ringNum * ringNum + 3 * ringNum + 1);
     }
 
     function PassRingStartCenterBlock(
-        uint256 PassIdRingNum_
+        uint16 PassIdRingNum_
     ) public pure returns (Block memory) {
-        int16 PassIdRingNum__ = int16(uint16(PassIdRingNum_));
+        int16 PassIdRingNum__ = int16(PassIdRingNum_);
         return
             Block(
                 -PassIdRingNum__ * 5,
@@ -42,22 +41,22 @@ library HexGridsMath {
     }
 
     function PassCenterBlock(
-        uint256 PassId
+        uint16 PassId
     ) public pure returns (Block memory block_) {
         if (PassId == 1) {
             return block_;
         }
 
-        uint256 PassIdRingNum_ = PassRingNum(PassId);
-        int256 PassIdRingNum__ = int256(PassIdRingNum_);
+        uint16 PassIdRingNum_ = PassRingNum(PassId);
+        int16 PassIdRingNum__ = int16(PassIdRingNum_);
         Block memory startblock = PassRingStartCenterBlock(PassIdRingNum_);
-        uint256 PassIdRingPos_ = PassRingPos(PassId);
-        int256 PassIdRingPos__ = int256(PassIdRingPos_) - 1;
+        uint16 PassIdRingPos_ = PassRingPos(PassId);
+        int16 PassIdRingPos__ = int16(PassIdRingPos_) - 1;
 
         uint256 side = Math.ceilDiv(PassIdRingPos_, PassIdRingNum_);
         int16 sidepos = 0;
         if (PassIdRingNum__ > 1) {
-            sidepos = int16(PassIdRingPos__ % PassIdRingNum__);
+            sidepos = PassIdRingPos__ % PassIdRingNum__;
         }
 
         if (side == 1) {
@@ -93,13 +92,14 @@ library HexGridsMath {
         int16[] memory xrange = new int16[](11);
         int16[] memory yrange = new int16[](11);
         int16[] memory zrange = new int16[](11);
-        for (uint256 i = 1; i < 6; i++) {
-            xrange[i * 2] = centerBlock_.x + int16(uint16(i));
-            xrange[i * 2 - 1] = centerBlock_.x - int16(uint16(i));
-            yrange[i * 2] = centerBlock_.y + int16(uint16(i));
-            yrange[i * 2 - 1] = centerBlock_.y - int16(uint16(i));
-            zrange[i * 2] = centerBlock_.z + int16(uint16(i));
-            zrange[i * 2 - 1] = centerBlock_.z - int16(uint16(i));
+        for (uint16 i = 1; i < 6; i++) {
+            int16 i16 = int16(i);
+            xrange[i * 2] = centerBlock_.x + i16;
+            xrange[i * 2 - 1] = centerBlock_.x - i16;
+            yrange[i * 2] = centerBlock_.y + i16;
+            yrange[i * 2 - 1] = centerBlock_.y - i16;
+            zrange[i * 2] = centerBlock_.z + i16;
+            zrange[i * 2 - 1] = centerBlock_.z - i16;
         }
         xrange[0] = centerBlock_.x;
         yrange[0] = centerBlock_.y;
@@ -109,13 +109,12 @@ library HexGridsMath {
 
     function blockIndex(
         Block memory block_,
-        uint256 PassId
-    ) public pure returns (int16 blockIndex_) {
-        Block memory centerPointBlock = PassCenterBlock(PassId);
+        Block memory centerPointBlock
+    ) public pure returns (uint256) {
         int16 dis = centerPointBlock.distance(block_);
         if (dis > 5) revert BlockNotInPass();
         dis--;
-        blockIndex_ = 3 * dis * dis + 3 * dis;
+        int16 blockIndex_ = 3 * dis * dis + 3 * dis;
         dis++;
         block_ = block_.subtract(centerPointBlock);
         if (block_.x >= 0 && block_.y > 0 && block_.z < 0) {
@@ -131,6 +130,7 @@ library HexGridsMath {
         } else {
             blockIndex_ += Block(-dis, dis, 0).distance(block_) + 1 + dis * 5;
         }
+        return uint256(int256(blockIndex_));
     }
 
     function blockLevels(
@@ -196,27 +196,48 @@ library HexGridsMath {
         }
     }
 
-    function blockRingBlocks(
+    function blockSpiralRingBlocks(
         Block memory block_,
-        uint256[] memory ringNums
+        uint256 radius
     ) public pure returns (Block[] memory) {
-        uint256 blockNum;
-        uint256 i;
-        for (i = 0; i < ringNums.length; i++) {
-            blockNum += ringNums[i] * 6;
-        }
+        uint256 blockNum = 3 * radius * radius + 3 * radius;
         Block[] memory blocks = new Block[](blockNum);
 
-        for (i = 0; i < ringNums.length; i++) {
+        for (uint256 i = 0; i < radius; i++) {
             Block memory startBlock = Block(
                 block_.x,
-                block_.y + int16(int256(ringNums[i])),
-                block_.z - int16(int256(ringNums[i]))
+                block_.y + int16(int256(i)),
+                block_.z - int16(int256(i))
             );
 
             for (uint256 j = 0; j < 6; j++) {
-                for (uint256 k = 0; k < ringNums[i]; k++) {
-                    blocks[j * ringNums[i] + k] = startBlock;
+                for (uint256 k = 0; k < i; k++) {
+                    blocks[j * i + k] = startBlock;
+                    startBlock = startBlock.neighbor(j);
+                }
+            }
+        }
+
+        return blocks;
+    }
+
+    function blockSpiralRingBlockInts(
+        Block memory block_,
+        uint256 radius
+    ) public pure returns (uint64[] memory) {
+        uint256 blockNum = 3 * radius * radius + 3 * radius;
+        uint64[] memory blocks = new uint64[](blockNum);
+
+        for (uint256 i = 0; i < radius; i++) {
+            Block memory startBlock = Block(
+                block_.x,
+                block_.y + int16(int256(i)),
+                block_.z - int16(int256(i))
+            );
+
+            for (uint256 j = 0; j < 6; j++) {
+                for (uint256 k = 0; k < i; k++) {
+                    blocks[j * i + k] = startBlock.coordinateInt();
                     startBlock = startBlock.neighbor(j);
                 }
             }
@@ -234,6 +255,21 @@ library HexGridsMath {
 
         for (uint256 i = 0; i < 6; i++) {
             blocks[i] = startBlock;
+            startBlock = startBlock.neighbor(i);
+        }
+
+        return blocks;
+    }
+
+    function blockIntSpheres(
+        Block memory block_
+    ) public pure returns (uint64[] memory) {
+        uint64[] memory blocks = new uint64[](6);
+
+        Block memory startBlock = Block(block_.x, block_.y + 1, block_.z - 1);
+
+        for (uint256 i = 0; i < 6; i++) {
+            blocks[i] = startBlock.coordinateInt();
             startBlock = startBlock.neighbor(i);
         }
 

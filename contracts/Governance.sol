@@ -5,9 +5,24 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Governance is Ownable {
+    struct AvatarStat {
+        uint256 startRound;
+        uint256 lastCollectTimeStamp;
+    }
+    struct CollectionBLERRound {
+        uint256 participants;
+        uint256 amount;
+    }
+    struct CollectionBLERRounds {
+        uint256 BLER;
+        uint256 currentRound;
+        mapping(uint256 => CollectionBLERRound) Rounds;
+    }
     address public energyContract;
 
     address public passContract;
+
+    address public mapContract;
 
     bytes32 public whiteListRoot;
 
@@ -15,7 +30,9 @@ contract Governance is Ownable {
 
     mapping(address => uint256) public COIDMap;
 
-    mapping(uint256 => uint256) public CollctionBLER;
+    mapping(uint256 => CollectionBLERRounds) public CollctionBLER;
+
+    mapping(uint256 => AvatarStat) public AvatarStats;
 
     function checkWhitelistCOID(
         address collectionContract,
@@ -49,6 +66,10 @@ contract Governance is Ownable {
         whiteListRoot = whiteListRoot_;
     }
 
+    function updateMapContract(address mapContract_) public onlyOwner {
+        mapContract = mapContract_;
+    }
+
     function getCOID(address collectionContract) public view returns (uint256) {
         return COIDMap[collectionContract];
     }
@@ -56,5 +77,18 @@ contract Governance is Ownable {
     function generateCOID(address collectionContract) internal {
         COIDCounter++;
         COIDMap[collectionContract] = COIDCounter;
+    }
+
+    function addCollectionBLER(uint256 COID, uint256 bler) public onlyMap {
+        CollctionBLER[COID].BLER += bler;
+    }
+
+    function SubCollectionBLER(uint256 COID, uint256 bler) public onlyMap {
+        CollctionBLER[COID].BLER -= bler;
+    }
+
+    modifier onlyMap() {
+        require(msg.sender == mapContract, "not allowed");
+        _;
     }
 }

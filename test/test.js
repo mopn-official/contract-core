@@ -23,11 +23,6 @@ describe("MOPN", function () {
     await governance.deployed();
     console.log("Governance", governance.address);
 
-    const setroottx = await governance.updateWhiteList(
-      "0xb6ed762e8f2d2616d1161b1379878a2c05a049a760d707deff79de4bccd39730"
-    );
-    await setroottx.wait();
-
     const Map = await ethers.getContractFactory("Map", {
       libraries: {
         BlockMath: blockMath.address,
@@ -44,12 +39,22 @@ describe("MOPN", function () {
         HexGridsMath: hexGridsMath.address,
       },
     });
-    avatar = await Avatar.deploy("MOPN Avatar", "MOPNA", governance.address, map.address);
+    avatar = await Avatar.deploy(governance.address, map.address);
     await avatar.deployed();
     console.log("Avatar", avatar.address);
 
     const mapsetavatarcontracttx = await map.setAvatarContract(avatar.address);
     await mapsetavatarcontracttx.wait();
+
+    const setroottx = await governance.updateWhiteList(
+      "0xb6ed762e8f2d2616d1161b1379878a2c05a049a760d707deff79de4bccd39730"
+    );
+    await setroottx.wait();
+    const setmaptx = await governance.updateMapContract(map.address);
+    await setmaptx.wait();
+
+    const mapsetgovernancecontracttx = await map.setGovernanceContract(governance.address);
+    await mapsetgovernancecontracttx.wait();
   });
 
   it("test mint nft", async function () {
@@ -71,23 +76,19 @@ describe("MOPN", function () {
     );
     await mintTx2.wait();
 
-    const moveToTx = await avatar.moveTo([1, -1, 0], 0, 1);
+    // [0, 0, 0, 0, 0, 0, 0]
+    const moveToTx = await avatar.moveTo([1, -1, 0], [1], [1, 1, 1, 1, 1, 1, 1], 0, 1);
     await moveToTx.wait();
 
-    const moveTo1Tx = await avatar.moveTo([0, 2, -2], 0, 2);
+    const moveTo1Tx = await avatar.moveTo([0, 2, -2], [1], [1, 1, 1, 1, 1, 1, 1], 0, 2);
     await moveTo1Tx.wait();
 
-    const moveTo2Tx = await avatar.moveTo([-3, 2, 1], 2, 3);
+    const moveTo2Tx = await avatar.moveTo([-3, 2, 1], [1], [1, 1, 1, 1, 1, 1, 1], 2, 3);
     await moveTo2Tx.wait();
 
     const avatarblock = await avatar.getAvatarOccupiedBlock(1);
     console.log(avatarblock);
 
-    const blocks = await avatar.getBlockSpheres(avatarblock);
-    console.log(blocks);
-
-    console.log(await map.getBlocksAvatars(blocks));
-
-    console.log(await avatar.test(1));
+    console.log(await avatar.getAvatarOccupiedBlockInt(1));
   });
 });
