@@ -11,7 +11,7 @@ contract Map {
 
     mapping(uint64 => uint256) public coblocks;
 
-    uint256[12] blers = [
+    uint256[13] blers = [
         125000000000000000,
         250000000000000000,
         375000000000000000,
@@ -23,7 +23,8 @@ contract Map {
         1125000000000000000,
         1250000000000000000,
         1375000000000000000,
-        1500000000000000000
+        1500000000000000000,
+        0
     ];
 
     IAvatar public Avatar;
@@ -49,19 +50,18 @@ contract Map {
         for (uint256 i = 0; i < 6; i++) {
             bler += coBlockAdd(blockSpheres[i], COID, blockLevels[i + 1]);
         }
-        if (bler > 0) {
-            Governance.addCollectionBLER(COID, bler);
-        }
     }
 
-    function avatarRemove(uint64 block_) public {
+    function avatarRemove(
+        uint64 block_
+    ) public onlyAvatar returns (uint256 bler) {
         blocks[block_] = 0;
-        coBlockSub(block_);
+        bler += coBlockSub(block_);
         uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
             BlockMath.fromCoordinateInt(block_)
         );
         for (uint256 i = 0; i < 6; i++) {
-            coBlockSub(blockSpheres[i]);
+            bler += coBlockSub(blockSpheres[i]);
         }
     }
 
@@ -71,7 +71,7 @@ contract Map {
         uint8 blockLevel
     ) private returns (uint256 bler) {
         if (coblocks[blockcoordinate] == 0) {
-            bler = blers[blockLevel - 1];
+            bler = blers[blockLevel];
         }
         coblocks[blockcoordinate] =
             COID *
@@ -86,7 +86,7 @@ contract Map {
         uint256 left = (coblocks[blockcoordinate] % 10);
         if (left == 0 || left == 1) {
             uint256 blockLevel = (coblocks[blockcoordinate] % 1000) / 10;
-            bler = blers[blockLevel - 1];
+            bler = blers[blockLevel];
             coblocks[blockcoordinate] = 0;
         } else {
             coblocks[blockcoordinate] -= 1;
@@ -105,6 +105,18 @@ contract Map {
             avatarIds[i] = blocks[blockcoordinates[i]];
         }
         return avatarIds;
+    }
+
+    function getBlocksCOIDs(
+        uint64[] memory blockcoordinates
+    ) public view returns (uint256[] memory) {
+        uint256[] memory COIDs = new uint256[](blockcoordinates.length);
+        for (uint256 i = 0; i < blockcoordinates.length; i++) {
+            COIDs[i] = coblocks[blockcoordinates[i]] > 0
+                ? coblocks[blockcoordinates[i]] / 1000
+                : 0;
+        }
+        return COIDs;
     }
 
     modifier onlyAvatar() {

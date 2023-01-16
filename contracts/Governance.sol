@@ -22,6 +22,8 @@ contract Governance is Ownable {
 
     address public passContract;
 
+    address public avatarContract;
+
     address public mapContract;
 
     bytes32 public whiteListRoot;
@@ -70,6 +72,14 @@ contract Governance is Ownable {
         mapContract = mapContract_;
     }
 
+    function updateAvatarContract(address avatarContract_) public onlyOwner {
+        avatarContract = avatarContract_;
+    }
+
+    function updatePassContract(address passContract_) public onlyOwner {
+        passContract = passContract_;
+    }
+
     function getCOID(address collectionContract) public view returns (uint256) {
         return COIDMap[collectionContract];
     }
@@ -79,12 +89,17 @@ contract Governance is Ownable {
         COIDMap[collectionContract] = COIDCounter;
     }
 
-    function addCollectionBLER(uint256 COID, uint256 bler) public onlyMap {
+    function addCollectionBLER(uint256 COID, uint256 bler) public onlyAvatar {
         CollctionBLER[COID].BLER += bler;
     }
 
-    function SubCollectionBLER(uint256 COID, uint256 bler) public onlyMap {
+    function SubCollectionBLER(uint256 COID, uint256 bler) public onlyAvatar {
         CollctionBLER[COID].BLER -= bler;
+    }
+
+    modifier onlyAvatar() {
+        require(msg.sender == avatarContract, "not allowed");
+        _;
     }
 
     modifier onlyMap() {

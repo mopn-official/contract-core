@@ -5,11 +5,14 @@ import "hardhat/console.sol";
 import "./interfaces/IMOPN.sol";
 import "./libraries/HexGridsMath.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 error linkBlockError();
 
-contract Avatar is Multicall {
+contract Avatar is Multicall, Ownable {
     using BlockMath for Block;
+    using Math for uint256;
 
     mapping(uint256 => AvatarData) public avatarNoumenon;
 
@@ -62,12 +65,19 @@ contract Avatar is Multicall {
         return currentAvatarId;
     }
 
+    function addHP(uint256 avatarId, uint256 amount) public onlyOwner {
+        avatarNoumenon[avatarId].HP += amount;
+    }
+
+    function addATT(uint256 avatarId, uint256 amount) public onlyOwner {
+        avatarNoumenon[avatarId].ATT += amount;
+    }
+
     function moveTo(
         Block memory block_,
-        uint16[] memory PassIds,
-        uint8[] memory spheresPassIds,
         uint256 linkedAvatarId,
-        uint256 avatarId
+        uint256 avatarId,
+        bool attack
     ) public blockCheck(block_) {
         if (linkedAvatarId > 0) {
             if (
@@ -83,52 +93,53 @@ contract Avatar is Multicall {
             revert linkBlockError();
         }
 
-        uint64[] memory blockIntAttackRange = getBlockAttackRange(block_);
+        uint64[] memory blockSpheres;
+        if (attack) {
+            blockSpheres = HexGridsMath.blockSpiralRingBlockInts(block_, 2);
 
-        if (
-            attackEnemies(avatarId, blockIntAttackRange) == BattleResult.Victory
-        ) {
-            bytes32[] memory randomseed = new bytes32[](3);
-            Block[] memory centerBlocks = new Block[](3);
-
-            uint256 i;
-            for (i = 0; i < PassIds.length; i++) {
-                randomseed[i] = keccak256(
-                    abi.encodePacked(Governance.passContract(), PassIds[i])
-                );
-                centerBlocks[i] = HexGridsMath.PassCenterBlock(PassIds[i]);
+            if (attackEnemies(avatarId, blockSpheres) != BattleResult.Victory) {
+                return;
             }
-
-            uint8[] memory blockLevels = new uint8[](7);
-            blockLevels[0] = HexGridsMath.blockLevel(
-                randomseed[spheresPassIds[0]],
-                HexGridsMath.blockIndex(block_, centerBlocks[spheresPassIds[0]])
-            );
-            for (i = 1; i < 7; i++) {
-                blockLevels[i] = HexGridsMath.blockLevel(
-                    randomseed[spheresPassIds[i]],
-                    HexGridsMath.blockIndex(
-                        BlockMath.fromCoordinateInt(blockIntAttackRange[i]),
-                        centerBlocks[spheresPassIds[i]]
-                    )
-                );
-            }
-
-            if (avatarNoumenon[avatarId].blockCoordinatInt != 0) {
-                Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt);
-            }
-
-            avatarNoumenon[avatarId].blockCoordinatInt = block_.coordinateInt();
-
-            Map.avatarSet(
-                avatarId,
-                avatarNoumenon[avatarId].COID,
-                avatarNoumenon[avatarId].blockCoordinatInt,
-                blockIntAttackRange,
-                blockLevels
-            );
         } else {
-            deFeat(avatarId);
+            blockSpheres = HexGridsMath.blockIntSpheres(block_);
+            uint256[] memory COIDs = Map.getBlocksCOIDs(blockSpheres);
+            for (uint256 i = 0; i < COIDs.length; i++) {
+                console.log(COIDs[i]);
+                require(
+                    COIDs[i] == 0 || COIDs[i] == avatarNoumenon[avatarId].COID,
+                    "no attack failure"
+                );
+            }
+        }
+
+        uint8[] memory blockLevels = new uint8[](7);
+
+        uint256 blerremove = 0;
+        if (avatarNoumenon[avatarId].blockCoordinatInt != 0) {
+            blerremove = Map.avatarRemove(
+                avatarNoumenon[avatarId].blockCoordinatInt
+            );
+        }
+
+        avatarNoumenon[avatarId].blockCoordinatInt = block_.coordinateInt();
+
+        uint256 bleradd = Map.avatarSet(
+            avatarId,
+            avatarNoumenon[avatarId].COID,
+            avatarNoumenon[avatarId].blockCoordinatInt,
+            blockSpheres,
+            blockLevels
+        );
+        if (bleradd < blerremove) {
+            Governance.SubCollectionBLER(
+                avatarNoumenon[avatarId].COID,
+                blerremove - bleradd
+            );
+        } else if (bleradd > blerremove) {
+            Governance.addCollectionBLER(
+                avatarNoumenon[avatarId].COID,
+                bleradd - blerremove
+            );
         }
     }
 
@@ -144,18 +155,17 @@ contract Avatar is Multicall {
         uint64[] memory blockAttackRange
     ) internal returns (BattleResult battleRes) {
         AvatarData memory avatarData = avatarNoumenon[avatarId];
-        uint256[] memory attackAvatarIds = Map.getBlocksAvatars(
-            blockAttackRange
-        );
         battleRes = BattleResult.Victory;
-        for (uint256 i = 0; i < attackAvatarIds.length; i++) {
+        uint256 attackAvatarId;
+        for (uint256 i = 0; i < blockAttackRange.length; i++) {
+            attackAvatarId = Map.getBlockAvatar(blockAttackRange[i]);
             if (
-                attackAvatarIds[i] == 0 ||
-                avatarNoumenon[attackAvatarIds[i]].COID == avatarData.COID
+                attackAvatarId == 0 ||
+                avatarNoumenon[attackAvatarId].COID == avatarData.COID
             ) {
                 continue;
             }
-            battleRes = attackEnemy(avatarId, attackAvatarIds[i]);
+            battleRes = attackEnemy(avatarId, attackAvatarId);
             if (BattleResult.Victory != battleRes) {
                 break;
             }
@@ -167,30 +177,57 @@ contract Avatar is Multicall {
         uint256 avatarId,
         uint256 enemyAvatarId
     ) public returns (BattleResult batteRes) {
-        //todo battle
         if (
             avatarNoumenon[avatarId].ATT == 0 &&
             avatarNoumenon[enemyAvatarId].ATT == 0
         ) {
             return BattleResult.Draw;
         }
-        deFeat(enemyAvatarId);
-        return BattleResult.Victory;
+        if (avatarNoumenon[avatarId].ATT == 0) {
+            deFeat(avatarId);
+            return BattleResult.Defeat;
+        } else if (avatarNoumenon[enemyAvatarId].ATT == 0) {
+            deFeat(enemyAvatarId);
+            return BattleResult.Victory;
+        } else {
+            uint256 enemyAttack = avatarNoumenon[avatarId].HP.ceilDiv(
+                avatarNoumenon[enemyAvatarId].ATT
+            );
+            uint256 avatarAttack = avatarNoumenon[enemyAvatarId].HP.ceilDiv(
+                avatarNoumenon[avatarId].ATT
+            );
+            if (enemyAttack > avatarAttack) {
+                avatarNoumenon[avatarId].HP -=
+                    avatarNoumenon[enemyAvatarId].ATT *
+                    avatarAttack;
+                deFeat(enemyAvatarId);
+                return BattleResult.Victory;
+            } else if (enemyAttack < avatarAttack) {
+                avatarNoumenon[enemyAvatarId].HP -=
+                    avatarNoumenon[avatarId].ATT *
+                    enemyAttack;
+                deFeat(avatarId);
+                return BattleResult.Defeat;
+            } else {
+                deFeat(avatarId);
+                deFeat(enemyAvatarId);
+                return BattleResult.NoWin;
+            }
+        }
     }
 
     function deFeat(uint256 avatarId) internal {
-        Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt);
+        Governance.SubCollectionBLER(
+            avatarNoumenon[avatarId].COID,
+            Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt)
+        );
         avatarNoumenon[avatarId].blockCoordinatInt = 0;
+        avatarNoumenon[avatarId].HP = 1;
+        avatarNoumenon[avatarId].ATT = 0;
         claimEnergy(avatarId);
     }
 
     function claimEnergy(uint256 avatarId) public {}
-
-    function getBlockAttackRange(
-        Block memory block_
-    ) public pure returns (uint64[] memory) {
-        return HexGridsMath.blockSpiralRingBlockInts(block_, 2);
-    }
 
     modifier blockCheck(Block memory block_) {
         block_.check();

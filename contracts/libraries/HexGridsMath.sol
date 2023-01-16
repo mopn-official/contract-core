@@ -169,31 +169,15 @@ library HexGridsMath {
     }
 
     function blockLevel(
-        bytes32 randomseed,
-        uint256 blockIndex_
+        uint256 passContract,
+        uint64 blockCoordinate
     ) public pure returns (uint8) {
-        if (randomseed.length < 10) {
-            revert RandomSeedInvalid();
-        }
-        if (blockIndex_ > 90) {
-            revert BlockIndexOverFlow();
-        }
-        unchecked {
-            uint256 startIndex = uint256(uint8(randomseed[0])) % 91;
-            if (blockIndex_ == 90) {
-                if (startIndex == 0) {
-                    return convertBytes1level(initBlockLevels[blockIndex_]);
-                }
-                return convertBytes1level(initBlockLevels[startIndex - 1]);
-            }
-            uint256 i = blockIndex_ / 10;
-            uint256 groupIndex = uint256(uint8(randomseed[i])) % 10;
-            uint256 index = (startIndex +
-                i *
-                10 +
-                ((groupIndex + (blockIndex_ % 10)) % 10)) % 91;
-            return convertBytes1level(initBlockLevels[index]);
-        }
+        uint256 blockCoordinate_ = uint256(blockCoordinate);
+        blockCoordinate_ =
+            (blockCoordinate_ / 100000000) *
+            ((blockCoordinate_ % 100000000) / 10000) *
+            (blockCoordinate_ % 10000);
+        return uint8((passContract / (10 ** (blockCoordinate_ % 30))) % 12) + 1;
     }
 
     function blockSpiralRingBlocks(
@@ -228,7 +212,7 @@ library HexGridsMath {
         uint256 blockNum = 3 * radius * radius + 3 * radius;
         uint64[] memory blocks = new uint64[](blockNum);
 
-        for (uint256 i = 0; i < radius; i++) {
+        for (uint256 i = 1; i <= radius; i++) {
             Block memory startBlock = Block(
                 block_.x,
                 block_.y + int16(int256(i)),
@@ -237,9 +221,56 @@ library HexGridsMath {
 
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
-                    blocks[j * i + k] = startBlock.coordinateInt();
+                    blocks[(i - 1) * 6 + j * i + k] = startBlock
+                        .coordinateInt();
                     startBlock = startBlock.neighbor(j);
                 }
+            }
+        }
+
+        return blocks;
+    }
+
+    function blockRingBlocks(
+        Block memory block_,
+        uint256 radius
+    ) public pure returns (Block[] memory) {
+        uint256 blockNum = 6 * radius;
+        Block[] memory blocks = new Block[](blockNum);
+
+        Block memory startBlock = Block(
+            block_.x,
+            block_.y + int16(int256(radius)),
+            block_.z - int16(int256(radius))
+        );
+
+        for (uint256 j = 0; j < 6; j++) {
+            for (uint256 k = 0; k < radius; k++) {
+                blocks[j * radius + k] = startBlock;
+                startBlock = startBlock.neighbor(j);
+            }
+        }
+
+        return blocks;
+    }
+
+    function blockRingBlockInts(
+        Block memory block_,
+        uint256 radius
+    ) public pure returns (uint64[] memory) {
+        uint256 blockNum = 6 * radius;
+        uint64[] memory blocks = new uint64[](blockNum);
+
+        Block memory startBlock = Block(
+            block_.x,
+            block_.y + int16(int256(radius)),
+            block_.z - int16(int256(radius))
+        );
+
+        for (uint256 j = 0; j < 6; j++) {
+            for (uint256 k = 0; k < radius; k++) {
+                blocks[j * radius + k] = startBlock.coordinateInt();
+                startBlock = startBlock.neighbor(j);
             }
         }
 
