@@ -20,4 +20,8 @@ interface IAvatar is IERC721 {
     ) external returns (uint256);
 
     function claimEnergy(uint256 avatarId) external;
+
+    function addBLER(uint256 avatarId, uint256 amount) external;
+
+    function subBLER(uint256 avatarId, uint256 amount) external;
 }

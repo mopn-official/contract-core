@@ -4,8 +4,6 @@ pragma solidity ^0.8.17;
 import "hardhat/console.sol";
 import "../structs/Structs.sol";
 
-error BlockCoordinateError();
-
 library BlockMath {
     function check(Block memory a) public pure {
         if (a.x + a.y + a.z != 0 || (a.x == 0 && a.y == 0 && a.z == 0)) {
@@ -69,32 +67,31 @@ library BlockMath {
         Block memory block_
     ) public pure returns (uint64 ckey) {
         unchecked {
-            ckey = uint64(int64(int16abs(block_.x))) * 100000000;
-            ckey = block_.x >= 0 ? ckey : ckey + 100000000000;
-
-            ckey += uint64(int64(int16abs(block_.y))) * 10000;
-            ckey = block_.y >= 0 ? ckey : ckey + 10000000;
-
-            ckey += uint64(int64(int16abs(block_.z)));
-            ckey = block_.z >= 0 ? ckey : ckey + 1000;
+            ckey = uint64(int64(1000 + block_.x)) * 100000000;
+            ckey += uint64(int64(1000 + block_.y)) * 10000;
+            ckey += uint64(int64(1000 + block_.z));
         }
     }
 
     function fromCoordinateInt(
         uint64 coordinateInt_
     ) public pure returns (Block memory block_) {
+        if (coordinateInt_ == 0) {
+            coordinateInt_ = 100010001000;
+        }
         int64 coordinateInt__ = int64(coordinateInt_);
-        int16 xdata = int16(int64(coordinateInt__) / 100000000);
-        block_.x = xdata % 1000;
-        if (xdata > 1000) block_.x = -block_.x;
+
+        int16 xdata = int16(coordinateInt__ / 100000000);
+        if (xdata >= 1000) block_.x = xdata - 1000;
+        else block_.x = -(1000 - xdata);
 
         int16 ydata = int16((coordinateInt__ % 100000000) / 10000);
-        block_.y = ydata % 1000;
-        if (ydata > 1000) block_.y = -block_.y;
+        if (ydata >= 1000) block_.y = ydata - 1000;
+        else block_.y = -(1000 - ydata);
 
         int16 zdata = int16(coordinateInt__ % 10000);
-        block_.z = zdata % 1000;
-        if (zdata > 1000) block_.z = -block_.z;
+        if (zdata >= 1000) block_.z = zdata - 1000;
+        else block_.z = -(1000 - zdata);
     }
 
     function int16abs(int16 n) internal pure returns (int16) {

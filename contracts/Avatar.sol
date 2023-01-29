@@ -60,6 +60,7 @@ contract Avatar is Multicall, Ownable {
 
         avatarNoumenon[currentAvatarId].COID = COID;
         avatarNoumenon[currentAvatarId].tokenId = token_.tokenId;
+        avatarNoumenon[currentAvatarId].HP = 1;
 
         tokenMap[COID][token_.tokenId] = currentAvatarId;
         return currentAvatarId;
@@ -71,6 +72,18 @@ contract Avatar is Multicall, Ownable {
 
     function addATT(uint256 avatarId, uint256 amount) public onlyOwner {
         avatarNoumenon[avatarId].ATT += amount;
+    }
+
+    function addSTA(uint256 avatarId, uint256 amount) public onlyOwner {
+        avatarNoumenon[avatarId].STA += amount;
+    }
+
+    function addBLER(uint256 avatarId, uint256 amount) public onlyMap {
+        avatarNoumenon[avatarId].BLER += amount;
+    }
+
+    function subBLER(uint256 avatarId, uint256 amount) public onlyMap {
+        avatarNoumenon[avatarId].BLER -= amount;
     }
 
     function moveTo(
@@ -93,15 +106,20 @@ contract Avatar is Multicall, Ownable {
             revert linkBlockError();
         }
 
+        uint64 blockcoordinate = block_.coordinateInt();
+
         uint64[] memory blockSpheres;
         if (attack) {
-            blockSpheres = HexGridsMath.blockSpiralRingBlockInts(block_, 2);
+            blockSpheres = HexGridsMath.blockSpiralRingBlockInts(
+                blockcoordinate,
+                2
+            );
 
             if (attackEnemies(avatarId, blockSpheres) != BattleResult.Victory) {
                 return;
             }
         } else {
-            blockSpheres = HexGridsMath.blockIntSpheres(block_);
+            blockSpheres = HexGridsMath.blockIntSpheres(blockcoordinate);
             uint256[] memory COIDs = Map.getBlocksCOIDs(blockSpheres);
             for (uint256 i = 0; i < COIDs.length; i++) {
                 console.log(COIDs[i]);
@@ -112,21 +130,22 @@ contract Avatar is Multicall, Ownable {
             }
         }
 
-        uint8[] memory blockLevels = new uint8[](7);
+        uint256[] memory blockLevels = new uint256[](7);
 
         uint256 blerremove = 0;
         if (avatarNoumenon[avatarId].blockCoordinatInt != 0) {
             blerremove = Map.avatarRemove(
-                avatarNoumenon[avatarId].blockCoordinatInt
+                avatarNoumenon[avatarId].blockCoordinatInt,
+                avatarId
             );
         }
 
-        avatarNoumenon[avatarId].blockCoordinatInt = block_.coordinateInt();
+        avatarNoumenon[avatarId].blockCoordinatInt = blockcoordinate;
 
         uint256 bleradd = Map.avatarSet(
             avatarId,
             avatarNoumenon[avatarId].COID,
-            avatarNoumenon[avatarId].blockCoordinatInt,
+            blockcoordinate,
             blockSpheres,
             blockLevels
         );
@@ -219,7 +238,10 @@ contract Avatar is Multicall, Ownable {
     function deFeat(uint256 avatarId) internal {
         Governance.SubCollectionBLER(
             avatarNoumenon[avatarId].COID,
-            Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt)
+            Map.avatarRemove(
+                avatarNoumenon[avatarId].blockCoordinatInt,
+                avatarId
+            )
         );
         avatarNoumenon[avatarId].blockCoordinatInt = 0;
         avatarNoumenon[avatarId].HP = 1;
@@ -235,6 +257,11 @@ contract Avatar is Multicall, Ownable {
             Map.getBlockAvatar(block_.coordinateInt()) == 0,
             "block not available"
         );
+        _;
+    }
+
+    modifier onlyMap() {
+        require(msg.sender == address(Map), "not allowed");
         _;
     }
 }

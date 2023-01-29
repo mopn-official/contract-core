@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+error BlockCoordinateError();
+
 struct Block {
     int16 x;
     int16 y;
@@ -14,6 +16,9 @@ struct AvatarData {
     uint256 HP;
     uint256 ATT;
     uint256 STA;
+    uint256 BLER;
+    uint256 BLERLastCalTime;
+    uint256 BLERTank;
 }
 
 struct CollectionData {

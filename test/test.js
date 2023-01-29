@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 describe("MOPN", function () {
-  let hexGridsMath, blockMath, governance, avatar, map;
+  let hexGridsMath, intBlockMath, blockMath, governance, avatar, map;
 
   it("deploy ", async function () {
     const BlockMath = await ethers.getContractFactory("BlockMath");
@@ -9,9 +9,15 @@ describe("MOPN", function () {
     await blockMath.deployed();
     console.log("BlockMath", blockMath.address);
 
+    const IntBlockMath = await ethers.getContractFactory("IntBlockMath");
+    intBlockMath = await IntBlockMath.deploy();
+    await intBlockMath.deployed();
+    console.log("IntBlockMath", intBlockMath.address);
+
     const HexGridsMath = await ethers.getContractFactory("HexGridsMath", {
       libraries: {
         BlockMath: blockMath.address,
+        IntBlockMath: intBlockMath.address,
       },
     });
     hexGridsMath = await HexGridsMath.deploy();
@@ -25,7 +31,6 @@ describe("MOPN", function () {
 
     const Map = await ethers.getContractFactory("Map", {
       libraries: {
-        BlockMath: blockMath.address,
         HexGridsMath: hexGridsMath.address,
       },
     });

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "./IntBlockMath.sol";
 import "./BlockMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
@@ -13,6 +14,7 @@ bytes constant initBlockLevels = "678851ac687a239ab7ba923c49bcbb995c45accb6b508c
 
 library HexGridsMath {
     using BlockMath for Block;
+    using IntBlockMath for uint64;
 
     function PassRingNum(uint16 PassId) public pure returns (uint16 n) {
         n = uint16((Math.sqrt(9 + 12 * (PassId - 1)) - 3) / (6));
@@ -206,23 +208,18 @@ library HexGridsMath {
     }
 
     function blockSpiralRingBlockInts(
-        Block memory block_,
+        uint64 blockcoordinate,
         uint256 radius
     ) public pure returns (uint64[] memory) {
         uint256 blockNum = 3 * radius * radius + 3 * radius;
         uint64[] memory blocks = new uint64[](blockNum);
 
         for (uint256 i = 1; i <= radius; i++) {
-            Block memory startBlock = Block(
-                block_.x,
-                block_.y + int16(int256(i)),
-                block_.z - int16(int256(i))
-            );
+            uint64 startBlock = blockcoordinate + uint64(10000 * i - 1 * i);
 
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
-                    blocks[(i - 1) * 6 + j * i + k] = startBlock
-                        .coordinateInt();
+                    blocks[(i - 1) * 6 + j * i + k] = startBlock;
                     startBlock = startBlock.neighbor(j);
                 }
             }
@@ -255,21 +252,17 @@ library HexGridsMath {
     }
 
     function blockRingBlockInts(
-        Block memory block_,
+        uint64 blockcoordinate,
         uint256 radius
     ) public pure returns (uint64[] memory) {
         uint256 blockNum = 6 * radius;
         uint64[] memory blocks = new uint64[](blockNum);
 
-        Block memory startBlock = Block(
-            block_.x,
-            block_.y + int16(int256(radius)),
-            block_.z - int16(int256(radius))
-        );
+        uint64 startBlock = blockcoordinate + uint64(9999 * radius);
 
         for (uint256 j = 0; j < 6; j++) {
             for (uint256 k = 0; k < radius; k++) {
-                blocks[j * radius + k] = startBlock.coordinateInt();
+                blocks[j * radius + k] = startBlock;
                 startBlock = startBlock.neighbor(j);
             }
         }
@@ -293,14 +286,14 @@ library HexGridsMath {
     }
 
     function blockIntSpheres(
-        Block memory block_
+        uint64 blockcoordinate
     ) public pure returns (uint64[] memory) {
         uint64[] memory blocks = new uint64[](6);
 
-        Block memory startBlock = Block(block_.x, block_.y + 1, block_.z - 1);
+        uint64 startBlock = blockcoordinate + uint64(9999);
 
         for (uint256 i = 0; i < 6; i++) {
-            blocks[i] = startBlock.coordinateInt();
+            blocks[i] = startBlock;
             startBlock = startBlock.neighbor(i);
         }
 

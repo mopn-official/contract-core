@@ -5,27 +5,14 @@ import "./interfaces/IMOPN.sol";
 import "./libraries/HexGridsMath.sol";
 
 contract Map {
-    using BlockMath for Block;
     // Block => avatarId
     mapping(uint64 => uint256) public blocks;
 
     mapping(uint64 => uint256) public coblocks;
 
-    uint256[13] blers = [
-        125000000000000000,
-        250000000000000000,
-        375000000000000000,
-        500000000000000000,
-        625000000000000000,
-        750000000000000000,
-        875000000000000000,
-        1000000000000000000,
-        1125000000000000000,
-        1250000000000000000,
-        1375000000000000000,
-        1500000000000000000,
-        0
-    ];
+    mapping(uint64 => mapping(uint256 => uint256)) public coblocksExt;
+
+    uint256[3] blers = [1, 5, 15];
 
     IAvatar public Avatar;
     IGovernance public Governance;
@@ -43,52 +30,75 @@ contract Map {
         uint256 COID,
         uint64 blockTo,
         uint64[] memory blockSpheres,
-        uint8[] memory blockLevels
+        uint256[] memory blockTypes
     ) public onlyAvatar returns (uint256 bler) {
         blocks[blockTo] = avatarId;
-        bler += coBlockAdd(blockTo, COID, blockLevels[0]);
+        bler += coBlockAdd(blockTo, COID, avatarId, blockTypes[0]);
         for (uint256 i = 0; i < 6; i++) {
-            bler += coBlockAdd(blockSpheres[i], COID, blockLevels[i + 1]);
+            bler += coBlockAdd(blockSpheres[i], COID, avatarId, blockTypes[i]);
         }
     }
 
     function avatarRemove(
-        uint64 block_
+        uint64 block_,
+        uint256 avatarId
     ) public onlyAvatar returns (uint256 bler) {
         blocks[block_] = 0;
-        bler += coBlockSub(block_);
-        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
-            BlockMath.fromCoordinateInt(block_)
-        );
+        bler += coBlockSub(block_, avatarId);
+
+        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(block_);
         for (uint256 i = 0; i < 6; i++) {
-            bler += coBlockSub(blockSpheres[i]);
+            bler += coBlockSub(blockSpheres[i], avatarId);
         }
     }
 
     function coBlockAdd(
         uint64 blockcoordinate,
         uint256 COID,
-        uint8 blockLevel
+        uint256 avatarId,
+        uint256 blockType
     ) private returns (uint256 bler) {
         if (coblocks[blockcoordinate] == 0) {
-            bler = blers[blockLevel];
+            bler = blers[blockType];
+            coblocks[blockcoordinate] = COID * 1000 + blockType * 10 + 1;
+            coblocksExt[blockcoordinate][0] = avatarId;
+        } else {
+            uint64 index = uint64((coblocks[blockcoordinate] % 10));
+            coblocksExt[blockcoordinate][index] = avatarId;
+            coblocks[blockcoordinate]++;
         }
-        coblocks[blockcoordinate] =
-            COID *
-            1000 +
-            blockLevel *
-            10 +
-            (coblocks[blockcoordinate] % 10) +
-            1;
     }
 
-    function coBlockSub(uint64 blockcoordinate) private returns (uint256 bler) {
+    function coBlockSub(
+        uint64 blockcoordinate,
+        uint256 avatarId
+    ) private returns (uint256 bler) {
+        uint256 blockType = (coblocks[blockcoordinate] % 1000) / 10;
+        bler = blers[blockType];
         uint256 left = (coblocks[blockcoordinate] % 10);
-        if (left == 0 || left == 1) {
-            uint256 blockLevel = (coblocks[blockcoordinate] % 1000) / 10;
-            bler = blers[blockLevel];
+        if (left == 1) {
             coblocks[blockcoordinate] = 0;
         } else {
+            uint256 substituteIndex = 0;
+            for (uint256 i = 0; i < left; i++) {
+                if (coblocksExt[blockcoordinate][i] == avatarId) {
+                    if (i == 0) {
+                        substituteIndex = i + 1;
+
+                        Avatar.addBLER(
+                            coblocksExt[blockcoordinate][substituteIndex],
+                            bler
+                        );
+                    } else {
+                        bler = 0;
+                    }
+                }
+                if (substituteIndex > 0 && i >= substituteIndex) {
+                    coblocksExt[blockcoordinate][i - 1] = coblocksExt[
+                        blockcoordinate
+                    ][i];
+                }
+            }
             coblocks[blockcoordinate] -= 1;
         }
     }
