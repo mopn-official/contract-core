@@ -16,8 +16,7 @@ interface IMap {
         uint256 avatarId,
         uint256 COID,
         uint64 blockTo,
-        uint64[] memory blockSphere,
-        uint256[] memory blockLevels
+        uint16 blockPassId
     ) external returns (uint256);
 
     function avatarRemove(

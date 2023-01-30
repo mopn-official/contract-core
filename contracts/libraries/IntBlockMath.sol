@@ -36,9 +36,16 @@ library IntBlockMath {
         }
     }
 
-    function int16abs(int16 n) internal pure returns (int16) {
-        unchecked {
-            return n >= 0 ? n : -n;
-        }
+    function distance(uint64 a, uint64 b) public pure returns (uint64) {
+        uint64 ax = a / 100000000;
+        uint64 bx = b / 100000000;
+        uint64 d = ax > bx ? ax - bx : bx - ax;
+        ax = (a % 100000000) / 10000;
+        bx = (b % 100000000) / 10000;
+        d += ax > bx ? ax - bx : bx - ax;
+        ax = a % 10000;
+        bx = b % 10000;
+        d += ax > bx ? ax - bx : bx - ax;
+        return d / 2;
     }
 }

@@ -4,17 +4,18 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Props is ERC1155, Ownable {
+contract Bomb is ERC1155, Ownable {
     constructor() ERC1155("") {}
 
     function setURI(string memory newuri) public onlyOwner {
         _setURI(newuri);
     }
 
-    function useTo(
-        uint256 propId,
-        uint256 amount,
-        uint256 x,
-        uint256 y
-    ) public {}
+    function mint(address to, uint256 id, uint256 amount) public onlyOwner {
+        _mint(to, id, amount, "");
+    }
+
+    function burn(address from, uint256 id, uint256 amount) public onlyOwner {
+        _burn(from, id, amount);
+    }
 }

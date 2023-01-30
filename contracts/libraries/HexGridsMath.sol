@@ -16,6 +16,15 @@ library HexGridsMath {
     using BlockMath for Block;
     using IntBlockMath for uint64;
 
+    function getPassType(uint16 PassId) public pure returns (uint8 _passType) {
+        uint16 ringNum = PassRingNum(PassId);
+        if (ringNum <= 6) {
+            _passType = 2;
+        } else if (ringNum >= 30 && ringNum <= 34) {
+            _passType = 1;
+        }
+    }
+
     function PassRingNum(uint16 PassId) public pure returns (uint16 n) {
         n = uint16((Math.sqrt(9 + 12 * (PassId - 1)) - 3) / (6));
         if ((3 * n * n + 3 * n + 1) == PassId) {

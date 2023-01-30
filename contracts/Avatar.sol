@@ -24,11 +24,14 @@ contract Avatar is Multicall, Ownable {
 
     IGovernance public Governance;
 
+    IBomb public Bomb;
+
     uint256 public currentAvatarId;
 
-    constructor(address governanceContract_, address mapContract_) {
-        Map = IMap(mapContract_);
+    function setGovernanceContract(address governanceContract_) public {
         Governance = IGovernance(governanceContract_);
+        Map = IMap(Governance.mapContract());
+        Bomb = IBomb(Governance.bombContract());
     }
 
     function getAvatarOccupiedBlock(
@@ -60,29 +63,24 @@ contract Avatar is Multicall, Ownable {
 
         avatarNoumenon[currentAvatarId].COID = COID;
         avatarNoumenon[currentAvatarId].tokenId = token_.tokenId;
-        avatarNoumenon[currentAvatarId].HP = 1;
 
         tokenMap[COID][token_.tokenId] = currentAvatarId;
         return currentAvatarId;
     }
 
-    function addHP(uint256 avatarId, uint256 amount) public onlyOwner {
-        avatarNoumenon[avatarId].HP += amount;
-    }
-
-    function addATT(uint256 avatarId, uint256 amount) public onlyOwner {
-        avatarNoumenon[avatarId].ATT += amount;
-    }
-
-    function addSTA(uint256 avatarId, uint256 amount) public onlyOwner {
-        avatarNoumenon[avatarId].STA += amount;
-    }
-
     function addBLER(uint256 avatarId, uint256 amount) public onlyMap {
+        _addBLER(avatarId, amount);
+    }
+
+    function _addBLER(uint256 avatarId, uint256 amount) internal {
         avatarNoumenon[avatarId].BLER += amount;
     }
 
     function subBLER(uint256 avatarId, uint256 amount) public onlyMap {
+        _subBLER(avatarId, amount);
+    }
+
+    function _subBLER(uint256 avatarId, uint256 amount) internal {
         avatarNoumenon[avatarId].BLER -= amount;
     }
 
@@ -90,47 +88,9 @@ contract Avatar is Multicall, Ownable {
         Block memory block_,
         uint256 linkedAvatarId,
         uint256 avatarId,
-        bool attack
-    ) public blockCheck(block_) {
-        if (linkedAvatarId > 0) {
-            if (
-                block_.distance(
-                    BlockMath.fromCoordinateInt(
-                        avatarNoumenon[linkedAvatarId].blockCoordinatInt
-                    )
-                ) > 3
-            ) {
-                revert linkBlockError();
-            }
-        } else if (collectionMap[avatarNoumenon[avatarId].COID] > 0) {
-            revert linkBlockError();
-        }
-
+        uint16 blockPassId
+    ) public blockCheck(block_) moveCheck(block_, linkedAvatarId, avatarId) {
         uint64 blockcoordinate = block_.coordinateInt();
-
-        uint64[] memory blockSpheres;
-        if (attack) {
-            blockSpheres = HexGridsMath.blockSpiralRingBlockInts(
-                blockcoordinate,
-                2
-            );
-
-            if (attackEnemies(avatarId, blockSpheres) != BattleResult.Victory) {
-                return;
-            }
-        } else {
-            blockSpheres = HexGridsMath.blockIntSpheres(blockcoordinate);
-            uint256[] memory COIDs = Map.getBlocksCOIDs(blockSpheres);
-            for (uint256 i = 0; i < COIDs.length; i++) {
-                console.log(COIDs[i]);
-                require(
-                    COIDs[i] == 0 || COIDs[i] == avatarNoumenon[avatarId].COID,
-                    "no attack failure"
-                );
-            }
-        }
-
-        uint256[] memory blockLevels = new uint256[](7);
 
         uint256 blerremove = 0;
         if (avatarNoumenon[avatarId].blockCoordinatInt != 0) {
@@ -146,107 +106,49 @@ contract Avatar is Multicall, Ownable {
             avatarId,
             avatarNoumenon[avatarId].COID,
             blockcoordinate,
-            blockSpheres,
-            blockLevels
+            blockPassId
         );
-        if (bleradd < blerremove) {
-            Governance.SubCollectionBLER(
-                avatarNoumenon[avatarId].COID,
-                blerremove - bleradd
-            );
-        } else if (bleradd > blerremove) {
-            Governance.addCollectionBLER(
-                avatarNoumenon[avatarId].COID,
-                bleradd - blerremove
-            );
+
+        if (bleradd > blerremove) {
+            _addBLER(avatarId, bleradd - blerremove);
+        } else if (bleradd < blerremove) {
+            _subBLER(avatarId, blerremove - bleradd);
         }
     }
 
-    enum BattleResult {
-        Defeat,
-        Victory,
-        NoWin,
-        Draw
-    }
+    function bomb(Block memory block_, uint256 avatarId) public {
+        Bomb.burn(msg.sender, 1, 1);
 
-    function attackEnemies(
-        uint256 avatarId,
-        uint64[] memory blockAttackRange
-    ) internal returns (BattleResult battleRes) {
-        AvatarData memory avatarData = avatarNoumenon[avatarId];
-        battleRes = BattleResult.Victory;
-        uint256 attackAvatarId;
-        for (uint256 i = 0; i < blockAttackRange.length; i++) {
-            attackAvatarId = Map.getBlockAvatar(blockAttackRange[i]);
-            if (
-                attackAvatarId == 0 ||
-                avatarNoumenon[attackAvatarId].COID == avatarData.COID
-            ) {
+        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
+            block_.coordinateInt()
+        );
+        uint256 attackAvatarId = Map.getBlockAvatar(block_.coordinateInt());
+        if (attackAvatarId != 0 && attackAvatarId != avatarId) {
+            deFeat(attackAvatarId);
+        }
+
+        for (uint256 i = 0; i < blockSpheres.length; i++) {
+            attackAvatarId = Map.getBlockAvatar(blockSpheres[i]);
+            if (attackAvatarId == 0 || attackAvatarId == avatarId) {
                 continue;
             }
-            battleRes = attackEnemy(avatarId, attackAvatarId);
-            if (BattleResult.Victory != battleRes) {
-                break;
-            }
-        }
-        require(battleRes != BattleResult.Draw, "draw battle");
-    }
-
-    function attackEnemy(
-        uint256 avatarId,
-        uint256 enemyAvatarId
-    ) public returns (BattleResult batteRes) {
-        if (
-            avatarNoumenon[avatarId].ATT == 0 &&
-            avatarNoumenon[enemyAvatarId].ATT == 0
-        ) {
-            return BattleResult.Draw;
-        }
-        if (avatarNoumenon[avatarId].ATT == 0) {
-            deFeat(avatarId);
-            return BattleResult.Defeat;
-        } else if (avatarNoumenon[enemyAvatarId].ATT == 0) {
-            deFeat(enemyAvatarId);
-            return BattleResult.Victory;
-        } else {
-            uint256 enemyAttack = avatarNoumenon[avatarId].HP.ceilDiv(
-                avatarNoumenon[enemyAvatarId].ATT
-            );
-            uint256 avatarAttack = avatarNoumenon[enemyAvatarId].HP.ceilDiv(
-                avatarNoumenon[avatarId].ATT
-            );
-            if (enemyAttack > avatarAttack) {
-                avatarNoumenon[avatarId].HP -=
-                    avatarNoumenon[enemyAvatarId].ATT *
-                    avatarAttack;
-                deFeat(enemyAvatarId);
-                return BattleResult.Victory;
-            } else if (enemyAttack < avatarAttack) {
-                avatarNoumenon[enemyAvatarId].HP -=
-                    avatarNoumenon[avatarId].ATT *
-                    enemyAttack;
-                deFeat(avatarId);
-                return BattleResult.Defeat;
-            } else {
-                deFeat(avatarId);
-                deFeat(enemyAvatarId);
-                return BattleResult.NoWin;
-            }
+            deFeat(attackAvatarId);
         }
     }
 
     function deFeat(uint256 avatarId) internal {
-        Governance.SubCollectionBLER(
-            avatarNoumenon[avatarId].COID,
-            Map.avatarRemove(
-                avatarNoumenon[avatarId].blockCoordinatInt,
-                avatarId
-            )
+        require(
+            avatarNoumenon[avatarId].blockCoordinatInt > 0,
+            "avatar not on map"
         );
+        uint256 bler = Map.avatarRemove(
+            avatarNoumenon[avatarId].blockCoordinatInt,
+            avatarId
+        );
+        if (bler > 0) {
+            _subBLER(avatarId, bler);
+        }
         avatarNoumenon[avatarId].blockCoordinatInt = 0;
-        avatarNoumenon[avatarId].HP = 1;
-        avatarNoumenon[avatarId].ATT = 0;
-        claimEnergy(avatarId);
     }
 
     function claimEnergy(uint256 avatarId) public {}
@@ -260,8 +162,38 @@ contract Avatar is Multicall, Ownable {
         _;
     }
 
+    modifier moveCheck(
+        Block memory block_,
+        uint256 linkedAvatarId,
+        uint256 avatarId
+    ) {
+        if (linkedAvatarId > 0) {
+            require(
+                avatarNoumenon[avatarId].COID ==
+                    avatarNoumenon[linkedAvatarId].COID,
+                "link co error"
+            );
+            if (
+                block_.distance(
+                    BlockMath.fromCoordinateInt(
+                        avatarNoumenon[linkedAvatarId].blockCoordinatInt
+                    )
+                ) > 3
+            ) {
+                revert linkBlockError();
+            }
+        } else if (collectionMap[avatarNoumenon[avatarId].COID] > 0) {
+            revert linkBlockError();
+        }
+        _;
+    }
+
     modifier onlyMap() {
-        require(msg.sender == address(Map), "not allowed");
+        console.log(msg.sender);
+        require(
+            msg.sender == address(Map) || msg.sender == address(this),
+            "not allowed"
+        );
         _;
     }
 }

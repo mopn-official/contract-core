@@ -24,5 +24,13 @@ interface IGovernance {
 
     function SubCollectionBLER(uint256 COID, uint256 bler) external;
 
+    function avatarContract() external view returns (address);
+
+    function bombContract() external view returns (address);
+
+    function energyContract() external view returns (address);
+
+    function mapContract() external view returns (address);
+
     function passContract() external view returns (address);
 }

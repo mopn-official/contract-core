@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 describe("MOPN", function () {
-  let hexGridsMath, intBlockMath, blockMath, governance, avatar, map;
+  let hexGridsMath, intBlockMath, blockMath, governance, avatar, map, bomb;
 
   it("deploy ", async function () {
     const BlockMath = await ethers.getContractFactory("BlockMath");
@@ -31,6 +31,8 @@ describe("MOPN", function () {
 
     const Map = await ethers.getContractFactory("Map", {
       libraries: {
+        BlockMath: blockMath.address,
+        IntBlockMath: intBlockMath.address,
         HexGridsMath: hexGridsMath.address,
       },
     });
@@ -44,15 +46,14 @@ describe("MOPN", function () {
         HexGridsMath: hexGridsMath.address,
       },
     });
-    avatar = await Avatar.deploy(governance.address, map.address);
+    avatar = await Avatar.deploy();
     await avatar.deployed();
     console.log("Avatar", avatar.address);
 
-    const mapsetavatarcontracttx = await map.setAvatarContract(avatar.address);
-    await mapsetavatarcontracttx.wait();
-
-    const mapsetgovernancecontracttx = await map.setGovernanceContract(governance.address);
-    await mapsetgovernancecontracttx.wait();
+    const Bomb = await ethers.getContractFactory("Bomb");
+    bomb = await Bomb.deploy();
+    await bomb.deployed();
+    console.log("Bomb", bomb.address);
 
     const governancesetroottx = await governance.updateWhiteList(
       "0xb6ed762e8f2d2616d1161b1379878a2c05a049a760d707deff79de4bccd39730"
@@ -62,18 +63,35 @@ describe("MOPN", function () {
     const governancesetavatartx = await governance.updateAvatarContract(avatar.address);
     await governancesetavatartx.wait();
 
+    const governancesetbombtx = await governance.updateBombContract(bomb.address);
+    await governancesetbombtx.wait();
+
+    const governancesetmaptx = await governance.updateMapContract(map.address);
+    await governancesetmaptx.wait();
+
     const governancesetpasstx = await governance.updatePassContract(map.address);
     await governancesetpasstx.wait();
+
+    const mapsetgovernancecontracttx = await map.setGovernanceContract(governance.address);
+    await mapsetgovernancecontracttx.wait();
+
+    const avatarsetgovernancecontracttx = await avatar.setGovernanceContract(governance.address);
+    await avatarsetgovernancecontracttx.wait();
   });
 
   it("test mint nft", async function () {
+    const [owner] = await ethers.getSigners();
+    const mintbombtx = await bomb.mint(owner.address, 1, 1);
+    await mintbombtx.wait();
+
+    const transownertx = await bomb.transferOwnership(avatar.address);
+    await transownertx.wait();
+
     const mintTx = await avatar.mintAvatar(
       ["0xaf0Eafef41b90C0E561E711f51151DBbA0ABa72D", 1],
       ["0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530"]
     );
     await mintTx.wait();
-    const addATTTx = await avatar.addATT(1, 1);
-    await addATTTx.wait();
 
     const mintTx1 = await avatar.mintAvatar(
       ["0xeDf9672409F73E844fAaf01e9d9A6862B13D9020", 1],
@@ -88,25 +106,26 @@ describe("MOPN", function () {
     await mintTx2.wait();
 
     // [0, 0, 0, 0, 0, 0, 0]
-    const moveToTx = await avatar.moveTo([1, -1, 0], 0, 1, false);
+    const moveToTx = await avatar.moveTo([1, -1, 0], 0, 1, 1);
     await moveToTx.wait();
 
-    const moveTo1Tx = await avatar.moveTo([0, 2, -2], 0, 2, false);
+    const moveTo1Tx = await avatar.moveTo([0, 2, -2], 0, 2, 1);
     await moveTo1Tx.wait();
 
-    const moveTo2Tx = await avatar.moveTo([2, 1, -3], 2, 3, false);
+    const moveTo2Tx = await avatar.moveTo([1, 2, -3], 2, 3, 1);
     await moveTo2Tx.wait();
 
     console.log(await avatar.getAvatarOccupiedBlock(1));
     console.log(await avatar.getAvatarOccupiedBlock(2));
     console.log(await avatar.getAvatarOccupiedBlock(3));
 
-    const moveTo3Tx = await avatar.moveTo([-1, 1, 0], 1, 1, true);
+    const moveTo3Tx = await avatar.moveTo([1, -2, 1], 1, 1, 1);
     await moveTo3Tx.wait();
 
-    const avatarblock = await avatar.getAvatarOccupiedBlock(1);
-    console.log(avatarblock);
+    const bombTx = await avatar.bomb([0, 2, -2], 1);
+    await bombTx.wait();
 
+    console.log(await avatar.getAvatarOccupiedBlock(1));
     console.log(await avatar.getAvatarOccupiedBlock(2));
     console.log(await avatar.getAvatarOccupiedBlock(3));
 

@@ -17,25 +17,44 @@ contract Map {
     IAvatar public Avatar;
     IGovernance public Governance;
 
-    function setAvatarContract(address avatarContract_) public {
-        Avatar = IAvatar(avatarContract_);
-    }
-
-    function setGovernanceContract(address governanceContract) public {
-        Governance = IGovernance(governanceContract);
+    function setGovernanceContract(address governanceContract_) public {
+        Governance = IGovernance(governanceContract_);
+        Avatar = IAvatar(Governance.avatarContract());
     }
 
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
-        uint64 blockTo,
-        uint64[] memory blockSpheres,
-        uint256[] memory blockTypes
+        uint64 blockCoordinate,
+        uint16 blockPassId
     ) public onlyAvatar returns (uint256 bler) {
-        blocks[blockTo] = avatarId;
-        bler += coBlockAdd(blockTo, COID, avatarId, blockTypes[0]);
+        require(getBlockAvatar(blockCoordinate) == 0, "dst Occupied");
+
+        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
+            blockCoordinate
+        );
+        uint256 coidcontext;
+        for (uint256 i = 0; i < blockSpheres.length; i++) {
+            coidcontext = getBlocksCOID(blockSpheres[i]);
+            require(coidcontext == 0 || coidcontext == COID, "dst has enemy");
+        }
+
+        require(
+            IntBlockMath.distance(
+                blockCoordinate,
+                BlockMath.coordinateInt(
+                    HexGridsMath.PassCenterBlock(blockPassId)
+                )
+            ) < 6,
+            "PassId error"
+        );
+        uint8 passType = HexGridsMath.getPassType(blockPassId);
+
+        blocks[blockCoordinate] = avatarId;
+        bler += coBlockAdd(blockCoordinate, COID, avatarId, passType);
+
         for (uint256 i = 0; i < 6; i++) {
-            bler += coBlockAdd(blockSpheres[i], COID, avatarId, blockTypes[i]);
+            bler += coBlockAdd(blockSpheres[i], COID, avatarId, passType);
         }
     }
 
@@ -115,6 +134,15 @@ contract Map {
             avatarIds[i] = blocks[blockcoordinates[i]];
         }
         return avatarIds;
+    }
+
+    function getBlocksCOID(
+        uint64 blockcoordinates
+    ) public view returns (uint256) {
+        return
+            coblocks[blockcoordinates] > 0
+                ? coblocks[blockcoordinates] / 1000
+                : 0;
     }
 
     function getBlocksCOIDs(

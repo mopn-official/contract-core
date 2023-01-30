@@ -6,4 +6,4 @@ import "./IArsenal.sol";
 import "./IAvatar.sol";
 import "./IGovernance.sol";
 import "./IMap.sol";
-import "./IProps.sol";
+import "./IBomb.sol";

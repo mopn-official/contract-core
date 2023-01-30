@@ -5,36 +5,72 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Governance is Ownable {
-    struct AvatarStat {
-        uint256 startRound;
-        uint256 lastCollectTimeStamp;
-    }
-    struct CollectionBLERRound {
-        uint256 participants;
-        uint256 amount;
-    }
-    struct CollectionBLERRounds {
-        uint256 BLER;
-        uint256 currentRound;
-        mapping(uint256 => CollectionBLERRound) Rounds;
-    }
-    address public energyContract;
+    uint256 constant BEP = 6000000000000000000000;
 
-    address public passContract;
+    uint256 constant BEP_REDUCE_INTERVAL = 50000;
 
-    address public avatarContract;
+    uint256 BEPStartBlock;
 
-    address public mapContract;
+    uint256 BEPSMinted;
+
+    uint256 BEPSLastMiningBlockNumber;
+
+    uint256 BEPSMiningShares;
+
+    mapping(uint256 => uint256) public AvatarCalcBlockNumber;
+
+    mapping(uint256 => uint256) public AvatarCalcEnergy;
+
+    mapping(uint256 => uint256) public AvatarBLERShare;
+
+    mapping(uint256 => uint256) public AvatarInboxEnergy;
+
+    function addBEPS(uint256 avatarId, uint256 amount) public onlyAvatar {
+        mintShareEnergy();
+    }
+
+    function subBEPS(uint256 avatarId, uint256 amount) public onlyAvatar {
+        mintShareEnergy();
+    }
+
+    function mintShareEnergy() public {
+        if (BEPSMiningShares == 0) {
+            BEPSLastMiningBlockNumber = block.number;
+        } else if (block.number > BEPSLastMiningBlockNumber) {
+            uint256 reduceTimes = (BEPSLastMiningBlockNumber - BEPStartBlock) /
+                BEP_REDUCE_INTERVAL;
+            uint256 rangeTotalReduceTimes = ((block.number - BEPStartBlock) /
+                BEP_REDUCE_INTERVAL) -
+                reduceTimes +
+                1;
+            uint256 curBEP;
+            uint256 reduceMaxBlockNumber;
+            uint256 blocks;
+            for (uint256 i = 0; i < rangeTotalReduceTimes; i++) {
+                reduceMaxBlockNumber =
+                    BEPStartBlock +
+                    (reduceTimes + i) *
+                    BEP_REDUCE_INTERVAL;
+                curBEP = currentBEP(reduceTimes + i);
+
+                if (block.number > reduceMaxBlockNumber) {
+                    blocks = reduceMaxBlockNumber - BEPSLastMiningBlockNumber;
+                    BEPSLastMiningBlockNumber = reduceMaxBlockNumber;
+                } else {
+                    blocks = block.number - BEPSLastMiningBlockNumber;
+                }
+
+                BEPSMinted += (blocks * curBEP) / BEPSMiningShares;
+            }
+            BEPSLastMiningBlockNumber = block.number;
+        }
+    }
+
+    function currentBEP(uint256 reduceTimes) public pure returns (uint256) {
+        return (BEP * 997 ** reduceTimes) / (1000 ** reduceTimes);
+    }
 
     bytes32 public whiteListRoot;
-
-    uint256 COIDCounter;
-
-    mapping(address => uint256) public COIDMap;
-
-    mapping(uint256 => CollectionBLERRounds) public CollctionBLER;
-
-    mapping(uint256 => AvatarStat) public AvatarStats;
 
     function checkWhitelistCOID(
         address collectionContract,
@@ -68,17 +104,40 @@ contract Governance is Ownable {
         whiteListRoot = whiteListRoot_;
     }
 
-    function updateMapContract(address mapContract_) public onlyOwner {
-        mapContract = mapContract_;
-    }
+    address public avatarContract;
 
     function updateAvatarContract(address avatarContract_) public onlyOwner {
         avatarContract = avatarContract_;
     }
 
+    address public bombContract;
+
+    function updateBombContract(address bombContract_) public onlyOwner {
+        bombContract = bombContract_;
+    }
+
+    address public energyContract;
+
+    function updateEnergyContract(address energyContract_) public onlyOwner {
+        energyContract = energyContract_;
+    }
+
+    address public mapContract;
+
+    function updateMapContract(address mapContract_) public onlyOwner {
+        mapContract = mapContract_;
+    }
+
     function updatePassContract(address passContract_) public onlyOwner {
         passContract = passContract_;
     }
+
+    address public passContract;
+
+    // Collection Id
+    uint256 COIDCounter;
+
+    mapping(address => uint256) public COIDMap;
 
     function getCOID(address collectionContract) public view returns (uint256) {
         return COIDMap[collectionContract];
@@ -87,14 +146,6 @@ contract Governance is Ownable {
     function generateCOID(address collectionContract) internal {
         COIDCounter++;
         COIDMap[collectionContract] = COIDCounter;
-    }
-
-    function addCollectionBLER(uint256 COID, uint256 bler) public onlyAvatar {
-        CollctionBLER[COID].BLER += bler;
-    }
-
-    function SubCollectionBLER(uint256 COID, uint256 bler) public onlyAvatar {
-        CollctionBLER[COID].BLER -= bler;
     }
 
     modifier onlyAvatar() {
