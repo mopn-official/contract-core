@@ -12,16 +12,7 @@ interface IAvatar is IERC721 {
         uint256 avatarId
     ) external view returns (uint256[] memory, uint256[] memory);
 
+    function getAvatarCOID(uint256 avatarId) external view returns (uint256);
+
     function moveTo(uint256 avatarId, uint256 x, uint256 y) external;
-
-    function jumpIn(
-        address nftcontract,
-        uint256 tokeId
-    ) external returns (uint256);
-
-    function claimEnergy(uint256 avatarId) external;
-
-    function addBLER(uint256 avatarId, uint256 amount) external;
-
-    function subBLER(uint256 avatarId, uint256 amount) external;
 }

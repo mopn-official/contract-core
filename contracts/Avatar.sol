@@ -24,14 +24,11 @@ contract Avatar is Multicall, Ownable {
 
     IGovernance public Governance;
 
-    IBomb public Bomb;
-
     uint256 public currentAvatarId;
 
     function setGovernanceContract(address governanceContract_) public {
         Governance = IGovernance(governanceContract_);
         Map = IMap(Governance.mapContract());
-        Bomb = IBomb(Governance.bombContract());
     }
 
     function getAvatarOccupiedBlock(
@@ -47,6 +44,10 @@ contract Avatar is Multicall, Ownable {
         uint256 avatarId
     ) public view returns (uint64) {
         return avatarNoumenon[avatarId].blockCoordinatInt;
+    }
+
+    function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
+        return avatarNoumenon[avatarId].COID;
     }
 
     function mintAvatar(
@@ -68,22 +69,6 @@ contract Avatar is Multicall, Ownable {
         return currentAvatarId;
     }
 
-    function addBLER(uint256 avatarId, uint256 amount) public onlyMap {
-        _addBLER(avatarId, amount);
-    }
-
-    function _addBLER(uint256 avatarId, uint256 amount) internal {
-        avatarNoumenon[avatarId].BLER += amount;
-    }
-
-    function subBLER(uint256 avatarId, uint256 amount) public onlyMap {
-        _subBLER(avatarId, amount);
-    }
-
-    function _subBLER(uint256 avatarId, uint256 amount) internal {
-        avatarNoumenon[avatarId].BLER -= amount;
-    }
-
     function moveTo(
         Block memory block_,
         uint256 linkedAvatarId,
@@ -92,32 +77,22 @@ contract Avatar is Multicall, Ownable {
     ) public blockCheck(block_) moveCheck(block_, linkedAvatarId, avatarId) {
         uint64 blockcoordinate = block_.coordinateInt();
 
-        uint256 blerremove = 0;
         if (avatarNoumenon[avatarId].blockCoordinatInt != 0) {
-            blerremove = Map.avatarRemove(
-                avatarNoumenon[avatarId].blockCoordinatInt,
-                avatarId
-            );
+            Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt);
         }
 
         avatarNoumenon[avatarId].blockCoordinatInt = blockcoordinate;
 
-        uint256 bleradd = Map.avatarSet(
+        Map.avatarSet(
             avatarId,
             avatarNoumenon[avatarId].COID,
             blockcoordinate,
             blockPassId
         );
-
-        if (bleradd > blerremove) {
-            _addBLER(avatarId, bleradd - blerremove);
-        } else if (bleradd < blerremove) {
-            _subBLER(avatarId, blerremove - bleradd);
-        }
     }
 
     function bomb(Block memory block_, uint256 avatarId) public {
-        Bomb.burn(msg.sender, 1, 1);
+        Governance.burnBomb(msg.sender, 1);
 
         uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
             block_.coordinateInt()
@@ -141,13 +116,7 @@ contract Avatar is Multicall, Ownable {
             avatarNoumenon[avatarId].blockCoordinatInt > 0,
             "avatar not on map"
         );
-        uint256 bler = Map.avatarRemove(
-            avatarNoumenon[avatarId].blockCoordinatInt,
-            avatarId
-        );
-        if (bler > 0) {
-            _subBLER(avatarId, bler);
-        }
+        Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt);
         avatarNoumenon[avatarId].blockCoordinatInt = 0;
     }
 
@@ -189,7 +158,6 @@ contract Avatar is Multicall, Ownable {
     }
 
     modifier onlyMap() {
-        console.log(msg.sender);
         require(
             msg.sender == address(Map) || msg.sender == address(this),
             "not allowed"

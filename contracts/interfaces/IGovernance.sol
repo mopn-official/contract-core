@@ -20,9 +20,13 @@ interface IGovernance {
         address collectionContract
     ) external view returns (uint256);
 
-    function addCollectionBLER(uint256 COID, uint256 bler) external;
+    function addBEPS(uint256 avatarId, uint16 PassId, uint256 amount) external;
 
-    function SubCollectionBLER(uint256 COID, uint256 bler) external;
+    function subBEPS(uint256 avatarId, uint256 amount) external;
+
+    function mintBomb(address to, uint256 amount) external;
+
+    function burnBomb(address from, uint256 amount) external;
 
     function avatarContract() external view returns (address);
 

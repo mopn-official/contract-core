@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 describe("MOPN", function () {
-  let hexGridsMath, intBlockMath, blockMath, governance, avatar, map, bomb;
+  let hexGridsMath, intBlockMath, blockMath, governance, avatar, map, bomb, energy;
 
   it("deploy ", async function () {
     const BlockMath = await ethers.getContractFactory("BlockMath");
@@ -25,7 +25,7 @@ describe("MOPN", function () {
     console.log("HexGridsMath", hexGridsMath.address);
 
     const Governance = await ethers.getContractFactory("Governance");
-    governance = await Governance.deploy();
+    governance = await Governance.deploy(0);
     await governance.deployed();
     console.log("Governance", governance.address);
 
@@ -55,6 +55,14 @@ describe("MOPN", function () {
     await bomb.deployed();
     console.log("Bomb", bomb.address);
 
+    const Energy = await ethers.getContractFactory("Energy");
+    energy = await Energy.deploy("$Energy", "MOPNE");
+    await energy.deployed();
+    console.log("Energy", energy.address);
+
+    const energytransownertx = await energy.transferOwnership(governance.address);
+    await energytransownertx.wait();
+
     const governancesetroottx = await governance.updateWhiteList(
       "0xb6ed762e8f2d2616d1161b1379878a2c05a049a760d707deff79de4bccd39730"
     );
@@ -72,6 +80,9 @@ describe("MOPN", function () {
     const governancesetpasstx = await governance.updatePassContract(map.address);
     await governancesetpasstx.wait();
 
+    const governancesetenergytx = await governance.updateEnergyContract(energy.address);
+    await governancesetenergytx.wait();
+
     const mapsetgovernancecontracttx = await map.setGovernanceContract(governance.address);
     await mapsetgovernancecontracttx.wait();
 
@@ -84,7 +95,7 @@ describe("MOPN", function () {
     const mintbombtx = await bomb.mint(owner.address, 1, 1);
     await mintbombtx.wait();
 
-    const transownertx = await bomb.transferOwnership(avatar.address);
+    const transownertx = await bomb.transferOwnership(governance.address);
     await transownertx.wait();
 
     const mintTx = await avatar.mintAvatar(
@@ -109,25 +120,34 @@ describe("MOPN", function () {
     const moveToTx = await avatar.moveTo([1, -1, 0], 0, 1, 1);
     await moveToTx.wait();
 
-    const moveTo1Tx = await avatar.moveTo([0, 2, -2], 0, 2, 1);
-    await moveTo1Tx.wait();
+    // const moveTo1Tx = await avatar.moveTo([0, 2, -2], 0, 2, 1);
+    // await moveTo1Tx.wait();
 
-    const moveTo2Tx = await avatar.moveTo([1, 2, -3], 2, 3, 1);
-    await moveTo2Tx.wait();
+    // const moveTo2Tx = await avatar.moveTo([1, 2, -3], 2, 3, 1);
+    // await moveTo2Tx.wait();
 
-    console.log(await avatar.getAvatarOccupiedBlock(1));
-    console.log(await avatar.getAvatarOccupiedBlock(2));
-    console.log(await avatar.getAvatarOccupiedBlock(3));
+    // console.log(await avatar.getAvatarOccupiedBlock(1));
+    // console.log(await avatar.getAvatarOccupiedBlock(2));
+    // console.log(await avatar.getAvatarOccupiedBlock(3));
 
-    const moveTo3Tx = await avatar.moveTo([1, -2, 1], 1, 1, 1);
-    await moveTo3Tx.wait();
+    // const moveTo3Tx = await avatar.moveTo([1, -2, 1], 1, 1, 1);
+    // await moveTo3Tx.wait();
 
-    const bombTx = await avatar.bomb([0, 2, -2], 1);
-    await bombTx.wait();
+    // const bombTx = await avatar.bomb([0, 2, -2], 1);
+    // await bombTx.wait();
 
-    console.log(await avatar.getAvatarOccupiedBlock(1));
-    console.log(await avatar.getAvatarOccupiedBlock(2));
-    console.log(await avatar.getAvatarOccupiedBlock(3));
+    // console.log(await avatar.getAvatarOccupiedBlock(1));
+    // console.log(await avatar.getAvatarOccupiedBlock(2));
+    // console.log(await avatar.getAvatarOccupiedBlock(3));
+
+    // console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1)));
+    // console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2)));
+    // console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3)));
+
+    const redeemEnergyTx = await governance.redeemAvatarInboxEnergy(1);
+    await redeemEnergyTx.wait();
+
+    console.log(ethers.utils.formatUnits(await energy.balanceOf(owner.address)));
 
     // console.log(await avatar.getAvatarOccupiedBlockInt(1));
   });

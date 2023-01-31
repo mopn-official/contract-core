@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "hardhat/console.sol";
+import "./interfaces/IEnergy.sol";
+import "./interfaces/IAvatar.sol";
+import "./interfaces/IBomb.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -9,65 +13,123 @@ contract Governance is Ownable {
 
     uint256 constant BEP_REDUCE_INTERVAL = 50000;
 
-    uint256 BEPStartBlock;
+    uint256 BEPSStartBlock;
 
+    // Block Energy Produce Share Minted
     uint256 BEPSMinted;
 
     uint256 BEPSLastMiningBlockNumber;
 
     uint256 BEPSMiningShares;
 
-    mapping(uint256 => uint256) public AvatarCalcBlockNumber;
-
     mapping(uint256 => uint256) public AvatarCalcEnergy;
 
-    mapping(uint256 => uint256) public AvatarBLERShare;
+    mapping(uint256 => uint256) public AvatarBEPSShare;
 
     mapping(uint256 => uint256) public AvatarInboxEnergy;
 
-    function addBEPS(uint256 avatarId, uint256 amount) public onlyAvatar {
-        mintShareEnergy();
+    mapping(uint256 => uint256) public CollectionInboxEnergy;
+
+    mapping(uint256 => uint256) public PassHolderInboxEnergy;
+
+    constructor(uint256 BEPSStartBlock_) {
+        BEPSStartBlock = BEPSStartBlock_;
     }
 
-    function subBEPS(uint256 avatarId, uint256 amount) public onlyAvatar {
+    function addBEPS(
+        uint256 avatarId,
+        uint16 PassId,
+        uint256 amount
+    ) public onlyMap {
         mintShareEnergy();
+        BEPSMiningShares += amount;
+        mintAvatarEnergy(avatarId);
+        uint256 PassId_ = uint256(PassId);
+        if (PassId_ == 0) {
+            PassId_ = AvatarBEPSShare[avatarId] % 100000;
+        }
+        AvatarBEPSShare[avatarId] =
+            (AvatarBEPSShare[avatarId] / 100000 + amount) *
+            100000 +
+            PassId_;
+    }
+
+    function subBEPS(uint256 avatarId, uint256 amount) public onlyMap {
+        mintShareEnergy();
+        BEPSMiningShares -= amount;
+        mintAvatarEnergy(avatarId);
+        AvatarBEPSShare[avatarId] -= amount * 100000;
     }
 
     function mintShareEnergy() public {
         if (BEPSMiningShares == 0) {
             BEPSLastMiningBlockNumber = block.number;
         } else if (block.number > BEPSLastMiningBlockNumber) {
-            uint256 reduceTimes = (BEPSLastMiningBlockNumber - BEPStartBlock) /
+            uint256 reduceTimes = (BEPSLastMiningBlockNumber - BEPSStartBlock) /
                 BEP_REDUCE_INTERVAL;
-            uint256 rangeTotalReduceTimes = ((block.number - BEPStartBlock) /
-                BEP_REDUCE_INTERVAL) -
-                reduceTimes +
-                1;
-            uint256 curBEP;
-            uint256 reduceMaxBlockNumber;
-            uint256 blocks;
-            for (uint256 i = 0; i < rangeTotalReduceTimes; i++) {
-                reduceMaxBlockNumber =
-                    BEPStartBlock +
-                    (reduceTimes + i) *
-                    BEP_REDUCE_INTERVAL;
-                curBEP = currentBEP(reduceTimes + i);
+            uint256 nextReduceBlockNumber = BEPSStartBlock +
+                BEP_REDUCE_INTERVAL +
+                reduceTimes *
+                BEP_REDUCE_INTERVAL;
 
-                if (block.number > reduceMaxBlockNumber) {
-                    blocks = reduceMaxBlockNumber - BEPSLastMiningBlockNumber;
-                    BEPSLastMiningBlockNumber = reduceMaxBlockNumber;
+            uint256 BEPSMinted_;
+            while (true) {
+                if (block.number > nextReduceBlockNumber) {
+                    BEPSMinted_ +=
+                        ((nextReduceBlockNumber - BEPSLastMiningBlockNumber) *
+                            currentBEP(reduceTimes)) /
+                        BEPSMiningShares;
+                    BEPSLastMiningBlockNumber = nextReduceBlockNumber;
+                    reduceTimes++;
+                    nextReduceBlockNumber += BEP_REDUCE_INTERVAL;
                 } else {
-                    blocks = block.number - BEPSLastMiningBlockNumber;
+                    BEPSMinted_ +=
+                        ((block.number - BEPSLastMiningBlockNumber) *
+                            currentBEP(reduceTimes)) /
+                        BEPSMiningShares;
+                    break;
                 }
-
-                BEPSMinted += (blocks * curBEP) / BEPSMiningShares;
             }
+
+            BEPSMinted += BEPSMinted_;
             BEPSLastMiningBlockNumber = block.number;
+        }
+    }
+
+    function mintAvatarEnergy(uint256 avatarId) internal {
+        if (AvatarCalcEnergy[avatarId] < BEPSMinted) {
+            if (AvatarBEPSShare[avatarId] / 100000 > 0) {
+                uint256 COID = IAvatar(avatarContract).getAvatarCOID(avatarId);
+                uint256 add = ((BEPSMinted - AvatarCalcEnergy[avatarId]) *
+                    AvatarBEPSShare[avatarId]) / 100000;
+                AvatarInboxEnergy[avatarId] += (add * 90) / 100;
+                CollectionInboxEnergy[COID] += (add * 9) / 100;
+                PassHolderInboxEnergy[AvatarBEPSShare[avatarId] % 100000] +=
+                    add /
+                    100;
+            }
+            AvatarCalcEnergy[avatarId] = BEPSMinted;
         }
     }
 
     function currentBEP(uint256 reduceTimes) public pure returns (uint256) {
         return (BEP * 997 ** reduceTimes) / (1000 ** reduceTimes);
+    }
+
+    function getAvatarInboxEnergy(
+        uint256 avatarId
+    ) public view returns (uint256) {
+        return AvatarInboxEnergy[avatarId];
+    }
+
+    function redeemAvatarInboxEnergy(uint256 avatarId) public {
+        mintShareEnergy();
+        mintAvatarEnergy(avatarId);
+
+        require(AvatarInboxEnergy[avatarId] > 0, "empty");
+        uint256 amount = AvatarInboxEnergy[avatarId];
+        AvatarInboxEnergy[avatarId] = 0;
+        IEnergy(energyContract).mint(msg.sender, amount);
     }
 
     bytes32 public whiteListRoot;
@@ -102,6 +164,12 @@ contract Governance is Ownable {
 
     function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
         whiteListRoot = whiteListRoot_;
+    }
+
+    address public arsenalContract;
+
+    function updateArsenalContract(address arsenalContract_) public onlyOwner {
+        arsenalContract = arsenalContract_;
     }
 
     address public avatarContract;
@@ -146,6 +214,20 @@ contract Governance is Ownable {
     function generateCOID(address collectionContract) internal {
         COIDCounter++;
         COIDMap[collectionContract] = COIDCounter;
+    }
+
+    // Bomb
+    function mintBomb(address to, uint256 amount) public onlyArsenal {
+        IBomb(bombContract).mint(to, 1, amount);
+    }
+
+    function burnBomb(address from, uint256 amount) public onlyAvatar {
+        IBomb(bombContract).burn(from, 1, amount);
+    }
+
+    modifier onlyArsenal() {
+        require(msg.sender == arsenalContract, "not allowed");
+        _;
     }
 
     modifier onlyAvatar() {

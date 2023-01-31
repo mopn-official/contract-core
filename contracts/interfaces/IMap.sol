@@ -17,12 +17,9 @@ interface IMap {
         uint256 COID,
         uint64 blockTo,
         uint16 blockPassId
-    ) external returns (uint256);
+    ) external;
 
-    function avatarRemove(
-        uint64 blockcoordinate,
-        uint256 avatarId
-    ) external returns (uint256);
+    function avatarRemove(uint64 blockcoordinate) external;
 
     function getBlockAvatar(uint64 block_) external view returns (uint256);
 }

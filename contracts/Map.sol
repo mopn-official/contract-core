@@ -12,7 +12,7 @@ contract Map {
 
     mapping(uint64 => mapping(uint256 => uint256)) public coblocksExt;
 
-    uint256[3] blers = [1, 5, 15];
+    uint256[3] BEPSs = [1, 5, 15];
 
     IAvatar public Avatar;
     IGovernance public Governance;
@@ -27,7 +27,7 @@ contract Map {
         uint256 COID,
         uint64 blockCoordinate,
         uint16 blockPassId
-    ) public onlyAvatar returns (uint256 bler) {
+    ) public onlyAvatar {
         require(getBlockAvatar(blockCoordinate) == 0, "dst Occupied");
 
         uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
@@ -51,24 +51,29 @@ contract Map {
         uint8 passType = HexGridsMath.getPassType(blockPassId);
 
         blocks[blockCoordinate] = avatarId;
-        bler += coBlockAdd(blockCoordinate, COID, avatarId, passType);
+        uint256 BEPS = coBlockAdd(blockCoordinate, COID, avatarId, passType);
 
         for (uint256 i = 0; i < 6; i++) {
-            bler += coBlockAdd(blockSpheres[i], COID, avatarId, passType);
+            BEPS += coBlockAdd(blockSpheres[i], COID, avatarId, passType);
         }
+
+        Governance.addBEPS(avatarId, blockPassId, BEPS);
     }
 
-    function avatarRemove(
-        uint64 block_,
-        uint256 avatarId
-    ) public onlyAvatar returns (uint256 bler) {
-        blocks[block_] = 0;
-        bler += coBlockSub(block_, avatarId);
+    function avatarRemove(uint64 blockcoordinate) public onlyAvatar {
+        uint256 avatarId = blocks[blockcoordinate];
+        blocks[blockcoordinate] = 0;
 
-        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(block_);
+        uint256 BEPS = coBlockSub(blockcoordinate, avatarId);
+
+        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
+            blockcoordinate
+        );
         for (uint256 i = 0; i < 6; i++) {
-            bler += coBlockSub(blockSpheres[i], avatarId);
+            BEPS += coBlockSub(blockSpheres[i], avatarId);
         }
+
+        Governance.subBEPS(avatarId, BEPS);
     }
 
     function coBlockAdd(
@@ -76,9 +81,9 @@ contract Map {
         uint256 COID,
         uint256 avatarId,
         uint256 blockType
-    ) private returns (uint256 bler) {
+    ) private returns (uint256 BEPS) {
         if (coblocks[blockcoordinate] == 0) {
-            bler = blers[blockType];
+            BEPS = BEPSs[blockType];
             coblocks[blockcoordinate] = COID * 1000 + blockType * 10 + 1;
             coblocksExt[blockcoordinate][0] = avatarId;
         } else {
@@ -91,9 +96,9 @@ contract Map {
     function coBlockSub(
         uint64 blockcoordinate,
         uint256 avatarId
-    ) private returns (uint256 bler) {
+    ) private returns (uint256 BEPS) {
         uint256 blockType = (coblocks[blockcoordinate] % 1000) / 10;
-        bler = blers[blockType];
+        BEPS = BEPSs[blockType];
         uint256 left = (coblocks[blockcoordinate] % 10);
         if (left == 1) {
             coblocks[blockcoordinate] = 0;
@@ -104,12 +109,13 @@ contract Map {
                     if (i == 0) {
                         substituteIndex = i + 1;
 
-                        Avatar.addBLER(
+                        Governance.addBEPS(
                             coblocksExt[blockcoordinate][substituteIndex],
-                            bler
+                            0,
+                            BEPS
                         );
                     } else {
-                        bler = 0;
+                        BEPS = 0;
                     }
                 }
                 if (substituteIndex > 0 && i >= substituteIndex) {

@@ -13,9 +13,6 @@ struct AvatarData {
     uint64 blockCoordinatInt;
     uint256 COID;
     uint256 tokenId;
-    uint256 BLER;
-    uint256 BLERLastCalTime;
-    uint256 BLERTank;
 }
 
 struct CollectionData {
