@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 describe("MOPN", function () {
-  let hexGridsMath, intBlockMath, blockMath, governance, avatar, map, bomb, energy;
+  let hexGridsMath, intBlockMath, blockMath, governance, arsenal, avatar, map, bomb, energy;
 
   it("deploy ", async function () {
     const BlockMath = await ethers.getContractFactory("BlockMath");
@@ -60,6 +60,11 @@ describe("MOPN", function () {
     await energy.deployed();
     console.log("Energy", energy.address);
 
+    const Arsenal = await ethers.getContractFactory("Arsenal");
+    arsenal = await Arsenal.deploy();
+    await arsenal.deployed();
+    console.log("Arsenal", arsenal.address);
+
     const energytransownertx = await energy.transferOwnership(governance.address);
     await energytransownertx.wait();
 
@@ -67,6 +72,9 @@ describe("MOPN", function () {
       "0xb6ed762e8f2d2616d1161b1379878a2c05a049a760d707deff79de4bccd39730"
     );
     await governancesetroottx.wait();
+
+    const governancesetarsenaltx = await governance.updateArsenalContract(arsenal.address);
+    await governancesetarsenaltx.wait();
 
     const governancesetavatartx = await governance.updateAvatarContract(avatar.address);
     await governancesetavatartx.wait();
@@ -88,6 +96,9 @@ describe("MOPN", function () {
 
     const avatarsetgovernancecontracttx = await avatar.setGovernanceContract(governance.address);
     await avatarsetgovernancecontracttx.wait();
+
+    const arsenalsetgovernancecontracttx = await arsenal.setGovernanceContract(governance.address);
+    await arsenalsetgovernancecontracttx.wait();
   });
 
   it("test mint nft", async function () {
@@ -148,6 +159,16 @@ describe("MOPN", function () {
     await redeemEnergyTx.wait();
 
     console.log(ethers.utils.formatUnits(await energy.balanceOf(owner.address)));
+
+    const allowanceTx = await energy.approve(
+      arsenal.address,
+      ethers.BigNumber.from("5400000000000000000000")
+    );
+    await allowanceTx.wait();
+
+    console.log(ethers.utils.formatUnits(await arsenal.getCurrentPrice()));
+    const buybombtx = await arsenal.buy(1);
+    await buybombtx.wait();
 
     // console.log(await avatar.getAvatarOccupiedBlockInt(1));
   });

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "hardhat/console.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IEnergy.sol";
 
@@ -11,7 +12,7 @@ contract Arsenal {
 
     uint256 public startUnixRound;
 
-    uint256 public startPrice = 1000000000000000000000000;
+    uint256 public startPrice = 10000000000000000000000;
 
     mapping(uint256 => uint256) roundStorage;
 
@@ -51,7 +52,7 @@ contract Arsenal {
         if (timeElapse >= roundTime) {
             return 0;
         }
-        return (startPrice * timeElapse) / roundTime;
+        return (startPrice * (roundTime - timeElapse)) / roundTime;
     }
 
     function getCurrentRoundData()
