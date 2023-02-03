@@ -2,14 +2,12 @@
 pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
-import "./interfaces/IEnergy.sol";
-import "./interfaces/IAvatar.sol";
-import "./interfaces/IBomb.sol";
+import "./interfaces/IMOPN.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Governance is Ownable {
-    uint256 constant BEP = 6000000000000000000000;
+    uint256 constant BEP = 600000000000000000000000;
 
     uint256 constant BEP_REDUCE_INTERVAL = 50000;
 
@@ -20,7 +18,7 @@ contract Governance is Ownable {
 
     uint256 BEPSLastMiningBlockNumber;
 
-    uint256 BEPSMiningShares;
+    uint256 BEPS_Count;
 
     mapping(uint256 => uint256) public AvatarCalcEnergy;
 
@@ -28,7 +26,15 @@ contract Governance is Ownable {
 
     mapping(uint256 => uint256) public AvatarInboxEnergy;
 
+    mapping(uint256 => uint256) public CollectionCalcEnergy;
+
+    mapping(uint256 => uint256) public CollectionBEPSShare;
+
     mapping(uint256 => uint256) public CollectionInboxEnergy;
+
+    mapping(uint256 => uint256) public PassHolderCalcEnergy;
+
+    mapping(uint256 => uint256) public PassHolderBEPSShare;
 
     mapping(uint256 => uint256) public PassHolderInboxEnergy;
 
@@ -38,31 +44,40 @@ contract Governance is Ownable {
 
     function addBEPS(
         uint256 avatarId,
-        uint16 PassId,
+        uint256 COID,
+        uint64 PassId,
         uint256 amount
     ) public onlyMap {
         mintShareEnergy();
-        BEPSMiningShares += amount;
+        BEPS_Count += amount;
         mintAvatarEnergy(avatarId);
-        uint256 PassId_ = uint256(PassId);
-        if (PassId_ == 0) {
-            PassId_ = AvatarBEPSShare[avatarId] % 100000;
-        }
-        AvatarBEPSShare[avatarId] =
-            (AvatarBEPSShare[avatarId] / 100000 + amount) *
-            100000 +
-            PassId_;
+        AvatarBEPSShare[avatarId] += amount;
+        mintCollectionEnergy(COID);
+        CollectionBEPSShare[COID] += amount;
+        mintPassHolderEnergy(PassId);
+        PassHolderBEPSShare[PassId] += amount;
     }
 
-    function subBEPS(uint256 avatarId, uint256 amount) public onlyMap {
+    function subBEPS(
+        uint256 avatarId,
+        uint256 COID,
+        uint64 PassId,
+        uint256 amount
+    ) public onlyMap {
         mintShareEnergy();
-        BEPSMiningShares -= amount;
+        BEPS_Count -= amount;
         mintAvatarEnergy(avatarId);
-        AvatarBEPSShare[avatarId] -= amount * 100000;
+        console.log("1:", AvatarBEPSShare[avatarId]);
+        console.log("2:", amount);
+        AvatarBEPSShare[avatarId] -= amount;
+        mintCollectionEnergy(COID);
+        CollectionBEPSShare[COID] -= amount;
+        mintPassHolderEnergy(PassId);
+        PassHolderBEPSShare[PassId] -= amount;
     }
 
     function mintShareEnergy() public {
-        if (BEPSMiningShares == 0) {
+        if (BEPS_Count == 0) {
             BEPSLastMiningBlockNumber = block.number;
         } else if (block.number > BEPSLastMiningBlockNumber) {
             uint256 reduceTimes = (BEPSLastMiningBlockNumber - BEPSStartBlock) /
@@ -78,7 +93,7 @@ contract Governance is Ownable {
                     BEPSMinted_ +=
                         ((nextReduceBlockNumber - BEPSLastMiningBlockNumber) *
                             currentBEP(reduceTimes)) /
-                        BEPSMiningShares;
+                        BEPS_Count;
                     BEPSLastMiningBlockNumber = nextReduceBlockNumber;
                     reduceTimes++;
                     nextReduceBlockNumber += BEP_REDUCE_INTERVAL;
@@ -86,7 +101,7 @@ contract Governance is Ownable {
                     BEPSMinted_ +=
                         ((block.number - BEPSLastMiningBlockNumber) *
                             currentBEP(reduceTimes)) /
-                        BEPSMiningShares;
+                        BEPS_Count;
                     break;
                 }
             }
@@ -98,17 +113,34 @@ contract Governance is Ownable {
 
     function mintAvatarEnergy(uint256 avatarId) internal {
         if (AvatarCalcEnergy[avatarId] < BEPSMinted) {
-            if (AvatarBEPSShare[avatarId] / 100000 > 0) {
-                uint256 COID = IAvatar(avatarContract).getAvatarCOID(avatarId);
+            if (AvatarBEPSShare[avatarId] > 0) {
                 uint256 add = ((BEPSMinted - AvatarCalcEnergy[avatarId]) *
-                    AvatarBEPSShare[avatarId]) / 100000;
+                    AvatarBEPSShare[avatarId]);
                 AvatarInboxEnergy[avatarId] += (add * 90) / 100;
-                CollectionInboxEnergy[COID] += (add * 9) / 100;
-                PassHolderInboxEnergy[AvatarBEPSShare[avatarId] % 100000] +=
-                    add /
-                    100;
             }
             AvatarCalcEnergy[avatarId] = BEPSMinted;
+        }
+    }
+
+    function mintCollectionEnergy(uint256 COID) internal {
+        if (CollectionCalcEnergy[COID] < BEPSMinted) {
+            if (CollectionBEPSShare[COID] > 0) {
+                uint256 add = ((BEPSMinted - CollectionCalcEnergy[COID]) *
+                    CollectionBEPSShare[COID]);
+                CollectionInboxEnergy[COID] += (add * 9) / 100;
+            }
+            CollectionCalcEnergy[COID] = BEPSMinted;
+        }
+    }
+
+    function mintPassHolderEnergy(uint64 PassId) internal {
+        if (PassHolderCalcEnergy[PassId] < BEPSMinted) {
+            if (PassHolderBEPSShare[PassId] > 0) {
+                uint256 add = ((BEPSMinted - PassHolderCalcEnergy[PassId]) *
+                    PassHolderBEPSShare[PassId]);
+                PassHolderInboxEnergy[PassId] += add / 100;
+            }
+            PassHolderCalcEnergy[PassId] = BEPSMinted;
         }
     }
 
@@ -196,11 +228,11 @@ contract Governance is Ownable {
         mapContract = mapContract_;
     }
 
+    address public passContract;
+
     function updatePassContract(address passContract_) public onlyOwner {
         passContract = passContract_;
     }
-
-    address public passContract;
 
     // Collection Id
     uint256 COIDCounter;

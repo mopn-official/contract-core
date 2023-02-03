@@ -2,15 +2,15 @@
 pragma solidity ^0.8.17;
 
 import "./interfaces/IMOPN.sol";
-import "./libraries/HexGridsMath.sol";
+import "./libraries/IntBlockMath.sol";
 
 contract Map {
+    using IntBlockMath for uint64;
+
     // Block => avatarId
     mapping(uint64 => uint256) public blocks;
 
-    mapping(uint64 => uint256) public coblocks;
-
-    mapping(uint64 => mapping(uint256 => uint256)) public coblocksExt;
+    mapping(uint64 => uint64) public blocksInPass;
 
     uint256[3] BEPSs = [1, 5, 15];
 
@@ -22,114 +22,193 @@ contract Map {
         Avatar = IAvatar(Governance.avatarContract());
     }
 
+    function PassData2Ids(
+        bytes memory b
+    ) internal pure returns (uint64[3] memory PassIds) {
+        for (uint i = 0; i < 3; i++) {
+            PassIds[i] =
+                uint64(uint8(b[i * 2])) *
+                256 +
+                uint64(uint8(b[i * 2 + 1]));
+        }
+    }
+
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
         uint64 blockCoordinate,
-        uint16 blockPassId
+        bytes memory PassData
     ) public onlyAvatar {
-        require(getBlockAvatar(blockCoordinate) == 0, "dst Occupied");
+        require(Map.getBlockAvatar(blockCoordinate) == 0, "dst Occupied");
 
-        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
-            blockCoordinate
-        );
-        uint256 coidcontext;
-        for (uint256 i = 0; i < blockSpheres.length; i++) {
-            coidcontext = getBlocksCOID(blockSpheres[i]);
-            require(coidcontext == 0 || coidcontext == COID, "dst has enemy");
+        uint64[3] memory PassIds = PassData2Ids(PassData);
+        blocks[blockCoordinate] = avatarId * 10000000000 + block.timestamp;
+
+        uint256 BEPS;
+        uint64 PassId;
+        for (uint256 i = 0; i < 7; i++) {
+            if (blocksInPass[blockCoordinate] > 0) {
+                PassId = blocksInPass[blockCoordinate];
+            } else {
+                PassId = PassIds[uint8(PassData[i + 6])];
+                require(
+                    blockCoordinate.distance(
+                        IntBlockMath.PassCenterBlock(PassId)
+                    ) < 6,
+                    "PassId error"
+                );
+                blocksInPass[blockCoordinate] = PassId;
+            }
+
+            BEPS = coBlockAdd(blockCoordinate, COID, PassId, i);
+            if (BEPS > 0) {
+                Governance.addBEPS(avatarId, COID, PassId, BEPS);
+            }
+            if (i == 0) {
+                blockCoordinate = blockCoordinate.neighbor(4);
+            } else {
+                blockCoordinate = blockCoordinate.neighbor(i - 1);
+            }
         }
-
-        require(
-            IntBlockMath.distance(
-                blockCoordinate,
-                BlockMath.coordinateInt(
-                    HexGridsMath.PassCenterBlock(blockPassId)
-                )
-            ) < 6,
-            "PassId error"
-        );
-        uint8 passType = HexGridsMath.getPassType(blockPassId);
-
-        blocks[blockCoordinate] = avatarId;
-        uint256 BEPS = coBlockAdd(blockCoordinate, COID, avatarId, passType);
-
-        for (uint256 i = 0; i < 6; i++) {
-            BEPS += coBlockAdd(blockSpheres[i], COID, avatarId, passType);
-        }
-
-        Governance.addBEPS(avatarId, blockPassId, BEPS);
     }
 
-    function avatarRemove(uint64 blockcoordinate) public onlyAvatar {
-        uint256 avatarId = blocks[blockcoordinate];
-        blocks[blockcoordinate] = 0;
+    function avatarRemove(
+        uint256 avatarId,
+        uint256 COID,
+        uint64 blockCoordinate
+    ) public onlyAvatar {
+        uint256 occupiedTimestamp = getBlockOccupiedTimestamp(blockCoordinate);
+        blocks[blockCoordinate] = 0;
 
-        uint256 BEPS = coBlockSub(blockcoordinate, avatarId);
-
-        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
-            blockcoordinate
-        );
-        for (uint256 i = 0; i < 6; i++) {
-            BEPS += coBlockSub(blockSpheres[i], avatarId);
+        uint256 BEPS;
+        for (uint256 i = 0; i < 7; i++) {
+            BEPS = coBlockSub(
+                blockCoordinate,
+                COID,
+                blocksInPass[blockCoordinate],
+                occupiedTimestamp,
+                i
+            );
+            if (BEPS > 0) {
+                Governance.subBEPS(
+                    avatarId,
+                    COID,
+                    blocksInPass[blockCoordinate],
+                    BEPS
+                );
+            }
+            if (i == 0) {
+                blockCoordinate = blockCoordinate.neighbor(4);
+            } else {
+                blockCoordinate = blockCoordinate.neighbor(i - 1);
+            }
         }
+    }
 
-        Governance.subBEPS(avatarId, BEPS);
+    function getBlockOuterDirections(
+        uint256 Index
+    ) public pure returns (uint8[4] memory a) {
+        if (Index == 1) {
+            return [3, 5, 0, 0];
+        } else if (Index == 2) {
+            return [4, 0, 1, 0];
+        } else if (Index == 3) {
+            return [5, 1, 2, 0];
+        } else if (Index == 4) {
+            return [0, 2, 3, 0];
+        } else if (Index == 5) {
+            return [1, 3, 4, 0];
+        } else if (Index == 6) {
+            return [2, 4, 5, 0];
+        }
     }
 
     function coBlockAdd(
-        uint64 blockcoordinate,
+        uint64 blockCoordinate,
         uint256 COID,
-        uint256 avatarId,
-        uint256 blockType
-    ) private returns (uint256 BEPS) {
-        if (coblocks[blockcoordinate] == 0) {
-            BEPS = BEPSs[blockType];
-            coblocks[blockcoordinate] = COID * 1000 + blockType * 10 + 1;
-            coblocksExt[blockcoordinate][0] = avatarId;
-        } else {
-            uint64 index = uint64((coblocks[blockcoordinate] % 10));
-            coblocksExt[blockcoordinate][index] = avatarId;
-            coblocks[blockcoordinate]++;
+        uint64 PassId,
+        uint256 Index
+    ) private view returns (uint256 BEPS) {
+        BEPS = BEPSs[IntBlockMath.getPassType(PassId)];
+        if (Index != 0) {
+            uint8[4] memory directions = getBlockOuterDirections(Index);
+            for (uint256 i = 0; i < directions.length; i++) {
+                uint256 coAvatarId = getBlockAvatar(blockCoordinate);
+                if (coAvatarId > 0) {
+                    require(
+                        Avatar.getAvatarCOID(coAvatarId) == COID,
+                        "dst has enemy"
+                    );
+                    BEPS = 0;
+                    break;
+                }
+
+                blockCoordinate = blockCoordinate.neighbor(directions[i]);
+            }
         }
     }
 
     function coBlockSub(
-        uint64 blockcoordinate,
-        uint256 avatarId
+        uint64 blockCoordinate,
+        uint256 COID,
+        uint64 PassId,
+        uint256 occupiedTimestamp,
+        uint256 Index
     ) private returns (uint256 BEPS) {
-        uint256 blockType = (coblocks[blockcoordinate] % 1000) / 10;
-        BEPS = BEPSs[blockType];
-        uint256 left = (coblocks[blockcoordinate] % 10);
-        if (left == 1) {
-            coblocks[blockcoordinate] = 0;
-        } else {
-            uint256 substituteIndex = 0;
-            for (uint256 i = 0; i < left; i++) {
-                if (coblocksExt[blockcoordinate][i] == avatarId) {
+        BEPS = BEPSs[IntBlockMath.getPassType(PassId)];
+        if (Index != 0) {
+            uint256 substituteAvatarId;
+            uint256 substituteOccupiedTimestamp;
+            uint256 substituteBEPS;
+            uint8[4] memory directions = getBlockOuterDirections(Index);
+            for (uint256 i = 0; i < directions.length; i++) {
+                uint256 coAvatarId = getBlockAvatar(blockCoordinate);
+                if (coAvatarId > 0) {
                     if (i == 0) {
-                        substituteIndex = i + 1;
-
-                        Governance.addBEPS(
-                            coblocksExt[blockcoordinate][substituteIndex],
-                            0,
-                            BEPS
-                        );
-                    } else {
                         BEPS = 0;
+                        break;
+                    }
+                    uint256 coOccupiedTimestamp = getBlockOccupiedTimestamp(
+                        blockCoordinate
+                    );
+                    if (coOccupiedTimestamp < occupiedTimestamp) {
+                        BEPS = 0;
+                        break;
+                    } else if (
+                        substituteOccupiedTimestamp == 0 ||
+                        coOccupiedTimestamp < substituteOccupiedTimestamp
+                    ) {
+                        substituteOccupiedTimestamp = coOccupiedTimestamp;
+                        substituteAvatarId = coAvatarId;
+                        substituteBEPS = BEPSs[
+                            IntBlockMath.getPassType(PassId)
+                        ];
                     }
                 }
-                if (substituteIndex > 0 && i >= substituteIndex) {
-                    coblocksExt[blockcoordinate][i - 1] = coblocksExt[
-                        blockcoordinate
-                    ][i];
-                }
+
+                blockCoordinate = blockCoordinate.neighbor(directions[i]);
             }
-            coblocks[blockcoordinate] -= 1;
+            if (substituteAvatarId > 0) {
+                Governance.addBEPS(
+                    substituteAvatarId,
+                    COID,
+                    PassId,
+                    substituteBEPS
+                );
+            }
         }
     }
 
-    function getBlockAvatar(uint64 block_) public view returns (uint256) {
-        return blocks[block_];
+    function getBlockAvatar(
+        uint64 blockCoordinate
+    ) public view returns (uint256) {
+        return blocks[blockCoordinate] / 10000000000;
+    }
+
+    function getBlockOccupiedTimestamp(
+        uint64 blockCoordinate
+    ) public view returns (uint256) {
+        return (blocks[blockCoordinate] % 10000000000);
     }
 
     function getBlocksAvatars(
@@ -137,30 +216,9 @@ contract Map {
     ) public view returns (uint256[] memory) {
         uint256[] memory avatarIds = new uint256[](blockcoordinates.length);
         for (uint256 i = 0; i < blockcoordinates.length; i++) {
-            avatarIds[i] = blocks[blockcoordinates[i]];
+            avatarIds[i] = blocks[blockcoordinates[i]] / 10000000000;
         }
         return avatarIds;
-    }
-
-    function getBlocksCOID(
-        uint64 blockcoordinates
-    ) public view returns (uint256) {
-        return
-            coblocks[blockcoordinates] > 0
-                ? coblocks[blockcoordinates] / 1000
-                : 0;
-    }
-
-    function getBlocksCOIDs(
-        uint64[] memory blockcoordinates
-    ) public view returns (uint256[] memory) {
-        uint256[] memory COIDs = new uint256[](blockcoordinates.length);
-        for (uint256 i = 0; i < blockcoordinates.length; i++) {
-            COIDs[i] = coblocks[blockcoordinates[i]] > 0
-                ? coblocks[blockcoordinates[i]] / 1000
-                : 0;
-        }
-        return COIDs;
     }
 
     modifier onlyAvatar() {

@@ -2,8 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
-import "./interfaces/IGovernance.sol";
-import "./interfaces/IEnergy.sol";
+import "./interfaces/IMOPN.sol";
 
 contract Arsenal {
     address public governanceContract;

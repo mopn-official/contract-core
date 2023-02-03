@@ -14,6 +14,16 @@ describe("MOPN", function () {
     await intBlockMath.deployed();
     console.log("IntBlockMath", intBlockMath.address);
 
+    const HexGridsMath = await ethers.getContractFactory("HexGridsMath", {
+      libraries: {
+        BlockMath: blockMath.address,
+        IntBlockMath: intBlockMath.address,
+      },
+    });
+    hexGridsMath = await HexGridsMath.deploy();
+    await hexGridsMath.deployed();
+    console.log("HexGridsMath", hexGridsMath.address);
+
     const Governance = await ethers.getContractFactory("Governance");
     governance = await Governance.deploy(0);
     await governance.deployed();
@@ -21,8 +31,9 @@ describe("MOPN", function () {
 
     const Map = await ethers.getContractFactory("Map", {
       libraries: {
-        // BlockMath: blockMath.address,
+        BlockMath: blockMath.address,
         IntBlockMath: intBlockMath.address,
+        HexGridsMath: hexGridsMath.address,
       },
     });
     map = await Map.deploy();
@@ -31,8 +42,8 @@ describe("MOPN", function () {
 
     const Avatar = await ethers.getContractFactory("Avatar", {
       libraries: {
-        // BlockMath: blockMath.address,
-        IntBlockMath: intBlockMath.address,
+        BlockMath: blockMath.address,
+        HexGridsMath: hexGridsMath.address,
       },
     });
     avatar = await Avatar.deploy();
@@ -116,65 +127,48 @@ describe("MOPN", function () {
     );
     await mintTx2.wait();
 
-    const mintTx3 = await avatar.mintAvatar(
-      ["0xeDf9672409F73E844fAaf01e9d9A6862B13D9020", 3],
-      ["0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18"]
+    // [0, 0, 0, 0, 0, 0, 0]
+    const moveToTx = await avatar.moveTo([1, -1, 0], 0, 1, 1);
+    await moveToTx.wait();
+
+    // const moveTo1Tx = await avatar.moveTo([0, 2, -2], 0, 2, 1);
+    // await moveTo1Tx.wait();
+
+    // const moveTo2Tx = await avatar.moveTo([1, 2, -3], 2, 3, 1);
+    // await moveTo2Tx.wait();
+
+    // console.log(await avatar.getAvatarOccupiedBlock(1));
+    // console.log(await avatar.getAvatarOccupiedBlock(2));
+    // console.log(await avatar.getAvatarOccupiedBlock(3));
+
+    // const moveTo3Tx = await avatar.moveTo([1, -2, 1], 1, 1, 1);
+    // await moveTo3Tx.wait();
+
+    // const bombTx = await avatar.bomb([0, 2, -2], 1);
+    // await bombTx.wait();
+
+    // console.log(await avatar.getAvatarOccupiedBlock(1));
+    // console.log(await avatar.getAvatarOccupiedBlock(2));
+    // console.log(await avatar.getAvatarOccupiedBlock(3));
+
+    // console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1)));
+    // console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2)));
+    // console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3)));
+
+    const redeemEnergyTx = await governance.redeemAvatarInboxEnergy(1);
+    await redeemEnergyTx.wait();
+
+    console.log(ethers.utils.formatUnits(await energy.balanceOf(owner.address)));
+
+    const allowanceTx = await energy.approve(
+      arsenal.address,
+      ethers.BigNumber.from("5400000000000000000000")
     );
-    await mintTx3.wait();
+    await allowanceTx.wait();
 
-    // 1 -1 0
-    const jumpInTx = await avatar.jumpIn(100109991000, 0, 1, "0x00010001000100000000000001");
-    await jumpInTx.wait();
-
-    // 0 2 -2
-    const jumpIn1Tx = await avatar.jumpIn(100010020998, 0, 2, "0x00010001000100000000000001");
-    await jumpIn1Tx.wait();
-
-    // // 1 2 -3
-    // const jumpIn2Tx = await avatar.jumpIn(100110020997, 2, 3, "0x00010001000100000000000001");
-    // await jumpIn2Tx.wait();
-
-    // // 1 2 -3
-    // const jumpIn3Tx = await avatar.jumpIn(100010030997, 2, 4, "0x00010001000100000000000001");
-    // await jumpIn3Tx.wait();
-
-    console.log(await avatar.getAvatarOccupiedBlock(1));
-    console.log(await avatar.getAvatarOccupiedBlock(2));
-    console.log(await avatar.getAvatarOccupiedBlock(3));
-    console.log(await avatar.getAvatarOccupiedBlock(4));
-
-    // 1, -2, 1;
-    const moveTo4Tx = await avatar.moveTo(100109981001, 0, 1, "0x00010001000100000000000001");
-    await moveTo4Tx.wait();
-
-    // 0 2 -2
-    const bombTx = await avatar.bomb(100010020998, 1);
-    await bombTx.wait();
-
-    console.log(await avatar.getAvatarOccupiedBlock(1));
-    console.log(await avatar.getAvatarOccupiedBlock(2));
-    console.log(await avatar.getAvatarOccupiedBlock(3));
-    console.log(await avatar.getAvatarOccupiedBlock(4));
-
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(4)));
-
-    // const redeemEnergyTx = await governance.redeemAvatarInboxEnergy(1);
-    // await redeemEnergyTx.wait();
-
-    // console.log(ethers.utils.formatUnits(await energy.balanceOf(owner.address)));
-
-    // const allowanceTx = await energy.approve(
-    //   arsenal.address,
-    //   ethers.BigNumber.from("10000000000000000000000")
-    // );
-    // await allowanceTx.wait();
-
-    // console.log(ethers.utils.formatUnits(await arsenal.getCurrentPrice()));
-    // const buybombtx = await arsenal.buy(1);
-    // await buybombtx.wait();
+    console.log(ethers.utils.formatUnits(await arsenal.getCurrentPrice()));
+    const buybombtx = await arsenal.buy(1);
+    await buybombtx.wait();
 
     // console.log(await avatar.getAvatarOccupiedBlockInt(1));
   });

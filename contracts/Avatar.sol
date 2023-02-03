@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
 import "./interfaces/IMOPN.sol";
-import "./libraries/HexGridsMath.sol";
+import "./libraries/IntBlockMath.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -11,8 +11,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 error linkBlockError();
 
 contract Avatar is Multicall, Ownable {
-    using BlockMath for Block;
     using Math for uint256;
+    using IntBlockMath for uint64;
 
     mapping(uint256 => AvatarData) public avatarNoumenon;
 
@@ -32,15 +32,6 @@ contract Avatar is Multicall, Ownable {
     }
 
     function getAvatarOccupiedBlock(
-        uint256 avatarId
-    ) public view returns (Block memory) {
-        return
-            BlockMath.fromCoordinateInt(
-                avatarNoumenon[avatarId].blockCoordinatInt
-            );
-    }
-
-    function getAvatarOccupiedBlockInt(
         uint256 avatarId
     ) public view returns (uint64) {
         return avatarNoumenon[avatarId].blockCoordinatInt;
@@ -69,45 +60,74 @@ contract Avatar is Multicall, Ownable {
         return currentAvatarId;
     }
 
-    function moveTo(
-        Block memory block_,
+    function jumpIn(
+        uint64 blockCoordinate,
         uint256 linkedAvatarId,
         uint256 avatarId,
-        uint16 blockPassId
-    ) public blockCheck(block_) moveCheck(block_, linkedAvatarId, avatarId) {
-        uint64 blockcoordinate = block_.coordinateInt();
+        bytes memory PassData
+    )
+        public
+        blockCheck(blockCoordinate)
+        linkCheck(blockCoordinate, linkedAvatarId, avatarId)
+    {
+        Map.avatarSet(
+            avatarId,
+            avatarNoumenon[avatarId].COID,
+            blockCoordinate,
+            PassData
+        );
 
-        if (avatarNoumenon[avatarId].blockCoordinatInt != 0) {
-            Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt);
-        }
+        avatarNoumenon[avatarId].blockCoordinatInt = blockCoordinate;
+    }
 
-        avatarNoumenon[avatarId].blockCoordinatInt = blockcoordinate;
+    function moveTo(
+        uint64 blockCoordinate,
+        uint256 linkedAvatarId,
+        uint256 avatarId,
+        bytes memory PassData
+    )
+        public
+        blockCheck(blockCoordinate)
+        linkCheck(blockCoordinate, linkedAvatarId, avatarId)
+    {
+        require(
+            avatarNoumenon[avatarId].blockCoordinatInt != 0,
+            "avatar not on map"
+        );
+        Map.avatarRemove(
+            avatarId,
+            avatarNoumenon[avatarId].COID,
+            avatarNoumenon[avatarId].blockCoordinatInt
+        );
 
         Map.avatarSet(
             avatarId,
             avatarNoumenon[avatarId].COID,
-            blockcoordinate,
-            blockPassId
+            blockCoordinate,
+            PassData
         );
+
+        avatarNoumenon[avatarId].blockCoordinatInt = blockCoordinate;
     }
 
-    function bomb(Block memory block_, uint256 avatarId) public {
+    function bomb(
+        uint64 blockCoordinate,
+        uint256 avatarId
+    ) public blockCheck(blockCoordinate) {
         Governance.burnBomb(msg.sender, 1);
 
-        uint64[] memory blockSpheres = HexGridsMath.blockIntSpheres(
-            block_.coordinateInt()
-        );
-        uint256 attackAvatarId = Map.getBlockAvatar(block_.coordinateInt());
-        if (attackAvatarId != 0 && attackAvatarId != avatarId) {
-            deFeat(attackAvatarId);
-        }
-
-        for (uint256 i = 0; i < blockSpheres.length; i++) {
-            attackAvatarId = Map.getBlockAvatar(blockSpheres[i]);
+        uint256 attackAvatarId;
+        for (uint256 i = 0; i < 7; i++) {
+            attackAvatarId = Map.getBlockAvatar(blockCoordinate);
             if (attackAvatarId == 0 || attackAvatarId == avatarId) {
                 continue;
             }
             deFeat(attackAvatarId);
+            if (i == 0) {
+                blockCoordinate = blockCoordinate.neighbor(4);
+            } else {
+                blockCoordinate = blockCoordinate.neighbor(i - 1);
+            }
         }
     }
 
@@ -116,23 +136,23 @@ contract Avatar is Multicall, Ownable {
             avatarNoumenon[avatarId].blockCoordinatInt > 0,
             "avatar not on map"
         );
-        Map.avatarRemove(avatarNoumenon[avatarId].blockCoordinatInt);
+        Map.avatarRemove(
+            avatarId,
+            avatarNoumenon[avatarId].COID,
+            avatarNoumenon[avatarId].blockCoordinatInt
+        );
         avatarNoumenon[avatarId].blockCoordinatInt = 0;
     }
 
     function claimEnergy(uint256 avatarId) public {}
 
-    modifier blockCheck(Block memory block_) {
-        block_.check();
-        require(
-            Map.getBlockAvatar(block_.coordinateInt()) == 0,
-            "block not available"
-        );
+    modifier blockCheck(uint64 blockCoordinate) {
+        blockCoordinate.check();
         _;
     }
 
-    modifier moveCheck(
-        Block memory block_,
+    modifier linkCheck(
+        uint64 blockCoordinate,
         uint256 linkedAvatarId,
         uint256 avatarId
     ) {
@@ -142,17 +162,21 @@ contract Avatar is Multicall, Ownable {
                     avatarNoumenon[linkedAvatarId].COID,
                 "link co error"
             );
+            require(linkedAvatarId != avatarId, "link to yourself");
             if (
-                block_.distance(
-                    BlockMath.fromCoordinateInt(
-                        avatarNoumenon[linkedAvatarId].blockCoordinatInt
-                    )
+                blockCoordinate.distance(
+                    avatarNoumenon[linkedAvatarId].blockCoordinatInt
                 ) > 3
             ) {
                 revert linkBlockError();
             }
         } else if (collectionMap[avatarNoumenon[avatarId].COID] > 0) {
-            revert linkBlockError();
+            if (
+                !(avatarNoumenon[avatarId].blockCoordinatInt > 0 &&
+                    collectionMap[avatarNoumenon[avatarId].COID] == 1)
+            ) {
+                revert linkBlockError();
+            }
         }
         _;
     }
