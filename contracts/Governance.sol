@@ -268,7 +268,6 @@ contract Governance is Ownable {
         uint256 onMapAvatarNum
     ) public onlyAvatar {
         uint256 amount = getCollectionBEPSInbox(COID);
-        console.log(amount);
         if (amount > 0) {
             amount = amount / (onMapAvatarNum + 1);
             CollectionEnergys[COID] -= amount * (10 ** 33);
