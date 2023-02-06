@@ -9,9 +9,11 @@ contract Arsenal {
 
     uint256 public roundTime = 79200;
 
+    uint256 public roundProduce = 500;
+
     uint256 public startUnixRound;
 
-    uint256 public startPrice = 10000000000000000000000;
+    uint256 public startPrice = 1000000000000000000000000;
 
     mapping(uint256 => uint256) roundStorage;
 
@@ -29,7 +31,7 @@ contract Arsenal {
 
     function buy(uint256 amount) public {
         uint256 roundId = getCurrentRound();
-        require(roundStorage[roundId] + amount < 100, "stockoom");
+        require(roundStorage[roundId] + amount < roundProduce, "stockoom");
         uint256 price = getCurrentPrice() * amount;
         require(price > 0, "round closed");
         require(Energy.balanceOf(msg.sender) > price, "energy not enough");
@@ -42,16 +44,26 @@ contract Arsenal {
         return (block.timestamp / 86400) - startUnixRound;
     }
 
-    function getCurrentPrice() public view returns (uint256) {
+    function getCurrentPrice() public view returns (uint256 price) {
         uint256 roundId = getCurrentRound();
-        if (roundStorage[roundId] == 100) {
+        if (roundStorage[roundId] == roundProduce) {
             return roundDealPrice[roundId];
         }
         uint256 timeElapse = block.timestamp % 86400;
         if (timeElapse >= roundTime) {
             return 0;
         }
-        return (startPrice * (roundTime - timeElapse)) / roundTime;
+        uint256 reduceTimes = timeElapse / 120;
+        price = startPrice;
+        while (true) {
+            if (reduceTimes > 30) {
+                price = (price * 49 ** 30) / (50 ** 30);
+            } else {
+                price = (price * 49 ** reduceTimes) / (50 ** reduceTimes);
+                break;
+            }
+            reduceTimes -= 30;
+        }
     }
 
     function getCurrentRoundData()
@@ -67,7 +79,7 @@ contract Arsenal {
     {
         roundId = getCurrentRound();
         price = getCurrentPrice();
-        amoutLeft = 100 - roundStorage[roundId];
+        amoutLeft = roundProduce - roundStorage[roundId];
         roundStartTime = block.timestamp - (block.timestamp % 86400);
         roundCloseTime = roundStartTime + roundTime;
     }
@@ -84,7 +96,7 @@ contract Arsenal {
             uint256 roundCloseTime
         )
     {
-        amoutLeft = 100 - roundStorage[roundId];
+        amoutLeft = roundProduce - roundStorage[roundId];
         price = getRoundPrice(roundId);
         roundStartTime = 86400 * (startUnixRound + roundId);
         roundCloseTime = roundStartTime + roundTime;
@@ -93,7 +105,7 @@ contract Arsenal {
     function getRoundPrice(
         uint256 roundId
     ) public view returns (uint256 price) {
-        uint256 amoutLeft = 100 - roundStorage[roundId];
+        uint256 amoutLeft = roundProduce - roundStorage[roundId];
         if (amoutLeft > 0) {
             price = 0;
         } else {

@@ -15,6 +15,19 @@ library IntBlockMath {
         }
     }
 
+    function getBlockBEPS(
+        uint64 blockCoordinate
+    ) public pure returns (uint256) {
+        uint64[3] memory coordinateArr = coordinateIntToArr(blockCoordinate);
+        if (coordinateArr[0] % 10 == 0) {
+            if (coordinateArr[1] % 10 == 0) {
+                return 15;
+            }
+            return 5;
+        }
+        return 1;
+    }
+
     function getPassType(
         uint64 PassId
     ) public pure returns (uint256 _passType) {

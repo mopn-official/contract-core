@@ -8,8 +8,6 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-error linkBlockError();
-
 contract Avatar is Multicall, Ownable {
     using Math for uint256;
     using IntBlockMath for uint64;
@@ -34,7 +32,7 @@ contract Avatar is Multicall, Ownable {
     function getAvatarOccupiedBlock(
         uint256 avatarId
     ) public view returns (uint64) {
-        return avatarNoumenon[avatarId].blockCoordinatInt;
+        return avatarNoumenon[avatarId].blockCoordinate;
     }
 
     function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
@@ -42,21 +40,22 @@ contract Avatar is Multicall, Ownable {
     }
 
     function mintAvatar(
-        NFToken calldata token_,
+        address collectionContract,
+        uint256 tokenId,
         bytes32[] memory proofs
     ) public returns (uint256) {
         uint256 COID = Governance.checkWhitelistCOID(
-            token_.collectionContract,
+            collectionContract,
             proofs
         );
-        require(tokenMap[COID][token_.tokenId] == 0, "avatar exist");
+        require(tokenMap[COID][tokenId] == 0, "avatar exist");
 
         currentAvatarId++;
 
         avatarNoumenon[currentAvatarId].COID = COID;
-        avatarNoumenon[currentAvatarId].tokenId = token_.tokenId;
+        avatarNoumenon[currentAvatarId].tokenId = tokenId;
 
-        tokenMap[COID][token_.tokenId] = currentAvatarId;
+        tokenMap[COID][tokenId] = currentAvatarId;
         return currentAvatarId;
     }
 
@@ -64,84 +63,105 @@ contract Avatar is Multicall, Ownable {
         uint64 blockCoordinate,
         uint256 linkedAvatarId,
         uint256 avatarId,
-        bytes memory PassData
+        uint64 PassId
     )
         public
         blockCheck(blockCoordinate)
         linkCheck(blockCoordinate, linkedAvatarId, avatarId)
     {
+        require(
+            avatarNoumenon[avatarId].blockCoordinate == 0,
+            "avatar is on map"
+        );
+
         Map.avatarSet(
             avatarId,
             avatarNoumenon[avatarId].COID,
             blockCoordinate,
-            PassData
+            PassId,
+            avatarNoumenon[avatarId].BoomUsed
         );
 
-        avatarNoumenon[avatarId].blockCoordinatInt = blockCoordinate;
+        avatarNoumenon[avatarId].blockCoordinate = blockCoordinate;
+        Governance.redeemCollectionInboxEnergy(
+            avatarId,
+            avatarNoumenon[avatarId].COID,
+            collectionMap[avatarNoumenon[avatarId].COID]
+        );
+        collectionMap[avatarNoumenon[avatarId].COID]++;
     }
 
     function moveTo(
         uint64 blockCoordinate,
         uint256 linkedAvatarId,
         uint256 avatarId,
-        bytes memory PassData
+        uint64 PassId
     )
         public
         blockCheck(blockCoordinate)
         linkCheck(blockCoordinate, linkedAvatarId, avatarId)
     {
         require(
-            avatarNoumenon[avatarId].blockCoordinatInt != 0,
+            avatarNoumenon[avatarId].blockCoordinate != 0,
             "avatar not on map"
         );
         Map.avatarRemove(
             avatarId,
             avatarNoumenon[avatarId].COID,
-            avatarNoumenon[avatarId].blockCoordinatInt
+            avatarNoumenon[avatarId].blockCoordinate
         );
 
         Map.avatarSet(
             avatarId,
             avatarNoumenon[avatarId].COID,
             blockCoordinate,
-            PassData
+            PassId,
+            0
         );
 
-        avatarNoumenon[avatarId].blockCoordinatInt = blockCoordinate;
+        avatarNoumenon[avatarId].blockCoordinate = blockCoordinate;
     }
 
     function bomb(
         uint64 blockCoordinate,
         uint256 avatarId
     ) public blockCheck(blockCoordinate) {
-        Governance.burnBomb(msg.sender, 1);
+        avatarNoumenon[avatarId].BoomUsed++;
+        if (avatarNoumenon[avatarId].blockCoordinate > 0) {
+            Governance.burnBomb(
+                msg.sender,
+                1,
+                avatarId,
+                avatarNoumenon[avatarId].COID,
+                Map.getBlockPassId(avatarNoumenon[avatarId].blockCoordinate)
+            );
+        } else {
+            Governance.burnBomb(msg.sender, 1, 0, 0, 0);
+        }
 
         uint256 attackAvatarId;
         for (uint256 i = 0; i < 7; i++) {
             attackAvatarId = Map.getBlockAvatar(blockCoordinate);
-            if (attackAvatarId == 0 || attackAvatarId == avatarId) {
-                continue;
-            }
-            deFeat(attackAvatarId);
             if (i == 0) {
                 blockCoordinate = blockCoordinate.neighbor(4);
             } else {
                 blockCoordinate = blockCoordinate.neighbor(i - 1);
             }
+            if (attackAvatarId == 0 || attackAvatarId == avatarId) {
+                continue;
+            }
+            deFeat(attackAvatarId);
         }
     }
 
     function deFeat(uint256 avatarId) internal {
-        require(
-            avatarNoumenon[avatarId].blockCoordinatInt > 0,
-            "avatar not on map"
-        );
         Map.avatarRemove(
             avatarId,
             avatarNoumenon[avatarId].COID,
-            avatarNoumenon[avatarId].blockCoordinatInt
+            avatarNoumenon[avatarId].blockCoordinate
         );
-        avatarNoumenon[avatarId].blockCoordinatInt = 0;
+        avatarNoumenon[avatarId].blockCoordinate = 0;
+        collectionMap[avatarNoumenon[avatarId].COID]--;
     }
 
     function claimEnergy(uint256 avatarId) public {}
@@ -165,14 +185,14 @@ contract Avatar is Multicall, Ownable {
             require(linkedAvatarId != avatarId, "link to yourself");
             if (
                 blockCoordinate.distance(
-                    avatarNoumenon[linkedAvatarId].blockCoordinatInt
+                    avatarNoumenon[linkedAvatarId].blockCoordinate
                 ) > 3
             ) {
                 revert linkBlockError();
             }
         } else if (collectionMap[avatarNoumenon[avatarId].COID] > 0) {
             if (
-                !(avatarNoumenon[avatarId].blockCoordinatInt > 0 &&
+                !(avatarNoumenon[avatarId].blockCoordinate > 0 &&
                     collectionMap[avatarNoumenon[avatarId].COID] == 1)
             ) {
                 revert linkBlockError();

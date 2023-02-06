@@ -27,16 +27,23 @@ interface IGovernance {
         uint256 amount
     ) external;
 
-    function subBEPS(
-        uint256 avatarId,
-        uint256 COID,
-        uint64 PassId,
-        uint256 amount
-    ) external;
+    function subBEPS(uint256 avatarId, uint256 COID, uint64 PassId) external;
 
     function mintBomb(address to, uint256 amount) external;
 
-    function burnBomb(address from, uint256 amount) external;
+    function burnBomb(
+        address from,
+        uint256 amount,
+        uint256 avatarId,
+        uint256 COID,
+        uint64 PassId
+    ) external;
+
+    function redeemCollectionInboxEnergy(
+        uint256 avatarId,
+        uint256 COID,
+        uint256 onMapAvatarNum
+    ) external;
 
     function avatarContract() external view returns (address);
 

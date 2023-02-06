@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Governance is Ownable {
-    uint256 constant BEP = 600000000000000000000000;
+    uint256 constant BEP = 6000000000000000000000;
 
     uint256 constant BEP_REDUCE_INTERVAL = 50000;
 
@@ -20,23 +20,11 @@ contract Governance is Ownable {
 
     uint256 BEPS_Count;
 
-    mapping(uint256 => uint256) public AvatarCalcEnergy;
+    mapping(uint256 => uint256) public AvatarEnergys;
 
-    mapping(uint256 => uint256) public AvatarBEPSShare;
+    mapping(uint256 => uint256) public CollectionEnergys;
 
-    mapping(uint256 => uint256) public AvatarInboxEnergy;
-
-    mapping(uint256 => uint256) public CollectionCalcEnergy;
-
-    mapping(uint256 => uint256) public CollectionBEPSShare;
-
-    mapping(uint256 => uint256) public CollectionInboxEnergy;
-
-    mapping(uint256 => uint256) public PassHolderCalcEnergy;
-
-    mapping(uint256 => uint256) public PassHolderBEPSShare;
-
-    mapping(uint256 => uint256) public PassHolderInboxEnergy;
+    mapping(uint256 => uint256) public PassHolderEnergys;
 
     constructor(uint256 BEPSStartBlock_) {
         BEPSStartBlock = BEPSStartBlock_;
@@ -48,32 +36,43 @@ contract Governance is Ownable {
         uint64 PassId,
         uint256 amount
     ) public onlyMap {
+        _addBEPS(avatarId, COID, PassId, amount);
+    }
+
+    function _addBEPS(
+        uint256 avatarId,
+        uint256 COID,
+        uint64 PassId,
+        uint256 amount
+    ) internal {
         mintShareEnergy();
         BEPS_Count += amount;
         mintAvatarEnergy(avatarId);
-        AvatarBEPSShare[avatarId] += amount;
+        AvatarEnergys[avatarId] += amount;
         mintCollectionEnergy(COID);
-        CollectionBEPSShare[COID] += amount;
+        CollectionEnergys[COID] += amount;
         mintPassHolderEnergy(PassId);
-        PassHolderBEPSShare[PassId] += amount;
+        PassHolderEnergys[PassId] += amount;
     }
 
     function subBEPS(
         uint256 avatarId,
         uint256 COID,
-        uint64 PassId,
-        uint256 amount
+        uint64 PassId
     ) public onlyMap {
+        _subBEPS(avatarId, COID, PassId);
+    }
+
+    function _subBEPS(uint256 avatarId, uint256 COID, uint64 PassId) internal {
         mintShareEnergy();
+        uint256 amount = getAvatarBEPSShare(avatarId);
         BEPS_Count -= amount;
         mintAvatarEnergy(avatarId);
-        console.log("1:", AvatarBEPSShare[avatarId]);
-        console.log("2:", amount);
-        AvatarBEPSShare[avatarId] -= amount;
+        AvatarEnergys[avatarId] -= amount;
         mintCollectionEnergy(COID);
-        CollectionBEPSShare[COID] -= amount;
+        CollectionEnergys[COID] -= amount;
         mintPassHolderEnergy(PassId);
-        PassHolderBEPSShare[PassId] -= amount;
+        PassHolderEnergys[PassId] -= amount;
     }
 
     function mintShareEnergy() public {
@@ -111,57 +110,170 @@ contract Governance is Ownable {
         }
     }
 
+    function getAvatarBEPSMinted(
+        uint256 avatarId
+    ) internal view returns (uint256) {
+        return (AvatarEnergys[avatarId] % 10 ** 33) / 1000;
+    }
+
+    function getCollectionBEPSMinted(
+        uint256 COID
+    ) internal view returns (uint256) {
+        return (CollectionEnergys[COID] % 10 ** 33) / 1000;
+    }
+
+    function getPassHolderBEPSMinted(
+        uint256 PassId
+    ) internal view returns (uint256) {
+        return (PassHolderEnergys[PassId] % 10 ** 33) / 1000;
+    }
+
+    function getAvatarBEPSInbox(
+        uint256 avatarId
+    ) internal view returns (uint256) {
+        return AvatarEnergys[avatarId] / 10 ** 33;
+    }
+
+    function getCollectionBEPSInbox(
+        uint256 COID
+    ) internal view returns (uint256) {
+        return CollectionEnergys[COID] / 10 ** 33;
+    }
+
+    function getPassHolderBEPSInbox(
+        uint256 PassId
+    ) internal view returns (uint256) {
+        return PassHolderEnergys[PassId] / 10 ** 33;
+    }
+
+    function getAvatarBEPSShare(
+        uint256 avatarId
+    ) internal view returns (uint256) {
+        return AvatarEnergys[avatarId] % 1000;
+    }
+
+    function getCollectionBEPSShare(
+        uint256 COID
+    ) internal view returns (uint256) {
+        return CollectionEnergys[COID] % 1000;
+    }
+
+    function getPassHolderBEPSShare(
+        uint256 PassId
+    ) internal view returns (uint256) {
+        return PassHolderEnergys[PassId] % 1000;
+    }
+
     function mintAvatarEnergy(uint256 avatarId) internal {
-        if (AvatarCalcEnergy[avatarId] < BEPSMinted) {
-            if (AvatarBEPSShare[avatarId] > 0) {
-                uint256 add = ((BEPSMinted - AvatarCalcEnergy[avatarId]) *
-                    AvatarBEPSShare[avatarId]);
-                AvatarInboxEnergy[avatarId] += (add * 90) / 100;
+        uint256 AvatarBEPSMinted = getAvatarBEPSMinted(avatarId);
+        if (AvatarBEPSMinted < BEPSMinted) {
+            uint256 AvatarBEPSShare = getAvatarBEPSShare(avatarId);
+            uint256 AvatarBEPSInbox = getAvatarBEPSInbox(avatarId);
+            if (AvatarBEPSShare > 0) {
+                AvatarBEPSInbox += ((((BEPSMinted - AvatarBEPSMinted) *
+                    AvatarBEPSShare) * 90) / 100);
             }
-            AvatarCalcEnergy[avatarId] = BEPSMinted;
+            AvatarEnergys[avatarId] =
+                AvatarBEPSInbox *
+                (10 ** 33) +
+                BEPSMinted *
+                1000 +
+                AvatarBEPSShare;
         }
     }
 
     function mintCollectionEnergy(uint256 COID) internal {
-        if (CollectionCalcEnergy[COID] < BEPSMinted) {
-            if (CollectionBEPSShare[COID] > 0) {
-                uint256 add = ((BEPSMinted - CollectionCalcEnergy[COID]) *
-                    CollectionBEPSShare[COID]);
-                CollectionInboxEnergy[COID] += (add * 9) / 100;
+        uint256 CollectionBEPSMinted = getCollectionBEPSMinted(COID);
+        if (CollectionBEPSMinted < BEPSMinted) {
+            uint256 CollectionBEPSShare = getCollectionBEPSShare(COID);
+            uint256 CollectionBEPSInbox = getCollectionBEPSInbox(COID);
+            if (CollectionBEPSShare > 0) {
+                CollectionBEPSInbox += ((((BEPSMinted - CollectionBEPSMinted) *
+                    CollectionBEPSShare) * 9) / 100);
             }
-            CollectionCalcEnergy[COID] = BEPSMinted;
+            CollectionEnergys[COID] =
+                CollectionBEPSInbox *
+                (10 ** 33) +
+                BEPSMinted *
+                1000 +
+                CollectionBEPSShare;
         }
     }
 
     function mintPassHolderEnergy(uint64 PassId) internal {
-        if (PassHolderCalcEnergy[PassId] < BEPSMinted) {
-            if (PassHolderBEPSShare[PassId] > 0) {
-                uint256 add = ((BEPSMinted - PassHolderCalcEnergy[PassId]) *
-                    PassHolderBEPSShare[PassId]);
-                PassHolderInboxEnergy[PassId] += add / 100;
+        uint256 PassHolderBEPSMinted = getPassHolderBEPSMinted(PassId);
+        if (PassHolderBEPSMinted < BEPSMinted) {
+            uint256 PassHolderBEPSShare = getCollectionBEPSShare(PassId);
+            uint256 PassHolderBEPSInbox = getCollectionBEPSInbox(PassId);
+            if (PassHolderBEPSShare > 0) {
+                PassHolderBEPSInbox +=
+                    ((BEPSMinted - PassHolderBEPSMinted) *
+                        PassHolderBEPSShare) /
+                    100;
             }
-            PassHolderCalcEnergy[PassId] = BEPSMinted;
+            PassHolderEnergys[PassId] =
+                PassHolderBEPSInbox *
+                (10 ** 33) +
+                BEPSMinted *
+                1000 +
+                PassHolderBEPSShare;
         }
     }
 
-    function currentBEP(uint256 reduceTimes) public pure returns (uint256) {
-        return (BEP * 997 ** reduceTimes) / (1000 ** reduceTimes);
+    function currentBEP(
+        uint256 reduceTimes
+    ) public pure returns (uint256 cBEP) {
+        cBEP = BEP;
+        while (true) {
+            if (reduceTimes > 17) {
+                cBEP = (BEP * 997 ** 17) / (1000 ** 17);
+            } else {
+                cBEP = (BEP * 997 ** reduceTimes) / (1000 ** reduceTimes);
+                break;
+            }
+            reduceTimes -= 17;
+        }
     }
 
     function getAvatarInboxEnergy(
         uint256 avatarId
-    ) public view returns (uint256) {
-        return AvatarInboxEnergy[avatarId];
+    ) public view returns (uint256 inbox) {
+        inbox = getAvatarBEPSInbox(avatarId);
+        uint256 AvatarBEPSMinted = getAvatarBEPSMinted(avatarId);
+        uint256 AvatarBEPSShare = getAvatarBEPSShare(avatarId);
+
+        if (AvatarBEPSMinted < BEPSMinted) {
+            if (AvatarBEPSShare > 0) {
+                inbox +=
+                    (((BEPSMinted - AvatarBEPSMinted) * AvatarBEPSShare) * 90) /
+                    100;
+            }
+        }
     }
 
     function redeemAvatarInboxEnergy(uint256 avatarId) public {
         mintShareEnergy();
         mintAvatarEnergy(avatarId);
 
-        require(AvatarInboxEnergy[avatarId] > 0, "empty");
-        uint256 amount = AvatarInboxEnergy[avatarId];
-        AvatarInboxEnergy[avatarId] = 0;
+        uint256 amount = getAvatarBEPSInbox(avatarId);
+        require(amount > 0, "empty");
+
+        AvatarEnergys[avatarId] = AvatarEnergys[avatarId] % (10 ** 33);
         IEnergy(energyContract).mint(msg.sender, amount);
+    }
+
+    function redeemCollectionInboxEnergy(
+        uint256 avatarId,
+        uint256 COID,
+        uint256 onMapAvatarNum
+    ) public onlyAvatar {
+        uint256 amount = getCollectionBEPSInbox(COID);
+        console.log(amount);
+        if (amount > 0) {
+            amount = amount / (onMapAvatarNum + 1);
+            CollectionEnergys[COID] -= amount * (10 ** 33);
+            AvatarEnergys[avatarId] += amount * (10 ** 33);
+        }
     }
 
     bytes32 public whiteListRoot;
@@ -253,7 +365,16 @@ contract Governance is Ownable {
         IBomb(bombContract).mint(to, 1, amount);
     }
 
-    function burnBomb(address from, uint256 amount) public onlyAvatar {
+    function burnBomb(
+        address from,
+        uint256 amount,
+        uint256 avatarId,
+        uint256 COID,
+        uint64 PassId
+    ) public onlyAvatar {
+        if (avatarId > 0 && COID > 0 && PassId > 0) {
+            _addBEPS(avatarId, COID, PassId, 1);
+        }
         IBomb(bombContract).burn(from, 1, amount);
     }
 
