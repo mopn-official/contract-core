@@ -15,4 +15,6 @@ interface IAvatar is IERC721 {
     function getAvatarCOID(uint256 avatarId) external view returns (uint256);
 
     function moveTo(uint256 avatarId, uint256 x, uint256 y) external;
+
+    function ownerOf(uint256 avatarId) external view returns (address);
 }

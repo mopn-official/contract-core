@@ -7,6 +7,7 @@ import "./libraries/IntBlockMath.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/interfaces/IERC721.sol";
 
 contract Avatar is Multicall, Ownable {
     using Math for uint256;
@@ -39,11 +40,23 @@ contract Avatar is Multicall, Ownable {
         return avatarNoumenon[avatarId].COID;
     }
 
+    function ownerOf(uint256 avatarId) public view returns (address) {
+        require(avatarNoumenon[avatarId].COID > 0, "avatar not exist");
+        return
+            IERC721(
+                Governance.getCollectionContract(avatarNoumenon[avatarId].COID)
+            ).ownerOf(avatarNoumenon[avatarId].tokenId);
+    }
+
     function mintAvatar(
         address collectionContract,
         uint256 tokenId,
         bytes32[] memory proofs
     ) public returns (uint256) {
+        require(
+            msg.sender == IERC721(collectionContract).ownerOf(tokenId),
+            "caller is not token owner"
+        );
         uint256 COID = Governance.checkWhitelistCOID(
             collectionContract,
             proofs
@@ -67,6 +80,7 @@ contract Avatar is Multicall, Ownable {
     )
         public
         blockCheck(blockCoordinate)
+        ownerCheck(avatarId)
         linkCheck(blockCoordinate, linkedAvatarId, avatarId)
     {
         require(
@@ -99,6 +113,7 @@ contract Avatar is Multicall, Ownable {
     )
         public
         blockCheck(blockCoordinate)
+        ownerCheck(avatarId)
         linkCheck(blockCoordinate, linkedAvatarId, avatarId)
     {
         require(
@@ -125,7 +140,7 @@ contract Avatar is Multicall, Ownable {
     function bomb(
         uint64 blockCoordinate,
         uint256 avatarId
-    ) public blockCheck(blockCoordinate) {
+    ) public blockCheck(blockCoordinate) ownerCheck(avatarId) {
         avatarNoumenon[avatarId].BoomUsed++;
         if (avatarNoumenon[avatarId].blockCoordinate > 0) {
             Governance.burnBomb(
@@ -164,7 +179,10 @@ contract Avatar is Multicall, Ownable {
         collectionMap[avatarNoumenon[avatarId].COID]--;
     }
 
-    function claimEnergy(uint256 avatarId) public {}
+    modifier ownerCheck(uint256 avatarId) {
+        require(ownerOf(avatarId) == msg.sender, "not your avatar");
+        _;
+    }
 
     modifier blockCheck(uint64 blockCoordinate) {
         blockCoordinate.check();
@@ -176,6 +194,8 @@ contract Avatar is Multicall, Ownable {
         uint256 linkedAvatarId,
         uint256 avatarId
     ) {
+        require(avatarNoumenon[avatarId].COID > 0, "avatar not exist");
+
         if (linkedAvatarId > 0) {
             require(
                 avatarNoumenon[avatarId].COID ==

@@ -16,9 +16,9 @@ interface IGovernance {
 
     function updateWhiteList(bytes32 whiteListRoot_) external;
 
-    function getCOID(
-        address collectionContract
-    ) external view returns (uint256);
+    function getCollectionContract(
+        uint256 COID
+    ) external view returns (address);
 
     function addBEPS(
         uint256 avatarId,

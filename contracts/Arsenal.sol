@@ -3,8 +3,9 @@ pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
 import "./interfaces/IMOPN.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Arsenal {
+contract Arsenal is Ownable {
     address public governanceContract;
 
     uint256 public roundTime = 79200;
@@ -24,7 +25,9 @@ contract Arsenal {
     IEnergy public Energy;
     IGovernance public Governance;
 
-    function setGovernanceContract(address governanceContract_) public {
+    function setGovernanceContract(
+        address governanceContract_
+    ) public onlyOwner {
         Governance = IGovernance(governanceContract_);
         Energy = IEnergy(Governance.energyContract());
     }

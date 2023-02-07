@@ -5,8 +5,9 @@ import "hardhat/console.sol";
 import "./interfaces/IMOPN.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract Governance is Ownable {
+contract Governance is Multicall, Ownable {
     uint256 constant BEP = 6000000000000000000000;
 
     uint256 constant BEP_REDUCE_INTERVAL = 50000;
@@ -252,6 +253,10 @@ contract Governance is Ownable {
     }
 
     function redeemAvatarInboxEnergy(uint256 avatarId) public {
+        require(
+            msg.sender == IAvatar(avatarContract).ownerOf(avatarId),
+            "not your avatar"
+        );
         mintShareEnergy();
         mintAvatarEnergy(avatarId);
 
@@ -277,18 +282,35 @@ contract Governance is Ownable {
 
     bytes32 public whiteListRoot;
 
+    // Collection Id
+    uint256 COIDCounter;
+
+    mapping(uint256 => address) public COIDMap;
+
+    mapping(address => uint256) public collectionMap;
+
+    function getCollectionContract(uint256 COID) public view returns (address) {
+        return COIDMap[COID];
+    }
+
+    function generateCOID(address collectionContract) internal {
+        COIDCounter++;
+        COIDMap[COIDCounter] = collectionContract;
+        collectionMap[collectionContract] = COIDCounter;
+    }
+
     function checkWhitelistCOID(
         address collectionContract,
         bytes32[] memory proofs
     ) public returns (uint256) {
-        if (COIDMap[collectionContract] == 0) {
+        if (collectionMap[collectionContract] == 0) {
             require(
                 isInWhiteList(collectionContract, proofs),
                 "not in whitelist"
             );
             generateCOID(collectionContract);
         }
-        return COIDMap[collectionContract];
+        return collectionMap[collectionContract];
     }
 
     function isInWhiteList(
@@ -343,20 +365,6 @@ contract Governance is Ownable {
 
     function updatePassContract(address passContract_) public onlyOwner {
         passContract = passContract_;
-    }
-
-    // Collection Id
-    uint256 COIDCounter;
-
-    mapping(address => uint256) public COIDMap;
-
-    function getCOID(address collectionContract) public view returns (uint256) {
-        return COIDMap[collectionContract];
-    }
-
-    function generateCOID(address collectionContract) internal {
-        COIDCounter++;
-        COIDMap[collectionContract] = COIDCounter;
     }
 
     // Bomb

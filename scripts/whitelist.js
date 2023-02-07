@@ -8,7 +8,7 @@ const main = async () => {
   console.log(JSON.parse(whitelistjson));
   const tree = StandardMerkleTree.of(JSON.parse(whitelistjson), ["address"]);
 
-  const proof = tree.getProof(1);
+  const proof = tree.getProof(0);
 
   const ipfs = new IPFS({
     host: "ipfs.infura.io",
