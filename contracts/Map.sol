@@ -3,8 +3,9 @@ pragma solidity ^0.8.17;
 
 import "./interfaces/IMOPN.sol";
 import "./libraries/IntBlockMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Map {
+contract Map is Ownable {
     using IntBlockMath for uint64;
 
     // Block => avatarId
@@ -15,7 +16,9 @@ contract Map {
     IAvatar public Avatar;
     IGovernance public Governance;
 
-    function setGovernanceContract(address governanceContract_) public {
+    function setGovernanceContract(
+        address governanceContract_
+    ) public onlyOwner {
         Governance = IGovernance(governanceContract_);
         Avatar = IAvatar(Governance.avatarContract());
     }
