@@ -6,6 +6,12 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../structs/Structs.sol";
 
 library BlockMath {
+    struct Block {
+        int16 x;
+        int16 y;
+        int16 z;
+    }
+
     using BlockMath for Block;
 
     function getPassType(uint16 PassId) public pure returns (uint8 _passType) {

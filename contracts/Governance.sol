@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract Governance is Multicall, Ownable {
-    uint256 constant BEP = 6000000000000000000000;
+    uint256 constant BEP = 600000000000;
 
     uint256 constant BEP_REDUCE_INTERVAL = 50000;
 
@@ -25,7 +25,7 @@ contract Governance is Multicall, Ownable {
 
     mapping(uint256 => uint256) public CollectionEnergys;
 
-    mapping(uint256 => uint256) public PassHolderEnergys;
+    mapping(uint32 => uint256) public PassHolderEnergys;
 
     constructor(uint256 BEPSStartBlock_) {
         BEPSStartBlock = BEPSStartBlock_;
@@ -34,7 +34,7 @@ contract Governance is Multicall, Ownable {
     function addBEPS(
         uint256 avatarId,
         uint256 COID,
-        uint64 PassId,
+        uint32 PassId,
         uint256 amount
     ) public onlyMap {
         _addBEPS(avatarId, COID, PassId, amount);
@@ -43,7 +43,7 @@ contract Governance is Multicall, Ownable {
     function _addBEPS(
         uint256 avatarId,
         uint256 COID,
-        uint64 PassId,
+        uint32 PassId,
         uint256 amount
     ) internal {
         mintShareEnergy();
@@ -59,12 +59,12 @@ contract Governance is Multicall, Ownable {
     function subBEPS(
         uint256 avatarId,
         uint256 COID,
-        uint64 PassId
+        uint32 PassId
     ) public onlyMap {
         _subBEPS(avatarId, COID, PassId);
     }
 
-    function _subBEPS(uint256 avatarId, uint256 COID, uint64 PassId) internal {
+    function _subBEPS(uint256 avatarId, uint256 COID, uint32 PassId) internal {
         mintShareEnergy();
         uint256 amount = getAvatarBEPSShare(avatarId);
         BEPS_Count -= amount;
@@ -114,55 +114,55 @@ contract Governance is Multicall, Ownable {
     function getAvatarBEPSMinted(
         uint256 avatarId
     ) internal view returns (uint256) {
-        return (AvatarEnergys[avatarId] % 10 ** 33) / 1000;
+        return (AvatarEnergys[avatarId] % 10 ** 50) / 10 ** 25;
     }
 
     function getCollectionBEPSMinted(
         uint256 COID
     ) internal view returns (uint256) {
-        return (CollectionEnergys[COID] % 10 ** 33) / 1000;
+        return (CollectionEnergys[COID] % 10 ** 50) / 10 ** 25;
     }
 
     function getPassHolderBEPSMinted(
-        uint256 PassId
+        uint32 PassId
     ) internal view returns (uint256) {
-        return (PassHolderEnergys[PassId] % 10 ** 33) / 1000;
+        return (PassHolderEnergys[PassId] % 10 ** 50) / 10 ** 25;
     }
 
     function getAvatarBEPSInbox(
         uint256 avatarId
     ) internal view returns (uint256) {
-        return AvatarEnergys[avatarId] / 10 ** 33;
+        return AvatarEnergys[avatarId] / 10 ** 50;
     }
 
     function getCollectionBEPSInbox(
         uint256 COID
     ) internal view returns (uint256) {
-        return CollectionEnergys[COID] / 10 ** 33;
+        return CollectionEnergys[COID] / 10 ** 50;
     }
 
     function getPassHolderBEPSInbox(
-        uint256 PassId
+        uint32 PassId
     ) internal view returns (uint256) {
-        return PassHolderEnergys[PassId] / 10 ** 33;
+        return PassHolderEnergys[PassId] / 10 ** 50;
     }
 
     function getAvatarBEPSShare(
         uint256 avatarId
     ) internal view returns (uint256) {
-        return AvatarEnergys[avatarId] % 1000;
+        return AvatarEnergys[avatarId] % 10 ** 25;
     }
 
     function getCollectionBEPSShare(
         uint256 COID
     ) internal view returns (uint256) {
-        return CollectionEnergys[COID] % 1000;
+        return CollectionEnergys[COID] % 10 ** 25;
     }
 
     function getPassHolderBEPSShare(
-        uint256 PassId
+        uint32 PassId
     ) internal view returns (uint256) {
-        return PassHolderEnergys[PassId] % 1000;
+        return PassHolderEnergys[PassId] % 10 ** 25;
     }
 
     function mintAvatarEnergy(uint256 avatarId) internal {
@@ -176,9 +176,9 @@ contract Governance is Multicall, Ownable {
             }
             AvatarEnergys[avatarId] =
                 AvatarBEPSInbox *
-                (10 ** 33) +
+                10 ** 50 +
                 BEPSMinted *
-                1000 +
+                10 ** 25 +
                 AvatarBEPSShare;
         }
     }
@@ -194,18 +194,18 @@ contract Governance is Multicall, Ownable {
             }
             CollectionEnergys[COID] =
                 CollectionBEPSInbox *
-                (10 ** 33) +
+                10 ** 50 +
                 BEPSMinted *
-                1000 +
+                10 ** 25 +
                 CollectionBEPSShare;
         }
     }
 
-    function mintPassHolderEnergy(uint64 PassId) internal {
+    function mintPassHolderEnergy(uint32 PassId) internal {
         uint256 PassHolderBEPSMinted = getPassHolderBEPSMinted(PassId);
         if (PassHolderBEPSMinted < BEPSMinted) {
-            uint256 PassHolderBEPSShare = getCollectionBEPSShare(PassId);
-            uint256 PassHolderBEPSInbox = getCollectionBEPSInbox(PassId);
+            uint256 PassHolderBEPSShare = getPassHolderBEPSShare(PassId);
+            uint256 PassHolderBEPSInbox = getPassHolderBEPSInbox(PassId);
             if (PassHolderBEPSShare > 0) {
                 PassHolderBEPSInbox +=
                     ((BEPSMinted - PassHolderBEPSMinted) *
@@ -214,9 +214,9 @@ contract Governance is Multicall, Ownable {
             }
             PassHolderEnergys[PassId] =
                 PassHolderBEPSInbox *
-                (10 ** 33) +
+                10 ** 50 +
                 BEPSMinted *
-                1000 +
+                10 ** 25 +
                 PassHolderBEPSShare;
         }
     }
@@ -263,7 +263,7 @@ contract Governance is Multicall, Ownable {
         uint256 amount = getAvatarBEPSInbox(avatarId);
         require(amount > 0, "empty");
 
-        AvatarEnergys[avatarId] = AvatarEnergys[avatarId] % (10 ** 33);
+        AvatarEnergys[avatarId] = AvatarEnergys[avatarId] % (10 ** 50);
         IEnergy(energyContract).mint(msg.sender, amount);
     }
 
@@ -275,8 +275,8 @@ contract Governance is Multicall, Ownable {
         uint256 amount = getCollectionBEPSInbox(COID);
         if (amount > 0) {
             amount = amount / (onMapAvatarNum + 1);
-            CollectionEnergys[COID] -= amount * (10 ** 33);
-            AvatarEnergys[avatarId] += amount * (10 ** 33);
+            CollectionEnergys[COID] -= amount * (10 ** 50);
+            AvatarEnergys[avatarId] += amount * (10 ** 50);
         }
     }
 
@@ -377,7 +377,7 @@ contract Governance is Multicall, Ownable {
         uint256 amount,
         uint256 avatarId,
         uint256 COID,
-        uint64 PassId
+        uint32 PassId
     ) public onlyAvatar {
         if (avatarId > 0 && COID > 0 && PassId > 0) {
             _addBEPS(avatarId, COID, PassId, 1);

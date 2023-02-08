@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/interfaces/IERC721.sol";
 
 contract Avatar is Multicall, Ownable {
     using Math for uint256;
-    using IntBlockMath for uint64;
+    using IntBlockMath for uint32;
 
     mapping(uint256 => AvatarData) public avatarNoumenon;
 
@@ -32,7 +32,7 @@ contract Avatar is Multicall, Ownable {
 
     function getAvatarOccupiedBlock(
         uint256 avatarId
-    ) public view returns (uint64) {
+    ) public view returns (uint32) {
         return avatarNoumenon[avatarId].blockCoordinate;
     }
 
@@ -73,10 +73,10 @@ contract Avatar is Multicall, Ownable {
     }
 
     function jumpIn(
-        uint64 blockCoordinate,
+        uint32 blockCoordinate,
         uint256 linkedAvatarId,
         uint256 avatarId,
-        uint64 PassId
+        uint32 PassId
     )
         public
         blockCheck(blockCoordinate)
@@ -106,10 +106,10 @@ contract Avatar is Multicall, Ownable {
     }
 
     function moveTo(
-        uint64 blockCoordinate,
+        uint32 blockCoordinate,
         uint256 linkedAvatarId,
         uint256 avatarId,
-        uint64 PassId
+        uint32 PassId
     )
         public
         blockCheck(blockCoordinate)
@@ -138,7 +138,7 @@ contract Avatar is Multicall, Ownable {
     }
 
     function bomb(
-        uint64 blockCoordinate,
+        uint32 blockCoordinate,
         uint256 avatarId
     ) public blockCheck(blockCoordinate) ownerCheck(avatarId) {
         avatarNoumenon[avatarId].BoomUsed++;
@@ -184,13 +184,13 @@ contract Avatar is Multicall, Ownable {
         _;
     }
 
-    modifier blockCheck(uint64 blockCoordinate) {
+    modifier blockCheck(uint32 blockCoordinate) {
         blockCoordinate.check();
         _;
     }
 
     modifier linkCheck(
-        uint64 blockCoordinate,
+        uint32 blockCoordinate,
         uint256 linkedAvatarId,
         uint256 avatarId
     ) {

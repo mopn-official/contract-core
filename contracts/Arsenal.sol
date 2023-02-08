@@ -14,7 +14,7 @@ contract Arsenal is Ownable {
 
     uint256 public startUnixRound;
 
-    uint256 public startPrice = 1000000000000000000000000;
+    uint256 public startPrice = 100000000000000;
 
     mapping(uint256 => uint256) roundStorage;
 

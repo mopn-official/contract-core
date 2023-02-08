@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 describe("HexGridsMath", function () {
-  let hexGridsMath, blockMath, intBlockMath;
+  let blockMath, intBlockMath;
 
   it("deploy ", async function () {
     const BlockMath = await ethers.getContractFactory("BlockMath");
@@ -13,28 +13,12 @@ describe("HexGridsMath", function () {
     intBlockMath = await IntBlockMath.deploy();
     await intBlockMath.deployed();
     console.log("IntBlockMath", intBlockMath.address);
-
-    const HexGridsMath = await ethers.getContractFactory("HexGridsMath", {
-      libraries: {
-        BlockMath: blockMath.address,
-        IntBlockMath: intBlockMath.address,
-      },
-    });
-
-    hexGridsMath = await HexGridsMath.deploy();
-    await hexGridsMath.deployed();
-
-    console.log(hexGridsMath.address);
-  });
-
-  it("test", async function () {
-    console.log(await hexGridsMath.block_coordinate_bytes([344, 556, -13]));
   });
 
   it("test center blocks", async function () {
     let passId = 10981;
     while (true) {
-      console.log("passid:", passId, await hexGridsMath.PassCenterBlock(passId));
+      console.log("passid:", passId, await intBlockMath.PassCenterBlock(passId));
       passId++;
       if (passId > 10981) {
         break;

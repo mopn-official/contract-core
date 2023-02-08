@@ -23,11 +23,11 @@ interface IGovernance {
     function addBEPS(
         uint256 avatarId,
         uint256 COID,
-        uint64 PassId,
+        uint32 PassId,
         uint256 amount
     ) external;
 
-    function subBEPS(uint256 avatarId, uint256 COID, uint64 PassId) external;
+    function subBEPS(uint256 avatarId, uint256 COID, uint32 PassId) external;
 
     function mintBomb(address to, uint256 amount) external;
 
@@ -36,7 +36,7 @@ interface IGovernance {
         uint256 amount,
         uint256 avatarId,
         uint256 COID,
-        uint64 PassId
+        uint32 PassId
     ) external;
 
     function redeemCollectionInboxEnergy(

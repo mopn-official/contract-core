@@ -6,10 +6,10 @@ import "./libraries/IntBlockMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Map is Ownable {
-    using IntBlockMath for uint64;
+    using IntBlockMath for uint32;
 
     // Block => avatarId
-    mapping(uint64 => uint256) public blocks;
+    mapping(uint32 => uint256) public blocks;
 
     uint256[3] BEPSs = [1, 5, 15];
 
@@ -26,8 +26,8 @@ contract Map is Ownable {
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
-        uint64 blockCoordinate,
-        uint64 PassId,
+        uint32 blockCoordinate,
+        uint32 PassId,
         uint256 BombUsed
     ) public onlyAvatar {
         require(Map.getBlockAvatar(blockCoordinate) == 0, "dst Occupied");
@@ -66,27 +66,27 @@ contract Map is Ownable {
     function avatarRemove(
         uint256 avatarId,
         uint256 COID,
-        uint64 blockCoordinate
+        uint32 blockCoordinate
     ) public onlyAvatar {
-        uint64 PassId = getBlockPassId(blockCoordinate);
+        uint32 PassId = getBlockPassId(blockCoordinate);
         blocks[blockCoordinate] = PassId;
         Governance.subBEPS(avatarId, COID, PassId);
     }
 
     function getBlockAvatar(
-        uint64 blockCoordinate
+        uint32 blockCoordinate
     ) public view returns (uint256) {
         return blocks[blockCoordinate] / 1000000;
     }
 
     function getBlockPassId(
-        uint64 blockCoordinate
-    ) public view returns (uint64) {
-        return uint64(blocks[blockCoordinate] % 1000000);
+        uint32 blockCoordinate
+    ) public view returns (uint32) {
+        return uint32(blocks[blockCoordinate] % 1000000);
     }
 
     function getBlocksAvatars(
-        uint64[] memory blockcoordinates
+        uint32[] memory blockcoordinates
     ) public view returns (uint256[] memory) {
         uint256[] memory avatarIds = new uint256[](blockcoordinates.length);
         for (uint256 i = 0; i < blockcoordinates.length; i++) {
@@ -95,7 +95,7 @@ contract Map is Ownable {
         return avatarIds;
     }
 
-    modifier checkPassId(uint64 blockCoordinate, uint64 PassId) {
+    modifier checkPassId(uint32 blockCoordinate, uint32 PassId) {
         if (getBlockPassId(blockCoordinate) != PassId) {
             require(
                 blockCoordinate.distance(IntBlockMath.PassCenterBlock(PassId)) <

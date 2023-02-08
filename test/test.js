@@ -1,7 +1,16 @@
 const { ethers } = require("hardhat");
 
 describe("MOPN", function () {
-  let testnft, intBlockMath, blockMath, governance, arsenal, avatar, map, bomb, energy;
+  let testnft,
+    intBlockMath,
+    blockMath,
+    governance,
+    arsenal,
+    avatar,
+    map,
+    bomb,
+    energy,
+    energydecimals;
 
   it("deploy ", async function () {
     const TESTNFT = await ethers.getContractFactory("TESTNFT");
@@ -53,6 +62,8 @@ describe("MOPN", function () {
     energy = await Energy.deploy("$Energy", "MOPNE");
     await energy.deployed();
     console.log("Energy", energy.address);
+
+    energydecimals = await energy.decimals();
 
     const Arsenal = await ethers.getContractFactory("Arsenal");
     arsenal = await Arsenal.deploy();
@@ -115,7 +126,7 @@ describe("MOPN", function () {
           "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
         ],
       ]),
-      avatar.interface.encodeFunctionData("jumpIn", [100010001000, 0, 1, 1]),
+      avatar.interface.encodeFunctionData("jumpIn", [10001000, 0, 1, 1]),
     ]);
     await multiTx.wait();
 
@@ -128,11 +139,24 @@ describe("MOPN", function () {
     mintnfttx = await testnft.safeMint(owner.address);
     await mintnfttx.wait();
 
-    const mintTx1 = await avatar.mintAvatar(testnft.address, 1, [
-      "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-      "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
+    const multi2Tx = await avatar.multicall([
+      avatar.interface.encodeFunctionData("mintAvatar", [
+        testnft.address,
+        1,
+        [
+          "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
+          "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
+        ],
+      ]),
+      avatar.interface.encodeFunctionData("jumpIn", [10001003, 1, 2, 1]),
     ]);
-    await mintTx1.wait();
+    await multi2Tx.wait();
+
+    // const mintTx1 = await avatar.mintAvatar(testnft.address, 1, [
+    //   "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
+    //   "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
+    // ]);
+    // await mintTx1.wait();
 
     mintnfttx = await testnft.safeMint(owner.address);
     await mintnfttx.wait();
@@ -193,31 +217,31 @@ describe("MOPN", function () {
     // await jumpInTx.wait();
 
     // 0 3 -3
-    const jumpIn1Tx = await avatar.jumpIn(100010030997, 1, 2, 1);
-    await jumpIn1Tx.wait();
+    // const jumpIn1Tx = await avatar.jumpIn(100010030997, 1, 2, 1);
+    // await jumpIn1Tx.wait();
 
     // 0 2 -2
-    const jumpIn2Tx = await avatar.jumpIn(100010020998, 2, 3, 1);
+    const jumpIn2Tx = await avatar.jumpIn(10001002, 2, 3, 1);
     await jumpIn2Tx.wait();
 
     // 1 2 -3
-    const jumpIn3Tx = await avatar.jumpIn(100110020997, 2, 4, 1);
+    const jumpIn3Tx = await avatar.jumpIn(10011002, 2, 4, 1);
     await jumpIn3Tx.wait();
 
     // -1 3 -2
-    const jumpIn4Tx = await avatar.jumpIn(099910030998, 2, 5, 1);
+    const jumpIn4Tx = await avatar.jumpIn(09991003, 2, 5, 1);
     await jumpIn4Tx.wait();
 
     // -1 4 -3
-    const jumpIn5Tx = await avatar.jumpIn(099910040997, 2, 6, 1);
+    const jumpIn5Tx = await avatar.jumpIn(09991004, 2, 6, 1);
     await jumpIn5Tx.wait();
 
     // 0 4 -4
-    const jumpIn6Tx = await avatar.jumpIn(100010040996, 2, 7, 1);
+    const jumpIn6Tx = await avatar.jumpIn(10001004, 2, 7, 1);
     await jumpIn6Tx.wait();
 
     // 1 3 -4
-    const jumpIn7Tx = await avatar.jumpIn(100110030996, 2, 8, 1);
+    const jumpIn7Tx = await avatar.jumpIn(10011003, 2, 8, 1);
     await jumpIn7Tx.wait();
 
     console.log(await avatar.getAvatarOccupiedBlock(1));
@@ -230,17 +254,17 @@ describe("MOPN", function () {
     console.log(await avatar.getAvatarOccupiedBlock(8));
 
     // 1, 0, -1;
-    const moveTo4Tx = await avatar.moveTo(100110000999, 2, 1, 1);
+    const moveTo4Tx = await avatar.moveTo(10011000, 2, 1, 1);
     await moveTo4Tx.wait();
 
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(4)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(5)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(6)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(7)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(8)));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(4), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(5), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(6), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(7), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(8), energydecimals));
 
     const redeemEnergyTx = await governance.redeemAvatarInboxEnergy(1);
     await redeemEnergyTx.wait();
@@ -256,33 +280,36 @@ describe("MOPN", function () {
     ]);
     await multi1Tx.wait();
 
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(4)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(5)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(6)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(7)));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(8)));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(4), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(5), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(6), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(7), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(8), energydecimals));
 
-    console.log("wallet balance", ethers.utils.formatUnits(await energy.balanceOf(owner.address)));
+    console.log(
+      "wallet balance",
+      ethers.utils.formatUnits(await energy.balanceOf(owner.address), energydecimals)
+    );
 
     const allowanceTx = await energy.approve(
       arsenal.address,
-      ethers.BigNumber.from("10000000000000000000000000")
+      ethers.BigNumber.from("1000000000000000")
     );
     await allowanceTx.wait();
 
-    console.log(ethers.utils.formatUnits(await arsenal.getCurrentPrice()));
+    console.log(ethers.utils.formatUnits(await arsenal.getCurrentPrice(), energydecimals));
     const buybombtx = await arsenal.buy(2);
     await buybombtx.wait();
 
     // -2 3 -1
-    const bombTx = await avatar.bomb(099810030999, 1);
+    const bombTx = await avatar.bomb(09981003, 1);
     await bombTx.wait();
 
     // 0 3 -3
-    const bomb1Tx = await avatar.bomb(100010030997, 1);
+    const bomb1Tx = await avatar.bomb(10001003, 1);
     await bomb1Tx.wait();
 
     console.log(await avatar.getAvatarOccupiedBlock(1));
