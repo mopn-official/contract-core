@@ -3,49 +3,136 @@ pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
 import "./interfaces/IMOPN.sol";
-import "./libraries/IntBlockMath.sol";
+import "./libraries/BlockMath.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/interfaces/IERC721.sol";
 
 contract Avatar is Multicall, Ownable {
-    using Math for uint256;
-    using IntBlockMath for uint32;
+    struct AvatarData {
+        uint256 tokenId;
+        uint256 setData;
+    }
 
+    struct AvatarDataOutput {
+        uint256 tokenId;
+        uint256 COID;
+        uint256 BombUsed;
+        uint32 blockCoordinate;
+    }
+
+    using Math for uint256;
+    using BlockMath for uint32;
+
+    event BombUse(uint256 indexed avatarId, uint32 blockCoordinate);
+
+    /** 
+        avatar storage map
+        avatarId => AvatarData
+    */
     mapping(uint256 => AvatarData) public avatarNoumenon;
 
+    // token map of Collection => tokenId => avatarId
     mapping(uint256 => mapping(uint256 => uint256)) public tokenMap;
 
-    mapping(uint256 => uint256) public collectionMap;
+    uint256 public currentAvatarId;
 
     IMap public Map;
-
     IGovernance public Governance;
-
-    uint256 public currentAvatarId;
 
     function setGovernanceContract(address governanceContract_) public {
         Governance = IGovernance(governanceContract_);
         Map = IMap(Governance.mapContract());
     }
 
-    function getAvatarOccupiedBlock(
+    /**
+     * get avatar info by avatarId
+     * @param avatarId avatar Id
+     */
+    function getAvatarByAvatarId(
         uint256 avatarId
-    ) public view returns (uint32) {
-        return avatarNoumenon[avatarId].blockCoordinate;
+    ) public view returns (AvatarDataOutput memory avatarData) {
+        avatarData.tokenId = avatarNoumenon[avatarId].tokenId;
+        avatarData.COID = getAvatarCOID(avatarId);
+        avatarData.BombUsed = getAvatarBombUsed(avatarId);
+        avatarData.blockCoordinate = getAvatarCoordinate(avatarId);
+    }
+
+    /**
+     * get avatar info
+     * @param collection  collection contract address
+     * @param tokenId  token Id
+     */
+    function getAvatarByNFT(
+        address collection,
+        uint256 tokenId
+    ) public view returns (AvatarDataOutput memory avatarData) {
+        uint256 avatarId = tokenMap[Governance.getCollectionCOID(collection)][
+            tokenId
+        ];
+        avatarData = getAvatarByAvatarId(avatarId);
+    }
+
+    /**
+     * get avatar infos
+     * @param collections array of collection contract address
+     * @param tokenIds array of token Ids
+     */
+    function getAvatarsByNFTs(
+        address[] memory collections,
+        uint256[] memory tokenIds
+    ) public view returns (AvatarDataOutput[] memory avatarDatas) {
+        uint256[] memory COIDs = Governance.getCollectionsCOIDs(collections);
+        avatarDatas = new AvatarDataOutput[](COIDs.length);
+        for (uint256 i = 0; i < COIDs.length; i++) {
+            avatarDatas[i] = getAvatarByAvatarId(
+                tokenMap[COIDs[i]][tokenIds[i]]
+            );
+        }
     }
 
     function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
-        return avatarNoumenon[avatarId].COID;
+        return (avatarNoumenon[avatarId].setData % 10 ** 18) / 10 ** 8;
+    }
+
+    function getAvatarBombUsed(uint256 avatarId) public view returns (uint256) {
+        return avatarNoumenon[avatarId].setData / 10 ** 18;
+    }
+
+    function addAvatarBombUsed(uint256 avatarId) internal {
+        avatarNoumenon[avatarId].setData += 10 ** 18;
+    }
+
+    function getAvatarCoordinate(
+        uint256 avatarId
+    ) public view returns (uint32) {
+        return uint32(avatarNoumenon[avatarId].setData % 10 ** 8);
+    }
+
+    function setAvatarCoordinate(
+        uint256 avatarId,
+        uint32 blockCoordinate
+    ) internal {
+        avatarNoumenon[avatarId].setData =
+            avatarNoumenon[avatarId].setData -
+            (avatarNoumenon[avatarId].setData % 10 ** 8) +
+            uint256(blockCoordinate);
     }
 
     function ownerOf(uint256 avatarId) public view returns (address) {
-        require(avatarNoumenon[avatarId].COID > 0, "avatar not exist");
+        uint256 COID = getAvatarCOID(avatarId);
+        require(COID > 0, "avatar not exist");
         return
-            IERC721(
-                Governance.getCollectionContract(avatarNoumenon[avatarId].COID)
-            ).ownerOf(avatarNoumenon[avatarId].tokenId);
+            IERC721(Governance.getCollectionContract(COID)).ownerOf(
+                avatarNoumenon[avatarId].tokenId
+            );
+    }
+
+    function ownerOf(
+        address collectionContract,
+        uint256 tokenId
+    ) public view returns (address) {
+        return IERC721(collectionContract).ownerOf(tokenId);
     }
 
     function mintAvatar(
@@ -54,7 +141,7 @@ contract Avatar is Multicall, Ownable {
         bytes32[] memory proofs
     ) public returns (uint256) {
         require(
-            msg.sender == IERC721(collectionContract).ownerOf(tokenId),
+            msg.sender == ownerOf(collectionContract, tokenId),
             "caller is not token owner"
         );
         uint256 COID = Governance.checkWhitelistCOID(
@@ -65,7 +152,7 @@ contract Avatar is Multicall, Ownable {
 
         currentAvatarId++;
 
-        avatarNoumenon[currentAvatarId].COID = COID;
+        avatarNoumenon[currentAvatarId].setData = COID * 10 ** 8;
         avatarNoumenon[currentAvatarId].tokenId = tokenId;
 
         tokenMap[COID][tokenId] = currentAvatarId;
@@ -83,26 +170,21 @@ contract Avatar is Multicall, Ownable {
         ownerCheck(avatarId)
         linkCheck(blockCoordinate, linkedAvatarId, avatarId)
     {
-        require(
-            avatarNoumenon[avatarId].blockCoordinate == 0,
-            "avatar is on map"
-        );
+        require(getAvatarCoordinate(avatarId) == 0, "avatar is on map");
+
+        uint256 COID = getAvatarCOID(avatarId);
 
         Map.avatarSet(
             avatarId,
-            avatarNoumenon[avatarId].COID,
+            COID,
             blockCoordinate,
             PassId,
-            avatarNoumenon[avatarId].BoomUsed
+            getAvatarBombUsed(avatarId)
         );
 
-        avatarNoumenon[avatarId].blockCoordinate = blockCoordinate;
-        Governance.redeemCollectionInboxEnergy(
-            avatarId,
-            avatarNoumenon[avatarId].COID,
-            collectionMap[avatarNoumenon[avatarId].COID]
-        );
-        collectionMap[avatarNoumenon[avatarId].COID]++;
+        setAvatarCoordinate(avatarId, blockCoordinate);
+        Governance.addCollectionOnMapNum(COID);
+        Governance.redeemCollectionInboxEnergy(avatarId, COID);
     }
 
     function moveTo(
@@ -116,39 +198,27 @@ contract Avatar is Multicall, Ownable {
         ownerCheck(avatarId)
         linkCheck(blockCoordinate, linkedAvatarId, avatarId)
     {
-        require(
-            avatarNoumenon[avatarId].blockCoordinate != 0,
-            "avatar not on map"
-        );
-        Map.avatarRemove(
-            avatarId,
-            avatarNoumenon[avatarId].COID,
-            avatarNoumenon[avatarId].blockCoordinate
-        );
+        uint256 COID = getAvatarCOID(avatarId);
+        require(getAvatarCoordinate(avatarId) != 0, "avatar not on map");
+        Map.avatarRemove(avatarId, COID, getAvatarCoordinate(avatarId));
 
-        Map.avatarSet(
-            avatarId,
-            avatarNoumenon[avatarId].COID,
-            blockCoordinate,
-            PassId,
-            0
-        );
+        Map.avatarSet(avatarId, COID, blockCoordinate, PassId, 0);
 
-        avatarNoumenon[avatarId].blockCoordinate = blockCoordinate;
+        setAvatarCoordinate(avatarId, blockCoordinate);
     }
 
     function bomb(
         uint32 blockCoordinate,
         uint256 avatarId
     ) public blockCheck(blockCoordinate) ownerCheck(avatarId) {
-        avatarNoumenon[avatarId].BoomUsed++;
-        if (avatarNoumenon[avatarId].blockCoordinate > 0) {
+        addAvatarBombUsed(avatarId);
+        if (getAvatarCoordinate(avatarId) > 0) {
             Governance.burnBomb(
                 msg.sender,
                 1,
                 avatarId,
-                avatarNoumenon[avatarId].COID,
-                Map.getBlockPassId(avatarNoumenon[avatarId].blockCoordinate)
+                getAvatarCOID(avatarId),
+                Map.getBlockPassId(getAvatarCoordinate(avatarId))
             );
         } else {
             Governance.burnBomb(msg.sender, 1, 0, 0, 0);
@@ -167,16 +237,17 @@ contract Avatar is Multicall, Ownable {
             }
             deFeat(attackAvatarId);
         }
+        emit BombUse(avatarId, blockCoordinate);
     }
 
     function deFeat(uint256 avatarId) internal {
         Map.avatarRemove(
             avatarId,
-            avatarNoumenon[avatarId].COID,
-            avatarNoumenon[avatarId].blockCoordinate
+            getAvatarCOID(avatarId),
+            getAvatarCoordinate(avatarId)
         );
-        avatarNoumenon[avatarId].blockCoordinate = 0;
-        collectionMap[avatarNoumenon[avatarId].COID]--;
+        setAvatarCoordinate(avatarId, 0);
+        Governance.subCollectionOnMapNum(getAvatarCOID(avatarId));
     }
 
     modifier ownerCheck(uint256 avatarId) {
@@ -194,28 +265,27 @@ contract Avatar is Multicall, Ownable {
         uint256 linkedAvatarId,
         uint256 avatarId
     ) {
-        require(avatarNoumenon[avatarId].COID > 0, "avatar not exist");
+        uint256 COID = getAvatarCOID(avatarId);
+        require(COID > 0, "avatar not exist");
 
         if (linkedAvatarId > 0) {
-            require(
-                avatarNoumenon[avatarId].COID ==
-                    avatarNoumenon[linkedAvatarId].COID,
-                "link co error"
-            );
+            require(COID == getAvatarCOID(linkedAvatarId), "link co error");
             require(linkedAvatarId != avatarId, "link to yourself");
             if (
-                blockCoordinate.distance(
-                    avatarNoumenon[linkedAvatarId].blockCoordinate
-                ) > 3
+                blockCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) >
+                3
             ) {
                 revert linkBlockError();
             }
-        } else if (collectionMap[avatarNoumenon[avatarId].COID] > 0) {
-            if (
-                !(avatarNoumenon[avatarId].blockCoordinate > 0 &&
-                    collectionMap[avatarNoumenon[avatarId].COID] == 1)
-            ) {
-                revert linkBlockError();
+        } else {
+            uint256 collectionOnMapNum = Governance.getCollectionOnMapNum(COID);
+            if (collectionOnMapNum > 0) {
+                if (
+                    !(getAvatarCoordinate(avatarId) > 0 &&
+                        collectionOnMapNum == 1)
+                ) {
+                    revert linkBlockError();
+                }
             }
         }
         _;

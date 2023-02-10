@@ -1,9 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "../structs/Structs.sol";
-
 interface IGovernance {
+    function getCollectionContract(
+        uint256 COID
+    ) external view returns (address);
+
+    function getCollectionCOID(
+        address collectionContract
+    ) external view returns (uint256);
+
+    function getCollectionsCOIDs(
+        address[] memory collectionContracts
+    ) external view returns (uint256[] memory COIDs);
+
     function checkWhitelistCOID(
         address collectionContract,
         bytes32[] memory proofs
@@ -16,9 +26,13 @@ interface IGovernance {
 
     function updateWhiteList(bytes32 whiteListRoot_) external;
 
-    function getCollectionContract(
+    function addCollectionOnMapNum(uint256 COID) external;
+
+    function subCollectionOnMapNum(uint256 COID) external;
+
+    function getCollectionOnMapNum(
         uint256 COID
-    ) external view returns (address);
+    ) external view returns (uint256);
 
     function addBEPS(
         uint256 avatarId,
@@ -41,8 +55,7 @@ interface IGovernance {
 
     function redeemCollectionInboxEnergy(
         uint256 avatarId,
-        uint256 COID,
-        uint256 onMapAvatarNum
+        uint256 COID
     ) external;
 
     function avatarContract() external view returns (address);

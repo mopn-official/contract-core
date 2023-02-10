@@ -1,16 +1,7 @@
 const { ethers } = require("hardhat");
 
 describe("MOPN", function () {
-  let testnft,
-    intBlockMath,
-    blockMath,
-    governance,
-    arsenal,
-    avatar,
-    map,
-    bomb,
-    energy,
-    energydecimals;
+  let testnft, blockMath, governance, arsenal, avatar, map, bomb, energy, energydecimals;
 
   it("deploy ", async function () {
     const TESTNFT = await ethers.getContractFactory("TESTNFT");
@@ -23,11 +14,6 @@ describe("MOPN", function () {
     await blockMath.deployed();
     console.log("BlockMath", blockMath.address);
 
-    const IntBlockMath = await ethers.getContractFactory("IntBlockMath");
-    intBlockMath = await IntBlockMath.deploy();
-    await intBlockMath.deployed();
-    console.log("IntBlockMath", intBlockMath.address);
-
     const Governance = await ethers.getContractFactory("Governance");
     governance = await Governance.deploy(0);
     await governance.deployed();
@@ -35,8 +21,7 @@ describe("MOPN", function () {
 
     const Map = await ethers.getContractFactory("Map", {
       libraries: {
-        // BlockMath: blockMath.address,
-        IntBlockMath: intBlockMath.address,
+        BlockMath: blockMath.address,
       },
     });
     map = await Map.deploy();
@@ -45,8 +30,7 @@ describe("MOPN", function () {
 
     const Avatar = await ethers.getContractFactory("Avatar", {
       libraries: {
-        // BlockMath: blockMath.address,
-        IntBlockMath: intBlockMath.address,
+        BlockMath: blockMath.address,
       },
     });
     avatar = await Avatar.deploy();
@@ -244,14 +228,14 @@ describe("MOPN", function () {
     const jumpIn7Tx = await avatar.jumpIn(10011003, 2, 8, 1);
     await jumpIn7Tx.wait();
 
-    console.log(await avatar.getAvatarOccupiedBlock(1));
-    console.log(await avatar.getAvatarOccupiedBlock(2));
-    console.log(await avatar.getAvatarOccupiedBlock(3));
-    console.log(await avatar.getAvatarOccupiedBlock(4));
-    console.log(await avatar.getAvatarOccupiedBlock(5));
-    console.log(await avatar.getAvatarOccupiedBlock(6));
-    console.log(await avatar.getAvatarOccupiedBlock(7));
-    console.log(await avatar.getAvatarOccupiedBlock(8));
+    console.log(await avatar.getAvatarByNFT(testnft.address, 0));
+    console.log(await avatar.getAvatarByNFT(testnft.address, 1));
+    console.log(await avatar.getAvatarByNFT(testnft.address, 2));
+    console.log(await avatar.getAvatarByNFT(testnft.address, 3));
+    console.log(await avatar.getAvatarByNFT(testnft.address, 4));
+    console.log(await avatar.getAvatarByNFT(testnft.address, 5));
+    console.log(await avatar.getAvatarByNFT(testnft.address, 6));
+    console.log(await avatar.getAvatarByNFT(testnft.address, 7));
 
     // 1, 0, -1;
     const moveTo4Tx = await avatar.moveTo(10011000, 2, 1, 1);
@@ -312,14 +296,21 @@ describe("MOPN", function () {
     const bomb1Tx = await avatar.bomb(10001003, 1);
     await bomb1Tx.wait();
 
-    console.log(await avatar.getAvatarOccupiedBlock(1));
-    console.log(await avatar.getAvatarOccupiedBlock(2));
-    console.log(await avatar.getAvatarOccupiedBlock(3));
-    console.log(await avatar.getAvatarOccupiedBlock(4));
-    console.log(await avatar.getAvatarOccupiedBlock(5));
-    console.log(await avatar.getAvatarOccupiedBlock(6));
-    console.log(await avatar.getAvatarOccupiedBlock(7));
-    console.log(await avatar.getAvatarOccupiedBlock(8));
+    console.log(
+      await avatar.getAvatarsByNFTs(
+        [
+          testnft.address,
+          testnft.address,
+          testnft.address,
+          testnft.address,
+          testnft.address,
+          testnft.address,
+          testnft.address,
+          testnft.address,
+        ],
+        [0, 1, 2, 3, 4, 5, 6, 7]
+      )
+    );
 
     // console.log(await avatar.getAvatarOccupiedBlockInt(1));
   });

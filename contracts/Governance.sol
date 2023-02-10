@@ -14,12 +14,8 @@ contract Governance is Multicall, Ownable {
 
     uint256 BEPSStartBlock;
 
-    // Block Energy Produce Share Minted
-    uint256 BEPSMinted;
-
-    uint256 BEPSLastMiningBlockNumber;
-
-    uint256 BEPS_Count;
+    // BEPSMinted * 10 ** 24 + BEPSLastMintedBlockNumber * 10 ** 12 + BEPSCount
+    uint256 BEPSData;
 
     mapping(uint256 => uint256) public AvatarEnergys;
 
@@ -29,6 +25,18 @@ contract Governance is Multicall, Ownable {
 
     constructor(uint256 BEPSStartBlock_) {
         BEPSStartBlock = BEPSStartBlock_;
+    }
+
+    function getBEPSMinted() public view returns (uint256) {
+        return BEPSData / 10 ** 24;
+    }
+
+    function getBEPSLastMintedBlockNumber() public view returns (uint256) {
+        return (BEPSData % 10 ** 24) / 10 ** 12;
+    }
+
+    function getBEPSCount() public view returns (uint256) {
+        return BEPSData % 10 ** 12;
     }
 
     function addBEPS(
@@ -47,7 +55,7 @@ contract Governance is Multicall, Ownable {
         uint256 amount
     ) internal {
         mintShareEnergy();
-        BEPS_Count += amount;
+        BEPSData += amount;
         mintAvatarEnergy(avatarId);
         AvatarEnergys[avatarId] += amount;
         mintCollectionEnergy(COID);
@@ -67,7 +75,7 @@ contract Governance is Multicall, Ownable {
     function _subBEPS(uint256 avatarId, uint256 COID, uint32 PassId) internal {
         mintShareEnergy();
         uint256 amount = getAvatarBEPSShare(avatarId);
-        BEPS_Count -= amount;
+        BEPSData -= amount;
         mintAvatarEnergy(avatarId);
         AvatarEnergys[avatarId] -= amount;
         mintCollectionEnergy(COID);
@@ -76,57 +84,62 @@ contract Governance is Multicall, Ownable {
         PassHolderEnergys[PassId] -= amount;
     }
 
-    function mintShareEnergy() public {
-        if (BEPS_Count == 0) {
-            BEPSLastMiningBlockNumber = block.number;
-        } else if (block.number > BEPSLastMiningBlockNumber) {
-            uint256 reduceTimes = (BEPSLastMiningBlockNumber - BEPSStartBlock) /
-                BEP_REDUCE_INTERVAL;
-            uint256 nextReduceBlockNumber = BEPSStartBlock +
-                BEP_REDUCE_INTERVAL +
-                reduceTimes *
-                BEP_REDUCE_INTERVAL;
-
-            uint256 BEPSMinted_;
-            while (true) {
-                if (block.number > nextReduceBlockNumber) {
-                    BEPSMinted_ +=
-                        ((nextReduceBlockNumber - BEPSLastMiningBlockNumber) *
-                            currentBEP(reduceTimes)) /
-                        BEPS_Count;
-                    BEPSLastMiningBlockNumber = nextReduceBlockNumber;
-                    reduceTimes++;
-                    nextReduceBlockNumber += BEP_REDUCE_INTERVAL;
-                } else {
-                    BEPSMinted_ +=
-                        ((block.number - BEPSLastMiningBlockNumber) *
-                            currentBEP(reduceTimes)) /
-                        BEPS_Count;
-                    break;
-                }
+    function currentBEP(
+        uint256 reduceTimes
+    ) public pure returns (uint256 cBEP) {
+        cBEP = BEP;
+        while (true) {
+            if (reduceTimes > 17) {
+                cBEP = (BEP * 997 ** 17) / (1000 ** 17);
+            } else {
+                cBEP = (BEP * 997 ** reduceTimes) / (1000 ** reduceTimes);
+                break;
             }
-
-            BEPSMinted += BEPSMinted_;
-            BEPSLastMiningBlockNumber = block.number;
+            reduceTimes -= 17;
         }
     }
 
-    function getAvatarBEPSMinted(
-        uint256 avatarId
-    ) internal view returns (uint256) {
-        return (AvatarEnergys[avatarId] % 10 ** 50) / 10 ** 25;
-    }
+    function mintShareEnergy() public {
+        uint256 BEPSLastMintedBlockNumber = getBEPSLastMintedBlockNumber();
 
-    function getCollectionBEPSMinted(
-        uint256 COID
-    ) internal view returns (uint256) {
-        return (CollectionEnergys[COID] % 10 ** 50) / 10 ** 25;
-    }
+        if (block.number > BEPSLastMintedBlockNumber) {
+            uint256 BEPSCount = getBEPSCount();
+            uint256 BEPSMinted = getBEPSMinted();
+            if (BEPSCount > 0) {
+                uint256 reduceTimes = (BEPSLastMintedBlockNumber -
+                    BEPSStartBlock) / BEP_REDUCE_INTERVAL;
+                uint256 nextReduceBlockNumber = BEPSStartBlock +
+                    BEP_REDUCE_INTERVAL +
+                    reduceTimes *
+                    BEP_REDUCE_INTERVAL;
 
-    function getPassHolderBEPSMinted(
-        uint32 PassId
-    ) internal view returns (uint256) {
-        return (PassHolderEnergys[PassId] % 10 ** 50) / 10 ** 25;
+                while (true) {
+                    if (block.number > nextReduceBlockNumber) {
+                        BEPSMinted +=
+                            ((nextReduceBlockNumber -
+                                BEPSLastMintedBlockNumber) *
+                                currentBEP(reduceTimes)) /
+                            BEPSCount;
+                        BEPSLastMintedBlockNumber = nextReduceBlockNumber;
+                        reduceTimes++;
+                        nextReduceBlockNumber += BEP_REDUCE_INTERVAL;
+                    } else {
+                        BEPSMinted +=
+                            ((block.number - BEPSLastMintedBlockNumber) *
+                                currentBEP(reduceTimes)) /
+                            BEPSCount;
+                        break;
+                    }
+                }
+            }
+            BEPSLastMintedBlockNumber = block.number;
+            BEPSData =
+                BEPSMinted *
+                10 ** 24 +
+                BEPSLastMintedBlockNumber *
+                10 ** 12 +
+                BEPSCount;
+        }
     }
 
     function getAvatarBEPSInbox(
@@ -135,16 +148,10 @@ contract Governance is Multicall, Ownable {
         return AvatarEnergys[avatarId] / 10 ** 50;
     }
 
-    function getCollectionBEPSInbox(
-        uint256 COID
+    function getAvatarBEPSMinted(
+        uint256 avatarId
     ) internal view returns (uint256) {
-        return CollectionEnergys[COID] / 10 ** 50;
-    }
-
-    function getPassHolderBEPSInbox(
-        uint32 PassId
-    ) internal view returns (uint256) {
-        return PassHolderEnergys[PassId] / 10 ** 50;
+        return (AvatarEnergys[avatarId] % 10 ** 50) / 10 ** 25;
     }
 
     function getAvatarBEPSShare(
@@ -153,20 +160,9 @@ contract Governance is Multicall, Ownable {
         return AvatarEnergys[avatarId] % 10 ** 25;
     }
 
-    function getCollectionBEPSShare(
-        uint256 COID
-    ) internal view returns (uint256) {
-        return CollectionEnergys[COID] % 10 ** 25;
-    }
-
-    function getPassHolderBEPSShare(
-        uint32 PassId
-    ) internal view returns (uint256) {
-        return PassHolderEnergys[PassId] % 10 ** 25;
-    }
-
     function mintAvatarEnergy(uint256 avatarId) internal {
         uint256 AvatarBEPSMinted = getAvatarBEPSMinted(avatarId);
+        uint256 BEPSMinted = getBEPSMinted();
         if (AvatarBEPSMinted < BEPSMinted) {
             uint256 AvatarBEPSShare = getAvatarBEPSShare(avatarId);
             uint256 AvatarBEPSInbox = getAvatarBEPSInbox(avatarId);
@@ -174,6 +170,7 @@ contract Governance is Multicall, Ownable {
                 AvatarBEPSInbox += ((((BEPSMinted - AvatarBEPSMinted) *
                     AvatarBEPSShare) * 90) / 100);
             }
+
             AvatarEnergys[avatarId] =
                 AvatarBEPSInbox *
                 10 ** 50 +
@@ -183,7 +180,56 @@ contract Governance is Multicall, Ownable {
         }
     }
 
+    function getAvatarInboxEnergy(
+        uint256 avatarId
+    ) public view returns (uint256 inbox) {
+        uint256 BEPSMinted = getBEPSMinted();
+        inbox = getAvatarBEPSInbox(avatarId);
+        uint256 AvatarBEPSMinted = getAvatarBEPSMinted(avatarId);
+        uint256 AvatarBEPSShare = getAvatarBEPSShare(avatarId);
+
+        if (AvatarBEPSMinted < BEPSMinted && AvatarBEPSShare > 0) {
+            inbox +=
+                (((BEPSMinted - AvatarBEPSMinted) * AvatarBEPSShare) * 90) /
+                100;
+        }
+    }
+
+    function redeemAvatarInboxEnergy(uint256 avatarId) public {
+        require(
+            msg.sender == IAvatar(avatarContract).ownerOf(avatarId),
+            "not your avatar"
+        );
+        mintShareEnergy();
+        mintAvatarEnergy(avatarId);
+
+        uint256 amount = getAvatarBEPSInbox(avatarId);
+        require(amount > 0, "empty");
+
+        AvatarEnergys[avatarId] = AvatarEnergys[avatarId] % (10 ** 50);
+        IEnergy(energyContract).mint(msg.sender, amount);
+    }
+
+    function getCollectionBEPSInbox(
+        uint256 COID
+    ) internal view returns (uint256) {
+        return CollectionEnergys[COID] / 10 ** 50;
+    }
+
+    function getCollectionBEPSMinted(
+        uint256 COID
+    ) internal view returns (uint256) {
+        return (CollectionEnergys[COID] % 10 ** 50) / 10 ** 25;
+    }
+
+    function getCollectionBEPSShare(
+        uint256 COID
+    ) internal view returns (uint256) {
+        return CollectionEnergys[COID] % 10 ** 25;
+    }
+
     function mintCollectionEnergy(uint256 COID) internal {
+        uint256 BEPSMinted = getBEPSMinted();
         uint256 CollectionBEPSMinted = getCollectionBEPSMinted(COID);
         if (CollectionBEPSMinted < BEPSMinted) {
             uint256 CollectionBEPSShare = getCollectionBEPSShare(COID);
@@ -201,7 +247,54 @@ contract Governance is Multicall, Ownable {
         }
     }
 
+    function getCollectionInboxEnergy(
+        uint256 COID
+    ) public view returns (uint256 inbox) {
+        uint256 BEPSMinted = getBEPSMinted();
+        inbox = getCollectionBEPSInbox(COID);
+        uint256 CollectionBEPSMinted = getCollectionBEPSMinted(COID);
+        uint256 CollectionBEPSShare = getCollectionBEPSShare(COID);
+
+        if (CollectionBEPSMinted < BEPSMinted && CollectionBEPSShare > 0) {
+            inbox +=
+                (((BEPSMinted - CollectionBEPSMinted) * CollectionBEPSShare) *
+                    9) /
+                100;
+        }
+    }
+
+    function redeemCollectionInboxEnergy(
+        uint256 avatarId,
+        uint256 COID
+    ) public onlyAvatar {
+        uint256 amount = getCollectionBEPSInbox(COID);
+        if (amount > 0) {
+            amount = amount / (getCollectionOnMapNum(COID) + 1);
+            CollectionEnergys[COID] -= amount * (10 ** 50);
+            AvatarEnergys[avatarId] += amount * (10 ** 50);
+        }
+    }
+
+    function getPassHolderBEPSInbox(
+        uint32 PassId
+    ) internal view returns (uint256) {
+        return PassHolderEnergys[PassId] / 10 ** 50;
+    }
+
+    function getPassHolderBEPSMinted(
+        uint32 PassId
+    ) internal view returns (uint256) {
+        return (PassHolderEnergys[PassId] % 10 ** 50) / 10 ** 25;
+    }
+
+    function getPassHolderBEPSShare(
+        uint32 PassId
+    ) internal view returns (uint256) {
+        return PassHolderEnergys[PassId] % 10 ** 25;
+    }
+
     function mintPassHolderEnergy(uint32 PassId) internal {
+        uint256 BEPSMinted = getBEPSMinted();
         uint256 PassHolderBEPSMinted = getPassHolderBEPSMinted(PassId);
         if (PassHolderBEPSMinted < BEPSMinted) {
             uint256 PassHolderBEPSShare = getPassHolderBEPSShare(PassId);
@@ -221,63 +314,34 @@ contract Governance is Multicall, Ownable {
         }
     }
 
-    function currentBEP(
-        uint256 reduceTimes
-    ) public pure returns (uint256 cBEP) {
-        cBEP = BEP;
-        while (true) {
-            if (reduceTimes > 17) {
-                cBEP = (BEP * 997 ** 17) / (1000 ** 17);
-            } else {
-                cBEP = (BEP * 997 ** reduceTimes) / (1000 ** reduceTimes);
-                break;
-            }
-            reduceTimes -= 17;
-        }
-    }
-
-    function getAvatarInboxEnergy(
-        uint256 avatarId
+    function getPassHolderInboxEnergy(
+        uint32 PassId
     ) public view returns (uint256 inbox) {
-        inbox = getAvatarBEPSInbox(avatarId);
-        uint256 AvatarBEPSMinted = getAvatarBEPSMinted(avatarId);
-        uint256 AvatarBEPSShare = getAvatarBEPSShare(avatarId);
+        uint256 BEPSMinted = getBEPSMinted();
+        inbox = getPassHolderBEPSInbox(PassId);
+        uint256 PassHolderBEPSMinted = getPassHolderBEPSMinted(PassId);
+        uint256 PassHolderBEPSShare = getPassHolderBEPSShare(PassId);
 
-        if (AvatarBEPSMinted < BEPSMinted) {
-            if (AvatarBEPSShare > 0) {
-                inbox +=
-                    (((BEPSMinted - AvatarBEPSMinted) * AvatarBEPSShare) * 90) /
-                    100;
-            }
+        if (PassHolderBEPSMinted < BEPSMinted && PassHolderBEPSShare > 0) {
+            inbox +=
+                ((BEPSMinted - PassHolderBEPSMinted) * PassHolderBEPSShare) /
+                100;
         }
     }
 
-    function redeemAvatarInboxEnergy(uint256 avatarId) public {
+    function redeemPassHolderInboxEnergy(uint32 PassId) public onlyAvatar {
         require(
-            msg.sender == IAvatar(avatarContract).ownerOf(avatarId),
-            "not your avatar"
+            msg.sender == IERC721(passContract).ownerOf(PassId),
+            "not your pass"
         );
         mintShareEnergy();
-        mintAvatarEnergy(avatarId);
+        mintPassHolderEnergy(PassId);
 
-        uint256 amount = getAvatarBEPSInbox(avatarId);
+        uint256 amount = getPassHolderBEPSInbox(PassId);
         require(amount > 0, "empty");
 
-        AvatarEnergys[avatarId] = AvatarEnergys[avatarId] % (10 ** 50);
+        PassHolderEnergys[PassId] = PassHolderEnergys[PassId] % (10 ** 50);
         IEnergy(energyContract).mint(msg.sender, amount);
-    }
-
-    function redeemCollectionInboxEnergy(
-        uint256 avatarId,
-        uint256 COID,
-        uint256 onMapAvatarNum
-    ) public onlyAvatar {
-        uint256 amount = getCollectionBEPSInbox(COID);
-        if (amount > 0) {
-            amount = amount / (onMapAvatarNum + 1);
-            CollectionEnergys[COID] -= amount * (10 ** 50);
-            AvatarEnergys[avatarId] += amount * (10 ** 50);
-        }
     }
 
     bytes32 public whiteListRoot;
@@ -287,30 +351,52 @@ contract Governance is Multicall, Ownable {
 
     mapping(uint256 => address) public COIDMap;
 
+    /**
+     * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
+     * Collection address => COID * 1000000 + on map nft number
+     */
     mapping(address => uint256) public collectionMap;
 
     function getCollectionContract(uint256 COID) public view returns (address) {
         return COIDMap[COID];
     }
 
-    function generateCOID(address collectionContract) internal {
+    function getCollectionCOID(
+        address collectionContract
+    ) public view returns (uint256) {
+        return collectionMap[collectionContract] / 1000000;
+    }
+
+    function getCollectionsCOIDs(
+        address[] memory collectionContracts
+    ) public view returns (uint256[] memory COIDs) {
+        COIDs = new uint256[](collectionContracts.length);
+        for (uint256 i = 0; i < collectionContracts.length; i++) {
+            COIDs[i] = collectionMap[collectionContracts[i]] / 1000000;
+        }
+    }
+
+    function generateCOID(
+        address collectionContract
+    ) internal returns (uint256) {
         COIDCounter++;
         COIDMap[COIDCounter] = collectionContract;
-        collectionMap[collectionContract] = COIDCounter;
+        collectionMap[collectionContract] = COIDCounter * 1000000;
+        return COIDCounter;
     }
 
     function checkWhitelistCOID(
         address collectionContract,
         bytes32[] memory proofs
-    ) public returns (uint256) {
-        if (collectionMap[collectionContract] == 0) {
+    ) public returns (uint256 COID) {
+        COID = getCollectionCOID(collectionContract);
+        if (COID == 0) {
             require(
                 isInWhiteList(collectionContract, proofs),
                 "not in whitelist"
             );
-            generateCOID(collectionContract);
+            COID = generateCOID(collectionContract);
         }
-        return collectionMap[collectionContract];
     }
 
     function isInWhiteList(
@@ -329,6 +415,18 @@ contract Governance is Multicall, Ownable {
 
     function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
         whiteListRoot = whiteListRoot_;
+    }
+
+    function addCollectionOnMapNum(uint256 COID) public onlyAvatar {
+        collectionMap[getCollectionContract(COID)]++;
+    }
+
+    function subCollectionOnMapNum(uint256 COID) public onlyAvatar {
+        collectionMap[getCollectionContract(COID)]--;
+    }
+
+    function getCollectionOnMapNum(uint256 COID) public view returns (uint256) {
+        return collectionMap[getCollectionContract(COID)] % 1000000;
     }
 
     address public arsenalContract;

@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "../structs/Structs.sol";
+error linkBlockError();
+error BlockHasEnemy();
+error PassIdOverflow();
+
 import "./IArsenal.sol";
 import "./IAvatar.sol";
 import "./IBomb.sol";
 import "./IEnergy.sol";
 import "./IGovernance.sol";
 import "./IMap.sol";
+import "@openzeppelin/contracts/interfaces/IERC721.sol";

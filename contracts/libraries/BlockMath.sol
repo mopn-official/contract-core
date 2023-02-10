@@ -1,30 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
-import "../structs/Structs.sol";
 
 library BlockMath {
-    struct Block {
-        int16 x;
-        int16 y;
-        int16 z;
-    }
+    error BlockCoordinateError();
 
-    using BlockMath for Block;
-
-    function getPassType(uint16 PassId) public pure returns (uint8 _passType) {
-        uint16 ringNum = PassRingNum(PassId);
-        if (ringNum <= 6) {
-            _passType = 2;
-        } else if (ringNum >= 30 && ringNum <= 34) {
-            _passType = 1;
+    function check(uint32 blockCoordinate) public pure {
+        uint32[3] memory coodinateArr = coordinateIntToArr(blockCoordinate);
+        if (coodinateArr[0] + coodinateArr[1] + coodinateArr[2] != 3000) {
+            revert BlockCoordinateError();
         }
     }
 
-    function PassRingNum(uint16 PassId) public pure returns (uint16 n) {
-        n = uint16((Math.sqrt(9 + 12 * (uint256(PassId) - 1)) - 3) / (6));
+    function PassRingNum(uint32 PassId) public pure returns (uint32 n) {
+        n = uint32((Math.sqrt(9 + 12 * (uint256(PassId) - 1)) - 3) / (6));
         if ((3 * n * n + 3 * n + 1) == PassId) {
             return n;
         } else {
@@ -32,236 +22,199 @@ library BlockMath {
         }
     }
 
-    function PassRingPos(uint16 PassId) public pure returns (uint16) {
-        uint16 ringNum = PassRingNum(PassId) - 1;
+    function PassRingPos(uint32 PassId) public pure returns (uint32) {
+        uint32 ringNum = PassRingNum(PassId) - 1;
         return PassId - (3 * ringNum * ringNum + 3 * ringNum + 1);
     }
 
     function PassRingStartCenterBlock(
-        uint16 PassIdRingNum_
-    ) public pure returns (Block memory) {
-        int16 PassIdRingNum__ = int16(PassIdRingNum_);
+        uint32 PassIdRingNum_
+    ) public pure returns (uint32) {
         return
-            Block(
-                -PassIdRingNum__ * 5,
-                PassIdRingNum__ * 11,
-                -PassIdRingNum__ * 6
-            );
+            (1000 - PassIdRingNum_ * 5) * 10000 + (1000 + PassIdRingNum_ * 11);
     }
 
     function PassCenterBlock(
-        uint16 PassId
-    ) public pure returns (Block memory block_) {
+        uint32 PassId
+    ) public pure returns (uint32 blockCoordinate) {
         if (PassId == 1) {
-            return block_;
+            return 10001000;
         }
 
-        uint16 PassIdRingNum_ = PassRingNum(PassId);
-        int16 PassIdRingNum__ = int16(PassIdRingNum_);
-        Block memory startblock = PassRingStartCenterBlock(PassIdRingNum_);
-        uint16 PassIdRingPos_ = PassRingPos(PassId);
-        int16 PassIdRingPos__ = int16(PassIdRingPos_) - 1;
+        uint32 PassIdRingNum_ = PassRingNum(PassId);
 
-        uint256 side = Math.ceilDiv(PassIdRingPos_, PassIdRingNum_);
-        int16 sidepos = 0;
-        if (PassIdRingNum__ > 1) {
-            sidepos = PassIdRingPos__ % PassIdRingNum__;
+        uint32[3] memory startblock = coordinateIntToArr(
+            PassRingStartCenterBlock(PassIdRingNum_)
+        );
+
+        uint32 PassIdRingPos_ = PassRingPos(PassId);
+
+        uint32 side = uint32(Math.ceilDiv(PassIdRingPos_, PassIdRingNum_));
+
+        uint32 sidepos = 0;
+        if (PassIdRingNum_ > 1) {
+            sidepos = (PassIdRingPos_ - 1) % PassIdRingNum_;
         }
-
         if (side == 1) {
-            block_.x = startblock.x + sidepos * 11;
-            block_.y = startblock.y - sidepos * 6;
-            block_.z = startblock.z - sidepos * 5;
+            blockCoordinate = (startblock[0] + sidepos * 11) * 10000;
+            blockCoordinate += startblock[1] - sidepos * 6;
         } else if (side == 2) {
-            block_.x = -startblock.z + sidepos * 5;
-            block_.y = -startblock.x - sidepos * 11;
-            block_.z = -startblock.y + sidepos * 6;
+            blockCoordinate = (2000 - startblock[2] + sidepos * 5) * 10000;
+            blockCoordinate += 2000 - startblock[0] - sidepos * 11;
         } else if (side == 3) {
-            block_.x = startblock.y - sidepos * 6;
-            block_.y = startblock.z - sidepos * 5;
-            block_.z = startblock.x + sidepos * 11;
+            blockCoordinate = (startblock[1] - sidepos * 6) * 10000;
+            blockCoordinate += startblock[2] - sidepos * 5;
         } else if (side == 4) {
-            block_.x = -startblock.x - sidepos * 11;
-            block_.y = -startblock.y + sidepos * 6;
-            block_.z = -startblock.z + sidepos * 5;
+            blockCoordinate = (2000 - startblock[0] - sidepos * 11) * 10000;
+            blockCoordinate += 2000 - startblock[1] + sidepos * 6;
         } else if (side == 5) {
-            block_.x = startblock.z - sidepos * 5;
-            block_.y = startblock.x + sidepos * 11;
-            block_.z = startblock.y - sidepos * 6;
+            blockCoordinate = (startblock[2] - sidepos * 5) * 10000;
+            blockCoordinate += startblock[0] + sidepos * 11;
         } else if (side == 6) {
-            block_.x = -startblock.y + sidepos * 6;
-            block_.y = -startblock.z + sidepos * 5;
-            block_.z = -startblock.x - sidepos * 11;
+            blockCoordinate = (2000 - startblock[1] + sidepos * 6) * 10000;
+            blockCoordinate += 2000 - startblock[2] + sidepos * 5;
         }
     }
 
-    function blockLevel(
-        uint256 passContract,
-        uint64 blockCoordinate
-    ) public pure returns (uint8) {
-        uint256 blockCoordinate_ = uint256(blockCoordinate);
-        blockCoordinate_ =
-            (blockCoordinate_ / 100000000) *
-            ((blockCoordinate_ % 100000000) / 10000) *
-            (blockCoordinate_ % 10000);
-        return uint8((passContract / (10 ** (blockCoordinate_ % 30))) % 12) + 1;
+    function PassBlockRange(
+        uint32 blockCoordinate
+    ) public pure returns (uint32[] memory, uint32[] memory) {
+        uint32[] memory xrange = new uint32[](11);
+        uint32[] memory yrange = new uint32[](11);
+        uint32[3] memory blockArr = coordinateIntToArr(blockCoordinate);
+        for (uint256 i = 0; i < 11; i++) {
+            xrange[i] = blockArr[0] + uint32(i) - 5;
+            yrange[i] = blockArr[1] + uint32(i) - 5;
+        }
+        return (xrange, yrange);
     }
 
-    function blockSpiralRingBlocks(
-        Block memory block_,
-        uint256 radius
-    ) public pure returns (Block[] memory) {
-        uint256 blockNum = 3 * radius * radius + 3 * radius;
-        Block[] memory blocks = new Block[](blockNum);
-
-        for (uint256 i = 0; i < radius; i++) {
-            Block memory startBlock = Block(
-                block_.x,
-                block_.y + int16(int256(i)),
-                block_.z - int16(int256(i))
-            );
-
+    function getPassBlocksBEPS(
+        uint32 PassId
+    ) public pure returns (uint256[] memory) {
+        uint32 blockCoordinate = PassCenterBlock(PassId);
+        uint256[] memory BEPSs = new uint256[](91);
+        BEPSs[0] = getBlockBEPS(blockCoordinate);
+        for (uint256 i = 1; i <= 5; i++) {
+            blockCoordinate++;
+            uint256 preringblocks = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
-                    blocks[j * i + k] = startBlock;
-                    startBlock = neighbor(startBlock, j);
+                    BEPSs[preringblocks + j * i + k + 1] = getBlockBEPS(
+                        blockCoordinate
+                    );
+                    blockCoordinate = neighbor(blockCoordinate, j);
                 }
             }
         }
+        return BEPSs;
+    }
 
+    function getBlockBEPS(
+        uint32 blockCoordinate
+    ) public pure returns (uint256) {
+        if ((blockCoordinate / 10000) % 10 == 0) {
+            if (blockCoordinate % 10 == 0) {
+                return 15;
+            }
+            return 5;
+        } else if (blockCoordinate % 10 == 0) {
+            return 5;
+        }
+        return 1;
+    }
+
+    function coordinateIntToArr(
+        uint32 blockCoordinate
+    ) public pure returns (uint32[3] memory coordinateArr) {
+        coordinateArr[0] = blockCoordinate / 10000;
+        coordinateArr[1] = blockCoordinate % 10000;
+        coordinateArr[2] = 3000 - (coordinateArr[0] + coordinateArr[1]);
+    }
+
+    function blockSpiralRingBlocks(
+        uint32 blockCoordinate,
+        uint256 radius
+    ) public pure returns (uint32[] memory) {
+        uint256 blockNum = 3 * radius * radius + 3 * radius;
+        uint32[] memory blocks = new uint32[](blockNum);
+        blocks[0] = blockCoordinate;
+        for (uint256 i = 1; i <= radius; i++) {
+            uint256 preringblocks = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
+            blockCoordinate++;
+            for (uint256 j = 0; j < 6; j++) {
+                for (uint256 k = 0; k < i; k++) {
+                    blocks[preringblocks + j * i + k + 1] = blockCoordinate;
+                    blockCoordinate = neighbor(blockCoordinate, j);
+                }
+            }
+        }
         return blocks;
     }
 
     function blockRingBlocks(
-        Block memory block_,
+        uint32 blockCoordinate,
         uint256 radius
-    ) public pure returns (Block[] memory) {
+    ) public pure returns (uint32[] memory) {
         uint256 blockNum = 6 * radius;
-        Block[] memory blocks = new Block[](blockNum);
+        uint32[] memory blocks = new uint32[](blockNum);
 
-        Block memory startBlock = Block(
-            block_.x,
-            block_.y + int16(int256(radius)),
-            block_.z - int16(int256(radius))
-        );
-
+        blocks[0] = blockCoordinate;
+        blockCoordinate += uint32(radius);
         for (uint256 j = 0; j < 6; j++) {
             for (uint256 k = 0; k < radius; k++) {
-                blocks[j * radius + k] = startBlock;
-                startBlock = neighbor(startBlock, j);
+                blocks[j * radius + k + 1] = blockCoordinate;
+                blockCoordinate = neighbor(blockCoordinate, j);
             }
         }
-
         return blocks;
     }
 
     function blockSpheres(
-        Block memory block_
-    ) public pure returns (Block[] memory) {
-        Block[] memory blocks = new Block[](6);
-
-        Block memory startBlock = Block(block_.x, block_.y + 1, block_.z - 1);
-
-        for (uint256 i = 0; i < 6; i++) {
-            blocks[i] = startBlock;
-            startBlock = neighbor(startBlock, i);
+        uint32 blockcoordinate
+    ) public pure returns (uint32[] memory) {
+        uint32[] memory blocks = new uint32[](7);
+        blocks[0] = blockcoordinate;
+        blockcoordinate++;
+        for (uint256 i = 1; i < 7; i++) {
+            blocks[i] = blockcoordinate;
+            blockcoordinate = neighbor(blockcoordinate, i);
         }
-
         return blocks;
     }
 
-    function check(Block memory a) public pure {
-        if (a.x + a.y + a.z != 0 || (a.x == 0 && a.y == 0 && a.z == 0)) {
-            revert BlockCoordinateError();
-        }
-    }
-
-    function add(
-        Block memory a,
-        Block memory b
-    ) public pure returns (Block memory) {
-        return Block(a.x + b.x, a.y + b.y, a.z + b.z);
-    }
-
-    function subtract(
-        Block memory a,
-        Block memory b
-    ) public pure returns (Block memory) {
-        return Block(a.x - b.x, a.y - b.y, a.z - b.z);
-    }
-
-    function length(Block memory a) public pure returns (int16) {
-        return (int16abs(a.x) + int16abs(a.y) + int16abs(a.z)) / 2;
-    }
-
-    function distance(
-        Block memory a,
-        Block memory b
-    ) public pure returns (int16) {
-        return length(subtract(a, b));
-    }
-
-    function equals(Block memory a, Block memory b) public pure returns (bool) {
-        return a.x == b.x && a.y == b.y && a.z == b.z;
-    }
-
-    function direction(uint256 direction_) public pure returns (Block memory) {
+    function direction(uint256 direction_) public pure returns (int32) {
         if (direction_ == 0) {
-            return Block(1, -1, 0);
+            return 9999;
         } else if (direction_ == 1) {
-            return Block(0, -1, 1);
+            return -1;
         } else if (direction_ == 2) {
-            return Block(-1, 0, 1);
+            return -10000;
         } else if (direction_ == 3) {
-            return Block(-1, 1, 0);
+            return -9999;
         } else if (direction_ == 4) {
-            return Block(0, 1, -1);
+            return 1;
+        } else if (direction_ == 5) {
+            return 10000;
         } else {
-            return Block(1, 0, -1);
+            return 0;
         }
     }
 
     function neighbor(
-        Block memory block_,
+        uint32 blockcoordinate,
         uint256 direction_
-    ) public pure returns (Block memory) {
-        return add(block_, direction(direction_));
+    ) public pure returns (uint32) {
+        return uint32(int32(blockcoordinate) + direction(direction_));
     }
 
-    function coordinateInt(
-        Block memory block_
-    ) public pure returns (uint64 ckey) {
-        unchecked {
-            ckey = uint64(int64(1000 + block_.x)) * 100000000;
-            ckey += uint64(int64(1000 + block_.y)) * 10000;
-            ckey += uint64(int64(1000 + block_.z));
+    function distance(uint32 a, uint32 b) public pure returns (uint32 d) {
+        uint32[3] memory aarr = coordinateIntToArr(a);
+        uint32[3] memory barr = coordinateIntToArr(b);
+        for (uint256 i = 0; i < 3; i++) {
+            d += aarr[i] > barr[i] ? aarr[i] - barr[i] : barr[i] - aarr[i];
         }
-    }
 
-    function fromCoordinateInt(
-        uint64 coordinateInt_
-    ) public pure returns (Block memory block_) {
-        if (coordinateInt_ == 0) {
-            coordinateInt_ = 100010001000;
-        }
-        int64 coordinateInt__ = int64(coordinateInt_);
-
-        int16 xdata = int16(coordinateInt__ / 100000000);
-        if (xdata >= 1000) block_.x = xdata - 1000;
-        else block_.x = -(1000 - xdata);
-
-        int16 ydata = int16((coordinateInt__ % 100000000) / 10000);
-        if (ydata >= 1000) block_.y = ydata - 1000;
-        else block_.y = -(1000 - ydata);
-
-        int16 zdata = int16(coordinateInt__ % 10000);
-        if (zdata >= 1000) block_.z = zdata - 1000;
-        else block_.z = -(1000 - zdata);
-    }
-
-    function int16abs(int16 n) internal pure returns (int16) {
-        unchecked {
-            return n >= 0 ? n : -n;
-        }
+        return d / 2;
     }
 }
