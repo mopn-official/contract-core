@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("solidity-docgen");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -28,5 +29,8 @@ module.exports = {
       goerli: process.env.ETHERSCAN_API_KEY,
       rinkeby: process.env.ETHERSCAN_API_KEY,
     },
+  },
+  docgen: {
+    pages: "files",
   },
 };
