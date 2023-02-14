@@ -12,18 +12,18 @@ function PassRingPos(PassId) {
   return PassId - (3 * ringNum * ringNum + 3 * ringNum + 1);
 }
 
-function PassRingStartCenterBlock(PassIdRingNum_) {
+function PassRingStartCenterTile(PassIdRingNum_) {
   return (1000 - PassIdRingNum_ * 5) * 10000 + (1000 + PassIdRingNum_ * 11);
 }
 
-function PassCenterBlock(PassId) {
+function PassCenterTile(PassId) {
   if (PassId == 1) {
     return 10001000;
   }
 
   const PassIdRingNum_ = PassRingNum(PassId);
 
-  const startblock = coordinateIntToArr(PassRingStartCenterBlock(PassIdRingNum_));
+  const startblock = coordinateIntToArr(PassRingStartCenterTile(PassIdRingNum_));
 
   const PassIdRingPos_ = PassRingPos(PassId);
 
@@ -65,24 +65,24 @@ function coordinateIntToArr(blockCoordinate) {
   return coordinateArr;
 }
 
-function getPassBlocksBEPS(PassId) {
-  let blockCoordinate = PassCenterBlock(PassId);
-  let BEPSs = [];
-  BEPSs[0] = getBlockBEPS(blockCoordinate);
+function getPassTilesEAW(PassId) {
+  let blockCoordinate = PassCenterTile(PassId);
+  let TilesEAW = [];
+  TilesEAW[0] = getTileEAW(blockCoordinate);
   for (let i = 1; i <= 5; i++) {
     blockCoordinate++;
     const preringblocks = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
     for (let j = 0; j < 6; j++) {
       for (let k = 0; k < i; k++) {
-        BEPSs[preringblocks + j * i + k + 1] = getBlockBEPS(blockCoordinate);
+        TilesEAW[preringblocks + j * i + k + 1] = getTileEAW(blockCoordinate);
         blockCoordinate = neighbor(blockCoordinate, j);
       }
     }
   }
-  return BEPSs;
+  return TilesEAW;
 }
 
-function getBlockBEPS(blockCoordinate) {
+function getTileEAW(blockCoordinate) {
   if (Math.floor(blockCoordinate / 10000) % 10 == 0) {
     if (blockCoordinate % 10 == 0) {
       return 15;
@@ -119,9 +119,9 @@ function neighbor(blockcoordinate, direction_) {
 module.exports = {
   PassRingNum,
   PassRingPos,
-  PassRingStartCenterBlock,
-  PassCenterBlock,
-  getBlockBEPS,
-  getPassBlocksBEPS,
+  PassRingStartCenterTile,
+  PassCenterTile,
+  getTileEAW,
+  getPassTilesEAW,
   neighbor,
 };

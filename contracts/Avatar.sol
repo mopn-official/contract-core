@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
 import "./interfaces/IMOPN.sol";
-import "./libraries/BlockMath.sol";
+import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -37,18 +37,18 @@ contract Avatar is Multicall, Ownable {
         uint256 tokenId;
         uint256 COID;
         uint256 BombUsed;
-        uint32 blockCoordinate;
+        uint32 tileCoordinate;
     }
 
     using Math for uint256;
-    using BlockMath for uint32;
+    using TileMath for uint32;
 
     /**
      * @notice BombUse Event emit when a Bomb is used at a coordinate by an avatar
      * @param avatarId avatarId that has indexed
-     * @param blockCoordinate the blockCoordinate
+     * @param tileCoordinate the tileCoordinate
      */
-    event BombUse(uint256 indexed avatarId, uint32 blockCoordinate);
+    event BombUse(uint256 indexed avatarId, uint32 tileCoordinate);
 
     /** 
         avatar storage map
@@ -85,7 +85,7 @@ contract Avatar is Multicall, Ownable {
         avatarData.tokenId = avatarNoumenon[avatarId].tokenId;
         avatarData.COID = getAvatarCOID(avatarId);
         avatarData.BombUsed = getAvatarBombUsed(avatarId);
-        avatarData.blockCoordinate = getAvatarCoordinate(avatarId);
+        avatarData.tileCoordinate = getAvatarCoordinate(avatarId);
     }
 
     /**
@@ -144,7 +144,7 @@ contract Avatar is Multicall, Ownable {
     /**
      * @notice get avatar on map coordinate
      * @param avatarId avatar Id
-     * @return blockCoordinate block coordinate
+     * @return tileCoordinate tile coordinate
      */
     function getAvatarCoordinate(
         uint256 avatarId
@@ -152,6 +152,9 @@ contract Avatar is Multicall, Ownable {
         return uint32(avatarNoumenon[avatarId].setData % 10 ** 8);
     }
 
+    /**
+     * @notice Delegate Wallet Protocols
+     */
     enum DelegateWallet {
         None,
         DelegateCash,
@@ -164,22 +167,15 @@ contract Avatar is Multicall, Ownable {
     address public constant DelegateCash_CONTRACT_ADDRESS =
         0x00000000000076A84feF008CDAbe6409d2FE638B;
 
-    function ownerOf(
-        uint256 avatarId,
-        DelegateWallet delegateWallet,
-        address vault
-    ) public view returns (address) {
-        uint256 COID = getAvatarCOID(avatarId);
-        require(COID > 0, "avatar not exist");
-        return
-            ownerOf(
-                Governance.getCollectionContract(COID),
-                avatarNoumenon[avatarId].tokenId,
-                delegateWallet,
-                vault
-            );
-    }
-
+    /**
+     * @notice get the original owner of a NFT
+     * @notice MOPN Avatar support hot wallet protocol https://delegate.cash/ and https://warm.xyz/ to verify your NFTs
+     * @param collectionContract NFT collection Contract Address
+     * @param tokenId NFT tokenId
+     * @param delegateWallet DelegateWallet enum to specify protocol
+     * @param vault cold wallet address
+     * @return owner nft owner or nft delegate hot wallet
+     */
     function ownerOf(
         address collectionContract,
         uint256 tokenId,
@@ -211,6 +207,37 @@ contract Avatar is Multicall, Ownable {
         }
     }
 
+    /**
+     * @notice get the original owner of a avatar linked nft
+     * @param avatarId avatar Id
+     * @param delegateWallet DelegateWallet enum to specify protocol
+     * @param vault cold wallet address
+     * @return owner nft owner or nft delegate hot wallet
+     */
+    function ownerOf(
+        uint256 avatarId,
+        DelegateWallet delegateWallet,
+        address vault
+    ) public view returns (address) {
+        uint256 COID = getAvatarCOID(avatarId);
+        require(COID > 0, "avatar not exist");
+        return
+            ownerOf(
+                Governance.getCollectionContract(COID),
+                avatarNoumenon[avatarId].tokenId,
+                delegateWallet,
+                vault
+            );
+    }
+
+    /**
+     * @notice mint an avatar for a NFT
+     * @param collectionContract NFT collection Contract Address
+     * @param tokenId NFT tokenId
+     * @param proofs NFT collection whitelist proof
+     * @param delegateWallet DelegateWallet enum to specify protocol
+     * @param vault cold wallet address
+     */
     function mintAvatar(
         address collectionContract,
         uint256 tokenId,
@@ -238,66 +265,93 @@ contract Avatar is Multicall, Ownable {
         return currentAvatarId;
     }
 
-    function jumpIn(
-        uint32 blockCoordinate,
-        uint256 linkedAvatarId,
-        uint256 avatarId,
-        uint32 PassId,
-        DelegateWallet delegateWallet,
-        address vault
-    )
-        public
-        blockCheck(blockCoordinate)
-        ownerCheck(avatarId, delegateWallet, vault)
-        linkCheck(blockCoordinate, linkedAvatarId, avatarId)
-    {
-        require(getAvatarCoordinate(avatarId) == 0, "avatar is on map");
-
-        uint256 COID = getAvatarCOID(avatarId);
-
-        Map.avatarSet(
-            avatarId,
-            COID,
-            blockCoordinate,
-            PassId,
-            getAvatarBombUsed(avatarId)
-        );
-
-        setAvatarCoordinate(avatarId, blockCoordinate);
-        Governance.addCollectionOnMapNum(COID);
-        Governance.redeemCollectionInboxEnergy(avatarId, COID);
+    /**
+     * @notice Avatar On Map Action Params
+     * @param tileCoordinate destination tile coordinate
+     * @param linkedAvatarId linked same collection avatar Id if you have a collection ally on the map
+     * @param avatarId your avatar Id
+     * @param PassId the destination tile's PassId
+     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
+     * @param vault cold wallet address
+     */
+    struct OnMapParams {
+        uint32 tileCoordinate;
+        uint256 linkedAvatarId;
+        uint256 avatarId;
+        uint32 PassId;
+        DelegateWallet delegateWallet;
+        address vault;
     }
 
-    function moveTo(
-        uint32 blockCoordinate,
-        uint256 linkedAvatarId,
-        uint256 avatarId,
-        uint32 PassId,
-        DelegateWallet delegateWallet,
-        address vault
+    /**
+     * @notice an off map avatar jump in to the map
+     * @param params OnMapParams
+     */
+    function jumpIn(
+        OnMapParams calldata params
     )
         public
-        blockCheck(blockCoordinate)
-        ownerCheck(avatarId, delegateWallet, vault)
-        linkCheck(blockCoordinate, linkedAvatarId, avatarId)
+        tileCheck(params.tileCoordinate)
+        ownerCheck(params.avatarId, params.delegateWallet, params.vault)
+        linkCheck(params.tileCoordinate, params.linkedAvatarId, params.avatarId)
     {
-        uint256 COID = getAvatarCOID(avatarId);
-        require(getAvatarCoordinate(avatarId) != 0, "avatar not on map");
-        Map.avatarRemove(avatarId, COID, getAvatarCoordinate(avatarId));
+        require(getAvatarCoordinate(params.avatarId) == 0, "avatar is on map");
 
-        Map.avatarSet(avatarId, COID, blockCoordinate, PassId, 0);
+        uint256 COID = getAvatarCOID(params.avatarId);
+        uint256 avatarBombUsed = getAvatarBombUsed(params.avatarId);
 
-        setAvatarCoordinate(avatarId, blockCoordinate);
+        Map.avatarSet(
+            params.avatarId,
+            COID,
+            params.tileCoordinate,
+            params.PassId,
+            avatarBombUsed
+        );
+
+        setAvatarCoordinate(params.avatarId, params.tileCoordinate);
+        Governance.addCollectionOnMapNum(COID);
+        Governance.redeemCollectionInboxEnergy(params.avatarId, COID);
+    }
+
+    /**
+     * @notice an on map avatar move to a new tile
+     * @param params OnMapParams
+     */
+    function moveTo(
+        OnMapParams calldata params
+    )
+        public
+        tileCheck(params.tileCoordinate)
+        ownerCheck(params.avatarId, params.delegateWallet, params.vault)
+        linkCheck(params.tileCoordinate, params.linkedAvatarId, params.avatarId)
+    {
+        uint256 COID = getAvatarCOID(params.avatarId);
+        require(getAvatarCoordinate(params.avatarId) != 0, "avatar not on map");
+        Map.avatarRemove(
+            params.avatarId,
+            COID,
+            getAvatarCoordinate(params.avatarId)
+        );
+
+        Map.avatarSet(
+            params.avatarId,
+            COID,
+            params.tileCoordinate,
+            params.PassId,
+            0
+        );
+
+        setAvatarCoordinate(params.avatarId, params.tileCoordinate);
     }
 
     function bomb(
-        uint32 blockCoordinate,
+        uint32 tileCoordinate,
         uint256 avatarId,
         DelegateWallet delegateWallet,
         address vault
     )
         public
-        blockCheck(blockCoordinate)
+        tileCheck(tileCoordinate)
         ownerCheck(avatarId, delegateWallet, vault)
     {
         addAvatarBombUsed(avatarId);
@@ -307,7 +361,7 @@ contract Avatar is Multicall, Ownable {
                 1,
                 avatarId,
                 getAvatarCOID(avatarId),
-                Map.getBlockPassId(getAvatarCoordinate(avatarId))
+                Map.getTilePassId(getAvatarCoordinate(avatarId))
             );
         } else {
             Governance.burnBomb(msg.sender, 1, 0, 0, 0);
@@ -315,18 +369,18 @@ contract Avatar is Multicall, Ownable {
 
         uint256 attackAvatarId;
         for (uint256 i = 0; i < 7; i++) {
-            attackAvatarId = Map.getBlockAvatar(blockCoordinate);
+            attackAvatarId = Map.getTileAvatar(tileCoordinate);
             if (i == 0) {
-                blockCoordinate = blockCoordinate.neighbor(4);
+                tileCoordinate = tileCoordinate.neighbor(4);
             } else {
-                blockCoordinate = blockCoordinate.neighbor(i - 1);
+                tileCoordinate = tileCoordinate.neighbor(i - 1);
             }
             if (attackAvatarId == 0 || attackAvatarId == avatarId) {
                 continue;
             }
             deFeat(attackAvatarId);
         }
-        emit BombUse(avatarId, blockCoordinate);
+        emit BombUse(avatarId, tileCoordinate);
     }
 
     function addAvatarBombUsed(uint256 avatarId) internal {
@@ -335,12 +389,12 @@ contract Avatar is Multicall, Ownable {
 
     function setAvatarCoordinate(
         uint256 avatarId,
-        uint32 blockCoordinate
+        uint32 tileCoordinate
     ) internal {
         avatarNoumenon[avatarId].setData =
             avatarNoumenon[avatarId].setData -
             (avatarNoumenon[avatarId].setData % 10 ** 8) +
-            uint256(blockCoordinate);
+            uint256(tileCoordinate);
     }
 
     function deFeat(uint256 avatarId) internal {
@@ -365,13 +419,13 @@ contract Avatar is Multicall, Ownable {
         _;
     }
 
-    modifier blockCheck(uint32 blockCoordinate) {
-        blockCoordinate.check();
+    modifier tileCheck(uint32 tileCoordinate) {
+        tileCoordinate.check();
         _;
     }
 
     modifier linkCheck(
-        uint32 blockCoordinate,
+        uint32 tileCoordinate,
         uint256 linkedAvatarId,
         uint256 avatarId
     ) {
@@ -382,10 +436,9 @@ contract Avatar is Multicall, Ownable {
             require(COID == getAvatarCOID(linkedAvatarId), "link co error");
             require(linkedAvatarId != avatarId, "link to yourself");
             if (
-                blockCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) >
-                3
+                tileCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) > 3
             ) {
-                revert linkBlockError();
+                revert linkAvatarError();
             }
         } else {
             uint256 collectionOnMapNum = Governance.getCollectionOnMapNum(COID);
@@ -394,7 +447,7 @@ contract Avatar is Multicall, Ownable {
                     !(getAvatarCoordinate(avatarId) > 0 &&
                         collectionOnMapNum == 1)
                 ) {
-                    revert linkBlockError();
+                    revert linkAvatarError();
                 }
             }
         }

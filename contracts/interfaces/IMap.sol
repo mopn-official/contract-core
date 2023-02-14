@@ -2,18 +2,10 @@
 pragma solidity ^0.8.17;
 
 interface IMap {
-    function getBlocksAvatars(
-        uint32[] memory blockCoordinates
-    ) external view returns (uint256[] memory);
-
-    function getBlocksCOIDs(
-        uint32[] memory blockCoordinates
-    ) external view returns (uint256[] memory);
-
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
-        uint32 blockCoordinate,
+        uint32 tileCoordinate,
         uint32 PassId,
         uint256 BombUsed
     ) external;
@@ -21,14 +13,18 @@ interface IMap {
     function avatarRemove(
         uint256 avatarId,
         uint256 COID,
-        uint32 blockCoordinate
+        uint32 tileCoordinate
     ) external;
 
-    function getBlockAvatar(
-        uint32 blockCoordinate
+    function getTileAvatar(
+        uint32 tileCoordinate
     ) external view returns (uint256);
 
-    function getBlockPassId(
-        uint32 blockCoordinate
+    function getTilesAvatars(
+        uint32[] memory tileCoordinates
+    ) external view returns (uint256[] memory);
+
+    function getTilePassId(
+        uint32 tileCoordinate
     ) external view returns (uint32);
 }

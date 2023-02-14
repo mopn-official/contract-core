@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-error linkBlockError();
-error BlockHasEnemy();
+error linkAvatarError();
+error TileHasEnemy();
 error PassIdOverflow();
 
 import "./IArsenal.sol";

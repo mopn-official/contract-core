@@ -2,49 +2,45 @@
 pragma solidity ^0.8.17;
 
 import "./interfaces/IMOPN.sol";
-import "./libraries/BlockMath.sol";
+import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Map is Ownable {
-    using BlockMath for uint32;
+    using TileMath for uint32;
 
-    // Block => avatarId
-    mapping(uint32 => uint256) public blocks;
-
-    uint256[3] BEPSs = [1, 5, 15];
+    // Tile => avatarId
+    mapping(uint32 => uint256) public tiles;
 
     event AvatarSet(
         uint256 indexed avatarId,
         uint256 indexed COID,
         uint32 indexed PassId,
-        uint32 blockCoordinate
+        uint32 tileCoordinate
     );
 
     event AvatarRemove(
         uint256 indexed avatarId,
         uint256 indexed COID,
         uint32 indexed PassId,
-        uint32 blockCoordinate
+        uint32 tileCoordinate
     );
 
-    function getBlockAvatar(
-        uint32 blockCoordinate
+    function getTileAvatar(
+        uint32 tileCoordinate
     ) public view returns (uint256) {
-        return blocks[blockCoordinate] / 1000000;
+        return tiles[tileCoordinate] / 1000000;
     }
 
-    function getBlockPassId(
-        uint32 blockCoordinate
-    ) public view returns (uint32) {
-        return uint32(blocks[blockCoordinate] % 1000000);
+    function getTilePassId(uint32 tileCoordinate) public view returns (uint32) {
+        return uint32(tiles[tileCoordinate] % 1000000);
     }
 
-    function getBlocksAvatars(
-        uint32[] memory blockcoordinates
+    function getTilesAvatars(
+        uint32[] memory tileCoordinates
     ) public view returns (uint256[] memory) {
-        uint256[] memory avatarIds = new uint256[](blockcoordinates.length);
-        for (uint256 i = 0; i < blockcoordinates.length; i++) {
-            avatarIds[i] = blocks[blockcoordinates[i]] / 1000000;
+        uint256[] memory avatarIds = new uint256[](tileCoordinates.length);
+        for (uint256 i = 0; i < tileCoordinates.length; i++) {
+            avatarIds[i] = tiles[tileCoordinates[i]] / 1000000;
         }
         return avatarIds;
     }
@@ -62,64 +58,64 @@ contract Map is Ownable {
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
-        uint32 blockCoordinate,
+        uint32 tileCoordinate,
         uint32 PassId,
         uint256 BombUsed
     ) public onlyAvatar {
-        require(Map.getBlockAvatar(blockCoordinate) == 0, "dst Occupied");
+        require(getTileAvatar(tileCoordinate) == 0, "dst Occupied");
 
         if (PassId < 1 || PassId > 10981) {
             revert PassIdOverflow();
         }
 
-        if (getBlockPassId(blockCoordinate) != PassId) {
+        if (getTilePassId(tileCoordinate) != PassId) {
             require(
-                blockCoordinate.distance(PassId.PassCenterBlock()) < 6,
+                tileCoordinate.distance(PassId.PassCenterTile()) < 6,
                 "PassId error"
             );
         }
 
-        emit AvatarSet(avatarId, COID, PassId, blockCoordinate);
+        emit AvatarSet(avatarId, COID, PassId, tileCoordinate);
 
-        uint256 BEPS = blockCoordinate.getBlockBEPS() + BombUsed;
+        uint256 TileEAW = tileCoordinate.getTileEAW() + BombUsed;
 
-        blocks[blockCoordinate] = avatarId * 1000000 + PassId;
-        blockCoordinate = blockCoordinate.neighbor(4);
+        tiles[tileCoordinate] = avatarId * 1000000 + PassId;
+        tileCoordinate = tileCoordinate.neighbor(4);
 
         for (uint256 i = 0; i < 18; i++) {
-            uint256 coAvatarId = getBlockAvatar(blockCoordinate);
+            uint256 coAvatarId = getTileAvatar(tileCoordinate);
             if (coAvatarId > 0 && Avatar.getAvatarCOID(coAvatarId) != COID) {
-                revert BlockHasEnemy();
+                revert TileHasEnemy();
             }
 
             if (i == 5) {
-                blockCoordinate = blockCoordinate.neighbor(4);
+                tileCoordinate = tileCoordinate.neighbor(4);
             } else if (i < 5) {
-                blockCoordinate = blockCoordinate.neighbor(i);
+                tileCoordinate = tileCoordinate.neighbor(i);
             } else {
-                blockCoordinate = blockCoordinate.neighbor((i - 6) / 2);
+                tileCoordinate = tileCoordinate.neighbor((i - 6) / 2);
             }
         }
 
-        Governance.addBEPS(avatarId, COID, PassId, BEPS);
+        Governance.addEAW(avatarId, COID, PassId, TileEAW);
     }
 
     function avatarRemove(
         uint256 avatarId,
         uint256 COID,
-        uint32 blockCoordinate
+        uint32 tileCoordinate
     ) public onlyAvatar {
-        uint32 PassId = getBlockPassId(blockCoordinate);
-        blocks[blockCoordinate] = PassId;
-        Governance.subBEPS(avatarId, COID, PassId);
+        uint32 PassId = getTilePassId(tileCoordinate);
+        tiles[tileCoordinate] = PassId;
+        Governance.subEAW(avatarId, COID, PassId);
 
-        emit AvatarRemove(avatarId, COID, PassId, blockCoordinate);
+        emit AvatarRemove(avatarId, COID, PassId, tileCoordinate);
     }
 
-    modifier checkPassId(uint32 blockCoordinate, uint32 PassId) {
-        if (getBlockPassId(blockCoordinate) != PassId) {
+    modifier checkPassId(uint32 tileCoordinate, uint32 PassId) {
+        if (getTilePassId(tileCoordinate) != PassId) {
             require(
-                blockCoordinate.distance(PassId.PassCenterBlock()) < 6,
+                tileCoordinate.distance(PassId.PassCenterTile()) < 6,
                 "PassId error"
             );
         }

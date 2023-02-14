@@ -34,14 +34,14 @@ interface IGovernance {
         uint256 COID
     ) external view returns (uint256);
 
-    function addBEPS(
+    function addEAW(
         uint256 avatarId,
         uint256 COID,
         uint32 PassId,
         uint256 amount
     ) external;
 
-    function subBEPS(uint256 avatarId, uint256 COID, uint32 PassId) external;
+    function subEAW(uint256 avatarId, uint256 COID, uint32 PassId) external;
 
     function mintBomb(address to, uint256 amount) external;
 
