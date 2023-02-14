@@ -7,15 +7,18 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
+/// @title Governance of MOPN
+/// @author Cyanface<cyanface@outlook.com>
+/// @dev Governance is all other MOPN contract's owner
 contract Governance is Multicall, Ownable {
-    uint256 constant EnergyProducePerBlock = 600000000000;
+    uint256 public constant EnergyProducePerBlock = 600000000000;
 
-    uint256 constant EnergyProduceReduceInterval = 50000;
+    uint256 public constant EnergyProduceReduceInterval = 50000;
 
-    uint256 EnergyProduceStartBlock;
+    uint256 public EnergyProduceStartBlock;
 
-    // PerEAWMinted * 10 ** 24 + EnergyLastMintedBlock * 10 ** 12 + TotalEAWs
-    uint256 EnergyProduceData;
+    /// @notice PerEAWMinted * 10 ** 24 + EnergyLastMintedBlock * 10 ** 12 + TotalEAWs
+    uint256 public EnergyProduceData;
 
     mapping(uint256 => uint256) public AvatarEnergys;
 
@@ -27,18 +30,34 @@ contract Governance is Multicall, Ownable {
         EnergyProduceStartBlock = EnergyProduceStartBlock_;
     }
 
+    /**
+     * @notice get settled Per Energy Allocation Weight minted energy number
+     */
     function getPerEAWMinted() public view returns (uint256) {
         return EnergyProduceData / 10 ** 24;
     }
 
+    /**
+     * @notice get Energy last minted settlement block number
+     */
     function getEnergyLastMintedBlock() public view returns (uint256) {
         return (EnergyProduceData % 10 ** 24) / 10 ** 12;
     }
 
+    /**
+     * @notice get total energy allocation weights
+     */
     function getTotalEAWs() public view returns (uint256) {
         return EnergyProduceData % 10 ** 12;
     }
 
+    /**
+     * add on map mining energy allocation weight
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     * @param PassId mopn pass Id
+     * @param amount EAW amount
+     */
     function addEAW(
         uint256 avatarId,
         uint256 COID,
@@ -48,22 +67,12 @@ contract Governance is Multicall, Ownable {
         _addEAW(avatarId, COID, PassId, amount);
     }
 
-    function _addEAW(
-        uint256 avatarId,
-        uint256 COID,
-        uint32 PassId,
-        uint256 amount
-    ) internal {
-        mintShareEnergy();
-        EnergyProduceData += amount;
-        mintAvatarEnergy(avatarId);
-        AvatarEnergys[avatarId] += amount;
-        mintCollectionEnergy(COID);
-        CollectionEnergys[COID] += amount;
-        mintPassHolderEnergy(PassId);
-        PassHolderEnergys[PassId] += amount;
-    }
-
+    /**
+     * substruct on map mining energy allocation weight
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     * @param PassId mopn pass Id
+     */
     function subEAW(
         uint256 avatarId,
         uint256 COID,
@@ -72,18 +81,10 @@ contract Governance is Multicall, Ownable {
         _subEAW(avatarId, COID, PassId);
     }
 
-    function _subEAW(uint256 avatarId, uint256 COID, uint32 PassId) internal {
-        mintShareEnergy();
-        uint256 amount = getAvatarEAW(avatarId);
-        EnergyProduceData -= amount;
-        mintAvatarEnergy(avatarId);
-        AvatarEnergys[avatarId] -= amount;
-        mintCollectionEnergy(COID);
-        CollectionEnergys[COID] -= amount;
-        mintPassHolderEnergy(PassId);
-        PassHolderEnergys[PassId] -= amount;
-    }
-
+    /**
+     * @notice get current energy produce per block
+     * @param reduceTimes energy produce reduce times
+     */
     function currentEPPB(
         uint256 reduceTimes
     ) public pure returns (uint256 EPPB) {
@@ -101,7 +102,10 @@ contract Governance is Multicall, Ownable {
         }
     }
 
-    function mintShareEnergy() public {
+    /**
+     * @notice settle per energy allocation weight mint energy
+     */
+    function settlePerEAWEnergy() public {
         uint256 EnergyLastMintedBlock = getEnergyLastMintedBlock();
 
         if (block.number > EnergyLastMintedBlock) {
@@ -142,28 +146,44 @@ contract Governance is Multicall, Ownable {
         }
     }
 
-    function getAvatarEnergyInbox(
+    /**
+     * @notice get avatar settled unclaimed minted energy
+     * @param avatarId avatar Id
+     */
+    function getAvatarSettledInboxEnergy(
         uint256 avatarId
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         return AvatarEnergys[avatarId] / 10 ** 50;
     }
 
+    /**
+     * @notice get avatar settled per energy allocation weight minted energy number
+     * @param avatarId avatar Id
+     */
     function getAvatarPerEAWMinted(
         uint256 avatarId
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         return (AvatarEnergys[avatarId] % 10 ** 50) / 10 ** 25;
     }
 
-    function getAvatarEAW(uint256 avatarId) internal view returns (uint256) {
+    /**
+     * @notice get avatar on map mining energy allocation weight
+     * @param avatarId avatar Id
+     */
+    function getAvatarEAW(uint256 avatarId) public view returns (uint256) {
         return AvatarEnergys[avatarId] % 10 ** 25;
     }
 
-    function mintAvatarEnergy(uint256 avatarId) internal {
+    /**
+     * @notice mint avatar energy
+     * @param avatarId avatar Id
+     */
+    function mintAvatarEnergy(uint256 avatarId) public {
         uint256 AvatarPerEAWMinted = getAvatarPerEAWMinted(avatarId);
         uint256 PerEAWMinted = getPerEAWMinted();
         if (AvatarPerEAWMinted < PerEAWMinted) {
             uint256 AvatarEAW = getAvatarEAW(avatarId);
-            uint256 AvatarEnergyInbox = getAvatarEnergyInbox(avatarId);
+            uint256 AvatarEnergyInbox = getAvatarSettledInboxEnergy(avatarId);
             if (AvatarEAW > 0) {
                 AvatarEnergyInbox += ((((PerEAWMinted - AvatarPerEAWMinted) *
                     AvatarEAW) * 90) / 100);
@@ -178,11 +198,15 @@ contract Governance is Multicall, Ownable {
         }
     }
 
+    /**
+     * @notice get avatar realtime unclaimed minted energy
+     * @param avatarId avatar Id
+     */
     function getAvatarInboxEnergy(
         uint256 avatarId
     ) public view returns (uint256 inbox) {
         uint256 PerEAWMinted = getPerEAWMinted();
-        inbox = getAvatarEnergyInbox(avatarId);
+        inbox = getAvatarSettledInboxEnergy(avatarId);
         uint256 AvatarPerEAWMinted = getAvatarPerEAWMinted(avatarId);
         uint256 AvatarEAW = getAvatarEAW(avatarId);
 
@@ -193,43 +217,76 @@ contract Governance is Multicall, Ownable {
         }
     }
 
-    function redeemAvatarInboxEnergy(uint256 avatarId) public {
+    /**
+     * @notice redeem avatar unclaimed minted energy
+     * @param avatarId avatar Id
+     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
+     * @param vault cold wallet address
+     */
+    function redeemAvatarInboxEnergy(
+        uint256 avatarId,
+        IAvatar.DelegateWallet delegateWallet,
+        address vault
+    ) public {
         require(
-            msg.sender == IAvatar(avatarContract).ownerOf(avatarId),
+            msg.sender ==
+                IAvatar(avatarContract).ownerOf(
+                    avatarId,
+                    delegateWallet,
+                    vault
+                ),
             "not your avatar"
         );
-        mintShareEnergy();
+        settlePerEAWEnergy();
         mintAvatarEnergy(avatarId);
 
-        uint256 amount = getAvatarEnergyInbox(avatarId);
+        uint256 amount = getAvatarSettledInboxEnergy(avatarId);
         require(amount > 0, "empty");
 
         AvatarEnergys[avatarId] = AvatarEnergys[avatarId] % (10 ** 50);
         IEnergy(energyContract).mint(msg.sender, amount);
     }
 
-    function getCollectionEnergyInbox(
+    /**
+     * @notice get collection settled minted unclaimed energy
+     * @param COID collection Id
+     */
+    function getCollectionSettledInboxEnergy(
         uint256 COID
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         return CollectionEnergys[COID] / 10 ** 50;
     }
 
+    /**
+     * @notice get collection settled per energy allocation weight minted energy number
+     * @param COID collection Id
+     */
     function getCollectionPerEAWMinted(
         uint256 COID
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         return (CollectionEnergys[COID] % 10 ** 50) / 10 ** 25;
     }
 
-    function getCollectionEAW(uint256 COID) internal view returns (uint256) {
+    /**
+     * @notice get collection on map mining energy allocation weight
+     * @param COID collection Id
+     */
+    function getCollectionEAW(uint256 COID) public view returns (uint256) {
         return CollectionEnergys[COID] % 10 ** 25;
     }
 
-    function mintCollectionEnergy(uint256 COID) internal {
+    /**
+     * @notice mint collection energy
+     * @param COID collection Id
+     */
+    function mintCollectionEnergy(uint256 COID) public {
         uint256 PerEAWMinted = getPerEAWMinted();
         uint256 CollectionPerEAWMinted = getCollectionPerEAWMinted(COID);
         if (CollectionPerEAWMinted < PerEAWMinted) {
             uint256 CollectionEAW = getCollectionEAW(COID);
-            uint256 CollectionEnergyInbox = getCollectionEnergyInbox(COID);
+            uint256 CollectionEnergyInbox = getCollectionSettledInboxEnergy(
+                COID
+            );
             if (CollectionEAW > 0) {
                 CollectionEnergyInbox += ((((PerEAWMinted -
                     CollectionPerEAWMinted) * CollectionEAW) * 9) / 100);
@@ -243,11 +300,15 @@ contract Governance is Multicall, Ownable {
         }
     }
 
+    /**
+     * @notice get collection realtime unclaimed minted energy
+     * @param COID collection Id
+     */
     function getCollectionInboxEnergy(
         uint256 COID
     ) public view returns (uint256 inbox) {
         uint256 PerEAWMinted = getPerEAWMinted();
-        inbox = getCollectionEnergyInbox(COID);
+        inbox = getCollectionSettledInboxEnergy(COID);
         uint256 CollectionPerEAWMinted = getCollectionPerEAWMinted(COID);
         uint256 CollectionEAW = getCollectionEAW(COID);
 
@@ -259,11 +320,17 @@ contract Governance is Multicall, Ownable {
         }
     }
 
+    /**
+     * @notice redeem 1/collectionOnMapNFTNumber of collection unclaimed minted energy to a avatar
+     * only avatar contract can calls
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     */
     function redeemCollectionInboxEnergy(
         uint256 avatarId,
         uint256 COID
     ) public onlyAvatar {
-        uint256 amount = getCollectionEnergyInbox(COID);
+        uint256 amount = getCollectionSettledInboxEnergy(COID);
         if (amount > 0) {
             amount = amount / (getCollectionOnMapNum(COID) + 1);
             CollectionEnergys[COID] -= amount * (10 ** 50);
@@ -271,28 +338,46 @@ contract Governance is Multicall, Ownable {
         }
     }
 
-    function getPassHolderEnergyInbox(
+    /**
+     * @notice get pass holder settled minted unclaimed energy
+     * @param PassId MOPN Pass Id
+     */
+    function getPassHolderSettledInboxEnergy(
         uint32 PassId
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         return PassHolderEnergys[PassId] / 10 ** 50;
     }
 
+    /**
+     * @notice get Pass holder settled per energy allocation weight minted energy number
+     * @param PassId MOPN Pass Id
+     */
     function getPassHolderPerEAWMinted(
         uint32 PassId
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         return (PassHolderEnergys[PassId] % 10 ** 50) / 10 ** 25;
     }
 
-    function getPassHolderEAW(uint32 PassId) internal view returns (uint256) {
+    /**
+     * @notice get Pass holder on map mining energy allocation weight
+     * @param PassId MOPN Pass Id
+     */
+    function getPassHolderEAW(uint32 PassId) public view returns (uint256) {
         return PassHolderEnergys[PassId] % 10 ** 25;
     }
 
-    function mintPassHolderEnergy(uint32 PassId) internal {
+    /**
+     * @notice mint Pass holder energy
+     * @param PassId MOPN Pass Id
+     */
+    function mintPassHolderEnergy(uint32 PassId) public {
         uint256 PerEAWMinted = getPerEAWMinted();
         uint256 PassHolderPerEAWMinted = getPassHolderPerEAWMinted(PassId);
         if (PassHolderPerEAWMinted < PerEAWMinted) {
             uint256 PassHolderEAW = getPassHolderEAW(PassId);
-            uint256 PassHolderEnergyInbox = getPassHolderEnergyInbox(PassId);
+            uint256 PassHolderEnergyInbox = getPassHolderSettledInboxEnergy(
+                PassId
+            );
             if (PassHolderEAW > 0) {
                 PassHolderEnergyInbox +=
                     ((PerEAWMinted - PassHolderPerEAWMinted) * PassHolderEAW) /
@@ -307,11 +392,15 @@ contract Governance is Multicall, Ownable {
         }
     }
 
+    /**
+     * @notice get Pass holder realtime unclaimed minted energy
+     * @param PassId MOPN Pass Id
+     */
     function getPassHolderInboxEnergy(
         uint32 PassId
     ) public view returns (uint256 inbox) {
         uint256 PerEAWMinted = getPerEAWMinted();
-        inbox = getPassHolderEnergyInbox(PassId);
+        inbox = getPassHolderSettledInboxEnergy(PassId);
         uint256 PassHolderPerEAWMinted = getPassHolderPerEAWMinted(PassId);
         uint256 PassHolderEAW = getPassHolderEAW(PassId);
 
@@ -322,15 +411,19 @@ contract Governance is Multicall, Ownable {
         }
     }
 
+    /**
+     * @notice redeem Pass holder unclaimed minted energy
+     * @param PassId MOPN Pass Id
+     */
     function redeemPassHolderInboxEnergy(uint32 PassId) public onlyAvatar {
         require(
             msg.sender == IERC721(passContract).ownerOf(PassId),
             "not your pass"
         );
-        mintShareEnergy();
+        settlePerEAWEnergy();
         mintPassHolderEnergy(PassId);
 
-        uint256 amount = getPassHolderEnergyInbox(PassId);
+        uint256 amount = getPassHolderSettledInboxEnergy(PassId);
         require(amount > 0, "empty");
 
         PassHolderEnergys[PassId] = PassHolderEnergys[PassId] % (10 ** 50);
@@ -346,20 +439,35 @@ contract Governance is Multicall, Ownable {
 
     /**
      * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
+     *
      * Collection address => COID * 1000000 + on map nft number
      */
     mapping(address => uint256) public collectionMap;
 
+    /**
+     * @notice use collection Id to get collection contract address
+     * @param COID collection Id
+     * @return contractAddress collection contract address
+     */
     function getCollectionContract(uint256 COID) public view returns (address) {
         return COIDMap[COID];
     }
 
+    /**
+     * @notice use collection contract address to get collection Id
+     * @param collectionContract collection contract address
+     * @return COID collection Id
+     */
     function getCollectionCOID(
         address collectionContract
     ) public view returns (uint256) {
         return collectionMap[collectionContract] / 1000000;
     }
 
+    /**
+     * @notice batch call for {getCollectionCOID}
+     * @param collectionContracts multi collection contracts
+     */
     function getCollectionsCOIDs(
         address[] memory collectionContracts
     ) public view returns (uint256[] memory COIDs) {
@@ -367,15 +475,6 @@ contract Governance is Multicall, Ownable {
         for (uint256 i = 0; i < collectionContracts.length; i++) {
             COIDs[i] = collectionMap[collectionContracts[i]] / 1000000;
         }
-    }
-
-    function generateCOID(
-        address collectionContract
-    ) internal returns (uint256) {
-        COIDCounter++;
-        COIDMap[COIDCounter] = collectionContract;
-        collectionMap[collectionContract] = COIDCounter * 1000000;
-        return COIDCounter;
     }
 
     function checkWhitelistCOID(
@@ -474,6 +573,43 @@ contract Governance is Multicall, Ownable {
             _addEAW(avatarId, COID, PassId, 1);
         }
         IBomb(bombContract).burn(from, 1, amount);
+    }
+
+    function _addEAW(
+        uint256 avatarId,
+        uint256 COID,
+        uint32 PassId,
+        uint256 amount
+    ) internal {
+        settlePerEAWEnergy();
+        EnergyProduceData += amount;
+        mintAvatarEnergy(avatarId);
+        AvatarEnergys[avatarId] += amount;
+        mintCollectionEnergy(COID);
+        CollectionEnergys[COID] += amount;
+        mintPassHolderEnergy(PassId);
+        PassHolderEnergys[PassId] += amount;
+    }
+
+    function _subEAW(uint256 avatarId, uint256 COID, uint32 PassId) internal {
+        settlePerEAWEnergy();
+        uint256 amount = getAvatarEAW(avatarId);
+        EnergyProduceData -= amount;
+        mintAvatarEnergy(avatarId);
+        AvatarEnergys[avatarId] -= amount;
+        mintCollectionEnergy(COID);
+        CollectionEnergys[COID] -= amount;
+        mintPassHolderEnergy(PassId);
+        PassHolderEnergys[PassId] -= amount;
+    }
+
+    function generateCOID(
+        address collectionContract
+    ) internal returns (uint256) {
+        COIDCounter++;
+        COIDMap[COIDCounter] = collectionContract;
+        collectionMap[collectionContract] = COIDCounter * 1000000;
+        return COIDCounter;
     }
 
     modifier onlyArsenal() {

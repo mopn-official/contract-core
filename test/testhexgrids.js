@@ -1,19 +1,19 @@
 const { ethers } = require("hardhat");
 
-describe("HexGridsMath", function () {
-  let blockMath;
+describe("TileMath", function () {
+  let tilekMath;
 
   it("deploy ", async function () {
-    const BlockMath = await ethers.getContractFactory("BlockMath");
-    blockMath = await BlockMath.deploy();
-    await blockMath.deployed();
-    console.log("BlockMath", blockMath.address);
+    const TileMath = await ethers.getContractFactory("TileMath");
+    tilekMath = await TileMath.deploy();
+    await tilekMath.deployed();
+    console.log("TileMath", tilekMath.address);
   });
 
   it("test center blocks", async function () {
     let passId = 17;
     while (true) {
-      console.log("passid:", passId, await blockMath.PassCenterBlock(passId));
+      console.log("passid:", passId, await tilekMath.PassCenterTile(passId));
       passId++;
       if (passId > 10981) {
         break;

@@ -27,7 +27,7 @@ interface DelegateCashInterface {
 /// @title MOPN Avatar Contract
 /// @author Cyanface <cyanface@outlook.com>
 /// @dev This Contract's owner must transfer to Governance Contract once it's deployed
-contract Avatar is Multicall, Ownable {
+contract Avatar is IAvatar, Multicall, Ownable {
     struct AvatarData {
         uint256 tokenId;
         uint256 setData;
@@ -61,8 +61,8 @@ contract Avatar is Multicall, Ownable {
 
     uint256 public currentAvatarId;
 
-    IMap public Map;
-    IGovernance public Governance;
+    IMap private Map;
+    IGovernance private Governance;
 
     /**
      * @dev set the governance contract address
@@ -152,15 +152,6 @@ contract Avatar is Multicall, Ownable {
         return uint32(avatarNoumenon[avatarId].setData % 10 ** 8);
     }
 
-    /**
-     * @notice Delegate Wallet Protocols
-     */
-    enum DelegateWallet {
-        None,
-        DelegateCash,
-        Warm
-    }
-
     address public constant WARM_CONTRACT_ADDRESS =
         0xC3AA9bc72Bd623168860a1e5c6a4530d3D80456c;
 
@@ -169,7 +160,7 @@ contract Avatar is Multicall, Ownable {
 
     /**
      * @notice get the original owner of a NFT
-     * @notice MOPN Avatar support hot wallet protocol https://delegate.cash/ and https://warm.xyz/ to verify your NFTs
+     * MOPN Avatar support hot wallet protocol https://delegate.cash/ and https://warm.xyz/ to verify your NFTs
      * @param collectionContract NFT collection Contract Address
      * @param tokenId NFT tokenId
      * @param delegateWallet DelegateWallet enum to specify protocol
@@ -344,6 +335,13 @@ contract Avatar is Multicall, Ownable {
         setAvatarCoordinate(params.avatarId, params.tileCoordinate);
     }
 
+    /**
+     * @notice throw a bomb to a tile
+     * @param tileCoordinate bombing tile coordinate
+     * @param avatarId bomb using avatar id
+     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
+     * @param vault cold wallet address
+     */
     function bomb(
         uint32 tileCoordinate,
         uint256 avatarId,

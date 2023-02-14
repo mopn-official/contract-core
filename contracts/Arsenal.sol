@@ -25,22 +25,22 @@ contract Arsenal is Multicall, Ownable {
      * @dev record the number of bombs that already sold and it's deal price by round
      * @dev roundId => DealPrice * 1000000 + roundSold
      */
-    mapping(uint256 => uint256) roundData;
+    mapping(uint256 => uint256) public roundData;
 
     /**
      * @dev record the last participate round auction data
      * @dev wallet address => total spend * 10 ** 17 + auction amount * 10 ** 11 + roundId * 10 + agio redeem status
      */
-    mapping(address => uint256) walletData;
+    mapping(address => uint256) public walletData;
 
     /**
      * @dev last active round and it's settlement status
      * @dev round Id * 10 + settlement status
      */
-    uint256 lastRound;
+    uint256 public lastRound;
 
-    IEnergy public Energy;
-    IGovernance public Governance;
+    IEnergy private Energy;
+    IGovernance private Governance;
 
     /**
      * @dev set the governance contract address

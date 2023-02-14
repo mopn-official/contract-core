@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 describe("MOPN", function () {
-  let testnft, blockMath, governance, arsenal, avatar, map, bomb, energy, energydecimals;
+  let testnft, tileMath, governance, arsenal, avatar, map, bomb, energy, energydecimals;
 
   it("deploy ", async function () {
     const TESTNFT = await ethers.getContractFactory("TESTNFT");
@@ -9,10 +9,10 @@ describe("MOPN", function () {
     await testnft.deployed();
     console.log("TESTNFT ", testnft.address);
 
-    const BlockMath = await ethers.getContractFactory("BlockMath");
-    blockMath = await BlockMath.deploy();
-    await blockMath.deployed();
-    console.log("BlockMath", blockMath.address);
+    const TileMath = await ethers.getContractFactory("TileMath");
+    tileMath = await TileMath.deploy();
+    await tileMath.deployed();
+    console.log("TileMath", tileMath.address);
 
     const Governance = await ethers.getContractFactory("Governance");
     governance = await Governance.deploy(0);
@@ -21,7 +21,7 @@ describe("MOPN", function () {
 
     const Map = await ethers.getContractFactory("Map", {
       libraries: {
-        BlockMath: blockMath.address,
+        TileMath: tileMath.address,
       },
     });
     map = await Map.deploy();
@@ -30,7 +30,7 @@ describe("MOPN", function () {
 
     const Avatar = await ethers.getContractFactory("Avatar", {
       libraries: {
-        BlockMath: blockMath.address,
+        TileMath: tileMath.address,
       },
     });
     avatar = await Avatar.deploy();
@@ -56,6 +56,9 @@ describe("MOPN", function () {
 
     const energytransownertx = await energy.transferOwnership(governance.address);
     await energytransownertx.wait();
+
+    const transownertx = await bomb.transferOwnership(governance.address);
+    await transownertx.wait();
 
     const governancesetroottx = await governance.updateWhiteList(
       "0x8a746c884b5d358e2337e88b5da1afe745ffe4a3a5a378819ec41d0979c9931b"
@@ -92,140 +95,116 @@ describe("MOPN", function () {
 
   it("test mint nft", async function () {
     const [owner] = await ethers.getSigners();
-    const mintbombtx = await bomb.mint(owner.address, 1, 1);
-    await mintbombtx.wait();
 
-    const transownertx = await bomb.transferOwnership(governance.address);
-    await transownertx.wait();
+    const testnftproofs = [
+      "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
+      "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
+    ];
+
+    const address0 = "0x0000000000000000000000000000000000000000";
 
     let mintnfttx = await testnft.safeMint(owner.address);
     await mintnfttx.wait();
+
+    // const mintTx = await avatar.mintAvatar(testnft.address, 0, testnftproofs, 0, address0);
+    // await mintTx.wait();
+
+    // 0 0 0
+    // const jumpInTx = await avatar.jumpIn([100010001000, 0, 1, 1, 0, address0]);
+    // await jumpInTx.wait();
 
     const multiTx = await avatar.multicall([
       avatar.interface.encodeFunctionData("mintAvatar", [
         testnft.address,
         0,
-        [
-          "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-          "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-        ],
+        testnftproofs,
+        0,
+        address0,
       ]),
-      avatar.interface.encodeFunctionData("jumpIn", [10001000, 0, 1, 1]),
+      avatar.interface.encodeFunctionData("jumpIn", [[10001000, 0, 1, 1, 0, address0]]),
     ]);
     await multiTx.wait();
 
-    // const mintTx = await avatar.mintAvatar(testnft.address, 0, [
-    //   "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-    //   "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-    // ]);
-    // await mintTx.wait();
-
     mintnfttx = await testnft.safeMint(owner.address);
     await mintnfttx.wait();
+
+    // const mintTx1 = await avatar.mintAvatar(testnft.address, 1, testnftproofs, 0, address0);
+    // await mintTx1.wait();
+
+    // 0 3 -3
+    // const jumpIn1Tx = await avatar.jumpIn([100010030997, 1, 2, 1, 0, address0]);
+    // await jumpIn1Tx.wait();
 
     const multi2Tx = await avatar.multicall([
       avatar.interface.encodeFunctionData("mintAvatar", [
         testnft.address,
         1,
-        [
-          "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-          "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-        ],
+        testnftproofs,
+        0,
+        address0,
       ]),
-      avatar.interface.encodeFunctionData("jumpIn", [10001003, 1, 2, 1]),
+      avatar.interface.encodeFunctionData("jumpIn", [[10001003, 1, 2, 1, 0, address0]]),
     ]);
     await multi2Tx.wait();
 
-    // const mintTx1 = await avatar.mintAvatar(testnft.address, 1, [
-    //   "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-    //   "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-    // ]);
-    // await mintTx1.wait();
-
     mintnfttx = await testnft.safeMint(owner.address);
     await mintnfttx.wait();
 
-    const mintTx2 = await avatar.mintAvatar(testnft.address, 2, [
-      "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-      "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-    ]);
+    const mintTx2 = await avatar.mintAvatar(testnft.address, 2, testnftproofs, 0, address0);
     await mintTx2.wait();
 
-    mintnfttx = await testnft.safeMint(owner.address);
-    await mintnfttx.wait();
-
-    const mintTx3 = await avatar.mintAvatar(testnft.address, 3, [
-      "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-      "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-    ]);
-    await mintTx3.wait();
-
-    mintnfttx = await testnft.safeMint(owner.address);
-    await mintnfttx.wait();
-
-    const mintTx4 = await avatar.mintAvatar(testnft.address, 4, [
-      "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-      "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-    ]);
-    await mintTx4.wait();
-
-    mintnfttx = await testnft.safeMint(owner.address);
-    await mintnfttx.wait();
-
-    const mintTx5 = await avatar.mintAvatar(testnft.address, 5, [
-      "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-      "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-    ]);
-    await mintTx5.wait();
-
-    mintnfttx = await testnft.safeMint(owner.address);
-    await mintnfttx.wait();
-
-    const mintTx6 = await avatar.mintAvatar(testnft.address, 6, [
-      "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-      "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-    ]);
-    await mintTx6.wait();
-
-    mintnfttx = await testnft.safeMint(owner.address);
-    await mintnfttx.wait();
-
-    const mintTx7 = await avatar.mintAvatar(testnft.address, 7, [
-      "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-      "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-    ]);
-    await mintTx7.wait();
-
-    // 0 0 0
-    // const jumpInTx = await avatar.jumpIn(100010001000, 0, 1, 1);
-    // await jumpInTx.wait();
-
-    // 0 3 -3
-    // const jumpIn1Tx = await avatar.jumpIn(100010030997, 1, 2, 1);
-    // await jumpIn1Tx.wait();
-
     // 0 2 -2
-    const jumpIn2Tx = await avatar.jumpIn(10001002, 2, 3, 1);
+    const jumpIn2Tx = await avatar.jumpIn([10001002, 2, 3, 1, 0, address0]);
     await jumpIn2Tx.wait();
 
+    mintnfttx = await testnft.safeMint(owner.address);
+    await mintnfttx.wait();
+
+    const mintTx3 = await avatar.mintAvatar(testnft.address, 3, testnftproofs, 0, address0);
+    await mintTx3.wait();
+
     // 1 2 -3
-    const jumpIn3Tx = await avatar.jumpIn(10011002, 2, 4, 1);
+    const jumpIn3Tx = await avatar.jumpIn([10011002, 2, 4, 1, 0, address0]);
     await jumpIn3Tx.wait();
 
+    mintnfttx = await testnft.safeMint(owner.address);
+    await mintnfttx.wait();
+
+    const mintTx4 = await avatar.mintAvatar(testnft.address, 4, testnftproofs, 0, address0);
+    await mintTx4.wait();
+
     // -1 3 -2
-    const jumpIn4Tx = await avatar.jumpIn(09991003, 2, 5, 1);
+    const jumpIn4Tx = await avatar.jumpIn([09991003, 2, 5, 1, 0, address0]);
     await jumpIn4Tx.wait();
 
+    mintnfttx = await testnft.safeMint(owner.address);
+    await mintnfttx.wait();
+
+    const mintTx5 = await avatar.mintAvatar(testnft.address, 5, testnftproofs, 0, address0);
+    await mintTx5.wait();
+
     // -1 4 -3
-    const jumpIn5Tx = await avatar.jumpIn(09991004, 2, 6, 1);
+    const jumpIn5Tx = await avatar.jumpIn([09991004, 2, 6, 1, 0, address0]);
     await jumpIn5Tx.wait();
 
+    mintnfttx = await testnft.safeMint(owner.address);
+    await mintnfttx.wait();
+
+    const mintTx6 = await avatar.mintAvatar(testnft.address, 6, testnftproofs, 0, address0);
+    await mintTx6.wait();
+
     // 0 4 -4
-    const jumpIn6Tx = await avatar.jumpIn(10001004, 2, 7, 1);
+    const jumpIn6Tx = await avatar.jumpIn([10001004, 2, 7, 1, 0, address0]);
     await jumpIn6Tx.wait();
 
+    mintnfttx = await testnft.safeMint(owner.address);
+    await mintnfttx.wait();
+
+    const mintTx7 = await avatar.mintAvatar(testnft.address, 7, testnftproofs, 0, address0);
+    await mintTx7.wait();
+
     // 1 3 -4
-    const jumpIn7Tx = await avatar.jumpIn(10011003, 2, 8, 1);
+    const jumpIn7Tx = await avatar.jumpIn([10011003, 2, 8, 1, 0, address0]);
     await jumpIn7Tx.wait();
 
     console.log(await avatar.getAvatarByNFT(testnft.address, 0));
@@ -238,7 +217,7 @@ describe("MOPN", function () {
     console.log(await avatar.getAvatarByNFT(testnft.address, 7));
 
     // 1, 0, -1;
-    const moveTo4Tx = await avatar.moveTo(10011000, 2, 1, 1);
+    const moveTo4Tx = await avatar.moveTo([10011000, 2, 1, 1, 0, address0]);
     await moveTo4Tx.wait();
 
     console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1), energydecimals));
@@ -250,17 +229,17 @@ describe("MOPN", function () {
     console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(7), energydecimals));
     console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(8), energydecimals));
 
-    const redeemEnergyTx = await governance.redeemAvatarInboxEnergy(1);
+    const redeemEnergyTx = await governance.redeemAvatarInboxEnergy(1, 0, address0);
     await redeemEnergyTx.wait();
 
     const multi1Tx = await governance.multicall([
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [2]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [3]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [4]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [5]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [6]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [7]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [8]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [2, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [3, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [4, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [5, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [6, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [7, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [8, 0, address0]),
     ]);
     await multi1Tx.wait();
 
@@ -289,11 +268,11 @@ describe("MOPN", function () {
     await buybombtx.wait();
 
     // -2 3 -1
-    const bombTx = await avatar.bomb(09981003, 1);
+    const bombTx = await avatar.bomb(09981003, 1, 0, address0);
     await bombTx.wait();
 
     // 0 3 -3
-    const bomb1Tx = await avatar.bomb(10001003, 1);
+    const bomb1Tx = await avatar.bomb(10001003, 1, 0, address0);
     await bomb1Tx.wait();
 
     console.log(
