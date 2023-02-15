@@ -14,7 +14,7 @@ interface IGovernance {
         address[] memory collectionContracts
     ) external view returns (uint256[] memory COIDs);
 
-    function checkWhitelistCOID(
+    function generateCOID(
         address collectionContract,
         bytes32[] memory proofs
     ) external returns (uint256);
