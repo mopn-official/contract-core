@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Map is Ownable {
     using TileMath for uint32;
 
-    // Tile => avatarId * 1000000 + MOPN Pass Id
+    // Tile => avatarId * 10 ** 16 + COID * 10 ** 6 + MOPN Pass Id
     mapping(uint32 => uint256) public tiles;
 
     /**
@@ -50,7 +50,15 @@ contract Map is Ownable {
     function getTileAvatar(
         uint32 tileCoordinate
     ) public view returns (uint256) {
-        return tiles[tileCoordinate] / 1000000;
+        return tiles[tileCoordinate] / 10 ** 16;
+    }
+
+    /**
+     * @notice get the coid of the avatar who is standing on a tile
+     * @param tileCoordinate tile coordinate
+     */
+    function getTileCOID(uint32 tileCoordinate) public view returns (uint256) {
+        return (tiles[tileCoordinate] % 10 ** 16) / 10 ** 6;
     }
 
     /**
@@ -58,7 +66,7 @@ contract Map is Ownable {
      * @param tileCoordinate tile coordinate
      */
     function getTilePassId(uint32 tileCoordinate) public view returns (uint32) {
-        return uint32(tiles[tileCoordinate] % 1000000);
+        return uint32(tiles[tileCoordinate] % 10 ** 6);
     }
 
     /**
@@ -70,7 +78,7 @@ contract Map is Ownable {
     ) public view returns (uint256[] memory) {
         uint256[] memory avatarIds = new uint256[](tileCoordinates.length);
         for (uint256 i = 0; i < tileCoordinates.length; i++) {
-            avatarIds[i] = tiles[tileCoordinates[i]] / 1000000;
+            avatarIds[i] = tiles[tileCoordinates[i]] / 10 ** 16;
         }
         return avatarIds;
     }
@@ -118,12 +126,12 @@ contract Map is Ownable {
 
         uint256 TileEAW = tileCoordinate.getTileEAW() + BombUsed;
 
-        tiles[tileCoordinate] = avatarId * 1000000 + PassId;
+        tiles[tileCoordinate] = avatarId * 10 ** 16 + COID * 10 ** 6 + PassId;
         tileCoordinate = tileCoordinate.neighbor(4);
 
         for (uint256 i = 0; i < 18; i++) {
-            uint256 coAvatarId = getTileAvatar(tileCoordinate);
-            if (coAvatarId > 0 && Avatar.getAvatarCOID(coAvatarId) != COID) {
+            uint256 tileCOID = getTileCOID(tileCoordinate);
+            if (tileCOID > 0 && tileCOID != COID) {
                 revert TileHasEnemy();
             }
 
