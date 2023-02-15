@@ -1,5 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("hardhat-docgen");
+require("solidity-docgen");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -31,8 +31,6 @@ module.exports = {
     },
   },
   docgen: {
-    path: "./docs",
-    clear: true,
-    runOnCompile: false,
+    pages: "files",
   },
 };
