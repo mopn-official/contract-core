@@ -207,6 +207,16 @@ describe("MOPN", function () {
     const jumpIn7Tx = await avatar.jumpIn([10011003, 2, 8, 1, 0, address0]);
     await jumpIn7Tx.wait();
 
+    mintnfttx = await testnft.safeMint(owner.address);
+    await mintnfttx.wait();
+
+    const mintTx8 = await avatar.mintAvatar(testnft.address, 8, testnftproofs, 0, address0);
+    await mintTx8.wait();
+
+    // -17 1 16
+    const jumpIn8Tx = await avatar.jumpIn([9831001, 2, 8, 17, 0, address0]);
+    await jumpIn8Tx.wait();
+
     console.log(await avatar.getAvatarByNFT(testnft.address, 0));
     console.log(await avatar.getAvatarByNFT(testnft.address, 1));
     console.log(await avatar.getAvatarByNFT(testnft.address, 2));

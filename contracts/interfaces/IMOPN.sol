@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 error linkAvatarError();
 error TileHasEnemy();
 error PassIdOverflow();
+error PassIdTilesNotOpen();
 
 import "./IArsenal.sol";
 import "./IAvatar.sol";

@@ -281,7 +281,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         public
         tileCheck(params.tileCoordinate)
         ownerCheck(params.avatarId, params.delegateWallet, params.vault)
-        linkCheck(params.tileCoordinate, params.linkedAvatarId, params.avatarId)
+        linkCheck(params)
     {
         require(getAvatarCoordinate(params.avatarId) == 0, "avatar is on map");
 
@@ -311,7 +311,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         public
         tileCheck(params.tileCoordinate)
         ownerCheck(params.avatarId, params.delegateWallet, params.vault)
-        linkCheck(params.tileCoordinate, params.linkedAvatarId, params.avatarId)
+        linkCheck(params)
     {
         uint256 COID = getAvatarCOID(params.avatarId);
         require(getAvatarCoordinate(params.avatarId) != 0, "avatar not on map");
@@ -419,19 +419,28 @@ contract Avatar is IAvatar, Multicall, Ownable {
         _;
     }
 
-    modifier linkCheck(
-        uint32 tileCoordinate,
-        uint256 linkedAvatarId,
-        uint256 avatarId
-    ) {
-        uint256 COID = getAvatarCOID(avatarId);
+    modifier linkCheck(OnMapParams calldata params) {
+        uint32 ringNum = params.PassId.PassRingNum();
+        if (ringNum == 0) ringNum++;
+        if (currentAvatarId < (ringNum - 1) * 100) {
+            revert PassIdTilesNotOpen();
+        }
+        uint256 COID = getAvatarCOID(params.avatarId);
         require(COID > 0, "avatar not exist");
 
-        if (linkedAvatarId > 0) {
-            require(COID == getAvatarCOID(linkedAvatarId), "link co error");
-            require(linkedAvatarId != avatarId, "link to yourself");
+        if (params.linkedAvatarId > 0) {
+            require(
+                COID == getAvatarCOID(params.linkedAvatarId),
+                "link co error"
+            );
+            require(
+                params.linkedAvatarId != params.avatarId,
+                "link to yourself"
+            );
             if (
-                tileCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) > 3
+                params.tileCoordinate.distance(
+                    getAvatarCoordinate(params.linkedAvatarId)
+                ) > 3
             ) {
                 revert linkAvatarError();
             }
@@ -439,7 +448,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
             uint256 collectionOnMapNum = Governance.getCollectionOnMapNum(COID);
             if (collectionOnMapNum > 0) {
                 if (
-                    !(getAvatarCoordinate(avatarId) > 0 &&
+                    !(getAvatarCoordinate(params.avatarId) > 0 &&
                         collectionOnMapNum == 1)
                 ) {
                     revert linkAvatarError();
