@@ -241,10 +241,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 ownerOf(collectionContract, tokenId, delegateWallet, vault),
             "caller is not token owner"
         );
-        uint256 COID = Governance.checkWhitelistCOID(
-            collectionContract,
-            proofs
-        );
+        uint256 COID = Governance.generateCOID(collectionContract, proofs);
         require(tokenMap[COID][tokenId] == 0, "avatar exist");
 
         currentAvatarId++;

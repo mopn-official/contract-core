@@ -15,7 +15,7 @@ describe("MOPN", function () {
     console.log("TileMath", tileMath.address);
 
     const Governance = await ethers.getContractFactory("Governance");
-    governance = await Governance.deploy(0);
+    governance = await Governance.deploy(0, true);
     await governance.deployed();
     console.log("Governance", governance.address);
 

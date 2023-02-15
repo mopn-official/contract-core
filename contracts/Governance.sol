@@ -26,8 +26,9 @@ contract Governance is Multicall, Ownable {
 
     mapping(uint32 => uint256) public PassHolderEnergys;
 
-    constructor(uint256 EnergyProduceStartBlock_) {
+    constructor(uint256 EnergyProduceStartBlock_, bool whiteListRequire_) {
         EnergyProduceStartBlock = EnergyProduceStartBlock_;
+        whiteListRequire = whiteListRequire_;
     }
 
     /**
@@ -430,6 +431,12 @@ contract Governance is Multicall, Ownable {
         IEnergy(energyContract).mint(msg.sender, amount);
     }
 
+    bool public whiteListRequire;
+
+    function setWhiteListRequire(bool whiteListRequire_) public onlyOwner {
+        whiteListRequire = whiteListRequire_;
+    }
+
     bytes32 public whiteListRoot;
 
     // Collection Id
@@ -461,7 +468,7 @@ contract Governance is Multicall, Ownable {
     function getCollectionCOID(
         address collectionContract
     ) public view returns (uint256) {
-        return collectionMap[collectionContract] / 1000000;
+        return collectionMap[collectionContract] / 10 ** 16;
     }
 
     /**
@@ -473,24 +480,52 @@ contract Governance is Multicall, Ownable {
     ) public view returns (uint256[] memory COIDs) {
         COIDs = new uint256[](collectionContracts.length);
         for (uint256 i = 0; i < collectionContracts.length; i++) {
-            COIDs[i] = collectionMap[collectionContracts[i]] / 1000000;
+            COIDs[i] = collectionMap[collectionContracts[i]] / 10 ** 16;
         }
     }
 
-    function checkWhitelistCOID(
+    /**
+     * Generate a collection id for new collection
+     * @param collectionContract collection contract adddress
+     * @param proofs collection whitelist proofs
+     */
+    function generateCOID(
         address collectionContract,
         bytes32[] memory proofs
     ) public returns (uint256 COID) {
         COID = getCollectionCOID(collectionContract);
         if (COID == 0) {
-            require(
-                isInWhiteList(collectionContract, proofs),
-                "not in whitelist"
-            );
-            COID = generateCOID(collectionContract);
+            if (whiteListRequire) {
+                require(
+                    isInWhiteList(collectionContract, proofs),
+                    "not in whitelist"
+                );
+            } else {
+                require(
+                    IERC165(collectionContract).supportsInterface(
+                        type(IERC721).interfaceId
+                    ),
+                    "not a erc721 compatible nft"
+                );
+            }
+
+            COIDCounter++;
+            COIDMap[COIDCounter] = collectionContract;
+            collectionMap[collectionContract] =
+                COIDCounter *
+                10 ** 16 +
+                1000000;
+            COID = COIDCounter;
+        } else {
+            addCollectionAvatarNum(COID);
         }
     }
 
+    /**
+     * @notice check if this collection is in white list
+     * @param collectionContract collection contract address
+     * @param proofs collection whitelist proofs
+     */
     function isInWhiteList(
         address collectionContract,
         bytes32[] memory proofs
@@ -505,8 +540,20 @@ contract Governance is Multicall, Ownable {
             );
     }
 
+    /**
+     * @notice update whitelist root
+     * @param whiteListRoot_ white list merkle tree root
+     */
     function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
         whiteListRoot = whiteListRoot_;
+    }
+
+    /**
+     * @notice get NFT collection On map avatar number
+     * @param COID collection Id
+     */
+    function getCollectionOnMapNum(uint256 COID) public view returns (uint256) {
+        return collectionMap[getCollectionContract(COID)] % 1000000;
     }
 
     function addCollectionOnMapNum(uint256 COID) public onlyAvatar {
@@ -517,8 +564,19 @@ contract Governance is Multicall, Ownable {
         collectionMap[getCollectionContract(COID)]--;
     }
 
-    function getCollectionOnMapNum(uint256 COID) public view returns (uint256) {
-        return collectionMap[getCollectionContract(COID)] % 1000000;
+    /**
+     * @notice get NFT collection minted avatar number
+     * @param COID collection Id
+     */
+    function getCollectionAvatarNum(
+        uint256 COID
+    ) public view returns (uint256) {
+        return
+            (collectionMap[getCollectionContract(COID)] % 10 ** 16) / 1000000;
+    }
+
+    function addCollectionAvatarNum(uint256 COID) public onlyAvatar {
+        collectionMap[getCollectionContract(COID)] += 1000000;
     }
 
     address public arsenalContract;
@@ -601,15 +659,6 @@ contract Governance is Multicall, Ownable {
         CollectionEnergys[COID] -= amount;
         mintPassHolderEnergy(PassId);
         PassHolderEnergys[PassId] -= amount;
-    }
-
-    function generateCOID(
-        address collectionContract
-    ) internal returns (uint256) {
-        COIDCounter++;
-        COIDMap[COIDCounter] = collectionContract;
-        collectionMap[collectionContract] = COIDCounter * 1000000;
-        return COIDCounter;
     }
 
     modifier onlyArsenal() {

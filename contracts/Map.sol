@@ -5,12 +5,23 @@ import "./interfaces/IMOPN.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/// @title The M(Map) of MOPN
+/// core contract for MOPN records all avatars on map
+/// @author Cyanface<cyanface@outlook.com>
+/// @dev This Contract's owner must transfer to Governance Contract once it's deployed
 contract Map is Ownable {
     using TileMath for uint32;
 
-    // Tile => avatarId
+    // Tile => avatarId * 1000000 + MOPN Pass Id
     mapping(uint32 => uint256) public tiles;
 
+    /**
+     * @notice This event emit when an anvatar occupied a tile
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     * @param PassId MOPN Pass Id
+     * @param tileCoordinate tile coordinate
+     */
     event AvatarSet(
         uint256 indexed avatarId,
         uint256 indexed COID,
@@ -18,6 +29,13 @@ contract Map is Ownable {
         uint32 tileCoordinate
     );
 
+    /**
+     * @notice This event emit when an anvatar left a tile
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     * @param PassId MOPN Pass Id
+     * @param tileCoordinate tile coordinate
+     */
     event AvatarRemove(
         uint256 indexed avatarId,
         uint256 indexed COID,
@@ -25,16 +43,28 @@ contract Map is Ownable {
         uint32 tileCoordinate
     );
 
+    /**
+     * @notice get the avatar Id who is standing on a tile
+     * @param tileCoordinate tile coordinate
+     */
     function getTileAvatar(
         uint32 tileCoordinate
     ) public view returns (uint256) {
         return tiles[tileCoordinate] / 1000000;
     }
 
+    /**
+     * @notice get MOPN Pass Id which a tile belongs(only have data if someone has occupied this tile before)
+     * @param tileCoordinate tile coordinate
+     */
     function getTilePassId(uint32 tileCoordinate) public view returns (uint32) {
         return uint32(tiles[tileCoordinate] % 1000000);
     }
 
+    /**
+     * @notice batch call for {getTileAvatar}
+     * @param tileCoordinates tile coordinate
+     */
     function getTilesAvatars(
         uint32[] memory tileCoordinates
     ) public view returns (uint256[] memory) {
@@ -45,8 +75,8 @@ contract Map is Ownable {
         return avatarIds;
     }
 
-    IAvatar public Avatar;
-    IGovernance public Governance;
+    IAvatar private Avatar;
+    IGovernance private Governance;
 
     function setGovernanceContract(
         address governanceContract_
@@ -55,6 +85,15 @@ contract Map is Ownable {
         Avatar = IAvatar(Governance.avatarContract());
     }
 
+    /**
+     * @notice avatar id occupied a tile
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     * @param tileCoordinate tile coordinate
+     * @param PassId MOPN Pass Id
+     * @param BombUsed avatar bomb used history number
+     * @dev can only called by avatar contract
+     */
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
@@ -100,6 +139,13 @@ contract Map is Ownable {
         Governance.addEAW(avatarId, COID, PassId, TileEAW);
     }
 
+    /**
+     * @notice avatar id left a tile
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     * @param tileCoordinate tile coordinate
+     * @dev can only called by avatar contract
+     */
     function avatarRemove(
         uint256 avatarId,
         uint256 COID,
