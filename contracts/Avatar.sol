@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
-import "./interfaces/IMOPN.sol";
+import "./interfaces/IAvatar.sol";
+import "./interfaces/IGovernance.sol";
+import "./interfaces/IMap.sol";
 import "./libraries/TileMath.sol";
+import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+error PassIdTilesNotOpen();
+error linkAvatarError();
 
 interface WarmInterface {
     function ownerOf(

@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "./interfaces/IMOPN.sol";
+import "./interfaces/IAvatar.sol";
+import "./interfaces/IGovernance.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+error TileHasEnemy();
+error PassIdOverflow();
 
 /// @title The M(Map) of MOPN
 /// core contract for MOPN records all avatars on map

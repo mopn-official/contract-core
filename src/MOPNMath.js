@@ -1,3 +1,5 @@
+const centerTiles = require("./passCenterTiles.json");
+
 function PassRingNum(PassId) {
   let n = Math.floor((Math.sqrt(9 + 12 * (PassId - 1)) - 3) / 6);
   if (3 * n * n + 3 * n + 1 == PassId) {
@@ -65,6 +67,14 @@ function coordinateIntToArr(blockCoordinate) {
   return coordinateArr;
 }
 
+function coordinateIntToXY(blockCoordinate) {
+  return { x: Math.floor(blockCoordinate / 10000) - 1000, y: (blockCoordinate % 10000) - 1000 };
+}
+
+function coordinateXYToInt(coordinateXY) {
+  return (1000 + coordinateXY.x) * 10000 + 1000 + coordinateXY.y;
+}
+
 function getPassTilesEAW(PassId) {
   let blockCoordinate = PassCenterTile(PassId);
   let TilesEAW = [];
@@ -116,6 +126,29 @@ function neighbor(blockcoordinate, direction_) {
   return blockcoordinate + direction(direction_);
 }
 
+function getTilePassId(tileCoordinate) {
+  if (centerTiles[tileCoordinate] != undefined) return centerTiles[tileCoordinate];
+  for (let i = 1; i <= 5; i++) {
+    tileCoordinate++;
+    for (let j = 0; j < 6; j++) {
+      for (let k = 0; k < i; k++) {
+        if (centerTiles[tileCoordinate] != undefined) return centerTiles[tileCoordinate];
+        tileCoordinate = neighbor(tileCoordinate, j);
+      }
+    }
+  }
+  return 0;
+}
+
+function checkPassIdOpen(PassId, avatarNum) {
+  let ringNum = PassRingNum(PassId);
+  if (ringNum == 0) ringNum++;
+  if (avatarNum < (ringNum - 1) * 100) {
+    return false;
+  }
+  return true;
+}
+
 module.exports = {
   PassRingNum,
   PassRingPos,
@@ -124,4 +157,9 @@ module.exports = {
   getTileEAW,
   getPassTilesEAW,
   neighbor,
+  getTilePassId,
+  checkPassIdOpen,
+  coordinateIntToArr,
+  coordinateIntToXY,
+  coordinateXYToInt,
 };
