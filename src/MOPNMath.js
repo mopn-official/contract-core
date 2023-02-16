@@ -25,7 +25,7 @@ function PassCenterTile(PassId) {
 
   const PassIdRingNum_ = PassRingNum(PassId);
 
-  const startblock = coordinateIntToArr(PassRingStartCenterTile(PassIdRingNum_));
+  const starttile = coordinateIntToArr(PassRingStartCenterTile(PassIdRingNum_));
 
   const PassIdRingPos_ = PassRingPos(PassId);
 
@@ -36,39 +36,39 @@ function PassCenterTile(PassId) {
     sidepos = (PassIdRingPos_ - 1) % PassIdRingNum_;
   }
 
-  let blockCoordinate = 0;
+  let tileCoordinate = 0;
   if (side == 1) {
-    blockCoordinate = (startblock[0] + sidepos * 11) * 10000;
-    blockCoordinate += startblock[1] - sidepos * 6;
+    tileCoordinate = (starttile[0] + sidepos * 11) * 10000;
+    tileCoordinate += starttile[1] - sidepos * 6;
   } else if (side == 2) {
-    blockCoordinate = (2000 - startblock[2] + sidepos * 5) * 10000;
-    blockCoordinate += 2000 - startblock[0] - sidepos * 11;
+    tileCoordinate = (2000 - starttile[2] + sidepos * 5) * 10000;
+    tileCoordinate += 2000 - starttile[0] - sidepos * 11;
   } else if (side == 3) {
-    blockCoordinate = (startblock[1] - sidepos * 6) * 10000;
-    blockCoordinate += startblock[2] - sidepos * 5;
+    tileCoordinate = (starttile[1] - sidepos * 6) * 10000;
+    tileCoordinate += starttile[2] - sidepos * 5;
   } else if (side == 4) {
-    blockCoordinate = (2000 - startblock[0] - sidepos * 11) * 10000;
-    blockCoordinate += 2000 - startblock[1] + sidepos * 6;
+    tileCoordinate = (2000 - starttile[0] - sidepos * 11) * 10000;
+    tileCoordinate += 2000 - starttile[1] + sidepos * 6;
   } else if (side == 5) {
-    blockCoordinate = (startblock[2] - sidepos * 5) * 10000;
-    blockCoordinate += startblock[0] + sidepos * 11;
+    tileCoordinate = (starttile[2] - sidepos * 5) * 10000;
+    tileCoordinate += starttile[0] + sidepos * 11;
   } else if (side == 6) {
-    blockCoordinate = (2000 - startblock[1] + sidepos * 6) * 10000;
-    blockCoordinate += 2000 - startblock[2] + sidepos * 5;
+    tileCoordinate = (2000 - starttile[1] + sidepos * 6) * 10000;
+    tileCoordinate += 2000 - starttile[2] + sidepos * 5;
   }
-  return blockCoordinate;
+  return tileCoordinate;
 }
 
-function coordinateIntToArr(blockCoordinate) {
+function coordinateIntToArr(tileCoordinate) {
   let coordinateArr = [];
-  coordinateArr[0] = Math.floor(blockCoordinate / 10000);
-  coordinateArr[1] = blockCoordinate % 10000;
+  coordinateArr[0] = Math.floor(tileCoordinate / 10000);
+  coordinateArr[1] = tileCoordinate % 10000;
   coordinateArr[2] = 3000 - (coordinateArr[0] + coordinateArr[1]);
   return coordinateArr;
 }
 
-function coordinateIntToXY(blockCoordinate) {
-  return { x: Math.floor(blockCoordinate / 10000) - 1000, y: (blockCoordinate % 10000) - 1000 };
+function coordinateIntToXY(tileCoordinate) {
+  return { x: Math.floor(tileCoordinate / 10000) - 1000, y: (tileCoordinate % 10000) - 1000 };
 }
 
 function coordinateXYToInt(coordinateXY) {
@@ -76,29 +76,29 @@ function coordinateXYToInt(coordinateXY) {
 }
 
 function getPassTilesEAW(PassId) {
-  let blockCoordinate = PassCenterTile(PassId);
+  let tileCoordinate = PassCenterTile(PassId);
   let TilesEAW = [];
-  TilesEAW[0] = getTileEAW(blockCoordinate);
+  TilesEAW[0] = getTileEAW(tileCoordinate);
   for (let i = 1; i <= 5; i++) {
-    blockCoordinate++;
-    const preringblocks = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
+    tileCoordinate++;
+    const preringtiles = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
     for (let j = 0; j < 6; j++) {
       for (let k = 0; k < i; k++) {
-        TilesEAW[preringblocks + j * i + k + 1] = getTileEAW(blockCoordinate);
-        blockCoordinate = neighbor(blockCoordinate, j);
+        TilesEAW[preringtiles + j * i + k + 1] = getTileEAW(tileCoordinate);
+        tileCoordinate = neighbor(tileCoordinate, j);
       }
     }
   }
   return TilesEAW;
 }
 
-function getTileEAW(blockCoordinate) {
-  if (Math.floor(blockCoordinate / 10000) % 10 == 0) {
-    if (blockCoordinate % 10 == 0) {
+function getTileEAW(tileCoordinate) {
+  if (Math.floor(tileCoordinate / 10000) % 10 == 0) {
+    if (tileCoordinate % 10 == 0) {
       return 15;
     }
     return 5;
-  } else if (blockCoordinate % 10 == 0) {
+  } else if (tileCoordinate % 10 == 0) {
     return 5;
   }
   return 1;
@@ -122,8 +122,8 @@ function direction(direction_) {
   }
 }
 
-function neighbor(blockcoordinate, direction_) {
-  return blockcoordinate + direction(direction_);
+function neighbor(tileCoordinate, direction_) {
+  return tileCoordinate + direction(direction_);
 }
 
 function getTilePassId(tileCoordinate) {
