@@ -579,22 +579,10 @@ function addCollectionAvatarNum(uint256 COID) public
 address arsenalContract
 ```
 
-### updateArsenalContract
-
-```solidity
-function updateArsenalContract(address arsenalContract_) public
-```
-
 ### avatarContract
 
 ```solidity
 address avatarContract
-```
-
-### updateAvatarContract
-
-```solidity
-function updateAvatarContract(address avatarContract_) public
 ```
 
 ### bombContract
@@ -603,22 +591,10 @@ function updateAvatarContract(address avatarContract_) public
 address bombContract
 ```
 
-### updateBombContract
-
-```solidity
-function updateBombContract(address bombContract_) public
-```
-
 ### energyContract
 
 ```solidity
 address energyContract
-```
-
-### updateEnergyContract
-
-```solidity
-function updateEnergyContract(address energyContract_) public
 ```
 
 ### mapContract
@@ -627,22 +603,16 @@ function updateEnergyContract(address energyContract_) public
 address mapContract
 ```
 
-### updateMapContract
-
-```solidity
-function updateMapContract(address mapContract_) public
-```
-
 ### passContract
 
 ```solidity
 address passContract
 ```
 
-### updatePassContract
+### updateMOPNContracts
 
 ```solidity
-function updatePassContract(address passContract_) public
+function updateMOPNContracts(address arsenalContract_, address avatarContract_, address bombContract_, address energyContract_, address mapContract_, address passContract_) public
 ```
 
 ### mintBomb

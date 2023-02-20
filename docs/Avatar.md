@@ -41,17 +41,6 @@ struct AvatarData {
 }
 ```
 
-### AvatarDataOutput
-
-```solidity
-struct AvatarDataOutput {
-  uint256 tokenId;
-  uint256 COID;
-  uint256 BombUsed;
-  uint32 tileCoordinate;
-}
-```
-
 ### BombUse
 
 ```solidity
@@ -106,7 +95,7 @@ this function also get the Map contract from the governances_
 ### getAvatarByAvatarId
 
 ```solidity
-function getAvatarByAvatarId(uint256 avatarId) public view returns (struct Avatar.AvatarDataOutput avatarData)
+function getAvatarByAvatarId(uint256 avatarId) public view returns (struct IAvatar.AvatarDataOutput avatarData)
 ```
 
 get avatar info by avatarId
@@ -121,12 +110,12 @@ get avatar info by avatarId
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| avatarData | struct Avatar.AvatarDataOutput | avatar data format struct AvatarDataOutput |
+| avatarData | struct IAvatar.AvatarDataOutput | avatar data format struct AvatarDataOutput |
 
 ### getAvatarByNFT
 
 ```solidity
-function getAvatarByNFT(address collection, uint256 tokenId) public view returns (struct Avatar.AvatarDataOutput avatarData)
+function getAvatarByNFT(address collection, uint256 tokenId) public view returns (struct IAvatar.AvatarDataOutput avatarData)
 ```
 
 get avatar info by nft contractAddress and tokenId
@@ -142,12 +131,12 @@ get avatar info by nft contractAddress and tokenId
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| avatarData | struct Avatar.AvatarDataOutput | avatar data format struct AvatarDataOutput |
+| avatarData | struct IAvatar.AvatarDataOutput | avatar data format struct AvatarDataOutput |
 
 ### getAvatarsByNFTs
 
 ```solidity
-function getAvatarsByNFTs(address[] collections, uint256[] tokenIds) public view returns (struct Avatar.AvatarDataOutput[] avatarDatas)
+function getAvatarsByNFTs(address[] collections, uint256[] tokenIds) public view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
 ```
 
 get avatar infos by nft contractAddresses and tokenIds
@@ -163,19 +152,38 @@ get avatar infos by nft contractAddresses and tokenIds
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| avatarDatas | struct Avatar.AvatarDataOutput[] | avatar datas format struct AvatarDataOutput |
+| avatarDatas | struct IAvatar.AvatarDataOutput[] | avatar datas format struct AvatarDataOutput |
 
 ### getAvatarsByCoordinateRange
 
 ```solidity
-function getAvatarsByCoordinateRange(uint32 startCoordinate, uint32 width, uint32 height) public view returns (struct Avatar.AvatarDataOutput[] avatarDatas)
+function getAvatarsByCoordinateRange(uint32 startCoordinate, uint32 width, uint32 height) public view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
 ```
+
+get avatar infos by tile sets start by start coordinate and range by width and height
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| startCoordinate | uint32 | start tile coordinate |
+| width | uint32 | range width |
+| height | uint32 | range height |
 
 ### getAvatarsByStartEndCoordinate
 
 ```solidity
-function getAvatarsByStartEndCoordinate(uint32 startCoordinate, uint32 endCoordinate) public view returns (struct Avatar.AvatarDataOutput[] avatarDatas)
+function getAvatarsByStartEndCoordinate(uint32 startCoordinate, uint32 endCoordinate) public view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
 ```
+
+get avatar infos by tile sets start by start coordinate and end by end coordinates
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| startCoordinate | uint32 | start tile coordinate |
+| endCoordinate | uint32 | end tile coordinate |
 
 ### getAvatarCOID
 
@@ -313,23 +321,10 @@ mint an avatar for a NFT
 | delegateWallet | enum IAvatar.DelegateWallet | DelegateWallet enum to specify protocol |
 | vault | address | cold wallet address |
 
-### OnMapParams
-
-```solidity
-struct OnMapParams {
-  uint32 tileCoordinate;
-  uint256 linkedAvatarId;
-  uint256 avatarId;
-  uint32 PassId;
-  enum IAvatar.DelegateWallet delegateWallet;
-  address vault;
-}
-```
-
 ### jumpIn
 
 ```solidity
-function jumpIn(struct Avatar.OnMapParams params) public
+function jumpIn(struct IAvatar.OnMapParams params) public
 ```
 
 an off map avatar jump in to the map
@@ -338,12 +333,12 @@ an off map avatar jump in to the map
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| params | struct Avatar.OnMapParams | OnMapParams |
+| params | struct IAvatar.OnMapParams | OnMapParams |
 
 ### moveTo
 
 ```solidity
-function moveTo(struct Avatar.OnMapParams params) public
+function moveTo(struct IAvatar.OnMapParams params) public
 ```
 
 an on map avatar move to a new tile
@@ -352,7 +347,7 @@ an on map avatar move to a new tile
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| params | struct Avatar.OnMapParams | OnMapParams |
+| params | struct IAvatar.OnMapParams | OnMapParams |
 
 ### bomb
 
@@ -404,7 +399,7 @@ modifier tileCheck(uint32 tileCoordinate)
 ### linkCheck
 
 ```solidity
-modifier linkCheck(struct Avatar.OnMapParams params)
+modifier linkCheck(struct IAvatar.OnMapParams params)
 ```
 
 ### onlyMap
