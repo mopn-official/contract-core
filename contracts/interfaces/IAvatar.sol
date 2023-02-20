@@ -2,6 +2,31 @@
 pragma solidity ^0.8.17;
 
 interface IAvatar {
+    struct AvatarDataOutput {
+        uint256 tokenId;
+        uint256 COID;
+        uint256 BombUsed;
+        uint32 tileCoordinate;
+    }
+
+    /**
+     * @notice Avatar On Map Action Params
+     * @param tileCoordinate destination tile coordinate
+     * @param linkedAvatarId linked same collection avatar Id if you have a collection ally on the map
+     * @param avatarId your avatar Id
+     * @param PassId the destination tile's PassId
+     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
+     * @param vault cold wallet address
+     */
+    struct OnMapParams {
+        uint32 tileCoordinate;
+        uint256 linkedAvatarId;
+        uint256 avatarId;
+        uint32 PassId;
+        DelegateWallet delegateWallet;
+        address vault;
+    }
+
     /**
      * @notice Delegate Wallet Protocols
      */
@@ -17,5 +42,98 @@ interface IAvatar {
         address vault
     ) external view returns (address);
 
-    function getAvatarCOID(uint256 avatarId) external view returns (uint256);
+    /**
+     * @notice get avatar info by avatarId
+     * @param avatarId avatar Id
+     * @return avatarData avatar data format struct AvatarDataOutput
+     */
+    function getAvatarByAvatarId(
+        uint256 avatarId
+    ) external view returns (AvatarDataOutput memory avatarData);
+
+    /**
+     * @notice get avatar info by nft contractAddress and tokenId
+     * @param collection  collection contract address
+     * @param tokenId  token Id
+     * @return avatarData avatar data format struct AvatarDataOutput
+     */
+    function getAvatarByNFT(
+        address collection,
+        uint256 tokenId
+    ) external view returns (AvatarDataOutput memory avatarData);
+
+    /**
+     * @notice get avatar infos by nft contractAddresses and tokenIds
+     * @param collections array of collection contract address
+     * @param tokenIds array of token Ids
+     * @return avatarDatas avatar datas format struct AvatarDataOutput
+     */
+    function getAvatarsByNFTs(
+        address[] memory collections,
+        uint256[] memory tokenIds
+    ) external view returns (AvatarDataOutput[] memory avatarDatas);
+
+    /**
+     * @notice get avatar infos by tile sets start by start coordinate and range by width and height
+     * @param startCoordinate start tile coordinate
+     * @param width range width
+     * @param height range height
+     */
+    function getAvatarsByCoordinateRange(
+        uint32 startCoordinate,
+        uint32 width,
+        uint32 height
+    ) external view returns (AvatarDataOutput[] memory avatarDatas);
+
+    /**
+     * @notice get avatar infos by tile sets start by start coordinate and end by end coordinates
+     * @param startCoordinate start tile coordinate
+     * @param endCoordinate end tile coordinate
+     */
+    function getAvatarsByStartEndCoordinate(
+        uint32 startCoordinate,
+        uint32 endCoordinate
+    ) external view returns (AvatarDataOutput[] memory avatarDatas);
+
+    /**
+     * @notice mint an avatar for a NFT
+     * @param collectionContract NFT collection Contract Address
+     * @param tokenId NFT tokenId
+     * @param proofs NFT collection whitelist proof
+     * @param delegateWallet DelegateWallet enum to specify protocol
+     * @param vault cold wallet address
+     */
+    function mintAvatar(
+        address collectionContract,
+        uint256 tokenId,
+        bytes32[] memory proofs,
+        DelegateWallet delegateWallet,
+        address vault
+    ) external returns (uint256);
+
+    /**
+     * @notice an off map avatar jump in to the map
+     * @param params OnMapParams
+     */
+    function jumpIn(OnMapParams calldata params) external;
+
+    /**
+     * @notice an on map avatar move to a new tile
+     * @param params OnMapParams
+     */
+    function moveTo(OnMapParams calldata params) external;
+
+    /**
+     * @notice throw a bomb to a tile
+     * @param tileCoordinate bombing tile coordinate
+     * @param avatarId bomb using avatar id
+     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
+     * @param vault cold wallet address
+     */
+    function bomb(
+        uint32 tileCoordinate,
+        uint256 avatarId,
+        DelegateWallet delegateWallet,
+        address vault
+    ) external;
 }

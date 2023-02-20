@@ -582,38 +582,25 @@ contract Governance is Multicall, Ownable {
     }
 
     address public arsenalContract;
-
-    function updateArsenalContract(address arsenalContract_) public onlyOwner {
-        arsenalContract = arsenalContract_;
-    }
-
     address public avatarContract;
-
-    function updateAvatarContract(address avatarContract_) public onlyOwner {
-        avatarContract = avatarContract_;
-    }
-
     address public bombContract;
-
-    function updateBombContract(address bombContract_) public onlyOwner {
-        bombContract = bombContract_;
-    }
-
     address public energyContract;
-
-    function updateEnergyContract(address energyContract_) public onlyOwner {
-        energyContract = energyContract_;
-    }
-
     address public mapContract;
-
-    function updateMapContract(address mapContract_) public onlyOwner {
-        mapContract = mapContract_;
-    }
-
     address public passContract;
 
-    function updatePassContract(address passContract_) public onlyOwner {
+    function updateMOPNContracts(
+        address arsenalContract_,
+        address avatarContract_,
+        address bombContract_,
+        address energyContract_,
+        address mapContract_,
+        address passContract_
+    ) public onlyOwner {
+        arsenalContract = arsenalContract_;
+        avatarContract = avatarContract_;
+        bombContract = bombContract_;
+        energyContract = energyContract_;
+        mapContract = mapContract_;
         passContract = passContract_;
     }
 

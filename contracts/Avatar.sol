@@ -38,13 +38,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint256 setData;
     }
 
-    struct AvatarDataOutput {
-        uint256 tokenId;
-        uint256 COID;
-        uint256 BombUsed;
-        uint32 tileCoordinate;
-    }
-
     using Math for uint256;
     using TileMath for uint32;
 
@@ -297,24 +290,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
         tokenMap[COID][tokenId] = currentAvatarId;
         return currentAvatarId;
-    }
-
-    /**
-     * @notice Avatar On Map Action Params
-     * @param tileCoordinate destination tile coordinate
-     * @param linkedAvatarId linked same collection avatar Id if you have a collection ally on the map
-     * @param avatarId your avatar Id
-     * @param PassId the destination tile's PassId
-     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
-     * @param vault cold wallet address
-     */
-    struct OnMapParams {
-        uint32 tileCoordinate;
-        uint256 linkedAvatarId;
-        uint256 avatarId;
-        uint32 PassId;
-        DelegateWallet delegateWallet;
-        address vault;
     }
 
     /**

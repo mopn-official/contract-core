@@ -1,14 +1,14 @@
 ### MOPN Contract Api
 
-1. [Arsenal](Arsenal.md) [0xe1C482EB374318ab5e5bCE34EcDBd3D1B8546f35](https://goerli.etherscan.io/address/0xe1C482EB374318ab5e5bCE34EcDBd3D1B8546f35)
-2. [Avatar](Avatar.md) [0x336fD0cA0406B3A57d9519b2767554ff9E3b3CAf](https://goerli.etherscan.io/address/0x336fD0cA0406B3A57d9519b2767554ff9E3b3CAf)
-3. [Governance](Governance.md) [0xC024f35a45D7a50f3C3092ab1e067E5623e56F03](https://goerli.etherscan.io/address/0xC024f35a45D7a50f3C3092ab1e067E5623e56F03)
-4. [Map](Map.md) [0x42826241A26dAf0e9263d0f35601D3B9eEbc8F9F](https://goerli.etherscan.io/address/0x42826241A26dAf0e9263d0f35601D3B9eEbc8F9F)
+1. [Arsenal](Arsenal.md) [0xfcAe84E58C853Aff8898E1b958cA31218bc6B364](https://sepolia.etherscan.io/address/0xfcAe84E58C853Aff8898E1b958cA31218bc6B364)
+2. [Avatar](Avatar.md) [IAvatar](interfaces/IAvatar.md) [0xe46E1DA50645448Baf45DA22AaFB45b24f1Db4B9](https://sepolia.etherscan.io/address/0xe46E1DA50645448Baf45DA22AaFB45b24f1Db4B9)
+3. [Governance](Governance.md) [0xDd9c8Dc7A9Ed13E12253D72FBCc79555ed6811ce](https://sepolia.etherscan.io/address/0xDd9c8Dc7A9Ed13E12253D72FBCc79555ed6811ce)
+4. [Map](Map.md) [0xBb80001381618Bb7AD4378B5dFb428ce7b4484A2](https://sepolia.etherscan.io/address/0xBb80001381618Bb7AD4378B5dFb428ce7b4484A2)
 
 #### Other Contracts
 
 | Name     | Address                                                                                                                      |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| TileMath | [0x74D483003Cada124Deb24744E786EbE73d9c3cDb](https://goerli.etherscan.io/address/0x74D483003Cada124Deb24744E786EbE73d9c3cDb) |
-| Bomb     | [0x61aF1608D7B41103C23Af4Cb8e67FBF995e89067](https://goerli.etherscan.io/address/0x61aF1608D7B41103C23Af4Cb8e67FBF995e89067) |
-| Energy   | [0x55ad6C0019B0aBc9615eAAb48459F52BB26b9565](https://goerli.etherscan.io/address/0x55ad6C0019B0aBc9615eAAb48459F52BB26b9565) |
+| TileMath | [0xBC7DEAdB2AF96690D0Ed7B9091e77E54C60A9e01](https://sepolia.etherscan.io/address/0xBC7DEAdB2AF96690D0Ed7B9091e77E54C60A9e01) |
+| Bomb     | [0x2DE1A041fDe1326E26aaC085562A9249Ec287409](https://sepolia.etherscan.io/address/0x2DE1A041fDe1326E26aaC085562A9249Ec287409) |
+| Energy   | [0x04B07B4ec49C89CF59D3FF7e184365402A5aFBEF](https://sepolia.etherscan.io/address/0x04B07B4ec49C89CF59D3FF7e184365402A5aFBEF) |
