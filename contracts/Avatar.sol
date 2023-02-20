@@ -128,6 +128,12 @@ contract Avatar is IAvatar, Multicall, Ownable {
         }
     }
 
+    /**
+     * @notice get avatar infos by tile sets start by start coordinate and range by width and height
+     * @param startCoordinate start tile coordinate
+     * @param width range width
+     * @param height range height
+     */
     function getAvatarsByCoordinateRange(
         uint32 startCoordinate,
         uint32 width,
@@ -146,6 +152,11 @@ contract Avatar is IAvatar, Multicall, Ownable {
         }
     }
 
+    /**
+     * @notice get avatar infos by tile sets start by start coordinate and end by end coordinates
+     * @param startCoordinate start tile coordinate
+     * @param endCoordinate end tile coordinate
+     */
     function getAvatarsByStartEndCoordinate(
         uint32 startCoordinate,
         uint32 endCoordinate
