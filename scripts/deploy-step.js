@@ -1,6 +1,8 @@
 const { ethers } = require("hardhat");
 
 async function main() {
+  const tileMath = { address: "0x74d483003cada124deb24744e786ebe73d9c3cdb" };
+
   console.log("deploy Avatar...");
   const Avatar = await ethers.getContractFactory("Avatar", {
     libraries: {
@@ -31,6 +33,7 @@ async function main() {
   await avatarsetgovernancecontracttx.wait();
   console.log("done");
 
+  const map = { address: "0x42826241a26daf0e9263d0f35601d3b9eebc8f9f" };
   console.log("Map update Governance Contract");
   const mapsetgovernancecontracttx = await map.setGovernanceContract(governance.address);
   await mapsetgovernancecontracttx.wait();
