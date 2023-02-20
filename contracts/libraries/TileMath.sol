@@ -4,6 +4,11 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
 library TileMath {
+    struct XYCoordinate {
+        int32 x;
+        int32 y;
+    }
+
     error TileCoordinateError();
 
     function check(uint32 tileCoordinate) public pure {
@@ -214,5 +219,12 @@ library TileMath {
         }
 
         return d / 2;
+    }
+
+    function coordinateToXY(
+        uint32 tileCoordinate
+    ) public pure returns (XYCoordinate memory xycoordinate) {
+        xycoordinate.x = int32(tileCoordinate / 10000) - 1000;
+        xycoordinate.y = int32(tileCoordinate % 10000) - 1000;
     }
 }

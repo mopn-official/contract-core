@@ -1,5 +1,17 @@
 # Solidity API
 
+## TileHasEnemy
+
+```solidity
+error TileHasEnemy()
+```
+
+## PassIdOverflow
+
+```solidity
+error PassIdOverflow()
+```
+
 ## Map
 
 _This Contract's owner must transfer to Governance Contract once it's deployed_

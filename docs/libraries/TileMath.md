@@ -2,6 +2,15 @@
 
 ## TileMath
 
+### XYCoordinate
+
+```solidity
+struct XYCoordinate {
+  int32 x;
+  int32 y;
+}
+```
+
 ### TileCoordinateError
 
 ```solidity
@@ -96,5 +105,11 @@ function neighbor(uint32 tileCoordinate, uint256 direction_) public pure returns
 
 ```solidity
 function distance(uint32 a, uint32 b) public pure returns (uint32 d)
+```
+
+### coordinateToXY
+
+```solidity
+function coordinateToXY(uint32 tileCoordinate) public pure returns (struct TileMath.XYCoordinate xycoordinate)
 ```
 

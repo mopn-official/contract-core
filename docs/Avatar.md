@@ -1,5 +1,17 @@
 # Solidity API
 
+## PassIdTilesNotOpen
+
+```solidity
+error PassIdTilesNotOpen()
+```
+
+## linkAvatarError
+
+```solidity
+error linkAvatarError()
+```
+
 ## WarmInterface
 
 ### ownerOf
@@ -152,6 +164,18 @@ get avatar infos by nft contractAddresses and tokenIds
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | avatarDatas | struct Avatar.AvatarDataOutput[] | avatar datas format struct AvatarDataOutput |
+
+### getAvatarsByCoordinateRange
+
+```solidity
+function getAvatarsByCoordinateRange(uint32 startCoordinate, uint32 width, uint32 height) public view returns (struct Avatar.AvatarDataOutput[] avatarDatas)
+```
+
+### getAvatarsByStartEndCoordinate
+
+```solidity
+function getAvatarsByStartEndCoordinate(uint32 startCoordinate, uint32 endCoordinate) public view returns (struct Avatar.AvatarDataOutput[] avatarDatas)
+```
 
 ### getAvatarCOID
 
@@ -380,7 +404,7 @@ modifier tileCheck(uint32 tileCoordinate)
 ### linkCheck
 
 ```solidity
-modifier linkCheck(uint32 tileCoordinate, uint256 linkedAvatarId, uint256 avatarId)
+modifier linkCheck(struct Avatar.OnMapParams params)
 ```
 
 ### onlyMap

@@ -128,6 +128,36 @@ contract Avatar is IAvatar, Multicall, Ownable {
         }
     }
 
+    function getAvatarsByCoordinateRange(
+        uint32 startCoordinate,
+        uint32 width,
+        uint32 height
+    ) public view returns (AvatarDataOutput[] memory avatarDatas) {
+        uint32 coordinate = startCoordinate;
+        for (uint256 i = 0; i < height; i++) {
+            for (uint256 j = 0; j < width; j++) {
+                avatarDatas[coordinate] = getAvatarByAvatarId(
+                    Map.getTileAvatar(coordinate)
+                );
+                coordinate = coordinate.neighbor((j % 2 == 0 ? 5 : 1));
+            }
+            startCoordinate = startCoordinate.neighbor(1);
+            coordinate = startCoordinate;
+        }
+    }
+
+    function getAvatarsByStartEndCoordinate(
+        uint32 startCoordinate,
+        uint32 endCoordinate
+    ) public view returns (AvatarDataOutput[] memory avatarDatas) {
+        TileMath.XYCoordinate memory startxy = startCoordinate.coordinateToXY();
+        TileMath.XYCoordinate memory endxy = endCoordinate.coordinateToXY();
+        uint32 width = uint32(endxy.x - startxy.x);
+        uint32 height = uint32(startxy.y - endxy.y) - (width / 2);
+        width += 1;
+        return getAvatarsByCoordinateRange(startCoordinate, width, height);
+    }
+
     /**
      * @notice get avatar collection id
      * @param avatarId avatar Id
