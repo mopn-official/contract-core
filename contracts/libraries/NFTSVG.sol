@@ -22,12 +22,12 @@ library NFTSVG {
     function getBlock(
         coordinate memory co,
         uint256 blockLevel,
-        string memory fillcolor
+        uint256 fillcolor
     ) public pure returns (string memory svg) {
         string memory blockbg = ' class="b1"';
-        if (bytes(fillcolor).length > 0) {
+        if (fillcolor > 0) {
             blockbg = string(
-                abi.encodePacked(' style="fill:', fillcolor, ';"')
+                abi.encodePacked(' style="fill:', COIDToColor(fillcolor), ';"')
             );
         }
         svg = string(
@@ -90,7 +90,6 @@ library NFTSVG {
     }
 
     function generateDefs(
-        bytes memory ringbordercolor,
         bytes memory ringbgcolor
     ) public pure returns (string memory svg) {
         svg = string(
@@ -98,9 +97,7 @@ library NFTSVG {
                 abi.encodePacked(
                     "<defs><style>.c1 {font-size: 24px;}.c1,.c2 {font-family: ArialMT, Arial;isolation: isolate;}",
                     ".c2 {font-size: 14px;}.c3 {stroke-width: 0.25px;}.c3,.c4 {stroke: #000;stroke-miterlimit: 10;}",
-                    ".c4 {fill: none;stroke-width: 0.5px;}.c5 {fill: ",
-                    ringbordercolor,
-                    ";}.c6 {fill: url(#background);}.b1 {fill: #fff;}</style>",
+                    ".c4 {fill: none;stroke-width: 0.5px;}.c5 {fill: #F2F2F2;}.c6 {fill: url(#background);}.b1 {fill: #fff;}</style>",
                     '<symbol id="Block" viewBox="0 0 46.188 40"><polygon class="c3" points="34.5688 .125 11.6192 .125 .1443 20 11.6192 39.875 34.5688 39.875 46.0437 20 34.5688 .125"/></symbol>',
                     '<symbol id="Lv5" viewBox="0 0 20.5 20.5"><circle class="c4" cx="10.25" cy="10.25" r="10"/></symbol>'
                     '<symbol id="Lv15" viewBox="0 0 20.5 20.5"><circle class="c4" cx="10.25" cy="10.25" r="10"/>',
@@ -122,7 +119,6 @@ library NFTSVG {
 
     function generateBackground(
         uint32 id,
-        uint32 BEPS,
         string memory coordinateStr
     ) public pure returns (string memory svg) {
         svg = string(
@@ -131,10 +127,7 @@ library NFTSVG {
                 '<text class="c1" transform="translate(30 46.4014)"><tspan>MOPN Land</tspan></text>',
                 '<text class="c1" transform="translate(470 46.4014)" text-anchor="end"><tspan>#',
                 id.toString(),
-                '</tspan></text><text class="c2" transform="translate(30 475.4541)"><tspan>Total BEMS ',
-                BEPS.toString(),
-                "</tspan>",
-                '</text><text class="c2" transform="translate(470 475.4542)" text-anchor="end"><tspan>',
+                '</tspan></text><text class="c2" transform="translate(470 475.4542)" text-anchor="end"><tspan>',
                 coordinateStr,
                 "</tspan></text></g>"
             )
@@ -142,7 +135,7 @@ library NFTSVG {
     }
 
     function generateBlocks(
-        uint256[] memory blockLevels
+        NFTSVG.tileData[] memory tileDatas
     ) public pure returns (string memory svg) {
         bytes memory output;
         uint32 ringNum = 0;
@@ -152,8 +145,11 @@ library NFTSVG {
         uint32 cy = 230;
         coordinate memory co = coordinate(226, 906, 230);
 
-        for (uint256 i = 0; i < blockLevels.length; i++) {
-            output = abi.encodePacked(output, getBlock(co, blockLevels[i], ""));
+        for (uint256 i = 0; i < tileDatas.length; i++) {
+            output = abi.encodePacked(
+                output,
+                getBlock(co, tileDatas[i].tileEAW, tileDatas[i].color)
+            );
 
             if (ringPos >= ringNum * 6) {
                 ringPos = 1;
@@ -212,5 +208,27 @@ library NFTSVG {
         }
 
         svg = string(abi.encodePacked("<g>", output, "</g>"));
+    }
+
+    function COIDToColor(uint256 COID) public pure returns (string memory) {
+        COID--;
+        uint256 biground = COID / 10800 + 1;
+
+        uint256 h = (COID % 12) * 30 + (COID % 360) / 12 + 1;
+        uint256 s = 100 - ((COID % 10800) / 360) * 3;
+
+        uint256 l = biground % 2 == 1 ? 50 + biground / 2 : 50 - biground / 2;
+        return
+            string(
+                abi.encodePacked(
+                    "hsl(",
+                    Strings.toString(h),
+                    ", ",
+                    Strings.toString(s),
+                    "%, ",
+                    Strings.toString(l),
+                    "%)"
+                )
+            );
     }
 }

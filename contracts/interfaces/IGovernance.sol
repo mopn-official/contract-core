@@ -58,6 +58,10 @@ interface IGovernance {
         uint256 COID
     ) external;
 
+    function getPassHolderRedeemed(
+        uint32 PassId
+    ) external view returns (uint256);
+
     function avatarContract() external view returns (address);
 
     function bombContract() external view returns (address);

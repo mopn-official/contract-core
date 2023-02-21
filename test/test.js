@@ -1,7 +1,17 @@
 const { ethers } = require("hardhat");
 
 describe("MOPN", function () {
-  let testnft, tileMath, governance, arsenal, avatar, map, bomb, energy, energydecimals;
+  let testnft,
+    testnft1,
+    tileMath,
+    governance,
+    arsenal,
+    avatar,
+    map,
+    bomb,
+    energy,
+    energydecimals,
+    passMetaDataRender;
 
   it("deploy ", async function () {
     const TESTNFT = await ethers.getContractFactory("TESTNFT");
@@ -9,13 +19,33 @@ describe("MOPN", function () {
     await testnft.deployed();
     console.log("TESTNFT ", testnft.address);
 
+    const TESTNFT1 = await ethers.getContractFactory("TESTNFT");
+    testnft1 = await TESTNFT1.deploy();
+    await testnft1.deployed();
+    console.log("TESTNFT1 ", testnft1.address);
+
     const TileMath = await ethers.getContractFactory("TileMath");
     tileMath = await TileMath.deploy();
     await tileMath.deployed();
     console.log("TileMath", tileMath.address);
 
+    const NFTSVG = await ethers.getContractFactory("NFTSVG");
+    const nftsvg = await NFTSVG.deploy();
+    await nftsvg.deployed();
+    console.log("NFTSVG", nftsvg.address);
+
+    const NFTMetaData = await ethers.getContractFactory("NFTMetaData", {
+      libraries: {
+        NFTSVG: nftsvg.address,
+        TileMath: tileMath.address,
+      },
+    });
+    const nftmetadata = await NFTMetaData.deploy();
+    await nftmetadata.deployed();
+    console.log("NFTMetaData", nftmetadata.address);
+
     const Governance = await ethers.getContractFactory("Governance");
-    governance = await Governance.deploy(0, true);
+    governance = await Governance.deploy(0, false);
     await governance.deployed();
     console.log("Governance", governance.address);
 
@@ -54,6 +84,16 @@ describe("MOPN", function () {
     await arsenal.deployed();
     console.log("Arsenal", arsenal.address);
 
+    const PassMetaDataRender = await ethers.getContractFactory("PassMetaDataRender", {
+      libraries: {
+        NFTMetaData: nftmetadata.address,
+        TileMath: tileMath.address,
+      },
+    });
+    passMetaDataRender = await PassMetaDataRender.deploy();
+    await passMetaDataRender.deployed();
+    console.log("PassMetaDataRender", passMetaDataRender.address);
+
     const energytransownertx = await energy.transferOwnership(governance.address);
     await energytransownertx.wait();
 
@@ -65,23 +105,15 @@ describe("MOPN", function () {
     );
     await governancesetroottx.wait();
 
-    const governancesetarsenaltx = await governance.updateArsenalContract(arsenal.address);
-    await governancesetarsenaltx.wait();
-
-    const governancesetavatartx = await governance.updateAvatarContract(avatar.address);
-    await governancesetavatartx.wait();
-
-    const governancesetbombtx = await governance.updateBombContract(bomb.address);
-    await governancesetbombtx.wait();
-
-    const governancesetmaptx = await governance.updateMapContract(map.address);
-    await governancesetmaptx.wait();
-
-    const governancesetpasstx = await governance.updatePassContract(map.address);
-    await governancesetpasstx.wait();
-
-    const governancesetenergytx = await governance.updateEnergyContract(energy.address);
-    await governancesetenergytx.wait();
+    const governancesetmopntx = await governance.updateMOPNContracts(
+      arsenal.address,
+      avatar.address,
+      bomb.address,
+      energy.address,
+      map.address,
+      map.address
+    );
+    await governancesetmopntx.wait();
 
     const mapsetgovernancecontracttx = await map.setGovernanceContract(governance.address);
     await mapsetgovernancecontracttx.wait();
@@ -91,6 +123,10 @@ describe("MOPN", function () {
 
     const arsenalsetgovernancecontracttx = await arsenal.setGovernanceContract(governance.address);
     await arsenalsetgovernancecontracttx.wait();
+
+    const passMetaDataRendersetgovernancecontracttx =
+      await passMetaDataRender.setGovernanceContract(governance.address);
+    await passMetaDataRendersetgovernancecontracttx.wait();
   });
 
   it("test mint nft", async function () {
@@ -135,7 +171,7 @@ describe("MOPN", function () {
     // const jumpIn1Tx = await avatar.jumpIn([100010030997, 1, 2, 1, 0, address0]);
     // await jumpIn1Tx.wait();
 
-    const multi2Tx = await avatar.multicall([
+    const multi1Tx = await avatar.multicall([
       avatar.interface.encodeFunctionData("mintAvatar", [
         testnft.address,
         1,
@@ -145,7 +181,7 @@ describe("MOPN", function () {
       ]),
       avatar.interface.encodeFunctionData("jumpIn", [[10001003, 1, 2, 1, 0, address0]]),
     ]);
-    await multi2Tx.wait();
+    await multi1Tx.wait();
 
     mintnfttx = await testnft.safeMint(owner.address);
     await mintnfttx.wait();
@@ -207,14 +243,14 @@ describe("MOPN", function () {
     const jumpIn7Tx = await avatar.jumpIn([10011003, 2, 8, 1, 0, address0]);
     await jumpIn7Tx.wait();
 
-    mintnfttx = await testnft.safeMint(owner.address);
+    mintnfttx = await testnft1.safeMint(owner.address);
     await mintnfttx.wait();
 
-    const mintTx8 = await avatar.mintAvatar(testnft.address, 8, testnftproofs, 0, address0);
+    const mintTx8 = await avatar.mintAvatar(testnft1.address, 0, testnftproofs, 0, address0);
     await mintTx8.wait();
 
-    // -17 1 16
-    const jumpIn8Tx = await avatar.jumpIn([9831001, 2, 8, 17, 0, address0]);
+    // 4 0 -4
+    const jumpIn8Tx = await avatar.jumpIn([10041000, 0, 9, 1, 0, address0]);
     await jumpIn8Tx.wait();
 
     console.log(await avatar.getAvatarByNFT(testnft.address, 0));
@@ -225,6 +261,8 @@ describe("MOPN", function () {
     console.log(await avatar.getAvatarByNFT(testnft.address, 5));
     console.log(await avatar.getAvatarByNFT(testnft.address, 6));
     console.log(await avatar.getAvatarByNFT(testnft.address, 7));
+
+    console.log(await passMetaDataRender.constructTokenURI(1));
 
     // 1, 0, -1;
     const moveTo4Tx = await avatar.moveTo([10011000, 2, 1, 1, 0, address0]);
@@ -242,7 +280,7 @@ describe("MOPN", function () {
     const redeemEnergyTx = await governance.redeemAvatarInboxEnergy(1, 0, address0);
     await redeemEnergyTx.wait();
 
-    const multi1Tx = await governance.multicall([
+    const multi10Tx = await governance.multicall([
       governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [2, 0, address0]),
       governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [3, 0, address0]),
       governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [4, 0, address0]),
@@ -251,7 +289,7 @@ describe("MOPN", function () {
       governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [7, 0, address0]),
       governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [8, 0, address0]),
     ]);
-    await multi1Tx.wait();
+    await multi10Tx.wait();
 
     console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1), energydecimals));
     console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2), energydecimals));
@@ -301,6 +339,6 @@ describe("MOPN", function () {
       )
     );
 
-    // console.log(await avatar.getAvatarOccupiedBlockInt(1));
+    console.log(await passMetaDataRender.constructTokenURI(1));
   });
 });

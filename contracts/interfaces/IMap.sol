@@ -24,6 +24,8 @@ interface IMap {
         uint32[] memory tileCoordinates
     ) external view returns (uint256[] memory);
 
+    function getTileCOID(uint32 tileCoordinate) external view returns (uint256);
+
     function getTilePassId(
         uint32 tileCoordinate
     ) external view returns (uint32);

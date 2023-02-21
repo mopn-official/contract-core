@@ -28,6 +28,8 @@ contract Governance is Multicall, Ownable {
 
     mapping(uint32 => uint256) public PassHolderEnergys;
 
+    mapping(uint32 => uint256) public PassHolderRedeemed;
+
     constructor(uint256 EnergyProduceStartBlock_, bool whiteListRequire_) {
         EnergyProduceStartBlock = EnergyProduceStartBlock_;
         whiteListRequire = whiteListRequire_;
@@ -430,7 +432,14 @@ contract Governance is Multicall, Ownable {
         require(amount > 0, "empty");
 
         PassHolderEnergys[PassId] = PassHolderEnergys[PassId] % (10 ** 50);
+        PassHolderRedeemed[PassId] += amount;
         IEnergy(energyContract).mint(msg.sender, amount);
+    }
+
+    function getPassHolderRedeemed(
+        uint32 PassId
+    ) public view returns (uint256) {
+        return PassHolderRedeemed[PassId] + getPassHolderInboxEnergy(PassId);
     }
 
     bool public whiteListRequire;

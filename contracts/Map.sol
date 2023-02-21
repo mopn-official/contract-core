@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "hardhat/console.sol";
 import "./interfaces/IAvatar.sol";
 import "./interfaces/IGovernance.sol";
 import "./libraries/TileMath.sol";
@@ -140,7 +141,7 @@ contract Map is Ownable {
             }
 
             if (i == 5) {
-                tileCoordinate = tileCoordinate.neighbor(4);
+                tileCoordinate = tileCoordinate.neighbor(4).neighbor(5);
             } else if (i < 5) {
                 tileCoordinate = tileCoordinate.neighbor(i);
             } else {

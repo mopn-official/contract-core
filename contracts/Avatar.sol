@@ -441,11 +441,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
     }
 
     modifier linkCheck(OnMapParams calldata params) {
-        uint32 ringNum = params.PassId.PassRingNum();
-        if (ringNum == 0) ringNum++;
-        if (currentAvatarId < (ringNum - 1) * 100) {
-            revert PassIdTilesNotOpen();
-        }
         uint256 COID = getAvatarCOID(params.avatarId);
         require(COID > 0, "avatar not exist");
 
