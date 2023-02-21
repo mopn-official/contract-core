@@ -31,7 +31,9 @@
     "axios": "^1.3.3",
     "css-loader": "6.7.3",
     "ipfs-infura": "^1.1.9",
-    "json2csv": "^5.0.7"
+    "base64-sol": "^1.1.0",
+    "erc721a": "^4.2.3",
+    "operator-filter-registry": "github:ProjectOpenSea/operator-filter-registry"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.1",
@@ -43,6 +45,7 @@
     "hardhat-docgen": "^1.3.0",
     "solidity-docgen": "0.6.0-beta.34",
     "vue-loader": "^15.10.1",
-    "vue-style-loader": "^4.1.3"
+    "vue-style-loader": "^4.1.3",
+    "json2csv": "^5.0.7"
   }
 }
