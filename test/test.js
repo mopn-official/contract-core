@@ -262,7 +262,7 @@ describe("MOPN", function () {
     console.log(await avatar.getAvatarByNFT(testnft.address, 6));
     console.log(await avatar.getAvatarByNFT(testnft.address, 7));
 
-    console.log(await passMetaDataRender.constructTokenURI(1));
+    // console.log(await passMetaDataRender.constructTokenURI(1));
 
     // 1, 0, -1;
     const moveTo4Tx = await avatar.moveTo([10011000, 2, 1, 1, 0, address0]);
@@ -339,6 +339,8 @@ describe("MOPN", function () {
       )
     );
 
-    console.log(await passMetaDataRender.constructTokenURI(1));
+    // console.log(await passMetaDataRender.constructTokenURI(1));
+
+    console.log(await tileMath.floorCbrt(9));
   });
 });
