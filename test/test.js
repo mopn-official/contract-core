@@ -3,15 +3,16 @@ const { ethers } = require("hardhat");
 describe("MOPN", function () {
   let testnft,
     testnft1,
+    testnft2,
     tileMath,
     governance,
-    arsenal,
+    auctionHouse,
     avatar,
     map,
     bomb,
     energy,
     energydecimals,
-    passMetaDataRender;
+    landMetaDataRender;
 
   it("deploy ", async function () {
     const TESTNFT = await ethers.getContractFactory("TESTNFT");
@@ -23,6 +24,11 @@ describe("MOPN", function () {
     testnft1 = await TESTNFT1.deploy();
     await testnft1.deployed();
     console.log("TESTNFT1 ", testnft1.address);
+
+    const TESTNFT2 = await ethers.getContractFactory("TESTNFT");
+    testnft2 = await TESTNFT2.deploy();
+    await testnft2.deployed();
+    console.log("TESTNFT2 ", testnft2.address);
 
     const TileMath = await ethers.getContractFactory("TileMath");
     tileMath = await TileMath.deploy();
@@ -49,14 +55,10 @@ describe("MOPN", function () {
     await governance.deployed();
     console.log("Governance", governance.address);
 
-    const Map = await ethers.getContractFactory("Map", {
-      libraries: {
-        TileMath: tileMath.address,
-      },
-    });
-    map = await Map.deploy();
-    await map.deployed();
-    console.log("Map", map.address);
+    const AuctionHouse = await ethers.getContractFactory("AuctionHouse");
+    auctionHouse = await AuctionHouse.deploy(1677184081, 1677184081);
+    await auctionHouse.deployed();
+    console.log("AuctionHouse", auctionHouse.address);
 
     const Avatar = await ethers.getContractFactory("Avatar", {
       libraries: {
@@ -79,20 +81,24 @@ describe("MOPN", function () {
 
     energydecimals = await energy.decimals();
 
-    const Arsenal = await ethers.getContractFactory("Arsenal");
-    arsenal = await Arsenal.deploy();
-    await arsenal.deployed();
-    console.log("Arsenal", arsenal.address);
+    const Map = await ethers.getContractFactory("Map", {
+      libraries: {
+        TileMath: tileMath.address,
+      },
+    });
+    map = await Map.deploy();
+    await map.deployed();
+    console.log("Map", map.address);
 
-    const PassMetaDataRender = await ethers.getContractFactory("PassMetaDataRender", {
+    const LandMetaDataRender = await ethers.getContractFactory("LandMetaDataRender", {
       libraries: {
         NFTMetaData: nftmetadata.address,
         TileMath: tileMath.address,
       },
     });
-    passMetaDataRender = await PassMetaDataRender.deploy();
-    await passMetaDataRender.deployed();
-    console.log("PassMetaDataRender", passMetaDataRender.address);
+    landMetaDataRender = await LandMetaDataRender.deploy();
+    await landMetaDataRender.deployed();
+    console.log("LandMetaDataRender", landMetaDataRender.address);
 
     const energytransownertx = await energy.transferOwnership(governance.address);
     await energytransownertx.wait();
@@ -100,18 +106,21 @@ describe("MOPN", function () {
     const transownertx = await bomb.transferOwnership(governance.address);
     await transownertx.wait();
 
+    const landtransownertx = await testnft2.transferOwnership(governance.address);
+    await landtransownertx.wait();
+
     const governancesetroottx = await governance.updateWhiteList(
       "0x8a746c884b5d358e2337e88b5da1afe745ffe4a3a5a378819ec41d0979c9931b"
     );
     await governancesetroottx.wait();
 
     const governancesetmopntx = await governance.updateMOPNContracts(
-      arsenal.address,
+      auctionHouse.address,
       avatar.address,
       bomb.address,
       energy.address,
       map.address,
-      map.address
+      testnft2.address
     );
     await governancesetmopntx.wait();
 
@@ -121,12 +130,14 @@ describe("MOPN", function () {
     const avatarsetgovernancecontracttx = await avatar.setGovernanceContract(governance.address);
     await avatarsetgovernancecontracttx.wait();
 
-    const arsenalsetgovernancecontracttx = await arsenal.setGovernanceContract(governance.address);
-    await arsenalsetgovernancecontracttx.wait();
+    const auctionHousesetgovernancecontracttx = await auctionHouse.setGovernanceContract(
+      governance.address
+    );
+    await auctionHousesetgovernancecontracttx.wait();
 
-    const passMetaDataRendersetgovernancecontracttx =
-      await passMetaDataRender.setGovernanceContract(governance.address);
-    await passMetaDataRendersetgovernancecontracttx.wait();
+    const LandMetaDataRendersetgovernancecontracttx =
+      await landMetaDataRender.setGovernanceContract(governance.address);
+    await LandMetaDataRendersetgovernancecontracttx.wait();
   });
 
   it("test mint nft", async function () {
@@ -262,7 +273,7 @@ describe("MOPN", function () {
     console.log(await avatar.getAvatarByNFT(testnft.address, 6));
     console.log(await avatar.getAvatarByNFT(testnft.address, 7));
 
-    // console.log(await passMetaDataRender.constructTokenURI(1));
+    // console.log(await LandMetaDataRender.constructTokenURI(1));
 
     // 1, 0, -1;
     const moveTo4Tx = await avatar.moveTo([10011000, 2, 1, 1, 0, address0]);
@@ -306,14 +317,26 @@ describe("MOPN", function () {
     );
 
     const allowanceTx = await energy.approve(
-      arsenal.address,
-      ethers.BigNumber.from("1000000000000000")
+      auctionHouse.address,
+      ethers.BigNumber.from("10000000000000000")
     );
     await allowanceTx.wait();
 
-    console.log(ethers.utils.formatUnits(await arsenal.getCurrentPrice(), energydecimals));
-    const buybombtx = await arsenal.buy(2);
+    console.log("Current Bomb Data", await auctionHouse.getBombCurrentData());
+
+    console.log(
+      "current 100 bomb price",
+      ethers.utils.formatUnits((await auctionHouse.getBombCurrentPrice()) * 100, energydecimals)
+    );
+    const buybombtx = await auctionHouse.buyBomb(100);
     await buybombtx.wait();
+
+    console.log("Current Bomb Data", await auctionHouse.getBombCurrentData());
+
+    console.log(
+      "wallet balance",
+      ethers.utils.formatUnits(await energy.balanceOf(owner.address), energydecimals)
+    );
 
     // -2 3 -1
     const bombTx = await avatar.bomb(09981003, 1, 0, address0);
@@ -339,8 +362,17 @@ describe("MOPN", function () {
       )
     );
 
-    // console.log(await passMetaDataRender.constructTokenURI(1));
+    console.log("Current Land Data", await auctionHouse.getLandCurrentData());
+    const buylandtx = await auctionHouse.buyLand();
+    await buylandtx.wait();
 
-    console.log(await tileMath.floorCbrt(9));
+    console.log("Current Land Data", await auctionHouse.getLandCurrentData());
+
+    console.log(
+      "wallet balance",
+      ethers.utils.formatUnits(await energy.balanceOf(owner.address), energydecimals)
+    );
+
+    // console.log(await LandMetaDataRender.constructTokenURI(1));
   });
 });

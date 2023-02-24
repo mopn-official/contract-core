@@ -5,15 +5,15 @@ for (let i = 1; i <= 15; i++) {
   tileCoordinate++;
   for (let j = 0; j < 6; j++) {
     for (let k = 0; k < i; k++) {
-      const PassId = MOPNMath.getTilePassId(tileCoordinate);
+      const LandId = MOPNMath.getTileLandId(tileCoordinate);
 
       console.log(
         "coordinate:",
         MOPNMath.coordinateIntToXY(tileCoordinate),
-        " PassId:",
-        PassId,
+        " LandId:",
+        LandId,
         " openstatus:",
-        MOPNMath.checkPassIdOpen(PassId, 1),
+        MOPNMath.checkLandIdOpen(LandId, 1),
         " tile Energy allocation Weight:",
         MOPNMath.getTileEAW(tileCoordinate)
       );

@@ -14,7 +14,7 @@ interface IAvatar {
      * @param tileCoordinate destination tile coordinate
      * @param linkedAvatarId linked same collection avatar Id if you have a collection ally on the map
      * @param avatarId your avatar Id
-     * @param PassId the destination tile's PassId
+     * @param LandId the destination tile's LandId
      * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
      * @param vault cold wallet address
      */
@@ -22,7 +22,7 @@ interface IAvatar {
         uint32 tileCoordinate;
         uint256 linkedAvatarId;
         uint256 avatarId;
-        uint32 PassId;
+        uint32 LandId;
         DelegateWallet delegateWallet;
         address vault;
     }

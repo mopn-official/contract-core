@@ -85,8 +85,8 @@ describe("MOPN", function () {
     const governancesetmaptx = await governance.updateMapContract(map.address);
     await governancesetmaptx.wait();
 
-    const governancesetpasstx = await governance.updatePassContract(map.address);
-    await governancesetpasstx.wait();
+    const governancesetLandtx = await governance.updateLandContract(map.address);
+    await governancesetLandtx.wait();
 
     const governancesetenergytx = await governance.updateEnergyContract(energy.address);
     await governancesetenergytx.wait();

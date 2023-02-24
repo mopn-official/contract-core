@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-error PassIdTilesNotOpen();
+error LandIdTilesNotOpen();
 error linkAvatarError();
 
 interface WarmInterface {
@@ -109,8 +109,8 @@ contract Avatar is IAvatar, Multicall, Ownable {
      * @return avatarDatas avatar datas format struct AvatarDataOutput
      */
     function getAvatarsByNFTs(
-        address[] memory collections,
-        uint256[] memory tokenIds
+        address[] calldata collections,
+        uint256[] calldata tokenIds
     ) public view returns (AvatarDataOutput[] memory avatarDatas) {
         uint256[] memory COIDs = Governance.getCollectionsCOIDs(collections);
         avatarDatas = new AvatarDataOutput[](COIDs.length);
@@ -161,6 +161,8 @@ contract Avatar is IAvatar, Multicall, Ownable {
         width += 1;
         return getAvatarsByCoordinateRange(startCoordinate, width, height);
     }
+
+    //@todo get avatars by coordinate array
 
     /**
      * @notice get avatar collection id
@@ -313,7 +315,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
             params.avatarId,
             COID,
             params.tileCoordinate,
-            params.PassId,
+            params.LandId,
             avatarBombUsed
         );
 
@@ -346,7 +348,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
             params.avatarId,
             COID,
             params.tileCoordinate,
-            params.PassId,
+            params.LandId,
             0
         );
 
@@ -377,7 +379,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 1,
                 avatarId,
                 getAvatarCOID(avatarId),
-                Map.getTilePassId(getAvatarCoordinate(avatarId))
+                Map.getTileLandId(getAvatarCoordinate(avatarId))
             );
         } else {
             Governance.burnBomb(msg.sender, 1, 0, 0, 0);

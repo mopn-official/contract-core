@@ -20,44 +20,45 @@
         let h = 0,
           s = 0,
           l = 0;
-        if (COID == 1) {
-          h = Math.round(360 / 2);
-          s = Math.round(130 / 2);
-          l = Math.round(85 / 2);
-        } else {
-          let i = 0,
-            batch = 1,
-            k = 0,
-            v = 0,
-            step = 0,
-            ht = 0,
-            st = 0,
-            lt = 0;
+        // if (COID == 1) {
+        //   h = Math.round(360 / 2);
+        //   s = Math.round(130 / 2);
+        //   l = Math.round(85 / 2);
+        // } else {
+        let i = 5,
+          batch = 4096,
+          k = 0,
+          v = 0,
+          step = 4096,
+          ht = 0,
+          st = 0,
+          lt = 0;
 
-          while (true) {
-            if (COID < step) {
-              k = 2 ** (i - 1);
-              v = COID - (step - batch);
-              ht = Math.floor(v / (k * k));
-              l = 50 + Math.round((30 / k) * (ht + 0.5));
-              v = v - ht * (k * k);
-              st = Math.floor(v / k);
-              s = 100 - Math.round((45 / k) * (st + 0.5));
-              lt = v - st * k;
-              h = Math.floor((360 / k) * (lt + 0.5));
-              console.log(COID, step, batch, k, ht, st, lt);
-              break;
-            }
-            batch = 8 ** i;
-            step += batch;
-            i++;
+        while (true) {
+          if (COID < step) {
+            COID = (COID % 40) * Math.floor(batch / 40) + Math.floor(COID / 40);
+            k = 2 ** (i - 1);
+            v = COID - (step - batch);
+            ht = Math.floor(v / (k * k));
+            h = Math.round((360 / k) * (ht + 0.5));
+            v = v - ht * (k * k);
+            st = Math.floor(v / k);
+            s = 100 - Math.round((45 / k) * (st + 0.5));
+            lt = v - st * k;
+            l = 50 + Math.floor((30 / k) * (lt + 0.5));
+            console.log(COID, step, batch, k, ht, st, lt);
+            break;
           }
+          batch = 8 ** i;
+          step += batch;
+          i++;
         }
+        // }
         return `hsl(${h},${s}%,${l}%)`;
       }
       $(function () {
-        let COID = 1;
-        for (let i = 0; i < 20; i++) {
+        let COID = 4000;
+        for (let i = 0; i < 100; i++) {
           for (let j = 0; j < 10; j++) {
             const startx = j * 1000;
             const starty = i * 500;
@@ -78,7 +79,7 @@
                 color +
                 "</text></g>"
             );
-            COID++;
+            COID += 1;
           }
         }
         $("body").html($("body").html());
@@ -89,7 +90,7 @@
     <svg
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
-      viewBox="0 0 10000 10000"
+      viewBox="0 0 10000 50000"
       id="svg"
     ></svg>
   </body>

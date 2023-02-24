@@ -18,47 +18,47 @@ library TileMath {
         }
     }
 
-    function PassRingNum(uint32 PassId) public pure returns (uint32 n) {
-        n = uint32((Math.sqrt(9 + 12 * (uint256(PassId) - 1)) - 3) / (6));
-        if ((3 * n * n + 3 * n + 1) == PassId) {
+    function LandRingNum(uint32 LandId) public pure returns (uint32 n) {
+        n = uint32((Math.sqrt(9 + 12 * (uint256(LandId) - 1)) - 3) / (6));
+        if ((3 * n * n + 3 * n + 1) == LandId) {
             return n;
         } else {
             return n + 1;
         }
     }
 
-    function PassRingPos(uint32 PassId) public pure returns (uint32) {
-        uint32 ringNum = PassRingNum(PassId) - 1;
-        return PassId - (3 * ringNum * ringNum + 3 * ringNum + 1);
+    function LandRingPos(uint32 LandId) public pure returns (uint32) {
+        uint32 ringNum = LandRingNum(LandId) - 1;
+        return LandId - (3 * ringNum * ringNum + 3 * ringNum + 1);
     }
 
-    function PassRingStartCenterTile(
-        uint32 PassIdRingNum_
+    function LandRingStartCenterTile(
+        uint32 LandIdRingNum_
     ) public pure returns (uint32) {
         return
-            (1000 - PassIdRingNum_ * 5) * 10000 + (1000 + PassIdRingNum_ * 11);
+            (1000 - LandIdRingNum_ * 5) * 10000 + (1000 + LandIdRingNum_ * 11);
     }
 
-    function PassCenterTile(
-        uint32 PassId
+    function LandCenterTile(
+        uint32 LandId
     ) public pure returns (uint32 tileCoordinate) {
-        if (PassId == 1) {
+        if (LandId == 1) {
             return 10001000;
         }
 
-        uint32 PassIdRingNum_ = PassRingNum(PassId);
+        uint32 LandIdRingNum_ = LandRingNum(LandId);
 
         uint32[3] memory startTile = coordinateIntToArr(
-            PassRingStartCenterTile(PassIdRingNum_)
+            LandRingStartCenterTile(LandIdRingNum_)
         );
 
-        uint32 PassIdRingPos_ = PassRingPos(PassId);
+        uint32 LandIdRingPos_ = LandRingPos(LandId);
 
-        uint32 side = uint32(Math.ceilDiv(PassIdRingPos_, PassIdRingNum_));
+        uint32 side = uint32(Math.ceilDiv(LandIdRingPos_, LandIdRingNum_));
 
         uint32 sidepos = 0;
-        if (PassIdRingNum_ > 1) {
-            sidepos = (PassIdRingPos_ - 1) % PassIdRingNum_;
+        if (LandIdRingNum_ > 1) {
+            sidepos = (LandIdRingPos_ - 1) % LandIdRingNum_;
         }
         if (side == 1) {
             tileCoordinate = (startTile[0] + sidepos * 11) * 10000;
@@ -81,7 +81,7 @@ library TileMath {
         }
     }
 
-    function PassTileRange(
+    function LandTileRange(
         uint32 tileCoordinate
     ) public pure returns (uint32[] memory, uint32[] memory) {
         uint32[] memory xrange = new uint32[](11);
@@ -94,10 +94,10 @@ library TileMath {
         return (xrange, yrange);
     }
 
-    function getPassTilesEAW(
-        uint32 PassId
+    function getLandTilesEAW(
+        uint32 LandId
     ) public pure returns (uint256[] memory) {
-        uint32 tileCoordinate = PassCenterTile(PassId);
+        uint32 tileCoordinate = LandCenterTile(LandId);
         uint256[] memory TilesEAW = new uint256[](91);
         TilesEAW[0] = getTileEAW(tileCoordinate);
         for (uint256 i = 1; i <= 5; i++) {

@@ -1,39 +1,39 @@
-const centerTiles = require("./passCenterTiles.json");
+const centerTiles = require("./LandCenterTiles.json");
 
-function PassRingNum(PassId) {
-  let n = Math.floor((Math.sqrt(9 + 12 * (PassId - 1)) - 3) / 6);
-  if (3 * n * n + 3 * n + 1 == PassId) {
+function LandRingNum(LandId) {
+  let n = Math.floor((Math.sqrt(9 + 12 * (LandId - 1)) - 3) / 6);
+  if (3 * n * n + 3 * n + 1 == LandId) {
     return n;
   } else {
     return n + 1;
   }
 }
 
-function PassRingPos(PassId) {
-  const ringNum = PassRingNum(PassId) - 1;
-  return PassId - (3 * ringNum * ringNum + 3 * ringNum + 1);
+function LandRingPos(LandId) {
+  const ringNum = LandRingNum(LandId) - 1;
+  return LandId - (3 * ringNum * ringNum + 3 * ringNum + 1);
 }
 
-function PassRingStartCenterTile(PassIdRingNum_) {
-  return (1000 - PassIdRingNum_ * 5) * 10000 + (1000 + PassIdRingNum_ * 11);
+function LandRingStartCenterTile(LandIdRingNum_) {
+  return (1000 - LandIdRingNum_ * 5) * 10000 + (1000 + LandIdRingNum_ * 11);
 }
 
-function PassCenterTile(PassId) {
-  if (PassId == 1) {
+function LandCenterTile(LandId) {
+  if (LandId == 1) {
     return 10001000;
   }
 
-  const PassIdRingNum_ = PassRingNum(PassId);
+  const LandIdRingNum_ = LandRingNum(LandId);
 
-  const starttile = coordinateIntToArr(PassRingStartCenterTile(PassIdRingNum_));
+  const starttile = coordinateIntToArr(LandRingStartCenterTile(LandIdRingNum_));
 
-  const PassIdRingPos_ = PassRingPos(PassId);
+  const LandIdRingPos_ = LandRingPos(LandId);
 
-  const side = Math.ceil(PassIdRingPos_ / PassIdRingNum_);
+  const side = Math.ceil(LandIdRingPos_ / LandIdRingNum_);
 
   let sidepos = 0;
-  if (PassIdRingNum_ > 1) {
-    sidepos = (PassIdRingPos_ - 1) % PassIdRingNum_;
+  if (LandIdRingNum_ > 1) {
+    sidepos = (LandIdRingPos_ - 1) % LandIdRingNum_;
   }
 
   let tileCoordinate = 0;
@@ -75,8 +75,8 @@ function coordinateXYToInt(coordinateXY) {
   return (1000 + coordinateXY.x) * 10000 + 1000 + coordinateXY.y;
 }
 
-function getPassTilesEAW(PassId) {
-  let tileCoordinate = PassCenterTile(PassId);
+function getLandTilesEAW(LandId) {
+  let tileCoordinate = LandCenterTile(LandId);
   let TilesEAW = [];
   TilesEAW[0] = getTileEAW(tileCoordinate);
   for (let i = 1; i <= 5; i++) {
@@ -126,7 +126,7 @@ function neighbor(tileCoordinate, direction_) {
   return tileCoordinate + direction(direction_);
 }
 
-function getTilePassId(tileCoordinate) {
+function getTileLandId(tileCoordinate) {
   if (centerTiles[tileCoordinate] != undefined) return centerTiles[tileCoordinate];
   for (let i = 1; i <= 5; i++) {
     tileCoordinate++;
@@ -140,8 +140,8 @@ function getTilePassId(tileCoordinate) {
   return 0;
 }
 
-function checkPassIdOpen(PassId, avatarNum) {
-  let ringNum = PassRingNum(PassId);
+function checkLandIdOpen(LandId, avatarNum) {
+  let ringNum = LandRingNum(LandId);
   if (ringNum == 0) ringNum++;
   if (avatarNum < (ringNum - 1) * 100) {
     return false;
@@ -178,15 +178,15 @@ function hslToHex(h, s, l) {
 }
 
 module.exports = {
-  PassRingNum,
-  PassRingPos,
-  PassRingStartCenterTile,
-  PassCenterTile,
+  LandRingNum,
+  LandRingPos,
+  LandRingStartCenterTile,
+  LandCenterTile,
   getTileEAW,
-  getPassTilesEAW,
+  getLandTilesEAW,
   neighbor,
-  getTilePassId,
-  checkPassIdOpen,
+  getTileLandId,
+  checkLandIdOpen,
   coordinateIntToArr,
   coordinateIntToXY,
   coordinateXYToInt,

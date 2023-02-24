@@ -8,7 +8,7 @@ import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 error TileHasEnemy();
-error PassIdOverflow();
+error LandIdOverflow();
 
 /// @title The M(Map) of MOPN
 /// core contract for MOPN records all avatars on map
@@ -17,20 +17,20 @@ error PassIdOverflow();
 contract Map is Ownable {
     using TileMath for uint32;
 
-    // Tile => avatarId * 10 ** 16 + COID * 10 ** 6 + MOPN Pass Id
+    // Tile => avatarId * 10 ** 16 + COID * 10 ** 6 + MOPN Land Id
     mapping(uint32 => uint256) public tiles;
 
     /**
      * @notice This event emit when an anvatar occupied a tile
      * @param avatarId avatar Id
      * @param COID collection Id
-     * @param PassId MOPN Pass Id
+     * @param LandId MOPN Land Id
      * @param tileCoordinate tile coordinate
      */
     event AvatarSet(
         uint256 indexed avatarId,
         uint256 indexed COID,
-        uint32 indexed PassId,
+        uint32 indexed LandId,
         uint32 tileCoordinate
     );
 
@@ -38,13 +38,13 @@ contract Map is Ownable {
      * @notice This event emit when an anvatar left a tile
      * @param avatarId avatar Id
      * @param COID collection Id
-     * @param PassId MOPN Pass Id
+     * @param LandId MOPN Land Id
      * @param tileCoordinate tile coordinate
      */
     event AvatarRemove(
         uint256 indexed avatarId,
         uint256 indexed COID,
-        uint32 indexed PassId,
+        uint32 indexed LandId,
         uint32 tileCoordinate
     );
 
@@ -67,10 +67,10 @@ contract Map is Ownable {
     }
 
     /**
-     * @notice get MOPN Pass Id which a tile belongs(only have data if someone has occupied this tile before)
+     * @notice get MOPN Land Id which a tile belongs(only have data if someone has occupied this tile before)
      * @param tileCoordinate tile coordinate
      */
-    function getTilePassId(uint32 tileCoordinate) public view returns (uint32) {
+    function getTileLandId(uint32 tileCoordinate) public view returns (uint32) {
         return uint32(tiles[tileCoordinate] % 10 ** 6);
     }
 
@@ -103,7 +103,7 @@ contract Map is Ownable {
      * @param avatarId avatar Id
      * @param COID collection Id
      * @param tileCoordinate tile coordinate
-     * @param PassId MOPN Pass Id
+     * @param LandId MOPN Land Id
      * @param BombUsed avatar bomb used history number
      * @dev can only called by avatar contract
      */
@@ -111,27 +111,27 @@ contract Map is Ownable {
         uint256 avatarId,
         uint256 COID,
         uint32 tileCoordinate,
-        uint32 PassId,
+        uint32 LandId,
         uint256 BombUsed
     ) public onlyAvatar {
         require(getTileAvatar(tileCoordinate) == 0, "dst Occupied");
 
-        if (PassId < 1 || PassId > 10981) {
-            revert PassIdOverflow();
+        if (LandId < 1 || LandId > 10981) {
+            revert LandIdOverflow();
         }
 
-        if (getTilePassId(tileCoordinate) != PassId) {
+        if (getTileLandId(tileCoordinate) != LandId) {
             require(
-                tileCoordinate.distance(PassId.PassCenterTile()) < 6,
-                "PassId error"
+                tileCoordinate.distance(LandId.LandCenterTile()) < 6,
+                "LandId error"
             );
         }
 
-        emit AvatarSet(avatarId, COID, PassId, tileCoordinate);
+        emit AvatarSet(avatarId, COID, LandId, tileCoordinate);
 
         uint256 TileEAW = tileCoordinate.getTileEAW() + BombUsed;
 
-        tiles[tileCoordinate] = avatarId * 10 ** 16 + COID * 10 ** 6 + PassId;
+        tiles[tileCoordinate] = avatarId * 10 ** 16 + COID * 10 ** 6 + LandId;
         tileCoordinate = tileCoordinate.neighbor(4);
 
         for (uint256 i = 0; i < 18; i++) {
@@ -149,7 +149,7 @@ contract Map is Ownable {
             }
         }
 
-        Governance.addEAW(avatarId, COID, PassId, TileEAW);
+        Governance.addEAW(avatarId, COID, LandId, TileEAW);
     }
 
     /**
@@ -164,18 +164,18 @@ contract Map is Ownable {
         uint256 COID,
         uint32 tileCoordinate
     ) public onlyAvatar {
-        uint32 PassId = getTilePassId(tileCoordinate);
-        tiles[tileCoordinate] = PassId;
-        Governance.subEAW(avatarId, COID, PassId);
+        uint32 LandId = getTileLandId(tileCoordinate);
+        tiles[tileCoordinate] = LandId;
+        Governance.subEAW(avatarId, COID, LandId);
 
-        emit AvatarRemove(avatarId, COID, PassId, tileCoordinate);
+        emit AvatarRemove(avatarId, COID, LandId, tileCoordinate);
     }
 
-    modifier checkPassId(uint32 tileCoordinate, uint32 PassId) {
-        if (getTilePassId(tileCoordinate) != PassId) {
+    modifier checkLandId(uint32 tileCoordinate, uint32 LandId) {
+        if (getTileLandId(tileCoordinate) != LandId) {
             require(
-                tileCoordinate.distance(PassId.PassCenterTile()) < 6,
-                "PassId error"
+                tileCoordinate.distance(LandId.LandCenterTile()) < 6,
+                "LandId error"
             );
         }
         _;

@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "hardhat/console.sol";
 import "./interfaces/IAvatar.sol";
 import "./interfaces/IEnergy.sol";
 import "./interfaces/IBomb.sol";
+import "./interfaces/ILand.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -19,16 +21,17 @@ contract Governance is Multicall, Ownable {
 
     uint256 public EnergyProduceStartBlock;
 
-    /// @notice PerEAWMinted * 10 ** 24 + EnergyLastMintedBlock * 10 ** 12 + TotalEAWs
+    /// @notice PerEAWMintedEnergy * 10 ** 24 + EnergyLastMintedBlock * 10 ** 12 + TotalEAWs
     uint256 public EnergyProduceData;
 
+    // @notice AvatarEnergyInbox * 10 ** 50 + PerEAWMintedEnergy * 10 ** 25 + TotalEAWs
     mapping(uint256 => uint256) public AvatarEnergys;
 
     mapping(uint256 => uint256) public CollectionEnergys;
 
-    mapping(uint32 => uint256) public PassHolderEnergys;
+    mapping(uint32 => uint256) public LandHolderEnergys;
 
-    mapping(uint32 => uint256) public PassHolderRedeemed;
+    mapping(uint32 => uint256) public LandHolderRedeemed;
 
     constructor(uint256 EnergyProduceStartBlock_, bool whiteListRequire_) {
         EnergyProduceStartBlock = EnergyProduceStartBlock_;
@@ -60,31 +63,53 @@ contract Governance is Multicall, Ownable {
      * add on map mining energy allocation weight
      * @param avatarId avatar Id
      * @param COID collection Id
-     * @param PassId mopn pass Id
+     * @param LandId mopn Land Id
      * @param amount EAW amount
      */
     function addEAW(
         uint256 avatarId,
         uint256 COID,
-        uint32 PassId,
+        uint32 LandId,
         uint256 amount
     ) public onlyMap {
-        _addEAW(avatarId, COID, PassId, amount);
+        _addEAW(avatarId, COID, LandId, amount);
     }
 
     /**
      * substruct on map mining energy allocation weight
      * @param avatarId avatar Id
      * @param COID collection Id
-     * @param PassId mopn pass Id
+     * @param LandId mopn Land Id
      */
     function subEAW(
         uint256 avatarId,
         uint256 COID,
-        uint32 PassId
+        uint32 LandId
     ) public onlyMap {
-        _subEAW(avatarId, COID, PassId);
+        _subEAW(avatarId, COID, LandId);
     }
+
+    uint256[] EPPBMap = [
+        600000000000,
+        133576606537,
+        29737849684,
+        6620468402,
+        1473899498,
+        328130815,
+        73050994,
+        16263166,
+        3620622,
+        806043,
+        179440,
+        39941,
+        8885,
+        1970,
+        431,
+        87,
+        13
+    ];
+
+    uint256 EPPBZeroTriger = 8211;
 
     /**
      * @notice get current energy produce per block
@@ -92,18 +117,27 @@ contract Governance is Multicall, Ownable {
      */
     function currentEPPB(
         uint256 reduceTimes
-    ) public pure returns (uint256 EPPB) {
-        EPPB = EnergyProducePerBlock;
-        while (true) {
-            if (reduceTimes > 17) {
-                EPPB = (EnergyProducePerBlock * 997 ** 17) / (1000 ** 17);
-            } else {
-                EPPB =
-                    (EnergyProducePerBlock * 997 ** reduceTimes) /
-                    (1000 ** reduceTimes);
-                break;
+    ) public view returns (uint256 EPPB) {
+        if (reduceTimes <= EPPBZeroTriger) {
+            uint256 mapKey = reduceTimes / 500;
+            if (mapKey >= EPPBMap.length) {
+                mapKey = EPPBMap.length - 1;
             }
-            reduceTimes -= 17;
+            EPPB = EPPBMap[mapKey];
+            reduceTimes -= mapKey * 500;
+            if (reduceTimes > 0) {
+                while (true) {
+                    if (reduceTimes > 17) {
+                        EPPB = (EPPB * 997 ** 17) / (1000 ** 17);
+                    } else {
+                        EPPB =
+                            (EPPB * 997 ** reduceTimes) /
+                            (1000 ** reduceTimes);
+                        break;
+                    }
+                    reduceTimes -= 17;
+                }
+            }
         }
     }
 
@@ -344,102 +378,102 @@ contract Governance is Multicall, Ownable {
     }
 
     /**
-     * @notice get pass holder settled minted unclaimed energy
-     * @param PassId MOPN Pass Id
+     * @notice get Land holder settled minted unclaimed energy
+     * @param LandId MOPN Land Id
      */
-    function getPassHolderSettledInboxEnergy(
-        uint32 PassId
+    function getLandHolderSettledInboxEnergy(
+        uint32 LandId
     ) public view returns (uint256) {
-        return PassHolderEnergys[PassId] / 10 ** 50;
+        return LandHolderEnergys[LandId] / 10 ** 50;
     }
 
     /**
-     * @notice get Pass holder settled per energy allocation weight minted energy number
-     * @param PassId MOPN Pass Id
+     * @notice get Land holder settled per energy allocation weight minted energy number
+     * @param LandId MOPN Land Id
      */
-    function getPassHolderPerEAWMinted(
-        uint32 PassId
+    function getLandHolderPerEAWMinted(
+        uint32 LandId
     ) public view returns (uint256) {
-        return (PassHolderEnergys[PassId] % 10 ** 50) / 10 ** 25;
+        return (LandHolderEnergys[LandId] % 10 ** 50) / 10 ** 25;
     }
 
     /**
-     * @notice get Pass holder on map mining energy allocation weight
-     * @param PassId MOPN Pass Id
+     * @notice get Land holder on map mining energy allocation weight
+     * @param LandId MOPN Land Id
      */
-    function getPassHolderEAW(uint32 PassId) public view returns (uint256) {
-        return PassHolderEnergys[PassId] % 10 ** 25;
+    function getLandHolderEAW(uint32 LandId) public view returns (uint256) {
+        return LandHolderEnergys[LandId] % 10 ** 25;
     }
 
     /**
-     * @notice mint Pass holder energy
-     * @param PassId MOPN Pass Id
+     * @notice mint Land holder energy
+     * @param LandId MOPN Land Id
      */
-    function mintPassHolderEnergy(uint32 PassId) public {
+    function mintLandHolderEnergy(uint32 LandId) public {
         uint256 PerEAWMinted = getPerEAWMinted();
-        uint256 PassHolderPerEAWMinted = getPassHolderPerEAWMinted(PassId);
-        if (PassHolderPerEAWMinted < PerEAWMinted) {
-            uint256 PassHolderEAW = getPassHolderEAW(PassId);
-            uint256 PassHolderEnergyInbox = getPassHolderSettledInboxEnergy(
-                PassId
+        uint256 LandHolderPerEAWMinted = getLandHolderPerEAWMinted(LandId);
+        if (LandHolderPerEAWMinted < PerEAWMinted) {
+            uint256 LandHolderEAW = getLandHolderEAW(LandId);
+            uint256 LandHolderEnergyInbox = getLandHolderSettledInboxEnergy(
+                LandId
             );
-            if (PassHolderEAW > 0) {
-                PassHolderEnergyInbox +=
-                    ((PerEAWMinted - PassHolderPerEAWMinted) * PassHolderEAW) /
+            if (LandHolderEAW > 0) {
+                LandHolderEnergyInbox +=
+                    ((PerEAWMinted - LandHolderPerEAWMinted) * LandHolderEAW) /
                     100;
             }
-            PassHolderEnergys[PassId] =
-                PassHolderEnergyInbox *
+            LandHolderEnergys[LandId] =
+                LandHolderEnergyInbox *
                 10 ** 50 +
                 PerEAWMinted *
                 10 ** 25 +
-                PassHolderEAW;
+                LandHolderEAW;
         }
     }
 
     /**
-     * @notice get Pass holder realtime unclaimed minted energy
-     * @param PassId MOPN Pass Id
+     * @notice get Land holder realtime unclaimed minted energy
+     * @param LandId MOPN Land Id
      */
-    function getPassHolderInboxEnergy(
-        uint32 PassId
+    function getLandHolderInboxEnergy(
+        uint32 LandId
     ) public view returns (uint256 inbox) {
         uint256 PerEAWMinted = getPerEAWMinted();
-        inbox = getPassHolderSettledInboxEnergy(PassId);
-        uint256 PassHolderPerEAWMinted = getPassHolderPerEAWMinted(PassId);
-        uint256 PassHolderEAW = getPassHolderEAW(PassId);
+        inbox = getLandHolderSettledInboxEnergy(LandId);
+        uint256 LandHolderPerEAWMinted = getLandHolderPerEAWMinted(LandId);
+        uint256 LandHolderEAW = getLandHolderEAW(LandId);
 
-        if (PassHolderPerEAWMinted < PerEAWMinted && PassHolderEAW > 0) {
+        if (LandHolderPerEAWMinted < PerEAWMinted && LandHolderEAW > 0) {
             inbox +=
-                ((PerEAWMinted - PassHolderPerEAWMinted) * PassHolderEAW) /
+                ((PerEAWMinted - LandHolderPerEAWMinted) * LandHolderEAW) /
                 100;
         }
     }
 
     /**
-     * @notice redeem Pass holder unclaimed minted energy
-     * @param PassId MOPN Pass Id
+     * @notice redeem Land holder unclaimed minted energy
+     * @param LandId MOPN Land Id
      */
-    function redeemPassHolderInboxEnergy(uint32 PassId) public onlyAvatar {
+    function redeemLandHolderInboxEnergy(uint32 LandId) public onlyAvatar {
         require(
-            msg.sender == IERC721(passContract).ownerOf(PassId),
-            "not your pass"
+            msg.sender == IERC721(landContract).ownerOf(LandId),
+            "not your Land"
         );
         settlePerEAWEnergy();
-        mintPassHolderEnergy(PassId);
+        mintLandHolderEnergy(LandId);
 
-        uint256 amount = getPassHolderSettledInboxEnergy(PassId);
+        uint256 amount = getLandHolderSettledInboxEnergy(LandId);
         require(amount > 0, "empty");
 
-        PassHolderEnergys[PassId] = PassHolderEnergys[PassId] % (10 ** 50);
-        PassHolderRedeemed[PassId] += amount;
+        LandHolderEnergys[LandId] = LandHolderEnergys[LandId] % (10 ** 50);
+        LandHolderRedeemed[LandId] += amount;
         IEnergy(energyContract).mint(msg.sender, amount);
     }
 
-    function getPassHolderRedeemed(
-        uint32 PassId
+    function getLandHolderRedeemed(
+        uint32 LandId
     ) public view returns (uint256) {
-        return PassHolderRedeemed[PassId] + getPassHolderInboxEnergy(PassId);
+        return LandHolderRedeemed[LandId] + getLandHolderInboxEnergy(LandId);
     }
 
     bool public whiteListRequire;
@@ -590,31 +624,31 @@ contract Governance is Multicall, Ownable {
         collectionMap[getCollectionContract(COID)] += 1000000;
     }
 
-    address public arsenalContract;
+    address public auctionHouseContract;
     address public avatarContract;
     address public bombContract;
     address public energyContract;
     address public mapContract;
-    address public passContract;
+    address public landContract;
 
     function updateMOPNContracts(
-        address arsenalContract_,
+        address auctionHouseContract_,
         address avatarContract_,
         address bombContract_,
         address energyContract_,
         address mapContract_,
-        address passContract_
+        address landContract_
     ) public onlyOwner {
-        arsenalContract = arsenalContract_;
+        auctionHouseContract = auctionHouseContract_;
         avatarContract = avatarContract_;
         bombContract = bombContract_;
         energyContract = energyContract_;
         mapContract = mapContract_;
-        passContract = passContract_;
+        landContract = landContract_;
     }
 
     // Bomb
-    function mintBomb(address to, uint256 amount) public onlyArsenal {
+    function mintBomb(address to, uint256 amount) public onlyAuctionHouse {
         IBomb(bombContract).mint(to, 1, amount);
     }
 
@@ -623,18 +657,23 @@ contract Governance is Multicall, Ownable {
         uint256 amount,
         uint256 avatarId,
         uint256 COID,
-        uint32 PassId
+        uint32 LandId
     ) public onlyAvatar {
-        if (avatarId > 0 && COID > 0 && PassId > 0) {
-            _addEAW(avatarId, COID, PassId, 1);
+        if (avatarId > 0 && COID > 0 && LandId > 0) {
+            _addEAW(avatarId, COID, LandId, 1);
         }
         IBomb(bombContract).burn(from, 1, amount);
+    }
+
+    // Land
+    function mintLand(address to) public onlyAuctionHouse {
+        ILand(landContract).safeMint(to);
     }
 
     function _addEAW(
         uint256 avatarId,
         uint256 COID,
-        uint32 PassId,
+        uint32 LandId,
         uint256 amount
     ) internal {
         settlePerEAWEnergy();
@@ -643,11 +682,11 @@ contract Governance is Multicall, Ownable {
         AvatarEnergys[avatarId] += amount;
         mintCollectionEnergy(COID);
         CollectionEnergys[COID] += amount;
-        mintPassHolderEnergy(PassId);
-        PassHolderEnergys[PassId] += amount;
+        mintLandHolderEnergy(LandId);
+        LandHolderEnergys[LandId] += amount;
     }
 
-    function _subEAW(uint256 avatarId, uint256 COID, uint32 PassId) internal {
+    function _subEAW(uint256 avatarId, uint256 COID, uint32 LandId) internal {
         settlePerEAWEnergy();
         uint256 amount = getAvatarEAW(avatarId);
         EnergyProduceData -= amount;
@@ -655,12 +694,12 @@ contract Governance is Multicall, Ownable {
         AvatarEnergys[avatarId] -= amount;
         mintCollectionEnergy(COID);
         CollectionEnergys[COID] -= amount;
-        mintPassHolderEnergy(PassId);
-        PassHolderEnergys[PassId] -= amount;
+        mintLandHolderEnergy(LandId);
+        LandHolderEnergys[LandId] -= amount;
     }
 
-    modifier onlyArsenal() {
-        require(msg.sender == arsenalContract, "not allowed");
+    modifier onlyAuctionHouse() {
+        require(msg.sender == auctionHouseContract, "not allowed");
         _;
     }
 

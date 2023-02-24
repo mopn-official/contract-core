@@ -37,20 +37,22 @@ interface IGovernance {
     function addEAW(
         uint256 avatarId,
         uint256 COID,
-        uint32 PassId,
+        uint32 LandId,
         uint256 amount
     ) external;
 
-    function subEAW(uint256 avatarId, uint256 COID, uint32 PassId) external;
+    function subEAW(uint256 avatarId, uint256 COID, uint32 LandId) external;
 
     function mintBomb(address to, uint256 amount) external;
+
+    function mintLand(address to) external;
 
     function burnBomb(
         address from,
         uint256 amount,
         uint256 avatarId,
         uint256 COID,
-        uint32 PassId
+        uint32 LandId
     ) external;
 
     function redeemCollectionInboxEnergy(
@@ -58,8 +60,8 @@ interface IGovernance {
         uint256 COID
     ) external;
 
-    function getPassHolderRedeemed(
-        uint32 PassId
+    function getLandHolderRedeemed(
+        uint32 LandId
     ) external view returns (uint256);
 
     function avatarContract() external view returns (address);
@@ -70,5 +72,5 @@ interface IGovernance {
 
     function mapContract() external view returns (address);
 
-    function passContract() external view returns (address);
+    function landContract() external view returns (address);
 }

@@ -11,11 +11,11 @@ describe("TileMath", function () {
   });
 
   it("test center blocks", async function () {
-    let passId = 17;
+    let LandId = 17;
     while (true) {
-      console.log("passid:", passId, await tilekMath.PassCenterTile(passId));
-      passId++;
-      if (passId > 10981) {
+      console.log("Landid:", LandId, await tilekMath.LandCenterTile(LandId));
+      LandId++;
+      if (LandId > 10981) {
         break;
       }
     }

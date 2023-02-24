@@ -10,12 +10,12 @@ library NFTMetaData {
     using Strings for uint32;
 
     function constructTokenURI(
-        uint32 PassId,
+        uint32 LandId,
         NFTSVG.tileData[] memory tileDatas,
         uint256 EnergyMinted
     ) public pure returns (string memory) {
-        uint32 blockCoordinate = TileMath.PassCenterTile(PassId);
-        uint32 ringNum = TileMath.PassRingNum(PassId);
+        uint32 blockCoordinate = TileMath.LandCenterTile(LandId);
+        uint32 ringNum = TileMath.LandRingNum(LandId);
         string memory coordinateStr = string(
             abi.encodePacked(
                 _int2str(blockCoordinate / 10000),
@@ -35,14 +35,14 @@ library NFTMetaData {
                     "data:application/json;base64,",
                     Base64.encode(
                         abi.encodePacked(
-                            '{"name":"MOPN Pass #',
-                            PassId.toString(),
-                            '", "description":"The Pass is a proof of support for members of the MOPN community. By holding this Pass, you can recycle $ENERGY from 91 tiles centered at the tile (',
+                            '{"name":"MOPN Land #',
+                            LandId.toString(),
+                            '", "description":"The Land is a proof of support for members of the MOPN community. By holding this Land, you can recycle $ENERGY from 91 tiles centered at the tile (',
                             coordinateStr,
-                            ') with a radius of 6 tiles. Other benefits of holding the Pass include participating in community governance and receiving priority access to the upcoming games."'
+                            ') with a radius of 6 tiles. Other benefits of holding the Land include participating in community governance and receiving priority access to the upcoming games."'
                             ', "attributes": ',
                             constructAttributes(
-                                PassId,
+                                LandId,
                                 blockCoordinate,
                                 ringNum,
                                 totalEAW,
@@ -50,7 +50,7 @@ library NFTMetaData {
                             ),
                             ', "image": "',
                             constructTokenImage(
-                                PassId,
+                                LandId,
                                 ringNum,
                                 coordinateStr,
                                 tileDatas
@@ -63,7 +63,7 @@ library NFTMetaData {
     }
 
     function constructAttributes(
-        uint32 PassId,
+        uint32 LandId,
         uint32 blockCoordinate,
         uint32 ringNum,
         uint32 totalEAW,
@@ -79,21 +79,21 @@ library NFTMetaData {
                 Strings.toString(EnergyMinted),
                 '},{"trait_type": "Ring Number", "value": "',
                 Strings.toString(ringNum),
-                '"},{"trait_type": "Pass ID", "display_type": "number", "max_value": 10981, "value":',
-                PassId.toString(),
+                '"},{"trait_type": "Land ID", "display_type": "number", "max_value": 10981, "value":',
+                LandId.toString(),
                 "}]"
             );
     }
 
     function constructTokenImage(
-        uint32 PassId,
+        uint32 LandId,
         uint32 ringNum,
         string memory coordinateStr,
         NFTSVG.tileData[] memory tileDatas
     ) public pure returns (string memory) {
         string memory defs = NFTSVG.generateDefs(ringBgColor(ringNum));
         string memory background = NFTSVG.generateBackground(
-            PassId,
+            LandId,
             coordinateStr
         );
 
@@ -114,7 +114,7 @@ library NFTMetaData {
         uint32 blockCoordinate
     ) public pure returns (bytes memory attributesBytes) {
         (uint32[] memory xrange, uint32[] memory yrange) = TileMath
-            .PassTileRange(blockCoordinate);
+            .LandTileRange(blockCoordinate);
 
         attributesBytes = abi.encodePacked(
             getIntAttributesArray("x", xrange),

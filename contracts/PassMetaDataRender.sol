@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "./interfaces/IPassMetaDataRender.sol";
+import "./interfaces/ILandMetaDataRender.sol";
 import "./interfaces/IMap.sol";
 import "./interfaces/IGovernance.sol";
 import "./libraries/NFTMetaData.sol";
 
-contract PassMetaDataRender is IPassMetaDataRender {
+contract LandMetaDataRender is ILandMetaDataRender {
     IMap private Map;
     IGovernance private Governance;
 
@@ -21,11 +21,11 @@ contract PassMetaDataRender is IPassMetaDataRender {
     }
 
     function constructTokenURI(
-        uint256 PassId_
+        uint256 LandId_
     ) public view returns (string memory) {
-        uint32 PassId = uint32(PassId_);
+        uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
-        uint32 tileCoordinate = TileMath.PassCenterTile(PassId);
+        uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
 
         tileDatas[0].tileEAW = TileMath.getTileEAW(tileCoordinate);
         uint256 COID = Map.getTileCOID(tileCoordinate);
@@ -119,9 +119,9 @@ contract PassMetaDataRender is IPassMetaDataRender {
 
         return
             NFTMetaData.constructTokenURI(
-                PassId,
+                LandId,
                 tileDatas,
-                Governance.getPassHolderRedeemed(PassId)
+                Governance.getLandHolderRedeemed(LandId)
             );
     }
 }

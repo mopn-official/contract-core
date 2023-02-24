@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-interface IPassMetaDataRender {
+interface ILandMetaDataRender {
     function constructTokenURI(
-        uint256 PassId
+        uint256 LandId
     ) external view returns (string memory);
 }

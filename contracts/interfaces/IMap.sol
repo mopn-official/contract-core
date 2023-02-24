@@ -6,7 +6,7 @@ interface IMap {
         uint256 avatarId,
         uint256 COID,
         uint32 tileCoordinate,
-        uint32 PassId,
+        uint32 LandId,
         uint256 BombUsed
     ) external;
 
@@ -26,7 +26,7 @@ interface IMap {
 
     function getTileCOID(uint32 tileCoordinate) external view returns (uint256);
 
-    function getTilePassId(
+    function getTileLandId(
         uint32 tileCoordinate
     ) external view returns (uint32);
 }
