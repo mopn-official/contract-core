@@ -186,7 +186,7 @@ function COIDToColor(COID) {
 }
 
 function getCoordinateMapDiff(startCoordinate, endCoordinate) {
-  const xrange = 90;
+  const xrange = 4;
 
   let width = endCoordinate.x - startCoordinate.x;
   let height;
@@ -197,6 +197,8 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
   } else {
     height = endCoordinate.y - startCoordinate.y;
   }
+
+  console.log(width, height);
 
   let hexes = { add: [], remove: [] };
 
@@ -232,14 +234,14 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
       );
     } else if (width >= 0 && height < 0) {
       hexes.add = getCoordinateByRange(
-        { x: endCoordinate.x - xrange, y: endCoordinate.y + height },
-        xrange * 2 + 1,
-        -height
+        { x: startCoordinate.x + xrange, y: startCoordinate.y + height },
+        width,
+        xrange + 1
       );
       hexes.add = hexes.add.concat(
         getCoordinateByRange(
-          { x: startCoordinate.x + xrange, y: startCoordinate.y - height },
-          width,
+          { x: endCoordinate.x - xrange, y: endCoordinate.y - height },
+          xrange + 1 - width,
           -height
         )
       );
@@ -255,7 +257,7 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
         getCoordinateByRange(
           {
             x: startCoordinate.x - xrange,
-            y: startCoordinate.y + xrange + 1 + height,
+            y: startCoordinate.y + xrange + height,
           },
           width,
           xrange + 1 + height
@@ -339,7 +341,7 @@ function getCoordinateByRange(startCoordinate, width, height) {
 
       coordinate = coordinateIntToXY(
         width > 0
-          ? neighbor(coordinateXYToInt(coordinate), j % 2 == 0 ? 5 : 1)
+          ? neighbor(coordinateXYToInt(coordinate), j % 2 == 0 ? 5 : 0)
           : neighbor(coordinateXYToInt(coordinate), j % 2 == 0 ? 3 : 2)
       );
     }
