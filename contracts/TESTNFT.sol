@@ -17,4 +17,8 @@ contract TESTNFT is ERC721, Ownable {
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
     }
+
+    function nextTokenId() public view returns (uint256) {
+        return _tokenIdCounter.current();
+    }
 }

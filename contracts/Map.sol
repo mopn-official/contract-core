@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
 import "./interfaces/IAvatar.sol";
+import "./interfaces/ILand.sol";
 import "./interfaces/IGovernance.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -90,12 +91,14 @@ contract Map is Ownable {
 
     IAvatar private Avatar;
     IGovernance private Governance;
+    ILand private Land;
 
     function setGovernanceContract(
         address governanceContract_
     ) public onlyOwner {
         Governance = IGovernance(governanceContract_);
         Avatar = IAvatar(Governance.avatarContract());
+        Land = ILand(Governance.landContract());
     }
 
     /**
@@ -125,6 +128,7 @@ contract Map is Ownable {
                 tileCoordinate.distance(LandId.LandCenterTile()) < 6,
                 "LandId error"
             );
+            require(Land.nextTokenId() > LandId, "Land Not Open");
         }
 
         emit AvatarSet(avatarId, COID, LandId, tileCoordinate);

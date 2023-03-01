@@ -129,18 +129,20 @@ contract Avatar is IAvatar, Multicall, Ownable {
      */
     function getAvatarsByCoordinateRange(
         uint32 startCoordinate,
-        uint32 width,
-        uint32 height
+        int32 width,
+        int32 height
     ) public view returns (AvatarDataOutput[] memory avatarDatas) {
         uint32 coordinate = startCoordinate;
-        for (uint256 i = 0; i < height; i++) {
-            for (uint256 j = 0; j < width; j++) {
+        for (uint256 i = 0; i < uint32(height); i++) {
+            for (uint256 j = 0; j < uint32(width); j++) {
                 avatarDatas[coordinate] = getAvatarByAvatarId(
                     Map.getTileAvatar(coordinate)
                 );
-                coordinate = coordinate.neighbor((j % 2 == 0 ? 5 : 1));
+                coordinate = width > 0
+                    ? coordinate.neighbor((j % 2 == 0 ? 5 : 1))
+                    : coordinate.neighbor((j % 2 == 0 ? 3 : 2));
             }
-            startCoordinate = startCoordinate.neighbor(1);
+            startCoordinate = startCoordinate.neighbor(height > 0 ? 1 : 4);
             coordinate = startCoordinate;
         }
     }
@@ -156,9 +158,16 @@ contract Avatar is IAvatar, Multicall, Ownable {
     ) public view returns (AvatarDataOutput[] memory avatarDatas) {
         TileMath.XYCoordinate memory startxy = startCoordinate.coordinateToXY();
         TileMath.XYCoordinate memory endxy = endCoordinate.coordinateToXY();
-        uint32 width = uint32(endxy.x - startxy.x);
-        uint32 height = uint32(startxy.y - endxy.y) - (width / 2);
-        width += 1;
+        int32 width = endxy.x - startxy.x;
+        int32 height;
+        if (width > 0) {
+            height = startxy.y - (width / 2) - endxy.y;
+            width += 1;
+        } else {
+            height = startxy.y + (width / 2) - endxy.y;
+            width -= 1;
+        }
+
         return getAvatarsByCoordinateRange(startCoordinate, width, height);
     }
 

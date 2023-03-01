@@ -81,8 +81,8 @@ interface IAvatar {
      */
     function getAvatarsByCoordinateRange(
         uint32 startCoordinate,
-        uint32 width,
-        uint32 height
+        int32 width,
+        int32 height
     ) external view returns (AvatarDataOutput[] memory avatarDatas);
 
     /**

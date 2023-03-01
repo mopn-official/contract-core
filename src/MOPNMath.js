@@ -150,31 +150,205 @@ function checkLandIdOpen(LandId, avatarNum) {
 }
 
 function COIDToColor(COID) {
-  COID--;
-  const biground = Math.floor(COID / 10800) + 1;
-  const hround = Math.floor((COID % 10800) / 360);
-  const stimes = Math.floor((COID % 360) / 12) + 1;
-  const hslot = COID % 12;
+  let h = 0,
+    s = 0,
+    l = 0;
 
-  const h = hslot * 30 + stimes;
-  const s = 100 - hround * 3;
+  let i = 5,
+    batch = 4096,
+    k = 0,
+    v = 0,
+    step = 4096,
+    ht = 0,
+    st = 0,
+    lt = 0;
 
-  const l = biground % 2 == 1 ? 50 + Math.floor(biground / 2) : 50 - Math.floor(biground / 2);
+  while (true) {
+    if (COID < step) {
+      COID = (COID % 40) * Math.floor(batch / 40) + Math.floor(COID / 40);
+      k = 2 ** (i - 1);
+      v = COID - (step - batch);
+      ht = Math.floor(v / (k * k));
+      h = Math.round((360 / k) * (ht + 0.5));
+      v = v - ht * (k * k);
+      st = Math.floor(v / k);
+      s = 100 - Math.round((45 / k) * (st + 0.5));
+      lt = v - st * k;
+      l = 50 + Math.floor((30 / k) * (lt + 0.5));
+      break;
+    }
+    batch = 8 ** i;
+    step += batch;
+    i++;
+  }
 
-  return hslToHex(h, s, l);
+  return `hsl(${h},${s}%,${l}%)`;
 }
 
-function hslToHex(h, s, l) {
-  l /= 100;
-  const a = (s * Math.min(l, 1 - l)) / 100;
-  const f = (n) => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color)
-      .toString(16)
-      .padStart(2, "0"); // convert to Hex and prefix "0" if needed
-  };
-  return `#${f(0)}${f(8)}${f(4)}`;
+function getCoordinateMapDiff(startCoordinate, endCoordinate) {
+  const xrange = 90;
+
+  let width = endCoordinate.x - startCoordinate.x;
+  let height;
+  if (width > 0) {
+    height = endCoordinate.y - (startCoordinate.y - Math.floor(width / 2));
+  } else if (width < 0) {
+    height = endCoordinate.y - (startCoordinate.y + Math.floor(Math.abs(width) / 2));
+  } else {
+    height = endCoordinate.y - startCoordinate.y;
+  }
+
+  let hexes = { add: [], remove: [] };
+
+  if (width != 0 || height != 0) {
+    if (width >= 0 && height >= 0) {
+      hexes.add = getCoordinateByRange(
+        { x: endCoordinate.x - xrange, y: endCoordinate.y + xrange },
+        xrange * 2 + 1,
+        height
+      );
+
+      hexes.add = hexes.add.concat(
+        getCoordinateByRange(
+          { x: startCoordinate.x + xrange, y: startCoordinate.y },
+          width,
+          xrange + 1 - height
+        )
+      );
+      hexes.remove = getCoordinateByRange(
+        { x: startCoordinate.x - xrange, y: startCoordinate.y + xrange },
+        width,
+        xrange + 1
+      );
+      hexes.remove = hexes.remove.concat(
+        getCoordinateByRange(
+          {
+            x: endCoordinate.x - xrange,
+            y: endCoordinate.y,
+          },
+          xrange * 2 + 1 - width,
+          height
+        )
+      );
+    } else if (width >= 0 && height < 0) {
+      hexes.add = getCoordinateByRange(
+        { x: endCoordinate.x - xrange, y: endCoordinate.y + height },
+        xrange * 2 + 1,
+        -height
+      );
+      hexes.add = hexes.add.concat(
+        getCoordinateByRange(
+          { x: startCoordinate.x + xrange, y: startCoordinate.y - height },
+          width,
+          -height
+        )
+      );
+      hexes.remove = getCoordinateByRange(
+        {
+          x: startCoordinate.x - xrange,
+          y: startCoordinate.y + xrange,
+        },
+        xrange * 2 + 1,
+        -height
+      );
+      hexes.remove = hexes.remove.concat(
+        getCoordinateByRange(
+          {
+            x: startCoordinate.x - xrange,
+            y: startCoordinate.y + xrange + 1 + height,
+          },
+          width,
+          xrange + 1 + height
+        )
+      );
+    } else if (width < 0 && height >= 0) {
+      hexes.add = getCoordinateByRange(
+        {
+          x: endCoordinate.x - xrange,
+          y: endCoordinate.y + xrange,
+        },
+        xrange * 2 + 1,
+        height
+      );
+      hexes.add = hexes.add.concat(
+        getCoordinateByRange({ x: endCoordinate.x - xrange, y: endCoordinate.y + xrange - height })
+      );
+      hexes.remove = getCoordinateByRange(
+        {
+          x: endCoordinate.x + xrange,
+          y: endCoordinate.y - height,
+        },
+        -width,
+        xrange + 1
+      );
+      hexes.remove = hexes.remove.concat(
+        getCoordinateByRange(
+          {
+            x: startCoordinate.x - xrange,
+            y: startCoordinate.y + height,
+          },
+          xrange * 2 + 1,
+          height
+        )
+      );
+    } else if (width < 0 && height < 0) {
+      hexes.add = getCoordinateByRange(
+        {
+          x: endCoordinate.x - xrange,
+          y: endCoordinate.y + xrange,
+        },
+        -width,
+        xrange + 1
+      );
+      hexes.add = hexes.add.concat(
+        getCoordinateByRange(
+          { x: startCoordinate.x - xrange, y: startCoordinate.y },
+          xrange * 2 + 1 + width,
+          -height
+        )
+      );
+      hexes.remove = getCoordinateByRange(
+        {
+          x: startCoordinate.x + xrange,
+          y: startCoordinate.y - xrange,
+        },
+        xrange * 2 + 1,
+        -height
+      );
+      hexes.remove = hexes.remove.concat(
+        getCoordinateByRange(
+          {
+            x: endCoordinate.x + xrange,
+            y: endCoordinate.y,
+          },
+          -width,
+          xrange + 1 + height
+        )
+      );
+    }
+  }
+  return hexes;
+}
+
+function getCoordinateByRange(startCoordinate, width, height) {
+  let coordinates = [];
+  let coordinate = startCoordinate;
+  for (let i = 0; i < Math.abs(height); i++) {
+    for (let j = 0; j < Math.abs(width); j++) {
+      coordinates.push(coordinate);
+
+      coordinate = coordinateIntToXY(
+        width > 0
+          ? neighbor(coordinateXYToInt(coordinate), j % 2 == 0 ? 5 : 1)
+          : neighbor(coordinateXYToInt(coordinate), j % 2 == 0 ? 3 : 2)
+      );
+    }
+    startCoordinate = coordinateIntToXY(
+      neighbor(coordinateXYToInt(startCoordinate), height > 0 ? 1 : 4)
+    );
+    coordinate = startCoordinate;
+  }
+  return coordinates;
 }
 
 module.exports = {
@@ -191,4 +365,5 @@ module.exports = {
   coordinateIntToXY,
   coordinateXYToInt,
   COIDToColor,
+  getCoordinateMapDiff,
 };

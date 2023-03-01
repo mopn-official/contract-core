@@ -211,13 +211,31 @@ library NFTSVG {
     }
 
     function COIDToColor(uint256 COID) public pure returns (string memory) {
-        COID--;
-        uint256 biground = COID / 10800 + 1;
+        uint256 i = 5;
+        uint256 batch = 4096;
+        uint256 step = 4096;
+        uint256 h;
+        uint256 s;
+        uint256 l;
+        while (true) {
+            if (COID < step) {
+                COID = (COID % 40) * (batch / 40) + (COID / 40);
+                uint256 k = 2 ** (i - 1);
+                uint256 v = COID - (step - batch);
+                uint256 ht = (v / (k * k));
+                h = ((360 / k) * (ht * 2 + 1)) / 2;
+                v = v - ht * (k * k);
+                uint256 st = (v / k);
+                s = 100 - ((45 / k) * (st * 2 + 1)) / 2;
+                uint256 lt = v - st * k;
+                l = 50 + ((30 / k) * (lt * 2 + 1)) / 2;
+                break;
+            }
+            batch = 8 ** i;
+            step += batch;
+            i++;
+        }
 
-        uint256 h = (COID % 12) * 30 + (COID % 360) / 12 + 1;
-        uint256 s = 100 - ((COID % 10800) / 360) * 3;
-
-        uint256 l = biground % 2 == 1 ? 50 + biground / 2 : 50 - biground / 2;
         return
             string(
                 abi.encodePacked(
