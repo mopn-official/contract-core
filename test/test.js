@@ -15,6 +15,8 @@ describe("MOPN", function () {
     landMetaDataRender;
 
   it("deploy ", async function () {
+    const [owner] = await ethers.getSigners();
+
     const TESTNFT = await ethers.getContractFactory("TESTNFT");
     testnft = await TESTNFT.deploy();
     await testnft.deployed();
@@ -105,6 +107,12 @@ describe("MOPN", function () {
 
     const transownertx = await bomb.transferOwnership(governance.address);
     await transownertx.wait();
+
+    let minpasstx = await testnft2.safeMint(owner.address);
+    await minpasstx.wait();
+
+    minpasstx = await testnft2.safeMint(owner.address);
+    await minpasstx.wait();
 
     const landtransownertx = await testnft2.transferOwnership(governance.address);
     await landtransownertx.wait();

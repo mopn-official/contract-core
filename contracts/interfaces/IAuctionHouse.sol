@@ -4,8 +4,6 @@ pragma solidity ^0.8.17;
 interface IAuctionHouse {
     function buyBomb(uint256 amount) external;
 
-    function getCurrentRound() external view returns (uint256);
-
     function getBombCurrentPrice() external view returns (uint256);
 
     function getBombCurrentData()
@@ -24,4 +22,6 @@ interface IAuctionHouse {
     function getAgio(address to) external view returns (uint256 agio);
 
     function redeemAgio() external;
+
+    function redeemAgioTo(address to) external;
 }

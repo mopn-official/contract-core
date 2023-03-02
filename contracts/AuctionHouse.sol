@@ -239,10 +239,18 @@ contract AuctionHouse is Multicall, Ownable {
      * @notice redeem the caller's agio
      */
     function redeemAgio() public {
-        uint256 agio = getAgio(msg.sender);
+        _redeemAgio(msg.sender);
+    }
+
+    function redeemAgioTo(address to) public onlyOwner {
+        _redeemAgio(to);
+    }
+
+    function _redeemAgio(address to) internal {
+        uint256 agio = getAgio(to);
         if (agio > 0) {
-            bombWalletData[msg.sender] = 0;
-            Energy.transfer(msg.sender, agio);
+            bombWalletData[to] = 0;
+            Energy.transfer(to, agio);
         }
     }
 

@@ -2,6 +2,36 @@
 pragma solidity ^0.8.17;
 
 interface IGovernance {
+    /**
+     * @notice Delegate Wallet Protocols
+     */
+    enum DelegateWallet {
+        None,
+        DelegateCash,
+        Warm
+    }
+
+    /**
+     * @notice redeem avatar unclaimed minted energy
+     * @param avatarId avatar Id
+     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
+     * @param vault cold wallet address
+     */
+    function redeemAvatarInboxEnergy(
+        uint256 avatarId,
+        DelegateWallet delegateWallet,
+        address vault
+    ) external;
+
+    function redeemCollectionInboxEnergy(
+        uint256 avatarId,
+        uint256 COID
+    ) external;
+
+    function getLandHolderRedeemed(
+        uint32 LandId
+    ) external view returns (uint256);
+
     function getCollectionContract(
         uint256 COID
     ) external view returns (address);
@@ -55,14 +85,7 @@ interface IGovernance {
         uint32 LandId
     ) external;
 
-    function redeemCollectionInboxEnergy(
-        uint256 avatarId,
-        uint256 COID
-    ) external;
-
-    function getLandHolderRedeemed(
-        uint32 LandId
-    ) external view returns (uint256);
+    function redeemAgio() external;
 
     function avatarContract() external view returns (address);
 

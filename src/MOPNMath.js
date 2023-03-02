@@ -185,9 +185,7 @@ function COIDToColor(COID) {
   return `hsl(${h},${s}%,${l}%)`;
 }
 
-function getCoordinateMapDiff(startCoordinate, endCoordinate) {
-  const xrange = 4;
-
+function getCoordinateMapDiff(startCoordinate, endCoordinate, xrange) {
   let width = endCoordinate.x - startCoordinate.x;
   let height;
   if (width > 0) {
@@ -198,8 +196,6 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
     height = endCoordinate.y - startCoordinate.y;
   }
 
-  console.log(width, height);
-
   let hexes = { add: [], remove: [] };
 
   if (width != 0 || height != 0) {
@@ -207,42 +203,42 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
       hexes.add = getCoordinateByRange(
         { x: endCoordinate.x - xrange, y: endCoordinate.y + xrange },
         xrange * 2 + 1,
-        height
+        height + 1
       );
 
       hexes.add = hexes.add.concat(
         getCoordinateByRange(
           { x: startCoordinate.x + xrange, y: startCoordinate.y },
-          width,
+          width + 1,
           xrange + 1 - height
         )
       );
       hexes.remove = getCoordinateByRange(
         { x: startCoordinate.x - xrange, y: startCoordinate.y + xrange },
-        width,
+        width - 1,
         xrange + 1
       );
       hexes.remove = hexes.remove.concat(
         getCoordinateByRange(
           {
             x: endCoordinate.x - xrange,
-            y: endCoordinate.y,
+            y: endCoordinate.y - 1,
           },
           xrange * 2 + 1 - width,
-          height
+          height + 1
         )
       );
     } else if (width >= 0 && height < 0) {
       hexes.add = getCoordinateByRange(
         { x: startCoordinate.x + xrange, y: startCoordinate.y + height },
-        width,
+        width + 1,
         xrange + 1
       );
       hexes.add = hexes.add.concat(
         getCoordinateByRange(
-          { x: endCoordinate.x - xrange, y: endCoordinate.y - height },
-          xrange + 1 - width,
-          -height
+          { x: endCoordinate.x - xrange, y: endCoordinate.y - height - 1 },
+          xrange * 2 + 1 - width,
+          -height + 1
         )
       );
       hexes.remove = getCoordinateByRange(
@@ -273,11 +269,15 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
         height
       );
       hexes.add = hexes.add.concat(
-        getCoordinateByRange({ x: endCoordinate.x - xrange, y: endCoordinate.y + xrange - height })
+        getCoordinateByRange(
+          { x: endCoordinate.x - xrange, y: endCoordinate.y + xrange - height },
+          -width,
+          xrange + 1 - height
+        )
       );
       hexes.remove = getCoordinateByRange(
         {
-          x: endCoordinate.x + xrange,
+          x: endCoordinate.x + xrange + 1,
           y: endCoordinate.y - height,
         },
         -width,
@@ -287,9 +287,9 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
         getCoordinateByRange(
           {
             x: startCoordinate.x - xrange,
-            y: startCoordinate.y + height,
+            y: startCoordinate.y + height - 1,
           },
-          xrange * 2 + 1,
+          xrange * 2 + 1 + width,
           height
         )
       );
@@ -299,14 +299,14 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
           x: endCoordinate.x - xrange,
           y: endCoordinate.y + xrange,
         },
-        -width,
+        -width + 1,
         xrange + 1
       );
       hexes.add = hexes.add.concat(
         getCoordinateByRange(
           { x: startCoordinate.x - xrange, y: startCoordinate.y },
           xrange * 2 + 1 + width,
-          -height
+          -height + 1
         )
       );
       hexes.remove = getCoordinateByRange(
@@ -314,17 +314,17 @@ function getCoordinateMapDiff(startCoordinate, endCoordinate) {
           x: startCoordinate.x + xrange,
           y: startCoordinate.y - xrange,
         },
-        xrange * 2 + 1,
-        -height
+        xrange * 2 + 2,
+        -height - 1
       );
       hexes.remove = hexes.remove.concat(
         getCoordinateByRange(
           {
-            x: endCoordinate.x + xrange,
+            x: endCoordinate.x + xrange + 1,
             y: endCoordinate.y,
           },
           -width,
-          xrange + 1 + height
+          xrange + 1 + height + 1
         )
       );
     }
@@ -341,7 +341,7 @@ function getCoordinateByRange(startCoordinate, width, height) {
 
       coordinate = coordinateIntToXY(
         width > 0
-          ? neighbor(coordinateXYToInt(coordinate), j % 2 == 0 ? 5 : 0)
+          ? neighbor(coordinateXYToInt(coordinate), j % 2 == 0 ? 0 : 5)
           : neighbor(coordinateXYToInt(coordinate), j % 2 == 0 ? 3 : 2)
       );
     }

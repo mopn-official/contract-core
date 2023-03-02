@@ -8,6 +8,7 @@ import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 error LandIdTilesNotOpen();
@@ -80,10 +81,15 @@ contract Avatar is IAvatar, Multicall, Ownable {
     function getAvatarByAvatarId(
         uint256 avatarId
     ) public view returns (AvatarDataOutput memory avatarData) {
-        avatarData.tokenId = avatarNoumenon[avatarId].tokenId;
-        avatarData.COID = getAvatarCOID(avatarId);
-        avatarData.BombUsed = getAvatarBombUsed(avatarId);
-        avatarData.tileCoordinate = getAvatarCoordinate(avatarId);
+        if (avatarNoumenon[avatarId].setData > 0) {
+            avatarData.tokenId = avatarNoumenon[avatarId].tokenId;
+            avatarData.COID = getAvatarCOID(avatarId);
+            avatarData.contractAddress = Governance.getCollectionContract(
+                avatarData.COID
+            );
+            avatarData.BombUsed = getAvatarBombUsed(avatarId);
+            avatarData.tileCoordinate = getAvatarCoordinate(avatarId);
+        }
     }
 
     /**
@@ -96,10 +102,9 @@ contract Avatar is IAvatar, Multicall, Ownable {
         address collection,
         uint256 tokenId
     ) public view returns (AvatarDataOutput memory avatarData) {
-        uint256 avatarId = tokenMap[Governance.getCollectionCOID(collection)][
-            tokenId
-        ];
-        avatarData = getAvatarByAvatarId(avatarId);
+        avatarData = getAvatarByAvatarId(
+            tokenMap[Governance.getCollectionCOID(collection)][tokenId]
+        );
     }
 
     /**
@@ -133,13 +138,16 @@ contract Avatar is IAvatar, Multicall, Ownable {
         int32 height
     ) public view returns (AvatarDataOutput[] memory avatarDatas) {
         uint32 coordinate = startCoordinate;
-        for (uint256 i = 0; i < uint32(height); i++) {
-            for (uint256 j = 0; j < uint32(width); j++) {
+        uint256 widthabs = SignedMath.abs(width);
+        uint256 heightabs = SignedMath.abs(height);
+        avatarDatas = new AvatarDataOutput[](widthabs * heightabs);
+        for (uint256 i = 0; i < heightabs; i++) {
+            for (uint256 j = 0; j < widthabs; j++) {
                 avatarDatas[coordinate] = getAvatarByAvatarId(
                     Map.getTileAvatar(coordinate)
                 );
                 coordinate = width > 0
-                    ? coordinate.neighbor((j % 2 == 0 ? 5 : 1))
+                    ? coordinate.neighbor((j % 2 == 0 ? 5 : 0))
                     : coordinate.neighbor((j % 2 == 0 ? 3 : 2));
             }
             startCoordinate = startCoordinate.neighbor(height > 0 ? 1 : 4);
@@ -171,7 +179,21 @@ contract Avatar is IAvatar, Multicall, Ownable {
         return getAvatarsByCoordinateRange(startCoordinate, width, height);
     }
 
-    //@todo get avatars by coordinate array
+    /**
+     * @notice get avatars by coordinate array
+     * @param coordinates array of coordinates
+     * @return avatarDatas avatar datas format struct AvatarDataOutput
+     */
+    function getAvatarsByCoordinates(
+        uint32[] memory coordinates
+    ) public view returns (AvatarDataOutput[] memory avatarDatas) {
+        avatarDatas = new AvatarDataOutput[](coordinates.length);
+        for (uint256 i; i < coordinates.length; i++) {
+            avatarDatas[coordinates[i]] = getAvatarByAvatarId(
+                Map.getTileAvatar(coordinates[i])
+            );
+        }
+    }
 
     /**
      * @notice get avatar collection id

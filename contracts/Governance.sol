@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
 import "./interfaces/IAvatar.sol";
+import "./interfaces/IAuctionHouse.sol";
 import "./interfaces/IEnergy.sol";
 import "./interfaces/IBomb.sol";
 import "./interfaces/ILand.sol";
@@ -24,14 +25,12 @@ contract Governance is Multicall, Ownable {
     /// @notice PerEAWMintedEnergy * 10 ** 24 + EnergyLastMintedBlock * 10 ** 12 + TotalEAWs
     uint256 public EnergyProduceData;
 
-    // @notice AvatarEnergyInbox * 10 ** 50 + PerEAWMintedEnergy * 10 ** 25 + TotalEAWs
+    // @notice Energy Inbox * 10 ** 52 + Total Minted Energy * 10 ** 32 + PerEAWMintedEnergy * 10 ** 12 + TotalEAWs
     mapping(uint256 => uint256) public AvatarEnergys;
 
     mapping(uint256 => uint256) public CollectionEnergys;
 
     mapping(uint32 => uint256) public LandHolderEnergys;
-
-    mapping(uint32 => uint256) public LandHolderRedeemed;
 
     constructor(uint256 EnergyProduceStartBlock_, bool whiteListRequire_) {
         EnergyProduceStartBlock = EnergyProduceStartBlock_;
@@ -145,44 +144,48 @@ contract Governance is Multicall, Ownable {
      * @notice settle per energy allocation weight mint energy
      */
     function settlePerEAWEnergy() public {
-        uint256 EnergyLastMintedBlock = getEnergyLastMintedBlock();
-
-        if (block.number > EnergyLastMintedBlock) {
-            uint256 TotalEAWs = getTotalEAWs();
-            uint256 PerEAWMinted = getPerEAWMinted();
-            if (TotalEAWs > 0) {
-                uint256 reduceTimes = (EnergyLastMintedBlock -
-                    EnergyProduceStartBlock) / EnergyProduceReduceInterval;
-                uint256 nextReduceBlock = EnergyProduceStartBlock +
-                    EnergyProduceReduceInterval +
-                    reduceTimes *
-                    EnergyProduceReduceInterval;
-
-                while (true) {
-                    if (block.number > nextReduceBlock) {
-                        PerEAWMinted +=
-                            ((nextReduceBlock - EnergyLastMintedBlock) *
-                                currentEPPB(reduceTimes)) /
-                            TotalEAWs;
-                        EnergyLastMintedBlock = nextReduceBlock;
-                        reduceTimes++;
-                        nextReduceBlock += EnergyProduceReduceInterval;
-                    } else {
-                        PerEAWMinted +=
-                            ((block.number - EnergyLastMintedBlock) *
-                                currentEPPB(reduceTimes)) /
-                            TotalEAWs;
-                        break;
-                    }
-                }
-            }
+        if (block.number > getEnergyLastMintedBlock()) {
+            uint256 PerEAWMinted = calcPerEAWEnergy();
             EnergyProduceData =
                 PerEAWMinted *
                 10 ** 24 +
                 block.number *
                 10 ** 12 +
-                TotalEAWs;
+                getTotalEAWs();
         }
+    }
+
+    function calcPerEAWEnergy() public view returns (uint256) {
+        uint256 TotalEAWs = getTotalEAWs();
+        uint256 PerEAWMinted = getPerEAWMinted();
+        if (TotalEAWs > 0) {
+            uint256 EnergyLastMintedBlock = getEnergyLastMintedBlock();
+            uint256 reduceTimes = (EnergyLastMintedBlock -
+                EnergyProduceStartBlock) / EnergyProduceReduceInterval;
+            uint256 nextReduceBlock = EnergyProduceStartBlock +
+                EnergyProduceReduceInterval +
+                reduceTimes *
+                EnergyProduceReduceInterval;
+
+            while (true) {
+                if (block.number > nextReduceBlock) {
+                    PerEAWMinted +=
+                        ((nextReduceBlock - EnergyLastMintedBlock) *
+                            currentEPPB(reduceTimes)) /
+                        TotalEAWs;
+                    EnergyLastMintedBlock = nextReduceBlock;
+                    reduceTimes++;
+                    nextReduceBlock += EnergyProduceReduceInterval;
+                } else {
+                    PerEAWMinted +=
+                        ((block.number - EnergyLastMintedBlock) *
+                            currentEPPB(reduceTimes)) /
+                        TotalEAWs;
+                    break;
+                }
+            }
+        }
+        return PerEAWMinted;
     }
 
     /**
@@ -192,7 +195,13 @@ contract Governance is Multicall, Ownable {
     function getAvatarSettledInboxEnergy(
         uint256 avatarId
     ) public view returns (uint256) {
-        return AvatarEnergys[avatarId] / 10 ** 50;
+        return AvatarEnergys[avatarId] / 10 ** 52;
+    }
+
+    function getAvatarTotalMinted(
+        uint256 avatarId
+    ) public view returns (uint256) {
+        return (AvatarEnergys[avatarId] % 10 ** 52) / 10 ** 32;
     }
 
     /**
@@ -202,7 +211,7 @@ contract Governance is Multicall, Ownable {
     function getAvatarPerEAWMinted(
         uint256 avatarId
     ) public view returns (uint256) {
-        return (AvatarEnergys[avatarId] % 10 ** 50) / 10 ** 25;
+        return (AvatarEnergys[avatarId] % 10 ** 32) / 10 ** 12;
     }
 
     /**
@@ -210,7 +219,7 @@ contract Governance is Multicall, Ownable {
      * @param avatarId avatar Id
      */
     function getAvatarEAW(uint256 avatarId) public view returns (uint256) {
-        return AvatarEnergys[avatarId] % 10 ** 25;
+        return AvatarEnergys[avatarId] % 10 ** 12;
     }
 
     /**
@@ -218,22 +227,16 @@ contract Governance is Multicall, Ownable {
      * @param avatarId avatar Id
      */
     function mintAvatarEnergy(uint256 avatarId) public {
+        uint256 AvatarEAW = getAvatarEAW(avatarId);
         uint256 AvatarPerEAWMinted = getAvatarPerEAWMinted(avatarId);
         uint256 PerEAWMinted = getPerEAWMinted();
-        if (AvatarPerEAWMinted < PerEAWMinted) {
-            uint256 AvatarEAW = getAvatarEAW(avatarId);
-            uint256 AvatarEnergyInbox = getAvatarSettledInboxEnergy(avatarId);
-            if (AvatarEAW > 0) {
-                AvatarEnergyInbox += ((((PerEAWMinted - AvatarPerEAWMinted) *
-                    AvatarEAW) * 90) / 100);
-            }
-
-            AvatarEnergys[avatarId] =
-                AvatarEnergyInbox *
-                10 ** 50 +
-                PerEAWMinted *
-                10 ** 25 +
-                AvatarEAW;
+        if (AvatarPerEAWMinted < PerEAWMinted && AvatarEAW > 0) {
+            AvatarEnergys[avatarId] +=
+                ((((PerEAWMinted - AvatarPerEAWMinted) * AvatarEAW) * 90) /
+                    100) *
+                10 ** 52 +
+                (PerEAWMinted - AvatarPerEAWMinted) *
+                10 ** 12;
         }
     }
 
@@ -244,8 +247,8 @@ contract Governance is Multicall, Ownable {
     function getAvatarInboxEnergy(
         uint256 avatarId
     ) public view returns (uint256 inbox) {
-        uint256 PerEAWMinted = getPerEAWMinted();
         inbox = getAvatarSettledInboxEnergy(avatarId);
+        uint256 PerEAWMinted = calcPerEAWEnergy();
         uint256 AvatarPerEAWMinted = getAvatarPerEAWMinted(avatarId);
         uint256 AvatarEAW = getAvatarEAW(avatarId);
 
@@ -282,7 +285,10 @@ contract Governance is Multicall, Ownable {
         uint256 amount = getAvatarSettledInboxEnergy(avatarId);
         require(amount > 0, "empty");
 
-        AvatarEnergys[avatarId] = AvatarEnergys[avatarId] % (10 ** 50);
+        AvatarEnergys[avatarId] =
+            (AvatarEnergys[avatarId] % (10 ** 52)) +
+            amount *
+            10 ** 32;
         IEnergy(energyContract).mint(msg.sender, amount);
     }
 
@@ -293,7 +299,13 @@ contract Governance is Multicall, Ownable {
     function getCollectionSettledInboxEnergy(
         uint256 COID
     ) public view returns (uint256) {
-        return CollectionEnergys[COID] / 10 ** 50;
+        return CollectionEnergys[COID] / 10 ** 52;
+    }
+
+    function getCollectionTotalMinted(
+        uint256 COID
+    ) public view returns (uint256) {
+        return (CollectionEnergys[COID] % 10 ** 52) / 10 ** 32;
     }
 
     /**
@@ -303,7 +315,7 @@ contract Governance is Multicall, Ownable {
     function getCollectionPerEAWMinted(
         uint256 COID
     ) public view returns (uint256) {
-        return (CollectionEnergys[COID] % 10 ** 50) / 10 ** 25;
+        return (CollectionEnergys[COID] % 10 ** 32) / 10 ** 12;
     }
 
     /**
@@ -311,7 +323,7 @@ contract Governance is Multicall, Ownable {
      * @param COID collection Id
      */
     function getCollectionEAW(uint256 COID) public view returns (uint256) {
-        return CollectionEnergys[COID] % 10 ** 25;
+        return CollectionEnergys[COID] % 10 ** 12;
     }
 
     /**
@@ -319,23 +331,16 @@ contract Governance is Multicall, Ownable {
      * @param COID collection Id
      */
     function mintCollectionEnergy(uint256 COID) public {
+        uint256 CollectionEAW = getCollectionEAW(COID);
         uint256 PerEAWMinted = getPerEAWMinted();
         uint256 CollectionPerEAWMinted = getCollectionPerEAWMinted(COID);
-        if (CollectionPerEAWMinted < PerEAWMinted) {
-            uint256 CollectionEAW = getCollectionEAW(COID);
-            uint256 CollectionEnergyInbox = getCollectionSettledInboxEnergy(
-                COID
-            );
-            if (CollectionEAW > 0) {
-                CollectionEnergyInbox += ((((PerEAWMinted -
-                    CollectionPerEAWMinted) * CollectionEAW) * 9) / 100);
-            }
-            CollectionEnergys[COID] =
-                CollectionEnergyInbox *
-                10 ** 50 +
-                PerEAWMinted *
-                10 ** 25 +
-                CollectionEAW;
+        if (CollectionPerEAWMinted < PerEAWMinted && CollectionEAW > 0) {
+            CollectionEnergys[COID] +=
+                ((((PerEAWMinted - CollectionPerEAWMinted) * CollectionEAW) *
+                    5) / 100) *
+                10 ** 52 +
+                (PerEAWMinted - CollectionPerEAWMinted) *
+                10 ** 12;
         }
     }
 
@@ -346,15 +351,15 @@ contract Governance is Multicall, Ownable {
     function getCollectionInboxEnergy(
         uint256 COID
     ) public view returns (uint256 inbox) {
-        uint256 PerEAWMinted = getPerEAWMinted();
         inbox = getCollectionSettledInboxEnergy(COID);
+        uint256 PerEAWMinted = calcPerEAWEnergy();
         uint256 CollectionPerEAWMinted = getCollectionPerEAWMinted(COID);
         uint256 CollectionEAW = getCollectionEAW(COID);
 
         if (CollectionPerEAWMinted < PerEAWMinted && CollectionEAW > 0) {
             inbox +=
                 (((PerEAWMinted - CollectionPerEAWMinted) * CollectionEAW) *
-                    9) /
+                    5) /
                 100;
         }
     }
@@ -372,8 +377,9 @@ contract Governance is Multicall, Ownable {
         uint256 amount = getCollectionSettledInboxEnergy(COID);
         if (amount > 0) {
             amount = amount / (getCollectionOnMapNum(COID) + 1);
-            CollectionEnergys[COID] -= amount * (10 ** 50);
-            AvatarEnergys[avatarId] += amount * (10 ** 50);
+            CollectionEnergys[COID] -= amount * (10 ** 52);
+            CollectionEnergys[COID] += amount * (10 ** 32);
+            AvatarEnergys[avatarId] += amount * (10 ** 52);
         }
     }
 
@@ -384,7 +390,13 @@ contract Governance is Multicall, Ownable {
     function getLandHolderSettledInboxEnergy(
         uint32 LandId
     ) public view returns (uint256) {
-        return LandHolderEnergys[LandId] / 10 ** 50;
+        return LandHolderEnergys[LandId] / 10 ** 52;
+    }
+
+    function getLandHolderTotalMinted(
+        uint32 LandId
+    ) public view returns (uint256) {
+        return (LandHolderEnergys[LandId] % 10 ** 52) / 10 ** 32;
     }
 
     /**
@@ -394,7 +406,7 @@ contract Governance is Multicall, Ownable {
     function getLandHolderPerEAWMinted(
         uint32 LandId
     ) public view returns (uint256) {
-        return (LandHolderEnergys[LandId] % 10 ** 50) / 10 ** 25;
+        return (LandHolderEnergys[LandId] % 10 ** 32) / 10 ** 12;
     }
 
     /**
@@ -402,7 +414,7 @@ contract Governance is Multicall, Ownable {
      * @param LandId MOPN Land Id
      */
     function getLandHolderEAW(uint32 LandId) public view returns (uint256) {
-        return LandHolderEnergys[LandId] % 10 ** 25;
+        return LandHolderEnergys[LandId] % 10 ** 12;
     }
 
     /**
@@ -410,24 +422,16 @@ contract Governance is Multicall, Ownable {
      * @param LandId MOPN Land Id
      */
     function mintLandHolderEnergy(uint32 LandId) public {
+        uint256 LandHolderEAW = getLandHolderEAW(LandId);
         uint256 PerEAWMinted = getPerEAWMinted();
         uint256 LandHolderPerEAWMinted = getLandHolderPerEAWMinted(LandId);
-        if (LandHolderPerEAWMinted < PerEAWMinted) {
-            uint256 LandHolderEAW = getLandHolderEAW(LandId);
-            uint256 LandHolderEnergyInbox = getLandHolderSettledInboxEnergy(
-                LandId
-            );
-            if (LandHolderEAW > 0) {
-                LandHolderEnergyInbox +=
-                    ((PerEAWMinted - LandHolderPerEAWMinted) * LandHolderEAW) /
-                    100;
-            }
-            LandHolderEnergys[LandId] =
-                LandHolderEnergyInbox *
-                10 ** 50 +
-                PerEAWMinted *
-                10 ** 25 +
-                LandHolderEAW;
+        if (LandHolderPerEAWMinted < PerEAWMinted && LandHolderEAW > 0) {
+            LandHolderEnergys[LandId] +=
+                ((((PerEAWMinted - LandHolderPerEAWMinted) * LandHolderEAW) *
+                    5) / 100) *
+                10 ** 52 +
+                (PerEAWMinted - LandHolderPerEAWMinted) *
+                10 ** 12;
         }
     }
 
@@ -438,14 +442,15 @@ contract Governance is Multicall, Ownable {
     function getLandHolderInboxEnergy(
         uint32 LandId
     ) public view returns (uint256 inbox) {
-        uint256 PerEAWMinted = getPerEAWMinted();
         inbox = getLandHolderSettledInboxEnergy(LandId);
+        uint256 PerEAWMinted = calcPerEAWEnergy();
         uint256 LandHolderPerEAWMinted = getLandHolderPerEAWMinted(LandId);
         uint256 LandHolderEAW = getLandHolderEAW(LandId);
 
         if (LandHolderPerEAWMinted < PerEAWMinted && LandHolderEAW > 0) {
             inbox +=
-                ((PerEAWMinted - LandHolderPerEAWMinted) * LandHolderEAW) /
+                (((PerEAWMinted - LandHolderPerEAWMinted) * LandHolderEAW) *
+                    5) /
                 100;
         }
     }
@@ -465,15 +470,19 @@ contract Governance is Multicall, Ownable {
         uint256 amount = getLandHolderSettledInboxEnergy(LandId);
         require(amount > 0, "empty");
 
-        LandHolderEnergys[LandId] = LandHolderEnergys[LandId] % (10 ** 50);
-        LandHolderRedeemed[LandId] += amount;
+        LandHolderEnergys[LandId] =
+            (LandHolderEnergys[LandId] % (10 ** 52)) +
+            amount *
+            10 ** 32;
+
         IEnergy(energyContract).mint(msg.sender, amount);
     }
 
     function getLandHolderRedeemed(
         uint32 LandId
     ) public view returns (uint256) {
-        return LandHolderRedeemed[LandId] + getLandHolderInboxEnergy(LandId);
+        return
+            getLandHolderTotalMinted(LandId) + getLandHolderInboxEnergy(LandId);
     }
 
     bool public whiteListRequire;
@@ -624,6 +633,28 @@ contract Governance is Multicall, Ownable {
         collectionMap[getCollectionContract(COID)] += 1000000;
     }
 
+    function getCollectionInfo(
+        uint256 COID
+    )
+        public
+        view
+        returns (
+            address collectionAddress,
+            uint256 onMapNum,
+            uint256 avatarNum,
+            uint256 totalEAWs,
+            uint256 totalMinted
+        )
+    {
+        collectionAddress = getCollectionContract(COID);
+        onMapNum = getCollectionOnMapNum(COID);
+        avatarNum = getCollectionAvatarNum(COID);
+        totalEAWs = getCollectionEAW(COID);
+        totalMinted =
+            getCollectionTotalMinted(COID) +
+            getCollectionInboxEnergy(COID);
+    }
+
     address public auctionHouseContract;
     address public avatarContract;
     address public bombContract;
@@ -668,6 +699,10 @@ contract Governance is Multicall, Ownable {
     // Land
     function mintLand(address to) public onlyAuctionHouse {
         ILand(landContract).safeMint(to);
+    }
+
+    function redeemAgio() public {
+        IAuctionHouse(auctionHouseContract).redeemAgioTo(msg.sender);
     }
 
     function _addEAW(

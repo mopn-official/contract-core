@@ -14,7 +14,6 @@ module.exports = {
     },
     goerli: {
       url: process.env.GOERLI_URL,
-      gasPrice: 50000000000,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     sepolia: {

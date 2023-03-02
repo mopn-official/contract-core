@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 interface IAvatar {
     struct AvatarDataOutput {
+        address contractAddress;
         uint256 tokenId;
         uint256 COID;
         uint256 BombUsed;
@@ -93,6 +94,15 @@ interface IAvatar {
     function getAvatarsByStartEndCoordinate(
         uint32 startCoordinate,
         uint32 endCoordinate
+    ) external view returns (AvatarDataOutput[] memory avatarDatas);
+
+    /**
+     * @notice get avatars by coordinate array
+     * @param coordinates array of token Ids
+     * @return avatarDatas avatar datas format struct AvatarDataOutput
+     */
+    function getAvatarsByCoordinates(
+        uint32[] memory coordinates
     ) external view returns (AvatarDataOutput[] memory avatarDatas);
 
     /**
