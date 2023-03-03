@@ -14,3 +14,9 @@ constructor() public
 function safeMint(address to) public
 ```
 
+### nextTokenId
+
+```solidity
+function nextTokenId() public view returns (uint256)
+```
+

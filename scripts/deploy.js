@@ -7,19 +7,19 @@ async function main() {
   // await tileMath.deployed();
   const tileMath = await ethers.getContractAt(
     "TileMath",
-    "0xBC7DEAdB2AF96690D0Ed7B9091e77E54C60A9e01"
+    "0xd1273be7de38269322fef74d6c48857aaac0a3fa"
   );
   console.log("TileMath:", tileMath.address);
 
-  console.log("deploy Arsenal...");
-  // const Arsenal = await ethers.getContractFactory("Arsenal");
-  // const arsenal = await Arsenal.deploy();
-  // await arsenal.deployed();
-  const arsenal = await ethers.getContractAt(
-    "Arsenal",
-    "0xfcAe84E58C853Aff8898E1b958cA31218bc6B364"
+  console.log("deploy AuctionHouse...");
+  // const AuctionHouse = await ethers.getContractFactory("AuctionHouse");
+  // const auctionHouse = await AuctionHouse.deploy(1677825096, 1677825096);
+  // await auctionHouse.deployed();
+  const auctionHouse = await ethers.getContractAt(
+    "AuctionHouse",
+    "0x949F682404d26dB4ad973d775B2D35447CE5de9b"
   );
-  console.log("Arsenal", arsenal.address);
+  console.log("AuctionHouse", auctionHouse.address);
 
   console.log("deploy Avatar...");
   // const Avatar = await ethers.getContractFactory("Avatar", {
@@ -29,21 +29,21 @@ async function main() {
   // });
   // const avatar = await Avatar.deploy();
   // await avatar.deployed();
-  const avatar = await ethers.getContractAt("Avatar", "0xe46E1DA50645448Baf45DA22AaFB45b24f1Db4B9");
+  const avatar = await ethers.getContractAt("Avatar", "0x59865373f6168f2fA498485174E48be8D46b1EB0");
   console.log("Avatar", avatar.address);
 
   console.log("deploy Bomb...");
   // const Bomb = await ethers.getContractFactory("Bomb");
   // const bomb = await Bomb.deploy();
   // await bomb.deployed();
-  const bomb = await ethers.getContractAt("Bomb", "0x2DE1A041fDe1326E26aaC085562A9249Ec287409");
+  const bomb = await ethers.getContractAt("Bomb", "0x9c81Dff5ad4a03F8A2a29b7A27ff729c7870d11E");
   console.log("Bomb", bomb.address);
 
   console.log("deploy Energy...");
-  // const Energy = await ethers.getContractFactory("Energy");
-  // const energy = await Energy.deploy("$Energy", "MOPNE");
-  // await energy.deployed();
-  const energy = await ethers.getContractAt("Energy", "0x04B07B4ec49C89CF59D3FF7e184365402A5aFBEF");
+  const Energy = await ethers.getContractFactory("Energy");
+  const energy = await Energy.deploy("$Energy", "MOPNE");
+  await energy.deployed();
+  // const energy = await ethers.getContractAt("Energy", "0x38D7cb5c9B0f0495fb189D703d7960f0d3e12FB5");
   console.log("Energy", energy.address);
 
   console.log("deploy Governance...");
@@ -52,7 +52,7 @@ async function main() {
   // await governance.deployed();
   const governance = await ethers.getContractAt(
     "Governance",
-    "0xDd9c8Dc7A9Ed13E12253D72FBCc79555ed6811ce"
+    "0x5Bc47286dB347F15526cE342076548a4235DDE0c"
   );
   console.log("Governance", governance.address);
 
@@ -64,22 +64,22 @@ async function main() {
   // });
   // const map = await Map.deploy();
   // await map.deployed();
-  const map = await ethers.getContractAt("Map", "0xBb80001381618Bb7AD4378B5dFb428ce7b4484A2");
+  const map = await ethers.getContractAt("Map", "0xEe275c38F035Aac08C24ebB44B05Af6cDEFDF3Ff");
   console.log("Map", map.address);
 
-  // console.log("transfer Energy owner...");
-  // const energytransownertx = await energy.transferOwnership(governance.address);
-  // await energytransownertx.wait();
-  // console.log("done");
+  console.log("transfer Energy owner...");
+  const energytransownertx = await energy.transferOwnership(governance.address);
+  await energytransownertx.wait();
+  console.log("done");
 
-  // console.log("transfer Bomb owner...");
-  // const bombtransownertx = await bomb.transferOwnership(governance.address);
-  // await bombtransownertx.wait();
-  // console.log("done");
+  console.log("transfer Bomb owner...");
+  const bombtransownertx = await bomb.transferOwnership(governance.address);
+  await bombtransownertx.wait();
+  console.log("done");
 
   console.log("Governance update MOPN Contracts");
   const governancesetmopntx = await governance.updateMOPNContracts(
-    arsenal.address,
+    auctionHouse.address,
     avatar.address,
     bomb.address,
     energy.address,
@@ -89,8 +89,10 @@ async function main() {
   await governancesetmopntx.wait();
   console.log("done");
 
-  console.log("Arsenal update Governance Contract");
-  const arsenalsetgovernancecontracttx = await arsenal.setGovernanceContract(governance.address);
+  console.log("AuctionHouse update Governance Contract");
+  const arsenalsetgovernancecontracttx = await auctionHouse.setGovernanceContract(
+    governance.address
+  );
   await arsenalsetgovernancecontracttx.wait();
   console.log("done");
 

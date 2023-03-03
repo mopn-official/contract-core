@@ -6,10 +6,10 @@
 error TileHasEnemy()
 ```
 
-## PassIdOverflow
+## LandIdOverflow
 
 ```solidity
-error PassIdOverflow()
+error LandIdOverflow()
 ```
 
 ## Map
@@ -25,7 +25,7 @@ mapping(uint32 => uint256) tiles
 ### AvatarSet
 
 ```solidity
-event AvatarSet(uint256 avatarId, uint256 COID, uint32 PassId, uint32 tileCoordinate)
+event AvatarSet(uint256 avatarId, uint256 COID, uint32 LandId, uint32 tileCoordinate)
 ```
 
 This event emit when an anvatar occupied a tile
@@ -36,13 +36,13 @@ This event emit when an anvatar occupied a tile
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
 | COID | uint256 | collection Id |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
 | tileCoordinate | uint32 | tile coordinate |
 
 ### AvatarRemove
 
 ```solidity
-event AvatarRemove(uint256 avatarId, uint256 COID, uint32 PassId, uint32 tileCoordinate)
+event AvatarRemove(uint256 avatarId, uint256 COID, uint32 LandId, uint32 tileCoordinate)
 ```
 
 This event emit when an anvatar left a tile
@@ -53,7 +53,7 @@ This event emit when an anvatar left a tile
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
 | COID | uint256 | collection Id |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
 | tileCoordinate | uint32 | tile coordinate |
 
 ### getTileAvatar
@@ -84,13 +84,13 @@ get the coid of the avatar who is standing on a tile
 | ---- | ---- | ----------- |
 | tileCoordinate | uint32 | tile coordinate |
 
-### getTilePassId
+### getTileLandId
 
 ```solidity
-function getTilePassId(uint32 tileCoordinate) public view returns (uint32)
+function getTileLandId(uint32 tileCoordinate) public view returns (uint32)
 ```
 
-get MOPN Pass Id which a tile belongs(only have data if someone has occupied this tile before)
+get MOPN Land Id which a tile belongs(only have data if someone has occupied this tile before)
 
 #### Parameters
 
@@ -121,7 +121,7 @@ function setGovernanceContract(address governanceContract_) public
 ### avatarSet
 
 ```solidity
-function avatarSet(uint256 avatarId, uint256 COID, uint32 tileCoordinate, uint32 PassId, uint256 BombUsed) public
+function avatarSet(uint256 avatarId, uint256 COID, uint32 tileCoordinate, uint32 LandId, uint256 BombUsed) public
 ```
 
 avatar id occupied a tile
@@ -135,7 +135,7 @@ _can only called by avatar contract_
 | avatarId | uint256 | avatar Id |
 | COID | uint256 | collection Id |
 | tileCoordinate | uint32 | tile coordinate |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
 | BombUsed | uint256 | avatar bomb used history number |
 
 ### avatarRemove
@@ -156,10 +156,10 @@ _can only called by avatar contract_
 | COID | uint256 | collection Id |
 | tileCoordinate | uint32 | tile coordinate |
 
-### checkPassId
+### checkLandId
 
 ```solidity
-modifier checkPassId(uint32 tileCoordinate, uint32 PassId)
+modifier checkLandId(uint32 tileCoordinate, uint32 LandId)
 ```
 
 ### onlyAvatar

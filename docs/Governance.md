@@ -28,7 +28,7 @@ uint256 EnergyProduceStartBlock
 uint256 EnergyProduceData
 ```
 
-PerEAWMinted * 10 ** 24 + EnergyLastMintedBlock * 10 ** 12 + TotalEAWs
+PerEAWMintedEnergy * 10 ** 24 + EnergyLastMintedBlock * 10 ** 12 + TotalEAWs
 
 ### AvatarEnergys
 
@@ -42,10 +42,10 @@ mapping(uint256 => uint256) AvatarEnergys
 mapping(uint256 => uint256) CollectionEnergys
 ```
 
-### PassHolderEnergys
+### LandHolderEnergys
 
 ```solidity
-mapping(uint32 => uint256) PassHolderEnergys
+mapping(uint32 => uint256) LandHolderEnergys
 ```
 
 ### constructor
@@ -81,7 +81,7 @@ get total energy allocation weights
 ### addEAW
 
 ```solidity
-function addEAW(uint256 avatarId, uint256 COID, uint32 PassId, uint256 amount) public
+function addEAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) public
 ```
 
 add on map mining energy allocation weight
@@ -92,13 +92,13 @@ add on map mining energy allocation weight
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
 | COID | uint256 | collection Id |
-| PassId | uint32 | mopn pass Id |
+| LandId | uint32 | mopn Land Id |
 | amount | uint256 | EAW amount |
 
 ### subEAW
 
 ```solidity
-function subEAW(uint256 avatarId, uint256 COID, uint32 PassId) public
+function subEAW(uint256 avatarId, uint256 COID, uint32 LandId) public
 ```
 
 substruct on map mining energy allocation weight
@@ -109,12 +109,24 @@ substruct on map mining energy allocation weight
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
 | COID | uint256 | collection Id |
-| PassId | uint32 | mopn pass Id |
+| LandId | uint32 | mopn Land Id |
+
+### EPPBMap
+
+```solidity
+uint256[] EPPBMap
+```
+
+### EPPBZeroTriger
+
+```solidity
+uint256 EPPBZeroTriger
+```
 
 ### currentEPPB
 
 ```solidity
-function currentEPPB(uint256 reduceTimes) public pure returns (uint256 EPPB)
+function currentEPPB(uint256 reduceTimes) public view returns (uint256 EPPB)
 ```
 
 get current energy produce per block
@@ -133,6 +145,12 @@ function settlePerEAWEnergy() public
 
 settle per energy allocation weight mint energy
 
+### calcPerEAWEnergy
+
+```solidity
+function calcPerEAWEnergy() public view returns (uint256)
+```
+
 ### getAvatarSettledInboxEnergy
 
 ```solidity
@@ -146,6 +164,12 @@ get avatar settled unclaimed minted energy
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
+
+### getAvatarTotalMinted
+
+```solidity
+function getAvatarTotalMinted(uint256 avatarId) public view returns (uint256)
+```
 
 ### getAvatarPerEAWMinted
 
@@ -233,6 +257,12 @@ get collection settled minted unclaimed energy
 | ---- | ---- | ----------- |
 | COID | uint256 | collection Id |
 
+### getCollectionTotalMinted
+
+```solidity
+function getCollectionTotalMinted(uint256 COID) public view returns (uint256)
+```
+
 ### getCollectionPerEAWMinted
 
 ```solidity
@@ -305,89 +335,101 @@ only avatar contract can calls
 | avatarId | uint256 | avatar Id |
 | COID | uint256 | collection Id |
 
-### getPassHolderSettledInboxEnergy
+### getLandHolderSettledInboxEnergy
 
 ```solidity
-function getPassHolderSettledInboxEnergy(uint32 PassId) public view returns (uint256)
+function getLandHolderSettledInboxEnergy(uint32 LandId) public view returns (uint256)
 ```
 
-get pass holder settled minted unclaimed energy
+get Land holder settled minted unclaimed energy
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
 
-### getPassHolderPerEAWMinted
+### getLandHolderTotalMinted
 
 ```solidity
-function getPassHolderPerEAWMinted(uint32 PassId) public view returns (uint256)
+function getLandHolderTotalMinted(uint32 LandId) public view returns (uint256)
 ```
 
-get Pass holder settled per energy allocation weight minted energy number
+### getLandHolderPerEAWMinted
+
+```solidity
+function getLandHolderPerEAWMinted(uint32 LandId) public view returns (uint256)
+```
+
+get Land holder settled per energy allocation weight minted energy number
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
 
-### getPassHolderEAW
+### getLandHolderEAW
 
 ```solidity
-function getPassHolderEAW(uint32 PassId) public view returns (uint256)
+function getLandHolderEAW(uint32 LandId) public view returns (uint256)
 ```
 
-get Pass holder on map mining energy allocation weight
+get Land holder on map mining energy allocation weight
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
 
-### mintPassHolderEnergy
+### mintLandHolderEnergy
 
 ```solidity
-function mintPassHolderEnergy(uint32 PassId) public
+function mintLandHolderEnergy(uint32 LandId) public
 ```
 
-mint Pass holder energy
+mint Land holder energy
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
 
-### getPassHolderInboxEnergy
+### getLandHolderInboxEnergy
 
 ```solidity
-function getPassHolderInboxEnergy(uint32 PassId) public view returns (uint256 inbox)
+function getLandHolderInboxEnergy(uint32 LandId) public view returns (uint256 inbox)
 ```
 
-get Pass holder realtime unclaimed minted energy
+get Land holder realtime unclaimed minted energy
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
 
-### redeemPassHolderInboxEnergy
+### redeemLandHolderInboxEnergy
 
 ```solidity
-function redeemPassHolderInboxEnergy(uint32 PassId) public
+function redeemLandHolderInboxEnergy(uint32 LandId) public
 ```
 
-redeem Pass holder unclaimed minted energy
+redeem Land holder unclaimed minted energy
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| PassId | uint32 | MOPN Pass Id |
+| LandId | uint32 | MOPN Land Id |
+
+### getLandHolderRedeemed
+
+```solidity
+function getLandHolderRedeemed(uint32 LandId) public view returns (uint256)
+```
 
 ### whiteListRequire
 
@@ -573,10 +615,16 @@ get NFT collection minted avatar number
 function addCollectionAvatarNum(uint256 COID) public
 ```
 
-### arsenalContract
+### getCollectionInfo
 
 ```solidity
-address arsenalContract
+function getCollectionInfo(uint256 COID) public view returns (address collectionAddress, uint256 onMapNum, uint256 avatarNum, uint256 totalEAWs, uint256 totalMinted)
+```
+
+### auctionHouseContract
+
+```solidity
+address auctionHouseContract
 ```
 
 ### avatarContract
@@ -603,16 +651,16 @@ address energyContract
 address mapContract
 ```
 
-### passContract
+### landContract
 
 ```solidity
-address passContract
+address landContract
 ```
 
 ### updateMOPNContracts
 
 ```solidity
-function updateMOPNContracts(address arsenalContract_, address avatarContract_, address bombContract_, address energyContract_, address mapContract_, address passContract_) public
+function updateMOPNContracts(address auctionHouseContract_, address avatarContract_, address bombContract_, address energyContract_, address mapContract_, address landContract_) public
 ```
 
 ### mintBomb
@@ -624,25 +672,37 @@ function mintBomb(address to, uint256 amount) public
 ### burnBomb
 
 ```solidity
-function burnBomb(address from, uint256 amount, uint256 avatarId, uint256 COID, uint32 PassId) public
+function burnBomb(address from, uint256 amount, uint256 avatarId, uint256 COID, uint32 LandId) public
+```
+
+### mintLand
+
+```solidity
+function mintLand(address to) public
+```
+
+### redeemAgio
+
+```solidity
+function redeemAgio() public
 ```
 
 ### _addEAW
 
 ```solidity
-function _addEAW(uint256 avatarId, uint256 COID, uint32 PassId, uint256 amount) internal
+function _addEAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) internal
 ```
 
 ### _subEAW
 
 ```solidity
-function _subEAW(uint256 avatarId, uint256 COID, uint32 PassId) internal
+function _subEAW(uint256 avatarId, uint256 COID, uint32 LandId) internal
 ```
 
-### onlyArsenal
+### onlyAuctionHouse
 
 ```solidity
-modifier onlyArsenal()
+modifier onlyAuctionHouse()
 ```
 
 ### onlyAvatar

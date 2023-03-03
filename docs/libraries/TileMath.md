@@ -23,40 +23,40 @@ error TileCoordinateError()
 function check(uint32 tileCoordinate) public pure
 ```
 
-### PassRingNum
+### LandRingNum
 
 ```solidity
-function PassRingNum(uint32 PassId) public pure returns (uint32 n)
+function LandRingNum(uint32 LandId) public pure returns (uint32 n)
 ```
 
-### PassRingPos
+### LandRingPos
 
 ```solidity
-function PassRingPos(uint32 PassId) public pure returns (uint32)
+function LandRingPos(uint32 LandId) public pure returns (uint32)
 ```
 
-### PassRingStartCenterTile
+### LandRingStartCenterTile
 
 ```solidity
-function PassRingStartCenterTile(uint32 PassIdRingNum_) public pure returns (uint32)
+function LandRingStartCenterTile(uint32 LandIdRingNum_) public pure returns (uint32)
 ```
 
-### PassCenterTile
+### LandCenterTile
 
 ```solidity
-function PassCenterTile(uint32 PassId) public pure returns (uint32 tileCoordinate)
+function LandCenterTile(uint32 LandId) public pure returns (uint32 tileCoordinate)
 ```
 
-### PassTileRange
+### LandTileRange
 
 ```solidity
-function PassTileRange(uint32 tileCoordinate) public pure returns (uint32[], uint32[])
+function LandTileRange(uint32 tileCoordinate) public pure returns (uint32[], uint32[])
 ```
 
-### getPassTilesEAW
+### getLandTilesEAW
 
 ```solidity
-function getPassTilesEAW(uint32 PassId) public pure returns (uint256[])
+function getLandTilesEAW(uint32 LandId) public pure returns (uint256[])
 ```
 
 ### getTileEAW

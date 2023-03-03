@@ -459,7 +459,7 @@ contract Governance is Multicall, Ownable {
      * @notice redeem Land holder unclaimed minted energy
      * @param LandId MOPN Land Id
      */
-    function redeemLandHolderInboxEnergy(uint32 LandId) public onlyAvatar {
+    function redeemLandHolderInboxEnergy(uint32 LandId) public {
         require(
             msg.sender == IERC721(landContract).ownerOf(LandId),
             "not your Land"

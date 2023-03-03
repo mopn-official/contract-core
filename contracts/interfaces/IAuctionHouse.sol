@@ -24,4 +24,11 @@ interface IAuctionHouse {
     function redeemAgio() external;
 
     function redeemAgioTo(address to) external;
+
+    function buyLand() external;
+
+    function getLandCurrentData()
+        external
+        view
+        returns (uint256 roundId, uint256 price, uint256 startTimestamp);
 }

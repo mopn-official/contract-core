@@ -2,24 +2,26 @@ const { ethers } = require("hardhat");
 
 async function main() {
   console.log("deploy TileMath...");
-  const TileMath = await ethers.getContractFactory("TileMath");
-  const tileMath = await TileMath.deploy({
-    gasLimit: 5000000,
-  });
-  console.log(tileMath.deployTransaction.hash);
-  await tileMath.deployed();
-  // const tileMath = await ethers.getContractAt(
-  //   "TileMath",
-  //   "0x0AE3768a53d1a7Ab15290A294018DE747725b2da"
-  // );
+  // const TileMath = await ethers.getContractFactory("TileMath");
+  // const tileMath = await TileMath.deploy({
+  //   gasLimit: 5000000,
+  // });
+  // console.log(tileMath.deployTransaction.hash);
+  // await tileMath.deployed();
+  const tileMath = await ethers.getContractAt(
+    "TileMath",
+    "0xd1273be7de38269322fef74d6c48857aaac0a3fa"
+  );
   console.log("TileMath:", tileMath.address);
 
   console.log("deploy NFTSVG...");
   const NFTSVG = await ethers.getContractFactory("NFTSVG");
-  const nftsvg = await NFTSVG.deploy();
+  const nftsvg = await NFTSVG.deploy({
+    gasLimit: 5000000,
+  });
   console.log(nftsvg.deployTransaction.hash);
   await nftsvg.deployed();
-  // const nftsvg = await ethers.getContractAt("NFTSVG", "0x74D483003Cada124Deb24744E786EbE73d9c3cDb");
+  // const nftsvg = await ethers.getContractAt("NFTSVG", "0x0036E1CEaC14cA79DdBa736b202d6C9E0863F4dD");
   console.log("NFTSVG:", nftsvg.address);
 
   console.log("deploy NFTMetaData...");
@@ -34,7 +36,7 @@ async function main() {
   await nftmetadata.deployed();
   // const nftmetadata = await ethers.getContractAt(
   //   "NFTMetaData",
-  //   "0xe1C482EB374318ab5e5bCE34EcDBd3D1B8546f35"
+  //   "0xD8Fce18eb003dC9AE6DC65dd0848Bc4A9694C035"
   // );
   console.log("NFTMetaData:", nftmetadata.address);
 
@@ -50,7 +52,7 @@ async function main() {
   await render.deployed();
   // const render = await ethers.getContractAt(
   //   "LandMetaDataRenderSolo",
-  //   "0x336fD0cA0406B3A57d9519b2767554ff9E3b3CAf"
+  //   "0x6a77e7c1b144EAd03E2f4e240dBB0e723466D6Ef"
   // );
   console.log("LandMetaDataRenderSolo:", render.address);
 }

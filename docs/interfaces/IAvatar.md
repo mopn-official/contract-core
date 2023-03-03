@@ -6,6 +6,7 @@
 
 ```solidity
 struct AvatarDataOutput {
+  address contractAddress;
   uint256 tokenId;
   uint256 COID;
   uint256 BombUsed;
@@ -20,7 +21,7 @@ struct OnMapParams {
   uint32 tileCoordinate;
   uint256 linkedAvatarId;
   uint256 avatarId;
-  uint32 PassId;
+  uint32 LandId;
   enum IAvatar.DelegateWallet delegateWallet;
   address vault;
 }
@@ -107,7 +108,7 @@ get avatar infos by nft contractAddresses and tokenIds
 ### getAvatarsByCoordinateRange
 
 ```solidity
-function getAvatarsByCoordinateRange(uint32 startCoordinate, uint32 width, uint32 height) external view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
+function getAvatarsByCoordinateRange(uint32 startCoordinate, int32 width, int32 height) external view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
 ```
 
 get avatar infos by tile sets start by start coordinate and range by width and height
@@ -117,8 +118,8 @@ get avatar infos by tile sets start by start coordinate and range by width and h
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | startCoordinate | uint32 | start tile coordinate |
-| width | uint32 | range width |
-| height | uint32 | range height |
+| width | int32 | range width |
+| height | int32 | range height |
 
 ### getAvatarsByStartEndCoordinate
 
@@ -134,6 +135,26 @@ get avatar infos by tile sets start by start coordinate and end by end coordinat
 | ---- | ---- | ----------- |
 | startCoordinate | uint32 | start tile coordinate |
 | endCoordinate | uint32 | end tile coordinate |
+
+### getAvatarsByCoordinates
+
+```solidity
+function getAvatarsByCoordinates(uint32[] coordinates) external view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
+```
+
+get avatars by coordinate array
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| coordinates | uint32[] | array of token Ids |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| avatarDatas | struct IAvatar.AvatarDataOutput[] | avatar datas format struct AvatarDataOutput |
 
 ### mintAvatar
 

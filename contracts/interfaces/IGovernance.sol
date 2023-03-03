@@ -11,6 +11,10 @@ interface IGovernance {
         Warm
     }
 
+    function getAvatarInboxEnergy(
+        uint256 avatarId
+    ) external view returns (uint256 inbox);
+
     /**
      * @notice redeem avatar unclaimed minted energy
      * @param avatarId avatar Id
@@ -23,14 +27,37 @@ interface IGovernance {
         address vault
     ) external;
 
+    function getCollectionInboxEnergy(
+        uint256 COID
+    ) external view returns (uint256 inbox);
+
     function redeemCollectionInboxEnergy(
         uint256 avatarId,
         uint256 COID
     ) external;
 
+    function getLandHolderInboxEnergy(
+        uint32 LandId
+    ) external view returns (uint256 inbox);
+
+    function redeemLandHolderInboxEnergy(uint32 LandId) external;
+
     function getLandHolderRedeemed(
         uint32 LandId
     ) external view returns (uint256);
+
+    function getCollectionInfo(
+        uint256 COID
+    )
+        external
+        view
+        returns (
+            address collectionAddress,
+            uint256 onMapNum,
+            uint256 avatarNum,
+            uint256 totalEAWs,
+            uint256 totalMinted
+        );
 
     function getCollectionContract(
         uint256 COID
@@ -75,8 +102,6 @@ interface IGovernance {
 
     function mintBomb(address to, uint256 amount) external;
 
-    function mintLand(address to) external;
-
     function burnBomb(
         address from,
         uint256 amount,
@@ -86,6 +111,8 @@ interface IGovernance {
     ) external;
 
     function redeemAgio() external;
+
+    function mintLand(address to) external;
 
     function avatarContract() external view returns (address);
 

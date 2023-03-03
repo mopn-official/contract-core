@@ -5,7 +5,7 @@
 ### avatarSet
 
 ```solidity
-function avatarSet(uint256 avatarId, uint256 COID, uint32 tileCoordinate, uint32 PassId, uint256 BombUsed) external
+function avatarSet(uint256 avatarId, uint256 COID, uint32 tileCoordinate, uint32 LandId, uint256 BombUsed) external
 ```
 
 ### avatarRemove
@@ -26,9 +26,15 @@ function getTileAvatar(uint32 tileCoordinate) external view returns (uint256)
 function getTilesAvatars(uint32[] tileCoordinates) external view returns (uint256[])
 ```
 
-### getTilePassId
+### getTileCOID
 
 ```solidity
-function getTilePassId(uint32 tileCoordinate) external view returns (uint32)
+function getTileCOID(uint32 tileCoordinate) external view returns (uint256)
+```
+
+### getTileLandId
+
+```solidity
+function getTileLandId(uint32 tileCoordinate) external view returns (uint32)
 ```
 

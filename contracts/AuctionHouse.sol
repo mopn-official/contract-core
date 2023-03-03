@@ -366,9 +366,10 @@ contract AuctionHouse is Multicall, Ownable {
     function getLandCurrentData()
         public
         view
-        returns (uint256 roundId, uint256 price)
+        returns (uint256 roundId, uint256 price, uint256 startTimestamp)
     {
         roundId = getLandRoundId();
         price = getLandCurrentPrice();
+        startTimestamp = getLandRoundStartTimestamp();
     }
 }
