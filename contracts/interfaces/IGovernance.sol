@@ -11,36 +11,33 @@ interface IGovernance {
         Warm
     }
 
-    function getAvatarInboxEnergy(
+    function getAvatarInboxMT(
         uint256 avatarId
     ) external view returns (uint256 inbox);
 
     /**
-     * @notice redeem avatar unclaimed minted energy
+     * @notice redeem avatar unclaimed minted MOPN Tokens
      * @param avatarId avatar Id
      * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
      * @param vault cold wallet address
      */
-    function redeemAvatarInboxEnergy(
+    function redeemAvatarInboxMT(
         uint256 avatarId,
         DelegateWallet delegateWallet,
         address vault
     ) external;
 
-    function getCollectionInboxEnergy(
+    function getCollectionInboxMT(
         uint256 COID
     ) external view returns (uint256 inbox);
 
-    function redeemCollectionInboxEnergy(
-        uint256 avatarId,
-        uint256 COID
-    ) external;
+    function redeemCollectionInboxMT(uint256 avatarId, uint256 COID) external;
 
-    function getLandHolderInboxEnergy(
+    function getLandHolderInboxMT(
         uint32 LandId
     ) external view returns (uint256 inbox);
 
-    function redeemLandHolderInboxEnergy(uint32 LandId) external;
+    function redeemLandHolderInboxMT(uint32 LandId) external;
 
     function getLandHolderRedeemed(
         uint32 LandId
@@ -91,14 +88,14 @@ interface IGovernance {
         uint256 COID
     ) external view returns (uint256);
 
-    function addEAW(
+    function addMTAW(
         uint256 avatarId,
         uint256 COID,
         uint32 LandId,
         uint256 amount
     ) external;
 
-    function subEAW(uint256 avatarId, uint256 COID, uint32 LandId) external;
+    function subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) external;
 
     function mintBomb(address to, uint256 amount) external;
 
@@ -118,7 +115,7 @@ interface IGovernance {
 
     function bombContract() external view returns (address);
 
-    function energyContract() external view returns (address);
+    function mtContract() external view returns (address);
 
     function mapContract() external view returns (address);
 

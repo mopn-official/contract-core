@@ -12,19 +12,19 @@ enum DelegateWallet {
 }
 ```
 
-### getAvatarInboxEnergy
+### getAvatarInboxMT
 
 ```solidity
-function getAvatarInboxEnergy(uint256 avatarId) external view returns (uint256 inbox)
+function getAvatarInboxMT(uint256 avatarId) external view returns (uint256 inbox)
 ```
 
-### redeemAvatarInboxEnergy
+### redeemAvatarInboxMT
 
 ```solidity
-function redeemAvatarInboxEnergy(uint256 avatarId, enum IGovernance.DelegateWallet delegateWallet, address vault) external
+function redeemAvatarInboxMT(uint256 avatarId, enum IGovernance.DelegateWallet delegateWallet, address vault) external
 ```
 
-redeem avatar unclaimed minted energy
+redeem avatar unclaimed minted MOPN Tokens
 
 #### Parameters
 
@@ -34,28 +34,28 @@ redeem avatar unclaimed minted energy
 | delegateWallet | enum IGovernance.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
 | vault | address | cold wallet address |
 
-### getCollectionInboxEnergy
+### getCollectionInboxMT
 
 ```solidity
-function getCollectionInboxEnergy(uint256 COID) external view returns (uint256 inbox)
+function getCollectionInboxMT(uint256 COID) external view returns (uint256 inbox)
 ```
 
-### redeemCollectionInboxEnergy
+### redeemCollectionInboxMT
 
 ```solidity
-function redeemCollectionInboxEnergy(uint256 avatarId, uint256 COID) external
+function redeemCollectionInboxMT(uint256 avatarId, uint256 COID) external
 ```
 
-### getLandHolderInboxEnergy
+### getLandHolderInboxMT
 
 ```solidity
-function getLandHolderInboxEnergy(uint32 LandId) external view returns (uint256 inbox)
+function getLandHolderInboxMT(uint32 LandId) external view returns (uint256 inbox)
 ```
 
-### redeemLandHolderInboxEnergy
+### redeemLandHolderInboxMT
 
 ```solidity
-function redeemLandHolderInboxEnergy(uint32 LandId) external
+function redeemLandHolderInboxMT(uint32 LandId) external
 ```
 
 ### getLandHolderRedeemed
@@ -124,16 +124,16 @@ function subCollectionOnMapNum(uint256 COID) external
 function getCollectionOnMapNum(uint256 COID) external view returns (uint256)
 ```
 
-### addEAW
+### addMTAW
 
 ```solidity
-function addEAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) external
+function addMTAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) external
 ```
 
-### subEAW
+### subMTAW
 
 ```solidity
-function subEAW(uint256 avatarId, uint256 COID, uint32 LandId) external
+function subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) external
 ```
 
 ### mintBomb
@@ -172,10 +172,10 @@ function avatarContract() external view returns (address)
 function bombContract() external view returns (address)
 ```
 
-### energyContract
+### mtContract
 
 ```solidity
-function energyContract() external view returns (address)
+function mtContract() external view returns (address)
 ```
 
 ### mapContract

@@ -27,7 +27,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
         uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
 
-        tileDatas[0].tileEAW = TileMath.getTileEAW(tileCoordinate);
+        tileDatas[0].tileMTAW = TileMath.getTileMTAW(tileCoordinate);
         uint256 COID = Map.getTileCOID(tileCoordinate);
         if (COID > 0) {
             tileDatas[0].color = COID;
@@ -47,7 +47,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
                     index = preringblocks + j * i + k + 1;
-                    tileDatas[index].tileEAW = TileMath.getTileEAW(
+                    tileDatas[index].tileMTAW = TileMath.getTileMTAW(
                         tileCoordinate
                     );
                     COID = Map.getTileCOID(tileCoordinate);
@@ -121,7 +121,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
             NFTMetaData.constructTokenURI(
                 LandId,
                 tileDatas,
-                Governance.getLandHolderRedeemed(LandId)
+                Governance.getLandHolderRedeemed(LandId) / 8
             );
     }
 }

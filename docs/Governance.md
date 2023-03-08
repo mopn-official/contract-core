@@ -4,87 +4,95 @@
 
 _Governance is all other MOPN contract's owner_
 
-### EnergyProducePerBlock
+### MTProducePerBlock
 
 ```solidity
-uint256 EnergyProducePerBlock
+uint256 MTProducePerBlock
 ```
 
-### EnergyProduceReduceInterval
+### MTProduceReduceInterval
 
 ```solidity
-uint256 EnergyProduceReduceInterval
+uint256 MTProduceReduceInterval
 ```
 
-### EnergyProduceStartBlock
+### MTProduceStartBlock
 
 ```solidity
-uint256 EnergyProduceStartBlock
+uint256 MTProduceStartBlock
 ```
 
-### EnergyProduceData
+### MTProduceData
 
 ```solidity
-uint256 EnergyProduceData
+uint256 MTProduceData
 ```
 
-PerEAWMintedEnergy * 10 ** 24 + EnergyLastMintedBlock * 10 ** 12 + TotalEAWs
+PerMTAWMinted * 10 ** 24 + LastPerMTAWMintedCalcBlock * 10 ** 12 + TotalMTAWs
 
-### AvatarEnergys
+### AvatarMTs
 
 ```solidity
-mapping(uint256 => uint256) AvatarEnergys
+mapping(uint256 => uint256) AvatarMTs
 ```
 
-### CollectionEnergys
+MT Inbox * 10 ** 52 + Total Minted MT * 10 ** 32 + PerMTAWMinted * 10 ** 12 + TotalMTAWs
+
+### CollectionMTs
 
 ```solidity
-mapping(uint256 => uint256) CollectionEnergys
+mapping(uint256 => uint256) CollectionMTs
 ```
 
-### LandHolderEnergys
+### LandHolderMTs
 
 ```solidity
-mapping(uint32 => uint256) LandHolderEnergys
+mapping(uint32 => uint256) LandHolderMTs
+```
+
+### MTClaimed
+
+```solidity
+event MTClaimed(address to, uint256 amount)
 ```
 
 ### constructor
 
 ```solidity
-constructor(uint256 EnergyProduceStartBlock_, bool whiteListRequire_) public
+constructor(uint256 MTProduceStartBlock_, bool whiteListRequire_) public
 ```
 
-### getPerEAWMinted
+### getPerMTAWMinted
 
 ```solidity
-function getPerEAWMinted() public view returns (uint256)
+function getPerMTAWMinted() public view returns (uint256)
 ```
 
-get settled Per Energy Allocation Weight minted energy number
+get settled Per MT Allocation Weight minted mopn token number
 
-### getEnergyLastMintedBlock
+### getLastPerMTAWMintedCalcBlock
 
 ```solidity
-function getEnergyLastMintedBlock() public view returns (uint256)
+function getLastPerMTAWMintedCalcBlock() public view returns (uint256)
 ```
 
-get Energy last minted settlement block number
+get MT last minted settlement block number
 
-### getTotalEAWs
+### getTotalMTAWs
 
 ```solidity
-function getTotalEAWs() public view returns (uint256)
+function getTotalMTAWs() public view returns (uint256)
 ```
 
-get total energy allocation weights
+get total mopn token allocation weights
 
-### addEAW
+### addMTAW
 
 ```solidity
-function addEAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) public
+function addMTAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) public
 ```
 
-add on map mining energy allocation weight
+add on map mining mopn token allocation weight
 
 #### Parameters
 
@@ -95,13 +103,13 @@ add on map mining energy allocation weight
 | LandId | uint32 | mopn Land Id |
 | amount | uint256 | EAW amount |
 
-### subEAW
+### subMTAW
 
 ```solidity
-function subEAW(uint256 avatarId, uint256 COID, uint32 LandId) public
+function subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) public
 ```
 
-substruct on map mining energy allocation weight
+substruct on map mining mopn token allocation weight
 
 #### Parameters
 
@@ -111,53 +119,53 @@ substruct on map mining energy allocation weight
 | COID | uint256 | collection Id |
 | LandId | uint32 | mopn Land Id |
 
-### EPPBMap
+### MTPPBMap
 
 ```solidity
-uint256[] EPPBMap
+uint256[] MTPPBMap
 ```
 
-### EPPBZeroTriger
+### MTPPBZeroTriger
 
 ```solidity
-uint256 EPPBZeroTriger
+uint256 MTPPBZeroTriger
 ```
 
-### currentEPPB
+### currentMTPPB
 
 ```solidity
-function currentEPPB(uint256 reduceTimes) public view returns (uint256 EPPB)
+function currentMTPPB(uint256 reduceTimes) public view returns (uint256 MTPPB)
 ```
 
-get current energy produce per block
+get current mopn token produce per block
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| reduceTimes | uint256 | energy produce reduce times |
+| reduceTimes | uint256 | mopn token produce reduce times |
 
-### settlePerEAWEnergy
-
-```solidity
-function settlePerEAWEnergy() public
-```
-
-settle per energy allocation weight mint energy
-
-### calcPerEAWEnergy
+### settlePerMTAWMinted
 
 ```solidity
-function calcPerEAWEnergy() public view returns (uint256)
+function settlePerMTAWMinted() public
 ```
 
-### getAvatarSettledInboxEnergy
+settle per mopn token allocation weight mint mopn token
+
+### calcPerMTAWMinted
 
 ```solidity
-function getAvatarSettledInboxEnergy(uint256 avatarId) public view returns (uint256)
+function calcPerMTAWMinted() public view returns (uint256)
 ```
 
-get avatar settled unclaimed minted energy
+### getAvatarSettledInboxMT
+
+```solidity
+function getAvatarSettledInboxMT(uint256 avatarId) public view returns (uint256)
+```
+
+get avatar settled unclaimed minted mopn token
 
 #### Parameters
 
@@ -171,13 +179,13 @@ get avatar settled unclaimed minted energy
 function getAvatarTotalMinted(uint256 avatarId) public view returns (uint256)
 ```
 
-### getAvatarPerEAWMinted
+### getAvatarPerMTAWMinted
 
 ```solidity
-function getAvatarPerEAWMinted(uint256 avatarId) public view returns (uint256)
+function getAvatarPerMTAWMinted(uint256 avatarId) public view returns (uint256)
 ```
 
-get avatar settled per energy allocation weight minted energy number
+get avatar settled per mopn token allocation weight minted mopn token number
 
 #### Parameters
 
@@ -185,13 +193,13 @@ get avatar settled per energy allocation weight minted energy number
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
 
-### getAvatarEAW
+### getAvatarMTAW
 
 ```solidity
-function getAvatarEAW(uint256 avatarId) public view returns (uint256)
+function getAvatarMTAW(uint256 avatarId) public view returns (uint256)
 ```
 
-get avatar on map mining energy allocation weight
+get avatar on map mining mopn token allocation weight
 
 #### Parameters
 
@@ -199,13 +207,13 @@ get avatar on map mining energy allocation weight
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
 
-### mintAvatarEnergy
+### mintAvatarMT
 
 ```solidity
-function mintAvatarEnergy(uint256 avatarId) public
+function mintAvatarMT(uint256 avatarId) public
 ```
 
-mint avatar energy
+mint avatar mopn token
 
 #### Parameters
 
@@ -213,13 +221,13 @@ mint avatar energy
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
 
-### getAvatarInboxEnergy
+### getAvatarInboxMT
 
 ```solidity
-function getAvatarInboxEnergy(uint256 avatarId) public view returns (uint256 inbox)
+function getAvatarInboxMT(uint256 avatarId) public view returns (uint256 inbox)
 ```
 
-get avatar realtime unclaimed minted energy
+get avatar realtime unclaimed minted mopn token
 
 #### Parameters
 
@@ -227,13 +235,13 @@ get avatar realtime unclaimed minted energy
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
 
-### redeemAvatarInboxEnergy
+### redeemAvatarInboxMT
 
 ```solidity
-function redeemAvatarInboxEnergy(uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault) public
+function redeemAvatarInboxMT(uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault) public
 ```
 
-redeem avatar unclaimed minted energy
+redeem avatar unclaimed minted mopn token
 
 #### Parameters
 
@@ -243,13 +251,29 @@ redeem avatar unclaimed minted energy
 | delegateWallet | enum IAvatar.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
 | vault | address | cold wallet address |
 
-### getCollectionSettledInboxEnergy
+### batchRedeemAvatarInboxMT
 
 ```solidity
-function getCollectionSettledInboxEnergy(uint256 COID) public view returns (uint256)
+function batchRedeemAvatarInboxMT(uint256[] avatarIds, enum IAvatar.DelegateWallet[] delegateWallets, address[] vaults) public
 ```
 
-get collection settled minted unclaimed energy
+batch redeem avatar unclaimed minted mopn token
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| avatarIds | uint256[] | avatar Ids |
+| delegateWallets | enum IAvatar.DelegateWallet[] | Delegate coldwallet to specify hotwallet protocol |
+| vaults | address[] | cold wallet address |
+
+### getCollectionSettledInboxMT
+
+```solidity
+function getCollectionSettledInboxMT(uint256 COID) public view returns (uint256)
+```
+
+get collection settled minted unclaimed mopn token
 
 #### Parameters
 
@@ -263,13 +287,13 @@ get collection settled minted unclaimed energy
 function getCollectionTotalMinted(uint256 COID) public view returns (uint256)
 ```
 
-### getCollectionPerEAWMinted
+### getCollectionPerMTAWMinted
 
 ```solidity
-function getCollectionPerEAWMinted(uint256 COID) public view returns (uint256)
+function getCollectionPerMTAWMinted(uint256 COID) public view returns (uint256)
 ```
 
-get collection settled per energy allocation weight minted energy number
+get collection settled per mopn token allocation weight minted mopn token number
 
 #### Parameters
 
@@ -277,13 +301,13 @@ get collection settled per energy allocation weight minted energy number
 | ---- | ---- | ----------- |
 | COID | uint256 | collection Id |
 
-### getCollectionEAW
+### getCollectionMTAW
 
 ```solidity
-function getCollectionEAW(uint256 COID) public view returns (uint256)
+function getCollectionMTAW(uint256 COID) public view returns (uint256)
 ```
 
-get collection on map mining energy allocation weight
+get collection on map mining mopn token allocation weight
 
 #### Parameters
 
@@ -291,13 +315,13 @@ get collection on map mining energy allocation weight
 | ---- | ---- | ----------- |
 | COID | uint256 | collection Id |
 
-### mintCollectionEnergy
+### mintCollectionMT
 
 ```solidity
-function mintCollectionEnergy(uint256 COID) public
+function mintCollectionMT(uint256 COID) public
 ```
 
-mint collection energy
+mint collection mopn token
 
 #### Parameters
 
@@ -305,13 +329,13 @@ mint collection energy
 | ---- | ---- | ----------- |
 | COID | uint256 | collection Id |
 
-### getCollectionInboxEnergy
+### getCollectionInboxMT
 
 ```solidity
-function getCollectionInboxEnergy(uint256 COID) public view returns (uint256 inbox)
+function getCollectionInboxMT(uint256 COID) public view returns (uint256 inbox)
 ```
 
-get collection realtime unclaimed minted energy
+get collection realtime unclaimed minted mopn token
 
 #### Parameters
 
@@ -319,13 +343,13 @@ get collection realtime unclaimed minted energy
 | ---- | ---- | ----------- |
 | COID | uint256 | collection Id |
 
-### redeemCollectionInboxEnergy
+### redeemCollectionInboxMT
 
 ```solidity
-function redeemCollectionInboxEnergy(uint256 avatarId, uint256 COID) public
+function redeemCollectionInboxMT(uint256 avatarId, uint256 COID) public
 ```
 
-redeem 1/collectionOnMapNFTNumber of collection unclaimed minted energy to a avatar
+redeem 1/collectionOnMapNFTNumber of collection unclaimed minted mopn token to a avatar
 only avatar contract can calls
 
 #### Parameters
@@ -335,13 +359,13 @@ only avatar contract can calls
 | avatarId | uint256 | avatar Id |
 | COID | uint256 | collection Id |
 
-### getLandHolderSettledInboxEnergy
+### getLandHolderSettledInboxMT
 
 ```solidity
-function getLandHolderSettledInboxEnergy(uint32 LandId) public view returns (uint256)
+function getLandHolderSettledInboxMT(uint32 LandId) public view returns (uint256)
 ```
 
-get Land holder settled minted unclaimed energy
+get Land holder settled minted unclaimed mopn token
 
 #### Parameters
 
@@ -355,13 +379,13 @@ get Land holder settled minted unclaimed energy
 function getLandHolderTotalMinted(uint32 LandId) public view returns (uint256)
 ```
 
-### getLandHolderPerEAWMinted
+### getLandHolderPerMTAWMinted
 
 ```solidity
-function getLandHolderPerEAWMinted(uint32 LandId) public view returns (uint256)
+function getLandHolderPerMTAWMinted(uint32 LandId) public view returns (uint256)
 ```
 
-get Land holder settled per energy allocation weight minted energy number
+get Land holder settled per mopn token allocation weight minted mopn token number
 
 #### Parameters
 
@@ -369,13 +393,13 @@ get Land holder settled per energy allocation weight minted energy number
 | ---- | ---- | ----------- |
 | LandId | uint32 | MOPN Land Id |
 
-### getLandHolderEAW
+### getLandHolderMTAW
 
 ```solidity
-function getLandHolderEAW(uint32 LandId) public view returns (uint256)
+function getLandHolderMTAW(uint32 LandId) public view returns (uint256)
 ```
 
-get Land holder on map mining energy allocation weight
+get Land holder on map mining mopn token allocation weight
 
 #### Parameters
 
@@ -383,13 +407,13 @@ get Land holder on map mining energy allocation weight
 | ---- | ---- | ----------- |
 | LandId | uint32 | MOPN Land Id |
 
-### mintLandHolderEnergy
+### mintLandHolderMT
 
 ```solidity
-function mintLandHolderEnergy(uint32 LandId) public
+function mintLandHolderMT(uint32 LandId) public
 ```
 
-mint Land holder energy
+mint Land holder mopn token
 
 #### Parameters
 
@@ -397,13 +421,13 @@ mint Land holder energy
 | ---- | ---- | ----------- |
 | LandId | uint32 | MOPN Land Id |
 
-### getLandHolderInboxEnergy
+### getLandHolderInboxMT
 
 ```solidity
-function getLandHolderInboxEnergy(uint32 LandId) public view returns (uint256 inbox)
+function getLandHolderInboxMT(uint32 LandId) public view returns (uint256 inbox)
 ```
 
-get Land holder realtime unclaimed minted energy
+get Land holder realtime unclaimed minted mopn token
 
 #### Parameters
 
@@ -411,13 +435,13 @@ get Land holder realtime unclaimed minted energy
 | ---- | ---- | ----------- |
 | LandId | uint32 | MOPN Land Id |
 
-### redeemLandHolderInboxEnergy
+### redeemLandHolderInboxMT
 
 ```solidity
-function redeemLandHolderInboxEnergy(uint32 LandId) public
+function redeemLandHolderInboxMT(uint32 LandId) public
 ```
 
-redeem Land holder unclaimed minted energy
+redeem Land holder unclaimed minted mopn token
 
 #### Parameters
 
@@ -618,7 +642,7 @@ function addCollectionAvatarNum(uint256 COID) public
 ### getCollectionInfo
 
 ```solidity
-function getCollectionInfo(uint256 COID) public view returns (address collectionAddress, uint256 onMapNum, uint256 avatarNum, uint256 totalEAWs, uint256 totalMinted)
+function getCollectionInfo(uint256 COID) public view returns (address collectionAddress, uint256 onMapNum, uint256 avatarNum, uint256 totalMTAWs, uint256 totalMinted)
 ```
 
 ### auctionHouseContract
@@ -639,10 +663,10 @@ address avatarContract
 address bombContract
 ```
 
-### energyContract
+### mtContract
 
 ```solidity
-address energyContract
+address mtContract
 ```
 
 ### mapContract
@@ -660,7 +684,7 @@ address landContract
 ### updateMOPNContracts
 
 ```solidity
-function updateMOPNContracts(address auctionHouseContract_, address avatarContract_, address bombContract_, address energyContract_, address mapContract_, address landContract_) public
+function updateMOPNContracts(address auctionHouseContract_, address avatarContract_, address bombContract_, address mtContract_, address mapContract_, address landContract_) public
 ```
 
 ### mintBomb
@@ -687,16 +711,16 @@ function mintLand(address to) public
 function redeemAgio() public
 ```
 
-### _addEAW
+### _addMTAW
 
 ```solidity
-function _addEAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) internal
+function _addMTAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) internal
 ```
 
-### _subEAW
+### _subMTAW
 
 ```solidity
-function _subEAW(uint256 avatarId, uint256 COID, uint32 LandId) internal
+function _subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) internal
 ```
 
 ### onlyAuctionHouse

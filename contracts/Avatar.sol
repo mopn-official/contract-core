@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "hardhat/console.sol";
 import "./interfaces/IAvatar.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IMap.sol";
@@ -36,18 +37,57 @@ interface DelegateCashInterface {
 contract Avatar is IAvatar, Multicall, Ownable {
     struct AvatarData {
         uint256 tokenId;
+        /// @notice avatar bomb used number * 10 ** 18 + avatar nft collection id * 10 ** 10 + avatar on map coordinate
         uint256 setData;
     }
 
     using Math for uint256;
     using TileMath for uint32;
 
+    event AvatarMint(uint256 indexed avatarId, uint256 indexed COID);
+
+    /**
+     * @notice This event emit when an avatar jump into the map
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     * @param LandId MOPN Land Id
+     * @param tileCoordinate tile coordinate
+     */
+    event AvatarJumpIn(
+        uint256 indexed avatarId,
+        uint256 indexed COID,
+        uint32 indexed LandId,
+        uint32 tileCoordinate
+    );
+
+    /**
+     * @notice This event emit when an avatar move on map
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     * @param LandId MOPN Land Id
+     * @param fromCoordinate tile coordinate
+     * @param toCoordinate tile coordinate
+     */
+    event AvatarMove(
+        uint256 indexed avatarId,
+        uint256 indexed COID,
+        uint32 indexed LandId,
+        uint32 fromCoordinate,
+        uint32 toCoordinate
+    );
+
     /**
      * @notice BombUse Event emit when a Bomb is used at a coordinate by an avatar
      * @param avatarId avatarId that has indexed
      * @param tileCoordinate the tileCoordinate
+     * @param victims thje victims that bombed out of the map
      */
-    event BombUse(uint256 indexed avatarId, uint32 tileCoordinate);
+    event BombUse(
+        uint256 indexed avatarId,
+        uint32 tileCoordinate,
+        uint256[] victims,
+        uint32[] victimsCoordinates
+    );
 
     /** 
         avatar storage map
@@ -143,9 +183,10 @@ contract Avatar is IAvatar, Multicall, Ownable {
         avatarDatas = new AvatarDataOutput[](widthabs * heightabs);
         for (uint256 i = 0; i < heightabs; i++) {
             for (uint256 j = 0; j < widthabs; j++) {
-                avatarDatas[coordinate] = getAvatarByAvatarId(
+                avatarDatas[i * widthabs + j] = getAvatarByAvatarId(
                     Map.getTileAvatar(coordinate)
                 );
+                console.log(coordinate);
                 coordinate = width > 0
                     ? coordinate.neighbor((j % 2 == 0 ? 5 : 0))
                     : coordinate.neighbor((j % 2 == 0 ? 3 : 2));
@@ -307,7 +348,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         bytes32[] memory proofs,
         DelegateWallet delegateWallet,
         address vault
-    ) public returns (uint256) {
+    ) public {
         require(
             msg.sender ==
                 ownerOf(collectionContract, tokenId, delegateWallet, vault),
@@ -322,7 +363,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         avatarNoumenon[currentAvatarId].tokenId = tokenId;
 
         tokenMap[COID][tokenId] = currentAvatarId;
-        return currentAvatarId;
+        emit AvatarMint(currentAvatarId, COID);
     }
 
     /**
@@ -340,19 +381,25 @@ contract Avatar is IAvatar, Multicall, Ownable {
         require(getAvatarCoordinate(params.avatarId) == 0, "avatar is on map");
 
         uint256 COID = getAvatarCOID(params.avatarId);
-        uint256 avatarBombUsed = getAvatarBombUsed(params.avatarId);
 
         Map.avatarSet(
             params.avatarId,
             COID,
             params.tileCoordinate,
             params.LandId,
-            avatarBombUsed
+            getAvatarBombUsed(params.avatarId)
         );
 
         setAvatarCoordinate(params.avatarId, params.tileCoordinate);
         Governance.addCollectionOnMapNum(COID);
-        Governance.redeemCollectionInboxEnergy(params.avatarId, COID);
+        Governance.redeemCollectionInboxMT(params.avatarId, COID);
+
+        emit AvatarJumpIn(
+            params.avatarId,
+            COID,
+            params.LandId,
+            params.tileCoordinate
+        );
     }
 
     /**
@@ -368,22 +415,27 @@ contract Avatar is IAvatar, Multicall, Ownable {
         linkCheck(params)
     {
         uint256 COID = getAvatarCOID(params.avatarId);
-        require(getAvatarCoordinate(params.avatarId) != 0, "avatar not on map");
-        Map.avatarRemove(
-            params.avatarId,
-            COID,
-            getAvatarCoordinate(params.avatarId)
-        );
+        uint32 orgCoordinate = getAvatarCoordinate(params.avatarId);
+        require(orgCoordinate != 0, "avatar not on map");
+        Map.avatarRemove(orgCoordinate, 0);
 
         Map.avatarSet(
             params.avatarId,
             COID,
             params.tileCoordinate,
             params.LandId,
-            0
+            getAvatarBombUsed(params.avatarId)
         );
 
         setAvatarCoordinate(params.avatarId, params.tileCoordinate);
+
+        emit AvatarMove(
+            params.avatarId,
+            COID,
+            params.LandId,
+            orgCoordinate,
+            params.tileCoordinate
+        );
     }
 
     /**
@@ -416,20 +468,31 @@ contract Avatar is IAvatar, Multicall, Ownable {
             Governance.burnBomb(msg.sender, 1, 0, 0, 0);
         }
 
-        uint256 attackAvatarId;
+        uint256[] memory attackAvatarIds = new uint256[](7);
+        uint32[] memory victimsCoordinates = new uint32[](7);
         for (uint256 i = 0; i < 7; i++) {
-            attackAvatarId = Map.getTileAvatar(tileCoordinate);
+            uint256 attackAvatarId = Map.avatarRemove(tileCoordinate, avatarId);
+
             if (i == 0) {
                 tileCoordinate = tileCoordinate.neighbor(4);
             } else {
                 tileCoordinate = tileCoordinate.neighbor(i - 1);
             }
-            if (attackAvatarId == 0 || attackAvatarId == avatarId) {
+
+            if (attackAvatarId == 0) {
                 continue;
             }
-            deFeat(attackAvatarId);
+            setAvatarCoordinate(attackAvatarId, 0);
+            Governance.subCollectionOnMapNum(getAvatarCOID(attackAvatarId));
+            attackAvatarIds[i] = attackAvatarId;
+            victimsCoordinates[i] = tileCoordinate;
         }
-        emit BombUse(avatarId, tileCoordinate);
+        emit BombUse(
+            avatarId,
+            tileCoordinate,
+            attackAvatarIds,
+            victimsCoordinates
+        );
     }
 
     function addAvatarBombUsed(uint256 avatarId) internal {
@@ -444,16 +507,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
             avatarNoumenon[avatarId].setData -
             (avatarNoumenon[avatarId].setData % 10 ** 8) +
             uint256(tileCoordinate);
-    }
-
-    function deFeat(uint256 avatarId) internal {
-        Map.avatarRemove(
-            avatarId,
-            getAvatarCOID(avatarId),
-            getAvatarCoordinate(avatarId)
-        );
-        setAvatarCoordinate(avatarId, 0);
-        Governance.subCollectionOnMapNum(getAvatarCOID(avatarId));
     }
 
     modifier ownerCheck(

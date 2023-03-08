@@ -22,34 +22,6 @@ contract Map is Ownable {
     mapping(uint32 => uint256) public tiles;
 
     /**
-     * @notice This event emit when an anvatar occupied a tile
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     * @param LandId MOPN Land Id
-     * @param tileCoordinate tile coordinate
-     */
-    event AvatarSet(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        uint32 indexed LandId,
-        uint32 tileCoordinate
-    );
-
-    /**
-     * @notice This event emit when an anvatar left a tile
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     * @param LandId MOPN Land Id
-     * @param tileCoordinate tile coordinate
-     */
-    event AvatarRemove(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        uint32 indexed LandId,
-        uint32 tileCoordinate
-    );
-
-    /**
      * @notice get the avatar Id who is standing on a tile
      * @param tileCoordinate tile coordinate
      */
@@ -119,11 +91,12 @@ contract Map is Ownable {
     ) public onlyAvatar {
         require(getTileAvatar(tileCoordinate) == 0, "dst Occupied");
 
-        if (LandId < 1 || LandId > 10981) {
+        if (LandId >= 10981) {
             revert LandIdOverflow();
         }
 
         if (getTileLandId(tileCoordinate) != LandId) {
+            console.log(LandId, LandId.LandCenterTile());
             require(
                 tileCoordinate.distance(LandId.LandCenterTile()) < 6,
                 "LandId error"
@@ -131,9 +104,7 @@ contract Map is Ownable {
             require(Land.nextTokenId() > LandId, "Land Not Open");
         }
 
-        emit AvatarSet(avatarId, COID, LandId, tileCoordinate);
-
-        uint256 TileEAW = tileCoordinate.getTileEAW() + BombUsed;
+        uint256 TileMTAW = tileCoordinate.getTileMTAW() + BombUsed;
 
         tiles[tileCoordinate] = avatarId * 10 ** 16 + COID * 10 ** 6 + LandId;
         tileCoordinate = tileCoordinate.neighbor(4);
@@ -153,26 +124,24 @@ contract Map is Ownable {
             }
         }
 
-        Governance.addEAW(avatarId, COID, LandId, TileEAW);
+        Governance.addMTAW(avatarId, COID, LandId, TileMTAW);
     }
 
     /**
      * @notice avatar id left a tile
-     * @param avatarId avatar Id
-     * @param COID collection Id
      * @param tileCoordinate tile coordinate
      * @dev can only called by avatar contract
      */
     function avatarRemove(
-        uint256 avatarId,
-        uint256 COID,
-        uint32 tileCoordinate
-    ) public onlyAvatar {
-        uint32 LandId = getTileLandId(tileCoordinate);
-        tiles[tileCoordinate] = LandId;
-        Governance.subEAW(avatarId, COID, LandId);
-
-        emit AvatarRemove(avatarId, COID, LandId, tileCoordinate);
+        uint32 tileCoordinate,
+        uint256 excludeAvatarId
+    ) public onlyAvatar returns (uint256 avatarId) {
+        avatarId = getTileAvatar(tileCoordinate);
+        if (avatarId > 0 && avatarId != excludeAvatarId) {
+            uint32 LandId = getTileLandId(tileCoordinate);
+            Governance.subMTAW(avatarId, getTileCOID(tileCoordinate), LandId);
+            tiles[tileCoordinate] = LandId;
+        }
     }
 
     modifier checkLandId(uint32 tileCoordinate, uint32 LandId) {

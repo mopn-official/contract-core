@@ -11,10 +11,9 @@ interface IMap {
     ) external;
 
     function avatarRemove(
-        uint256 avatarId,
-        uint256 COID,
-        uint32 tileCoordinate
-    ) external;
+        uint32 tileCoordinate,
+        uint256 excludeAvatarId
+    ) external returns (uint256);
 
     function getTileAvatar(
         uint32 tileCoordinate

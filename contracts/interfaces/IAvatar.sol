@@ -119,7 +119,7 @@ interface IAvatar {
         bytes32[] memory proofs,
         DelegateWallet delegateWallet,
         address vault
-    ) external returns (uint256);
+    ) external;
 
     /**
      * @notice an off map avatar jump in to the map

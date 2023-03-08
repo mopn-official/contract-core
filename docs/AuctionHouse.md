@@ -44,6 +44,12 @@ mapping(address => uint256) bombWalletData
 _record the last participate round auction data
 wallet address => total spend * 10 ** 14 + auction amount * 10 ** 11 + roundId * 10 + agio redeem status_
 
+### BombSold
+
+```solidity
+event BombSold(address buyer, uint256 amount, uint256 price)
+```
+
 ### constructor
 
 ```solidity
@@ -57,7 +63,7 @@ function setGovernanceContract(address governanceContract_) public
 ```
 
 _set the governance contract address
-this function also get the energy contract from the governances_
+this function also get the mopn token contract from the governances_
 
 #### Parameters
 

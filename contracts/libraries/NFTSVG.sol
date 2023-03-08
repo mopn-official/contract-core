@@ -16,7 +16,7 @@ library NFTSVG {
 
     struct tileData {
         uint256 color;
-        uint256 tileEAW;
+        uint256 tileMTAW;
     }
 
     function getBlock(
@@ -148,7 +148,7 @@ library NFTSVG {
         for (uint256 i = 0; i < tileDatas.length; i++) {
             output = abi.encodePacked(
                 output,
-                getBlock(co, tileDatas[i].tileEAW, tileDatas[i].color)
+                getBlock(co, tileDatas[i].tileMTAW, tileDatas[i].color)
             );
 
             if (ringPos >= ringNum * 6) {

@@ -22,40 +22,6 @@ _This Contract's owner must transfer to Governance Contract once it's deployed_
 mapping(uint32 => uint256) tiles
 ```
 
-### AvatarSet
-
-```solidity
-event AvatarSet(uint256 avatarId, uint256 COID, uint32 LandId, uint32 tileCoordinate)
-```
-
-This event emit when an anvatar occupied a tile
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| LandId | uint32 | MOPN Land Id |
-| tileCoordinate | uint32 | tile coordinate |
-
-### AvatarRemove
-
-```solidity
-event AvatarRemove(uint256 avatarId, uint256 COID, uint32 LandId, uint32 tileCoordinate)
-```
-
-This event emit when an anvatar left a tile
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| LandId | uint32 | MOPN Land Id |
-| tileCoordinate | uint32 | tile coordinate |
-
 ### getTileAvatar
 
 ```solidity

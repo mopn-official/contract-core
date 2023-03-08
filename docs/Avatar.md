@@ -41,10 +41,51 @@ struct AvatarData {
 }
 ```
 
+### AvatarMint
+
+```solidity
+event AvatarMint(uint256 avatarId, uint256 COID)
+```
+
+### AvatarJumpIn
+
+```solidity
+event AvatarJumpIn(uint256 avatarId, uint256 COID, uint32 LandId, uint32 tileCoordinate)
+```
+
+This event emit when an avatar jump into the map
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| avatarId | uint256 | avatar Id |
+| COID | uint256 | collection Id |
+| LandId | uint32 | MOPN Land Id |
+| tileCoordinate | uint32 | tile coordinate |
+
+### AvatarMove
+
+```solidity
+event AvatarMove(uint256 avatarId, uint256 COID, uint32 LandId, uint32 fromCoordinate, uint32 toCoordinate)
+```
+
+This event emit when an avatar move on map
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| avatarId | uint256 | avatar Id |
+| COID | uint256 | collection Id |
+| LandId | uint32 | MOPN Land Id |
+| fromCoordinate | uint32 | tile coordinate |
+| toCoordinate | uint32 | tile coordinate |
+
 ### BombUse
 
 ```solidity
-event BombUse(uint256 avatarId, uint32 tileCoordinate)
+event BombUse(uint256 avatarId, uint32 tileCoordinate, uint256[] victims)
 ```
 
 BombUse Event emit when a Bomb is used at a coordinate by an avatar
@@ -55,6 +96,7 @@ BombUse Event emit when a Bomb is used at a coordinate by an avatar
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatarId that has indexed |
 | tileCoordinate | uint32 | the tileCoordinate |
+| victims | uint256[] | thje victims that bombed out of the map |
 
 ### avatarNoumenon
 
@@ -326,7 +368,7 @@ get the original owner of a avatar linked nft
 ### mintAvatar
 
 ```solidity
-function mintAvatar(address collectionContract, uint256 tokenId, bytes32[] proofs, enum IAvatar.DelegateWallet delegateWallet, address vault) public returns (uint256)
+function mintAvatar(address collectionContract, uint256 tokenId, bytes32[] proofs, enum IAvatar.DelegateWallet delegateWallet, address vault) public
 ```
 
 mint an avatar for a NFT

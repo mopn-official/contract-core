@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
-import "./interfaces/IEnergy.sol";
+import "./interfaces/IMOPNToken.sol";
 import "./interfaces/ILand.sol";
 import "./interfaces/IGovernance.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -34,7 +34,9 @@ contract AuctionHouse is Multicall, Ownable {
      */
     mapping(address => uint256) public bombWalletData;
 
-    IEnergy private Energy;
+    event BombSold(address indexed buyer, uint256 amount, uint256 price);
+
+    IMOPNToken private MT;
     IGovernance private Governance;
     ILand private Land;
 
@@ -45,14 +47,14 @@ contract AuctionHouse is Multicall, Ownable {
 
     /**
      * @dev set the governance contract address
-     * @dev this function also get the energy contract from the governances
+     * @dev this function also get the mopn token contract from the governances
      * @param governanceContract_ Governance Contract Address
      */
     function setGovernanceContract(
         address governanceContract_
     ) public onlyOwner {
         Governance = IGovernance(governanceContract_);
-        Energy = IEnergy(Governance.energyContract());
+        MT = IMOPNToken(Governance.mtContract());
         Land = ILand(Governance.landContract());
     }
 
@@ -73,8 +75,8 @@ contract AuctionHouse is Multicall, Ownable {
         uint256 price = currentPrice * amount;
 
         if (price > 0) {
-            require(Energy.balanceOf(msg.sender) > price, "energy not enough");
-            Energy.transferFrom(msg.sender, address(this), price);
+            require(MT.balanceOf(msg.sender) > price, "mopn token not enough");
+            MT.transferFrom(msg.sender, address(this), price);
         }
 
         Governance.mintBomb(msg.sender, amount);
@@ -91,6 +93,7 @@ contract AuctionHouse is Multicall, Ownable {
         } else {
             bombRound += amount;
         }
+        emit BombSold(msg.sender, amount, currentPrice);
     }
 
     /**
@@ -250,7 +253,7 @@ contract AuctionHouse is Multicall, Ownable {
         uint256 agio = getAgio(to);
         if (agio > 0) {
             bombWalletData[to] = 0;
-            Energy.transfer(to, agio);
+            MT.transfer(to, agio);
         }
     }
 
@@ -260,7 +263,7 @@ contract AuctionHouse is Multicall, Ownable {
     function settleBombPreviousRound(uint256 roundId, uint256 price) internal {
         if (price > 0) {
             price = price * bombRoundProduce;
-            Energy.burn(price);
+            MT.burn(price);
         }
         bombRoundData[roundId] = price;
         bombRound = (roundId + 1) * 10 ** 14 + block.timestamp * 10 ** 3;
@@ -299,8 +302,8 @@ contract AuctionHouse is Multicall, Ownable {
         uint256 price = getLandCurrentPrice();
 
         if (price > 0) {
-            require(Energy.balanceOf(msg.sender) > price, "energy not enough");
-            Energy.burnFrom(msg.sender, price);
+            require(MT.balanceOf(msg.sender) > price, "MOPNToken not enough");
+            MT.burnFrom(msg.sender, price);
         }
 
         Governance.mintLand(msg.sender);

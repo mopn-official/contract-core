@@ -5,13 +5,13 @@
 ### constructTokenURI
 
 ```solidity
-function constructTokenURI(uint32 LandId, struct NFTSVG.tileData[] tileDatas, uint256 EnergyMinted) public pure returns (string)
+function constructTokenURI(uint32 LandId, struct NFTSVG.tileData[] tileDatas, uint256 MTMinted) public pure returns (string)
 ```
 
 ### constructAttributes
 
 ```solidity
-function constructAttributes(uint32 LandId, uint32 blockCoordinate, uint32 ringNum, uint32 totalEAW, uint256 EnergyMinted) public pure returns (bytes)
+function constructAttributes(uint32 LandId, uint32 blockCoordinate, uint32 ringNum, uint32 totalEAW, uint256 MTMinted) public pure returns (bytes)
 ```
 
 ### constructTokenImage

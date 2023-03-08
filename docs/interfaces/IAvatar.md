@@ -159,7 +159,7 @@ get avatars by coordinate array
 ### mintAvatar
 
 ```solidity
-function mintAvatar(address collectionContract, uint256 tokenId, bytes32[] proofs, enum IAvatar.DelegateWallet delegateWallet, address vault) external returns (uint256)
+function mintAvatar(address collectionContract, uint256 tokenId, bytes32[] proofs, enum IAvatar.DelegateWallet delegateWallet, address vault) external
 ```
 
 mint an avatar for a NFT

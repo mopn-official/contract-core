@@ -10,8 +10,8 @@ describe("MOPN", function () {
     avatar,
     map,
     bomb,
-    energy,
-    energydecimals,
+    mt,
+    mtdecimals,
     landMetaDataRender;
 
   it("deploy ", async function () {
@@ -53,7 +53,7 @@ describe("MOPN", function () {
     console.log("NFTMetaData", nftmetadata.address);
 
     const Governance = await ethers.getContractFactory("Governance");
-    governance = await Governance.deploy(0, false);
+    governance = await Governance.deploy(0);
     await governance.deployed();
     console.log("Governance", governance.address);
 
@@ -76,12 +76,12 @@ describe("MOPN", function () {
     await bomb.deployed();
     console.log("Bomb", bomb.address);
 
-    const Energy = await ethers.getContractFactory("Energy");
-    energy = await Energy.deploy("$Energy", "MOPNE");
-    await energy.deployed();
-    console.log("Energy", energy.address);
+    const MOPNToken = await ethers.getContractFactory("MOPNToken");
+    mt = await MOPNToken.deploy();
+    await mt.deployed();
+    console.log("MOPNToken", mt.address);
 
-    energydecimals = await energy.decimals();
+    mtdecimals = await mt.decimals();
 
     const Map = await ethers.getContractFactory("Map", {
       libraries: {
@@ -102,8 +102,8 @@ describe("MOPN", function () {
     await landMetaDataRender.deployed();
     console.log("LandMetaDataRender", landMetaDataRender.address);
 
-    const energytransownertx = await energy.transferOwnership(governance.address);
-    await energytransownertx.wait();
+    const mttransownertx = await mt.transferOwnership(governance.address);
+    await mttransownertx.wait();
 
     const transownertx = await bomb.transferOwnership(governance.address);
     await transownertx.wait();
@@ -126,7 +126,7 @@ describe("MOPN", function () {
       auctionHouse.address,
       avatar.address,
       bomb.address,
-      energy.address,
+      mt.address,
       map.address,
       testnft2.address
     );
@@ -164,8 +164,8 @@ describe("MOPN", function () {
     // const mintTx = await avatar.mintAvatar(testnft.address, 0, testnftproofs, 0, address0);
     // await mintTx.wait();
 
-    // 0 0 0
-    // const jumpInTx = await avatar.jumpIn([100010001000, 0, 1, 1, 0, address0]);
+    // // 0 0 0
+    // const jumpInTx = await avatar.jumpIn([10001000, 0, 1, 1, 0, address0]);
     // await jumpInTx.wait();
 
     const multiTx = await avatar.multicall([
@@ -176,7 +176,7 @@ describe("MOPN", function () {
         0,
         address0,
       ]),
-      avatar.interface.encodeFunctionData("jumpIn", [[10001000, 0, 1, 1, 0, address0]]),
+      avatar.interface.encodeFunctionData("jumpIn", [[10001000, 0, 1, 0, 0, address0]]),
     ]);
     await multiTx.wait();
 
@@ -198,7 +198,7 @@ describe("MOPN", function () {
         0,
         address0,
       ]),
-      avatar.interface.encodeFunctionData("jumpIn", [[10001003, 1, 2, 1, 0, address0]]),
+      avatar.interface.encodeFunctionData("jumpIn", [[10001003, 1, 2, 0, 0, address0]]),
     ]);
     await multi1Tx.wait();
 
@@ -209,7 +209,7 @@ describe("MOPN", function () {
     await mintTx2.wait();
 
     // 0 2 -2
-    const jumpIn2Tx = await avatar.jumpIn([10001002, 2, 3, 1, 0, address0]);
+    const jumpIn2Tx = await avatar.jumpIn([10001002, 2, 3, 0, 0, address0]);
     await jumpIn2Tx.wait();
 
     mintnfttx = await testnft.safeMint(owner.address);
@@ -219,7 +219,7 @@ describe("MOPN", function () {
     await mintTx3.wait();
 
     // 1 2 -3
-    const jumpIn3Tx = await avatar.jumpIn([10011002, 2, 4, 1, 0, address0]);
+    const jumpIn3Tx = await avatar.jumpIn([10011002, 2, 4, 0, 0, address0]);
     await jumpIn3Tx.wait();
 
     mintnfttx = await testnft.safeMint(owner.address);
@@ -229,7 +229,7 @@ describe("MOPN", function () {
     await mintTx4.wait();
 
     // -1 3 -2
-    const jumpIn4Tx = await avatar.jumpIn([09991003, 2, 5, 1, 0, address0]);
+    const jumpIn4Tx = await avatar.jumpIn([09991003, 2, 5, 0, 0, address0]);
     await jumpIn4Tx.wait();
 
     mintnfttx = await testnft.safeMint(owner.address);
@@ -239,7 +239,7 @@ describe("MOPN", function () {
     await mintTx5.wait();
 
     // -1 4 -3
-    const jumpIn5Tx = await avatar.jumpIn([09991004, 2, 6, 1, 0, address0]);
+    const jumpIn5Tx = await avatar.jumpIn([09991004, 2, 6, 0, 0, address0]);
     await jumpIn5Tx.wait();
 
     mintnfttx = await testnft.safeMint(owner.address);
@@ -249,7 +249,7 @@ describe("MOPN", function () {
     await mintTx6.wait();
 
     // 0 4 -4
-    const jumpIn6Tx = await avatar.jumpIn([10001004, 2, 7, 1, 0, address0]);
+    const jumpIn6Tx = await avatar.jumpIn([10001004, 2, 7, 0, 0, address0]);
     await jumpIn6Tx.wait();
 
     mintnfttx = await testnft.safeMint(owner.address);
@@ -259,7 +259,7 @@ describe("MOPN", function () {
     await mintTx7.wait();
 
     // 1 3 -4
-    const jumpIn7Tx = await avatar.jumpIn([10011003, 2, 8, 1, 0, address0]);
+    const jumpIn7Tx = await avatar.jumpIn([10011003, 2, 8, 0, 0, address0]);
     await jumpIn7Tx.wait();
 
     mintnfttx = await testnft1.safeMint(owner.address);
@@ -269,7 +269,7 @@ describe("MOPN", function () {
     await mintTx8.wait();
 
     // 4 0 -4
-    const jumpIn8Tx = await avatar.jumpIn([10041000, 0, 9, 1, 0, address0]);
+    const jumpIn8Tx = await avatar.jumpIn([10041000, 0, 9, 0, 0, address0]);
     await jumpIn8Tx.wait();
 
     console.log(await avatar.getAvatarByNFT(testnft.address, 0));
@@ -284,47 +284,47 @@ describe("MOPN", function () {
     // console.log(await LandMetaDataRender.constructTokenURI(1));
 
     // 1, 0, -1;
-    const moveTo4Tx = await avatar.moveTo([10011000, 2, 1, 1, 0, address0]);
+    const moveTo4Tx = await avatar.moveTo([10011000, 2, 1, 0, 0, address0]);
     await moveTo4Tx.wait();
 
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(4), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(5), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(6), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(7), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(8), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(1), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(2), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(3), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(4), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(5), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(6), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(7), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(8), mtdecimals));
 
-    const redeemEnergyTx = await governance.redeemAvatarInboxEnergy(1, 0, address0);
-    await redeemEnergyTx.wait();
+    const redeemMTTx = await governance.redeemAvatarInboxMT(1, 0, address0);
+    await redeemMTTx.wait();
 
     const multi10Tx = await governance.multicall([
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [2, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [3, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [4, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [5, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [6, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [7, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxEnergy", [8, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [2, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [3, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [4, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [5, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [6, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [7, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [8, 0, address0]),
     ]);
     await multi10Tx.wait();
 
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(1), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(2), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(3), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(4), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(5), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(6), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(7), energydecimals));
-    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxEnergy(8), energydecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(1), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(2), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(3), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(4), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(5), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(6), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(7), mtdecimals));
+    console.log(ethers.utils.formatUnits(await governance.getAvatarInboxMT(8), mtdecimals));
 
     console.log(
       "wallet balance",
-      ethers.utils.formatUnits(await energy.balanceOf(owner.address), energydecimals)
+      ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
     );
 
-    const allowanceTx = await energy.approve(
+    const allowanceTx = await mt.approve(
       auctionHouse.address,
       ethers.BigNumber.from("10000000000000000")
     );
@@ -334,7 +334,7 @@ describe("MOPN", function () {
 
     console.log(
       "current 100 bomb price",
-      ethers.utils.formatUnits((await auctionHouse.getBombCurrentPrice()) * 100, energydecimals)
+      ethers.utils.formatUnits((await auctionHouse.getBombCurrentPrice()) * 100, mtdecimals)
     );
     const buybombtx = await auctionHouse.buyBomb(100);
     await buybombtx.wait();
@@ -343,7 +343,7 @@ describe("MOPN", function () {
 
     console.log(
       "wallet balance",
-      ethers.utils.formatUnits(await energy.balanceOf(owner.address), energydecimals)
+      ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
     );
 
     // -2 3 -1
@@ -370,6 +370,13 @@ describe("MOPN", function () {
       )
     );
 
+    const batchRedeemMTTx = await governance.batchRedeemAvatarInboxMT(
+      [1, 2, 3, 4, 5, 6, 7, 8],
+      [],
+      []
+    );
+    await batchRedeemMTTx.wait();
+
     console.log("Current Land Data", await auctionHouse.getLandCurrentData());
     const buylandtx = await auctionHouse.buyLand();
     await buylandtx.wait();
@@ -378,9 +385,10 @@ describe("MOPN", function () {
 
     console.log(
       "wallet balance",
-      ethers.utils.formatUnits(await energy.balanceOf(owner.address), energydecimals)
+      ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
     );
 
-    // console.log(await LandMetaDataRender.constructTokenURI(1));
+    // console.log(await avatar.getAvatarsByCoordinateRange(1001999, 50, 50));
+    // console.log(await landMetaDataRender.constructTokenURI(1));
   });
 });

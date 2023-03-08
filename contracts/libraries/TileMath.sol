@@ -19,8 +19,8 @@ library TileMath {
     }
 
     function LandRingNum(uint32 LandId) public pure returns (uint32 n) {
-        n = uint32((Math.sqrt(9 + 12 * (uint256(LandId) - 1)) - 3) / (6));
-        if ((3 * n * n + 3 * n + 1) == LandId) {
+        n = uint32((Math.sqrt(9 + 12 * uint256(LandId)) - 3) / 6);
+        if ((3 * n * n + 3 * n) == LandId) {
             return n;
         } else {
             return n + 1;
@@ -29,7 +29,7 @@ library TileMath {
 
     function LandRingPos(uint32 LandId) public pure returns (uint32) {
         uint32 ringNum = LandRingNum(LandId) - 1;
-        return LandId - (3 * ringNum * ringNum + 3 * ringNum + 1);
+        return LandId - (3 * ringNum * ringNum + 3 * ringNum);
     }
 
     function LandRingStartCenterTile(
@@ -42,7 +42,7 @@ library TileMath {
     function LandCenterTile(
         uint32 LandId
     ) public pure returns (uint32 tileCoordinate) {
-        if (LandId == 1) {
+        if (LandId == 0) {
             return 10001000;
         }
 
@@ -58,7 +58,7 @@ library TileMath {
 
         uint32 sidepos = 0;
         if (LandIdRingNum_ > 1) {
-            sidepos = (LandIdRingPos_ - 1) % LandIdRingNum_;
+            sidepos = (LandIdRingPos_) % LandIdRingNum_;
         }
         if (side == 1) {
             tileCoordinate = (startTile[0] + sidepos * 11) * 10000;
@@ -94,28 +94,28 @@ library TileMath {
         return (xrange, yrange);
     }
 
-    function getLandTilesEAW(
+    function getLandTilesMTAW(
         uint32 LandId
     ) public pure returns (uint256[] memory) {
         uint32 tileCoordinate = LandCenterTile(LandId);
-        uint256[] memory TilesEAW = new uint256[](91);
-        TilesEAW[0] = getTileEAW(tileCoordinate);
+        uint256[] memory TilesMTAW = new uint256[](91);
+        TilesMTAW[0] = getTileMTAW(tileCoordinate);
         for (uint256 i = 1; i <= 5; i++) {
             tileCoordinate++;
             uint256 preringblocks = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
-                    TilesEAW[preringblocks + j * i + k + 1] = getTileEAW(
+                    TilesMTAW[preringblocks + j * i + k + 1] = getTileMTAW(
                         tileCoordinate
                     );
                     tileCoordinate = neighbor(tileCoordinate, j);
                 }
             }
         }
-        return TilesEAW;
+        return TilesMTAW;
     }
 
-    function getTileEAW(uint32 tileCoordinate) public pure returns (uint256) {
+    function getTileMTAW(uint32 tileCoordinate) public pure returns (uint256) {
         if ((tileCoordinate / 10000) % 10 == 0) {
             if (tileCoordinate % 10 == 0) {
                 return 15;
