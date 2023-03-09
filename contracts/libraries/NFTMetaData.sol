@@ -49,7 +49,6 @@ library NFTMetaData {
                             ', "image": "',
                             constructTokenImage(
                                 LandId,
-                                ringNum,
                                 coordinateStr,
                                 tileDatas
                             ),
@@ -69,7 +68,7 @@ library NFTMetaData {
     ) public pure returns (bytes memory) {
         return
             abi.encodePacked(
-                '[{"trait_type": "Weightst", "value": "',
+                '[{"trait_type": "Weights", "value": "',
                 totalMTAW.toString(),
                 '"}',
                 getIntAttributesRangeBytes(blockCoordinate),
@@ -85,11 +84,10 @@ library NFTMetaData {
 
     function constructTokenImage(
         uint32 LandId,
-        uint32 ringNum,
         string memory coordinateStr,
         NFTSVG.tileData[] memory tileDatas
     ) public pure returns (string memory) {
-        string memory defs = NFTSVG.generateDefs(ringBgColor(ringNum));
+        string memory defs = NFTSVG.generateDefs(landBgColor(LandId));
         string memory background = NFTSVG.generateBackground(
             LandId,
             coordinateStr
@@ -136,12 +134,23 @@ library NFTMetaData {
         }
     }
 
-    function ringBgColor(uint256 ringNum) public pure returns (bytes memory) {
+    function landBgColor(uint32 landId) public pure returns (bytes memory) {
+        if (landId == 0) {
+            return abi.encodePacked("hsl(0, 100%, 100%)");
+        }
+        uint256 ringNum = TileMath.LandRingNum(landId);
+        uint256 landRingPos = TileMath.LandRingPos(landId);
+        uint256 h = landRingPos == 0
+            ? 0
+            : (360 * landRingPos) / (3 * ringNum * ringNum + 3 * ringNum);
+
         return
             abi.encodePacked(
                 "hsl(",
-                Strings.toString(60 + ringNum * 5),
-                ", 100%, 65%)"
+                Strings.toString(h),
+                ", ",
+                Strings.toString(100 - ringNum),
+                "%, 60%)"
             );
     }
 

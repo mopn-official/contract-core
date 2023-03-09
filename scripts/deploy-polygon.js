@@ -4,22 +4,22 @@ async function main() {
   console.log("deploy TileMath...");
   // const TileMath = await ethers.getContractFactory("TileMath");
   // const tileMath = await TileMath.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + tileMath.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + tileMath.deployTransaction.hash);
   // await tileMath.deployed();
   const tileMath = await ethers.getContractAt(
     "TileMath",
-    "0xDc075087F4a0088BABD6220000A3c8Cf57018511"
+    "0xBC7DEAdB2AF96690D0Ed7B9091e77E54C60A9e01"
   );
   console.log("TileMath:", tileMath.address);
 
   console.log("deploy AuctionHouse...");
   // const AuctionHouse = await ethers.getContractFactory("AuctionHouse");
   // const auctionHouse = await AuctionHouse.deploy(1677825096, 1677825096);
-  // console.log("https://goerli.etherscan.io/tx/" + auctionHouse.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + auctionHouse.deployTransaction.hash);
   // await auctionHouse.deployed();
   const auctionHouse = await ethers.getContractAt(
     "AuctionHouse",
-    "0xCfe93b0De47CD9bEd5eF4470535733CC0c862a6C"
+    "0xfcAe84E58C853Aff8898E1b958cA31218bc6B364"
   );
   console.log("AuctionHouse", auctionHouse.address);
 
@@ -30,35 +30,35 @@ async function main() {
   //   },
   // });
   // const avatar = await Avatar.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + avatar.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + avatar.deployTransaction.hash);
   // await avatar.deployed();
-  const avatar = await ethers.getContractAt("Avatar", "0x76f054fCE60aA6555935af2Ca39a4c35C6331DA5");
+  const avatar = await ethers.getContractAt("Avatar", "0xe46E1DA50645448Baf45DA22AaFB45b24f1Db4B9");
   console.log("Avatar", avatar.address);
 
   console.log("deploy Bomb...");
   // const Bomb = await ethers.getContractFactory("Bomb");
   // const bomb = await Bomb.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + bomb.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + bomb.deployTransaction.hash);
   // await bomb.deployed();
-  const bomb = await ethers.getContractAt("Bomb", "0x9eF0A20Bea4068Ceb5191afdAEC07eA8A96c7fD2");
+  const bomb = await ethers.getContractAt("Bomb", "0x2DE1A041fDe1326E26aaC085562A9249Ec287409");
   console.log("Bomb", bomb.address);
 
   console.log("deploy MOPNToken...");
   // const MOPNToken = await ethers.getContractFactory("MOPNToken");
   // const mt = await MOPNToken.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + mt.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + mt.deployTransaction.hash);
   // await mt.deployed();
-  const mt = await ethers.getContractAt("MOPNToken", "0x802aea0a0A3178f6d6692b65004f143be5368a90");
+  const mt = await ethers.getContractAt("MOPNToken", "0xf0F2764DbC65fc6c2aBBB975677c9AC9A7B9a716");
   console.log("MOPNToken", mt.address);
 
   console.log("deploy Governance...");
   // const Governance = await ethers.getContractFactory("Governance");
   // const governance = await Governance.deploy(0);
-  // console.log("https://goerli.etherscan.io/tx/" + governance.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + governance.deployTransaction.hash);
   // await governance.deployed();
   const governance = await ethers.getContractAt(
     "Governance",
-    "0xb864e6Bf6328c05bed3B94b17416A075d356271d"
+    "0x04B07B4ec49C89CF59D3FF7e184365402A5aFBEF"
   );
   console.log("Governance", governance.address);
 
@@ -69,17 +69,17 @@ async function main() {
   //   },
   // });
   // const map = await Map.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + map.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + map.deployTransaction.hash);
   // await map.deployed();
-  const map = await ethers.getContractAt("Map", "0x4CB7fEcb203f3AD11357c368dF16c05D92fB2EA2");
+  const map = await ethers.getContractAt("Map", "0x6DebE7514EC0f09C4003729F34c7e137C0737693");
   console.log("Map", map.address);
 
   console.log("deploy NFTSVG...");
   // const NFTSVG = await ethers.getContractFactory("NFTSVG");
   // const nftsvg = await NFTSVG.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + nftsvg.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + nftsvg.deployTransaction.hash);
   // await nftsvg.deployed();
-  const nftsvg = await ethers.getContractAt("NFTSVG", "0xC9435cccE0069DE0Cc2094f7A36f997da13f00B6");
+  const nftsvg = await ethers.getContractAt("NFTSVG", "0xBb80001381618Bb7AD4378B5dFb428ce7b4484A2");
   console.log("NFTSVG:", nftsvg.address);
 
   console.log("deploy NFTMetaData...");
@@ -90,11 +90,11 @@ async function main() {
   //   },
   // });
   // const nftmetadata = await NFTMetaData.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + nftmetadata.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + nftmetadata.deployTransaction.hash);
   // await nftmetadata.deployed();
   const nftmetadata = await ethers.getContractAt(
     "NFTMetaData",
-    "0x3EE256Eeef106798ED679a17A38d475840213Fac"
+    "0xD05aD9C85237c5660c9dB49ab3F5961F51426f53"
   );
   console.log("NFTMetaData:", nftmetadata.address);
 
@@ -106,11 +106,11 @@ async function main() {
   //   },
   // });
   // const render = await LandMetaDataRender.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + render.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + render.deployTransaction.hash);
   // await render.deployed();
   const render = await ethers.getContractAt(
     "LandMetaDataRender",
-    "0x4d8C79EC0BA420bEC22c88c22e74591bB279D4C2"
+    "0x6701DDa4E6d95b57a68e263e6fa186cf8bd1b598"
   );
   console.log("LandMetaDataRender:", render.address);
 
@@ -133,9 +133,9 @@ async function main() {
   console.log("deploy MOPNLand...");
   // const MOPNLand = await ethers.getContractFactory("MOPNLand");
   // const land = await MOPNLand.deploy();
-  // console.log("https://goerli.etherscan.io/tx/" + land.deployTransaction.hash);
+  // console.log("https://mumbai.polygonscan.com/tx/" + land.deployTransaction.hash);
   // await land.deployed();
-  const land = await ethers.getContractAt("MOPNLand", "0xe765a92a6181cccd5a4cbd7ab2318960aa01745c");
+  const land = await ethers.getContractAt("MOPNLand", "0xfB416c98FC74CE74fAFc14762f2652eC40258277");
   console.log("MOPNLand", land.address);
 
   // console.log("update land render...");
@@ -149,7 +149,7 @@ async function main() {
   // await testnft.deployed();
   const testnft = await ethers.getContractAt(
     "TESTNFT",
-    "0xb33a329679e005CFD50Af2f477d30800F8ff05E7"
+    "0x75e38249815F1697f1116D9ab10a3Df0CD5480b9"
   );
   console.log("TESTNFT", testnft.address);
 
@@ -158,10 +158,10 @@ async function main() {
   await energytransownertx.wait();
   console.log("done");
 
-  console.log("transfer Bomb owner...");
-  const bombtransownertx = await bomb.transferOwnership(governance.address);
-  await bombtransownertx.wait();
-  console.log("done");
+  // console.log("transfer Bomb owner...");
+  // const bombtransownertx = await bomb.transferOwnership(governance.address);
+  // await bombtransownertx.wait();
+  // console.log("done");
 
   console.log("Governance update MOPN Contracts");
   const governancesetmopntx = await governance.updateMOPNContracts(
@@ -175,12 +175,12 @@ async function main() {
   await governancesetmopntx.wait();
   console.log("done");
 
-  console.log("AuctionHouse update Governance Contract");
-  const arsenalsetgovernancecontracttx = await auctionHouse.setGovernanceContract(
-    governance.address
-  );
-  await arsenalsetgovernancecontracttx.wait();
-  console.log("done");
+  // console.log("AuctionHouse update Governance Contract");
+  // const arsenalsetgovernancecontracttx = await auctionHouse.setGovernanceContract(
+  //   governance.address
+  // );
+  // await arsenalsetgovernancecontracttx.wait();
+  // console.log("done");
 
   // console.log("Avatar update Governance Contract");
   // const avatarsetgovernancecontracttx = await avatar.setGovernanceContract(governance.address);

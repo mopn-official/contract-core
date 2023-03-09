@@ -7,7 +7,7 @@ import "./libraries/NFTMetaData.sol";
 contract LandMetaDataRenderSolo is ILandMetaDataRender {
     function constructTokenURI(
         uint256 LandId_
-    ) public pure returns (string memory) {
+    ) public view returns (string memory) {
         uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
         uint32 tileCoordinate = TileMath.LandCenterTile(LandId);

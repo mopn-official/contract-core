@@ -12,6 +12,7 @@ describe("MOPN", function () {
     bomb,
     mt,
     mtdecimals,
+    land,
     landMetaDataRender;
 
   it("deploy ", async function () {
@@ -27,10 +28,10 @@ describe("MOPN", function () {
     await testnft1.deployed();
     console.log("TESTNFT1 ", testnft1.address);
 
-    const TESTNFT2 = await ethers.getContractFactory("TESTNFT");
-    testnft2 = await TESTNFT2.deploy();
-    await testnft2.deployed();
-    console.log("TESTNFT2 ", testnft2.address);
+    const MOPNLand = await ethers.getContractFactory("MOPNLand");
+    land = await MOPNLand.deploy();
+    await land.deployed();
+    console.log("MOPNLand ", land.address);
 
     const TileMath = await ethers.getContractFactory("TileMath");
     tileMath = await TileMath.deploy();
@@ -108,13 +109,13 @@ describe("MOPN", function () {
     const transownertx = await bomb.transferOwnership(governance.address);
     await transownertx.wait();
 
-    let minpasstx = await testnft2.safeMint(owner.address);
+    let minpasstx = await land.auctionMint(owner.address, 1);
     await minpasstx.wait();
 
-    minpasstx = await testnft2.safeMint(owner.address);
+    minpasstx = await land.auctionMint(owner.address, 2);
     await minpasstx.wait();
 
-    const landtransownertx = await testnft2.transferOwnership(governance.address);
+    const landtransownertx = await land.transferOwnership(governance.address);
     await landtransownertx.wait();
 
     const governancesetroottx = await governance.updateWhiteList(
@@ -128,7 +129,7 @@ describe("MOPN", function () {
       bomb.address,
       mt.address,
       map.address,
-      testnft2.address
+      land.address
     );
     await governancesetmopntx.wait();
 
@@ -389,6 +390,6 @@ describe("MOPN", function () {
     );
 
     // console.log(await avatar.getAvatarsByCoordinateRange(1001999, 50, 50));
-    // console.log(await landMetaDataRender.constructTokenURI(1));
+    console.log(await landMetaDataRender.constructTokenURI(1));
   });
 });

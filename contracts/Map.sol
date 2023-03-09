@@ -61,16 +61,12 @@ contract Map is Ownable {
         return avatarIds;
     }
 
-    IAvatar private Avatar;
     IGovernance private Governance;
-    ILand private Land;
 
     function setGovernanceContract(
         address governanceContract_
     ) public onlyOwner {
         Governance = IGovernance(governanceContract_);
-        Avatar = IAvatar(Governance.avatarContract());
-        Land = ILand(Governance.landContract());
     }
 
     /**
@@ -101,7 +97,10 @@ contract Map is Ownable {
                 tileCoordinate.distance(LandId.LandCenterTile()) < 6,
                 "LandId error"
             );
-            require(Land.nextTokenId() > LandId, "Land Not Open");
+            require(
+                ILand(Governance.landContract()).nextTokenId() > LandId,
+                "Land Not Open"
+            );
         }
 
         uint256 TileMTAW = tileCoordinate.getTileMTAW() + BombUsed;
@@ -155,7 +154,7 @@ contract Map is Ownable {
     }
 
     modifier onlyAvatar() {
-        require(msg.sender == address(Avatar), "not allowed");
+        require(msg.sender == Governance.avatarContract(), "not allowed");
         _;
     }
 }

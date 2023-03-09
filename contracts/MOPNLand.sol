@@ -13,10 +13,11 @@ contract MOPNLand is ERC721, Ownable {
 
     constructor() ERC721("MOPNLand", "Land") {}
 
-    function safeMint(address to) public {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
+    function auctionMint(address to, uint256 amount) public {
+        for (uint256 i = 0; i < amount; i++) {
+            _tokenIdCounter.increment();
+            _safeMint(to, _tokenIdCounter.current());
+        }
     }
 
     function nextTokenId() public view returns (uint256) {

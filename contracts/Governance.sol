@@ -755,7 +755,7 @@ contract Governance is Multicall, Ownable {
 
     // Land
     function mintLand(address to) public onlyAuctionHouse {
-        ILand(landContract).safeMint(to);
+        ILand(landContract).auctionMint(to, 1);
     }
 
     function redeemAgio() public {
