@@ -20,3 +20,7 @@
 |                |                                     | Mumbai: [0xfB416c98FC74CE74fAFc14762f2652eC40258277](https://mumbai.polygonscan.com/address/0xfB416c98FC74CE74fAFc14762f2652eC40258277) |
 | TESTNFT        | [TESTNFT Doc](TESTNFT.md)           | Goerli: [0xb33a329679e005CFD50Af2f477d30800F8ff05E7](https://goerli.etherscan.io/address/0xb33a329679e005CFD50Af2f477d30800F8ff05E7)    |
 |                |                                     | Mumbai: [0x75e38249815F1697f1116D9ab10a3Df0CD5480b9](https://mumbai.polygonscan.com/address/0x75e38249815F1697f1116D9ab10a3Df0CD5480b9) |
+| TESTNFT1       | [TESTNFT Doc](TESTNFT.md)           |                                                                                                                                         |
+|                |                                     | Mumbai: [0xfbD66038431f292380C0C590c0C043A31826e576](https://mumbai.polygonscan.com/address/0xfbD66038431f292380C0C590c0C043A31826e576) |
+| TESTNFT2       | [TESTNFT Doc](TESTNFT.md)           |                                                                                                                                         |
+|                |                                     | Mumbai: [0x3CB5E014E2489F3CAe102c0969a7C9036c72c074](https://mumbai.polygonscan.com/address/0x3CB5E014E2489F3CAe102c0969a7C9036c72c074) |

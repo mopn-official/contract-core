@@ -26,6 +26,9 @@ contract LandMetaDataRender is ILandMetaDataRender {
         uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
         uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
+        uint32[3] memory centerTileArr = TileMath.coordinateIntToArr(
+            tileCoordinate
+        );
 
         tileDatas[0].tileMTAW = TileMath.getTileMTAW(tileCoordinate);
         uint256 COID = Map.getTileCOID(tileCoordinate);
@@ -60,9 +63,9 @@ contract LandMetaDataRender is ILandMetaDataRender {
                         } else {
                             roundIndex = index - (i - 1) * 6 - j;
                             if (
-                                tileCoordinateArr[0] == 1000 ||
-                                tileCoordinateArr[1] == 1000 ||
-                                tileCoordinateArr[2] == 1000
+                                tileCoordinateArr[0] == centerTileArr[0] ||
+                                tileCoordinateArr[1] == centerTileArr[1] ||
+                                tileCoordinateArr[2] == centerTileArr[2]
                             ) {
                                 tileDatas[roundIndex].color = COID;
                             } else {
@@ -91,24 +94,27 @@ contract LandMetaDataRender is ILandMetaDataRender {
                             tileDatas[index + 1].color = COID;
                         }
                         roundIndex = index + i * 6 + j;
-                        if (
-                            tileCoordinateArr[0] == 1000 ||
-                            tileCoordinateArr[1] == 1000 ||
-                            tileCoordinateArr[2] == 1000
-                        ) {
-                            if (roundIndex == preringblocks + i * 6 + 1) {
-                                tileDatas[preringblocks + i * 6 + (i + 1) * 6]
-                                    .color = COID;
-                                tileDatas[roundIndex].color = COID;
-                                tileDatas[roundIndex + 1].color = COID;
+                        if (roundIndex < 91) {
+                            if (
+                                tileCoordinateArr[0] == centerTileArr[0] ||
+                                tileCoordinateArr[1] == centerTileArr[1] ||
+                                tileCoordinateArr[2] == centerTileArr[2]
+                            ) {
+                                if (roundIndex == preringblocks + i * 6 + 1) {
+                                    tileDatas[
+                                        preringblocks + i * 6 + (i + 1) * 6
+                                    ].color = COID;
+                                    tileDatas[roundIndex].color = COID;
+                                    tileDatas[roundIndex + 1].color = COID;
+                                } else {
+                                    tileDatas[roundIndex - 1].color = COID;
+                                    tileDatas[roundIndex].color = COID;
+                                    tileDatas[roundIndex + 1].color = COID;
+                                }
                             } else {
-                                tileDatas[roundIndex - 1].color = COID;
                                 tileDatas[roundIndex].color = COID;
                                 tileDatas[roundIndex + 1].color = COID;
                             }
-                        } else {
-                            tileDatas[roundIndex].color = COID;
-                            tileDatas[roundIndex + 1].color = COID;
                         }
                     }
 
@@ -121,7 +127,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
             NFTMetaData.constructTokenURI(
                 LandId,
                 tileDatas,
-                Governance.getLandHolderRedeemed(LandId) / 8
+                (Governance.getLandHolderRedeemed(LandId) / 10 ** 8)
             );
     }
 }

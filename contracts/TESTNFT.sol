@@ -12,10 +12,11 @@ contract TESTNFT is ERC721, Ownable {
 
     constructor() ERC721("MyToken", "MTK") {}
 
-    function safeMint(address to) public {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
+    function safeMint(address to, uint256 amount) public {
+        for (uint256 i = 0; i < amount; i++) {
+            _safeMint(to, _tokenIdCounter.current());
+            _tokenIdCounter.increment();
+        }
     }
 
     function nextTokenId() public view returns (uint256) {

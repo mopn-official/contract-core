@@ -108,10 +108,10 @@ async function main() {
   // const render = await LandMetaDataRender.deploy();
   // console.log("https://goerli.etherscan.io/tx/" + render.deployTransaction.hash);
   // await render.deployed();
-  const render = await ethers.getContractAt(
-    "LandMetaDataRender",
-    "0x4d8C79EC0BA420bEC22c88c22e74591bB279D4C2"
-  );
+  // const render = await ethers.getContractAt(
+  //   "LandMetaDataRender",
+  //   "0x4d8C79EC0BA420bEC22c88c22e74591bB279D4C2"
+  // );
   console.log("LandMetaDataRender:", render.address);
 
   // console.log("deploy LandMetaDataRenderSolo...");
@@ -138,10 +138,10 @@ async function main() {
   const land = await ethers.getContractAt("MOPNLand", "0xe765a92a6181cccd5a4cbd7ab2318960aa01745c");
   console.log("MOPNLand", land.address);
 
-  // console.log("update land render...");
-  // const landrendertx = await land.setMetaDataRender(render.address);
-  // await landrendertx.wait();
-  // console.log("done");
+  console.log("update land render...");
+  const landrendertx = await land.setMetaDataRender(render.address);
+  await landrendertx.wait();
+  console.log("done");
 
   console.log("deploy TESTNFT...");
   // const TESTNFT = await ethers.getContractFactory("TESTNFT");
@@ -153,15 +153,15 @@ async function main() {
   );
   console.log("TESTNFT", testnft.address);
 
-  console.log("transfer MOPNToken owner...");
-  const energytransownertx = await mt.transferOwnership(governance.address);
-  await energytransownertx.wait();
-  console.log("done");
+  // console.log("transfer MOPNToken owner...");
+  // const energytransownertx = await mt.transferOwnership(governance.address);
+  // await energytransownertx.wait();
+  // console.log("done");
 
-  console.log("transfer Bomb owner...");
-  const bombtransownertx = await bomb.transferOwnership(governance.address);
-  await bombtransownertx.wait();
-  console.log("done");
+  // console.log("transfer Bomb owner...");
+  // const bombtransownertx = await bomb.transferOwnership(governance.address);
+  // await bombtransownertx.wait();
+  // console.log("done");
 
   console.log("Governance update MOPN Contracts");
   const governancesetmopntx = await governance.updateMOPNContracts(
@@ -175,12 +175,12 @@ async function main() {
   await governancesetmopntx.wait();
   console.log("done");
 
-  console.log("AuctionHouse update Governance Contract");
-  const arsenalsetgovernancecontracttx = await auctionHouse.setGovernanceContract(
-    governance.address
-  );
-  await arsenalsetgovernancecontracttx.wait();
-  console.log("done");
+  // console.log("AuctionHouse update Governance Contract");
+  // const arsenalsetgovernancecontracttx = await auctionHouse.setGovernanceContract(
+  //   governance.address
+  // );
+  // await arsenalsetgovernancecontracttx.wait();
+  // console.log("done");
 
   // console.log("Avatar update Governance Contract");
   // const avatarsetgovernancecontracttx = await avatar.setGovernanceContract(governance.address);
