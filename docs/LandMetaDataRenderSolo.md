@@ -5,6 +5,6 @@
 ### constructTokenURI
 
 ```solidity
-function constructTokenURI(uint256 LandId_) public pure returns (string)
+function constructTokenURI(uint256 LandId_) public view returns (string)
 ```
 

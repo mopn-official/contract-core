@@ -2,10 +2,10 @@
 
 ## ILand
 
-### safeMint
+### auctionMint
 
 ```solidity
-function safeMint(address to) external
+function auctionMint(address to, uint256 amount) external
 ```
 
 ### nextTokenId

@@ -148,9 +148,9 @@ library NFTMetaData {
             abi.encodePacked(
                 "hsl(",
                 Strings.toString(h),
-                ", ",
-                Strings.toString(100 - ringNum),
-                "%, 60%)"
+                ",40%, ",
+                Strings.toString(50 + ringNum / 2),
+                "%)"
             );
     }
 

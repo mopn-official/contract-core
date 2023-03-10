@@ -59,7 +59,7 @@ event MTClaimed(address to, uint256 amount)
 ### constructor
 
 ```solidity
-constructor(uint256 MTProduceStartBlock_, bool whiteListRequire_) public
+constructor(uint256 MTProduceStartBlock_) public
 ```
 
 ### getPerMTAWMinted

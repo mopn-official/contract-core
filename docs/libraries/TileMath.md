@@ -53,16 +53,16 @@ function LandCenterTile(uint32 LandId) public pure returns (uint32 tileCoordinat
 function LandTileRange(uint32 tileCoordinate) public pure returns (uint32[], uint32[])
 ```
 
-### getLandTilesEAW
+### getLandTilesMTAW
 
 ```solidity
-function getLandTilesEAW(uint32 LandId) public pure returns (uint256[])
+function getLandTilesMTAW(uint32 LandId) public pure returns (uint256[])
 ```
 
-### getTileEAW
+### getTileMTAW
 
 ```solidity
-function getTileEAW(uint32 tileCoordinate) public pure returns (uint256)
+function getTileMTAW(uint32 tileCoordinate) public pure returns (uint256)
 ```
 
 ### coordinateIntToArr

@@ -11,7 +11,7 @@ function avatarSet(uint256 avatarId, uint256 COID, uint32 tileCoordinate, uint32
 ### avatarRemove
 
 ```solidity
-function avatarRemove(uint256 avatarId, uint256 COID, uint32 tileCoordinate) external
+function avatarRemove(uint32 tileCoordinate, uint256 excludeAvatarId) external returns (uint256)
 ```
 
 ### getTileAvatar

@@ -17,7 +17,7 @@ struct coordinate {
 ```solidity
 struct tileData {
   uint256 color;
-  uint256 tileEAW;
+  uint256 tileMTAW;
 }
 ```
 

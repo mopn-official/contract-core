@@ -107,7 +107,7 @@ _can only called by avatar contract_
 ### avatarRemove
 
 ```solidity
-function avatarRemove(uint256 avatarId, uint256 COID, uint32 tileCoordinate) public
+function avatarRemove(uint32 tileCoordinate, uint256 excludeAvatarId) public returns (uint256 avatarId)
 ```
 
 avatar id left a tile
@@ -118,9 +118,8 @@ _can only called by avatar contract_
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
 | tileCoordinate | uint32 | tile coordinate |
+| excludeAvatarId | uint256 |  |
 
 ### checkLandId
 

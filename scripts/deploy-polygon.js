@@ -32,7 +32,7 @@ async function main() {
   // const avatar = await Avatar.deploy();
   // console.log("https://mumbai.polygonscan.com/tx/" + avatar.deployTransaction.hash);
   // await avatar.deployed();
-  const avatar = await ethers.getContractAt("Avatar", "0xe46E1DA50645448Baf45DA22AaFB45b24f1Db4B9");
+  const avatar = await ethers.getContractAt("Avatar", "0x14C0344AAa352a80F053670FbB2Ca1879729148b");
   console.log("Avatar", avatar.address);
 
   console.log("deploy Bomb...");
@@ -40,7 +40,7 @@ async function main() {
   // const bomb = await Bomb.deploy();
   // console.log("https://mumbai.polygonscan.com/tx/" + bomb.deployTransaction.hash);
   // await bomb.deployed();
-  const bomb = await ethers.getContractAt("Bomb", "0x2DE1A041fDe1326E26aaC085562A9249Ec287409");
+  const bomb = await ethers.getContractAt("Bomb", "0xee5A0801D51feC7c54A5ac03E6E84213AA08Bd80");
   console.log("Bomb", bomb.address);
 
   console.log("deploy MOPNToken...");
@@ -48,7 +48,7 @@ async function main() {
   // const mt = await MOPNToken.deploy();
   // console.log("https://mumbai.polygonscan.com/tx/" + mt.deployTransaction.hash);
   // await mt.deployed();
-  const mt = await ethers.getContractAt("MOPNToken", "0xf0F2764DbC65fc6c2aBBB975677c9AC9A7B9a716");
+  const mt = await ethers.getContractAt("MOPNToken", "0x4C0b27272160D8349c1c1A46ef4930D72f03B9fB");
   console.log("MOPNToken", mt.address);
 
   console.log("deploy Governance...");
@@ -58,7 +58,7 @@ async function main() {
   // await governance.deployed();
   const governance = await ethers.getContractAt(
     "Governance",
-    "0x04B07B4ec49C89CF59D3FF7e184365402A5aFBEF"
+    "0x5dC899e32325E5d8506c5955A5FF25906165C16C"
   );
   console.log("Governance", governance.address);
 
@@ -71,7 +71,7 @@ async function main() {
   // const map = await Map.deploy();
   // console.log("https://mumbai.polygonscan.com/tx/" + map.deployTransaction.hash);
   // await map.deployed();
-  const map = await ethers.getContractAt("Map", "0x6DebE7514EC0f09C4003729F34c7e137C0737693");
+  const map = await ethers.getContractAt("Map", "0x42E627CD652Caf8340bF8753bB1d436eD1457C04");
   console.log("Map", map.address);
 
   console.log("deploy NFTSVG...");
@@ -135,7 +135,7 @@ async function main() {
   // const land = await MOPNLand.deploy();
   // console.log("https://mumbai.polygonscan.com/tx/" + land.deployTransaction.hash);
   // await land.deployed();
-  const land = await ethers.getContractAt("MOPNLand", "0xfB416c98FC74CE74fAFc14762f2652eC40258277");
+  const land = await ethers.getContractAt("MOPNLand", "0xBFe8B57039D81F8e841bF123309635AE195499D6");
   console.log("MOPNLand", land.address);
 
   // console.log("update land render...");
@@ -154,68 +154,66 @@ async function main() {
   console.log("TESTNFT", testnft.address);
 
   console.log("deploy TESTNFT1...");
-  const TESTNFT1 = await ethers.getContractFactory("TESTNFT");
-  const testnft1 = await TESTNFT1.deploy();
-  await testnft1.deployed();
-  // const testnft1 = await ethers.getContractAt(
-  //   "TESTNFT",
-  //   "0x75e38249815F1697f1116D9ab10a3Df0CD5480b9"
-  // );
+  // const TESTNFT1 = await ethers.getContractFactory("TESTNFT");
+  // const testnft1 = await TESTNFT1.deploy();
+  // await testnft1.deployed();
+  const testnft1 = await ethers.getContractAt(
+    "TESTNFT",
+    "0x75e38249815F1697f1116D9ab10a3Df0CD5480b9"
+  );
   console.log("TESTNFT1", testnft1.address);
 
   console.log("deploy TESTNFT2...");
-  const TESTNFT2 = await ethers.getContractFactory("TESTNFT");
-  const testnft2 = await TESTNFT2.deploy();
-  await testnft2.deployed();
-  // const testnft2 = await ethers.getContractAt(
-  //   "TESTNFT",
-  //   "0x75e38249815F1697f1116D9ab10a3Df0CD5480b9"
-  // );
+  // const TESTNFT2 = await ethers.getContractFactory("TESTNFT");
+  // const testnft2 = await TESTNFT2.deploy();
+  // await testnft2.deployed();
+  const testnft2 = await ethers.getContractAt(
+    "TESTNFT",
+    "0x75e38249815F1697f1116D9ab10a3Df0CD5480b9"
+  );
   console.log("TESTNFT2", testnft2.address);
 
-  // console.log("transfer MOPNToken owner...");
-  // const energytransownertx = await mt.transferOwnership(governance.address);
-  // await energytransownertx.wait();
-  // console.log("done");
+  console.log("transfer MOPNToken owner...");
+  const energytransownertx = await mt.transferOwnership(governance.address);
+  await energytransownertx.wait();
+  console.log("done");
 
-  // console.log("transfer Bomb owner...");
-  // const bombtransownertx = await bomb.transferOwnership(governance.address);
-  // await bombtransownertx.wait();
-  // console.log("done");
+  console.log("transfer Bomb owner...");
+  const bombtransownertx = await bomb.transferOwnership(governance.address);
+  await bombtransownertx.wait();
+  console.log("done");
 
-  // console.log("Governance update MOPN Contracts");
-  // const governancesetmopntx = await governance.updateMOPNContracts(
-  //   auctionHouse.address,
-  //   avatar.address,
-  //   bomb.address,
-  //   mt.address,
-  //   map.address,
-  //   land.address
-  // );
-  // await governancesetmopntx.wait();
-  // console.log("done");
+  console.log("Governance update MOPN Contracts");
+  const governancesetmopntx = await governance.updateMOPNContracts(
+    auctionHouse.address,
+    avatar.address,
+    bomb.address,
+    mt.address,
+    map.address,
+    land.address
+  );
+  await governancesetmopntx.wait();
+  console.log("done");
 
-  // console.log("AuctionHouse update Governance Contract");
-  // const arsenalsetgovernancecontracttx = await auctionHouse.setGovernanceContract(
-  //   governance.address
-  // );
-  // await arsenalsetgovernancecontracttx.wait();
-  // console.log("done");
+  console.log("AuctionHouse update Governance Contract");
+  const ahsetgovernancecontracttx = await auctionHouse.setGovernanceContract(governance.address);
+  await ahsetgovernancecontracttx.wait();
+  console.log("done");
 
-  // console.log("Avatar update Governance Contract");
-  // const avatarsetgovernancecontracttx = await avatar.setGovernanceContract(governance.address);
-  // await avatarsetgovernancecontracttx.wait();
-  // console.log("done");
+  console.log("Avatar update Governance Contract");
+  const avatarsetgovernancecontracttx = await avatar.setGovernanceContract(governance.address);
+  await avatarsetgovernancecontracttx.wait();
+  console.log("done");
 
-  // console.log("Map update Governance Contract");
-  // const mapsetgovernancecontracttx = await map.setGovernanceContract(governance.address);
-  // await mapsetgovernancecontracttx.wait();
-  // console.log("done");
+  console.log("Map update Governance Contract");
+  const mapsetgovernancecontracttx = await map.setGovernanceContract(governance.address);
+  await mapsetgovernancecontracttx.wait();
+  console.log("done");
 
-  // console.log("Land Render update Governance Contract");
-  // const rendersetgovernancecontracttx = await render.setGovernanceContract(governance.address);
-  // await rendersetgovernancecontracttx.wait();
-  // console.log("done");
+  console.log("Land Render update Governance Contract");
+  const rendersetgovernancecontracttx = await render.setGovernanceContract(governance.address);
+  await rendersetgovernancecontracttx.wait();
+  console.log("done");
 }
 
 main().catch((error) => {

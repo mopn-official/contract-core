@@ -11,7 +11,7 @@ constructor() public
 ### safeMint
 
 ```solidity
-function safeMint(address to) public
+function safeMint(address to, uint256 amount) public
 ```
 
 ### nextTokenId

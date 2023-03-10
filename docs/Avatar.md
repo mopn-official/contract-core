@@ -85,7 +85,7 @@ This event emit when an avatar move on map
 ### BombUse
 
 ```solidity
-event BombUse(uint256 avatarId, uint32 tileCoordinate, uint256[] victims)
+event BombUse(uint256 avatarId, uint32 tileCoordinate, uint256[] victims, uint32[] victimsCoordinates)
 ```
 
 BombUse Event emit when a Bomb is used at a coordinate by an avatar
@@ -97,6 +97,7 @@ BombUse Event emit when a Bomb is used at a coordinate by an avatar
 | avatarId | uint256 | avatarId that has indexed |
 | tileCoordinate | uint32 | the tileCoordinate |
 | victims | uint256[] | thje victims that bombed out of the map |
+| victimsCoordinates | uint32[] |  |
 
 ### avatarNoumenon
 
@@ -110,7 +111,7 @@ avatar storage map
 ### tokenMap
 
 ```solidity
-mapping(uint256 => mapping(uint256 => uint256)) tokenMap
+mapping(address => mapping(uint256 => uint256)) tokenMap
 ```
 
 ### currentAvatarId
@@ -414,7 +415,7 @@ an on map avatar move to a new tile
 ### bomb
 
 ```solidity
-function bomb(uint32 tileCoordinate, uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault) public
+function bomb(struct IAvatar.BombParams params) public
 ```
 
 throw a bomb to a tile
@@ -423,10 +424,7 @@ throw a bomb to a tile
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| tileCoordinate | uint32 | bombing tile coordinate |
-| avatarId | uint256 | bomb using avatar id |
-| delegateWallet | enum IAvatar.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
-| vault | address | cold wallet address |
+| params | struct IAvatar.BombParams | OnMapParams |
 
 ### addAvatarBombUsed
 
@@ -440,16 +438,10 @@ function addAvatarBombUsed(uint256 avatarId) internal
 function setAvatarCoordinate(uint256 avatarId, uint32 tileCoordinate) internal
 ```
 
-### deFeat
+### linkCheck
 
 ```solidity
-function deFeat(uint256 avatarId) internal
-```
-
-### ownerCheck
-
-```solidity
-modifier ownerCheck(uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault)
+function linkCheck(uint256 avatarId, uint256 linkedAvatarId, uint32 tileCoordinate) internal
 ```
 
 ### tileCheck
@@ -458,10 +450,10 @@ modifier ownerCheck(uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet
 modifier tileCheck(uint32 tileCoordinate)
 ```
 
-### linkCheck
+### ownerCheck
 
 ```solidity
-modifier linkCheck(struct IAvatar.OnMapParams params)
+modifier ownerCheck(address collectionContract, uint256 tokenId, enum IAvatar.DelegateWallet delegateWallet, address vault)
 ```
 
 ### onlyMap

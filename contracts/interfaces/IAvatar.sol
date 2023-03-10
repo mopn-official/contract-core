@@ -13,17 +13,27 @@ interface IAvatar {
     /**
      * @notice Avatar On Map Action Params
      * @param tileCoordinate destination tile coordinate
+     * @param collectionContract the collection contract address of a nft
+     * @param tokenId the token Id of a nft
      * @param linkedAvatarId linked same collection avatar Id if you have a collection ally on the map
-     * @param avatarId your avatar Id
      * @param LandId the destination tile's LandId
      * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
      * @param vault cold wallet address
      */
     struct OnMapParams {
         uint32 tileCoordinate;
+        address collectionContract;
+        uint256 tokenId;
         uint256 linkedAvatarId;
-        uint256 avatarId;
         uint32 LandId;
+        DelegateWallet delegateWallet;
+        address vault;
+    }
+
+    struct BombParams {
+        uint32 tileCoordinate;
+        address collectionContract;
+        uint256 tokenId;
         DelegateWallet delegateWallet;
         address vault;
     }
@@ -135,15 +145,7 @@ interface IAvatar {
 
     /**
      * @notice throw a bomb to a tile
-     * @param tileCoordinate bombing tile coordinate
-     * @param avatarId bomb using avatar id
-     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
-     * @param vault cold wallet address
+     * @param params BombParams
      */
-    function bomb(
-        uint32 tileCoordinate,
-        uint256 avatarId,
-        DelegateWallet delegateWallet,
-        address vault
-    ) external;
+    function bomb(BombParams calldata params) external;
 }

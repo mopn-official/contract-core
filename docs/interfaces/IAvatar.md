@@ -19,9 +19,22 @@ struct AvatarDataOutput {
 ```solidity
 struct OnMapParams {
   uint32 tileCoordinate;
+  address collectionContract;
+  uint256 tokenId;
   uint256 linkedAvatarId;
-  uint256 avatarId;
   uint32 LandId;
+  enum IAvatar.DelegateWallet delegateWallet;
+  address vault;
+}
+```
+
+### BombParams
+
+```solidity
+struct BombParams {
+  uint32 tileCoordinate;
+  address collectionContract;
+  uint256 tokenId;
   enum IAvatar.DelegateWallet delegateWallet;
   address vault;
 }
@@ -205,7 +218,7 @@ an on map avatar move to a new tile
 ### bomb
 
 ```solidity
-function bomb(uint32 tileCoordinate, uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault) external
+function bomb(struct IAvatar.BombParams params) external
 ```
 
 throw a bomb to a tile
@@ -214,8 +227,5 @@ throw a bomb to a tile
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| tileCoordinate | uint32 | bombing tile coordinate |
-| avatarId | uint256 | bomb using avatar id |
-| delegateWallet | enum IAvatar.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
-| vault | address | cold wallet address |
+| params | struct IAvatar.BombParams | BombParams |
 

@@ -108,10 +108,10 @@ async function main() {
   // const render = await LandMetaDataRender.deploy();
   // console.log("https://goerli.etherscan.io/tx/" + render.deployTransaction.hash);
   // await render.deployed();
-  // const render = await ethers.getContractAt(
-  //   "LandMetaDataRender",
-  //   "0x4d8C79EC0BA420bEC22c88c22e74591bB279D4C2"
-  // );
+  const render = await ethers.getContractAt(
+    "LandMetaDataRender",
+    "0x4d8C79EC0BA420bEC22c88c22e74591bB279D4C2"
+  );
   console.log("LandMetaDataRender:", render.address);
 
   // console.log("deploy LandMetaDataRenderSolo...");
@@ -135,13 +135,13 @@ async function main() {
   // const land = await MOPNLand.deploy();
   // console.log("https://goerli.etherscan.io/tx/" + land.deployTransaction.hash);
   // await land.deployed();
-  const land = await ethers.getContractAt("MOPNLand", "0xe765a92a6181cccd5a4cbd7ab2318960aa01745c");
+  const land = await ethers.getContractAt("MOPNLand", "0xBFe8B57039D81F8e841bF123309635AE195499D6");
   console.log("MOPNLand", land.address);
 
-  console.log("update land render...");
-  const landrendertx = await land.setMetaDataRender(render.address);
-  await landrendertx.wait();
-  console.log("done");
+  // console.log("update land render...");
+  // const landrendertx = await land.setMetaDataRender(render.address);
+  // await landrendertx.wait();
+  // console.log("done");
 
   console.log("deploy TESTNFT...");
   // const TESTNFT = await ethers.getContractFactory("TESTNFT");
@@ -170,6 +170,7 @@ async function main() {
     bomb.address,
     mt.address,
     map.address,
+    //"0x0B265c1010367647Ea0F2e87563c24948f13bcb2"
     land.address
   );
   await governancesetmopntx.wait();
