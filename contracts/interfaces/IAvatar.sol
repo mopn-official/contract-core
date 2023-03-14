@@ -5,6 +5,7 @@ interface IAvatar {
     struct AvatarDataOutput {
         address contractAddress;
         uint256 tokenId;
+        uint256 avatarId;
         uint256 COID;
         uint256 BombUsed;
         uint32 tileCoordinate;

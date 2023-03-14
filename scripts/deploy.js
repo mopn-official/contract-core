@@ -138,6 +138,8 @@ async function main() {
   const land = await ethers.getContractAt("MOPNLand", "0xBFe8B57039D81F8e841bF123309635AE195499D6");
   console.log("MOPNLand", land.address);
 
+  console.log("remember to update land's auctionaddress to governance address");
+
   // console.log("update land render...");
   // const landrendertx = await land.setMetaDataRender(render.address);
   // await landrendertx.wait();

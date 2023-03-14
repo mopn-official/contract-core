@@ -32,6 +32,10 @@ contract Governance is Multicall, Ownable {
 
     mapping(uint32 => uint256) public LandHolderMTs;
 
+    event AvatarMTMinted(uint256 indexed avatarId, uint256 amount);
+
+    event CollectionMTMinted(uint256 indexed COID, uint256 amount);
+
     event MTClaimed(address indexed to, uint256 amount);
 
     constructor(uint256 MTProduceStartBlock_) {
@@ -232,12 +236,14 @@ contract Governance is Multicall, Ownable {
         uint256 AvatarPerMTAWMinted = getAvatarPerMTAWMinted(avatarId);
         uint256 PerMTAWMinted = getPerMTAWMinted();
         if (AvatarPerMTAWMinted < PerMTAWMinted && AvatarMTAW > 0) {
+            uint256 amount = ((((PerMTAWMinted - AvatarPerMTAWMinted) *
+                AvatarMTAW) * 90) / 100);
             AvatarMTs[avatarId] +=
-                ((((PerMTAWMinted - AvatarPerMTAWMinted) * AvatarMTAW) * 90) /
-                    100) *
+                amount *
                 10 ** 52 +
                 (PerMTAWMinted - AvatarPerMTAWMinted) *
                 10 ** 12;
+            emit AvatarMTMinted(avatarId, amount);
         }
     }
 
@@ -291,6 +297,7 @@ contract Governance is Multicall, Ownable {
             amount *
             10 ** 32;
         IMOPNToken(mtContract).mint(msg.sender, amount);
+        emit MTClaimed(msg.sender, amount);
     }
 
     /**
@@ -393,12 +400,14 @@ contract Governance is Multicall, Ownable {
         uint256 PerMTAWMinted = getPerMTAWMinted();
         uint256 CollectionPerMTAWMinted = getCollectionPerMTAWMinted(COID);
         if (CollectionPerMTAWMinted < PerMTAWMinted && CollectionMTAW > 0) {
+            uint256 amount = ((((PerMTAWMinted - CollectionPerMTAWMinted) *
+                CollectionMTAW) * 5) / 100);
             CollectionMTs[COID] +=
-                ((((PerMTAWMinted - CollectionPerMTAWMinted) * CollectionMTAW) *
-                    5) / 100) *
+                amount *
                 10 ** 52 +
                 (PerMTAWMinted - CollectionPerMTAWMinted) *
                 10 ** 12;
+            emit CollectionMTMinted(COID, amount);
         }
     }
 
@@ -438,6 +447,7 @@ contract Governance is Multicall, Ownable {
             CollectionMTs[COID] -= amount * (10 ** 52);
             CollectionMTs[COID] += amount * (10 ** 32);
             AvatarMTs[avatarId] += amount * (10 ** 52);
+            emit AvatarMTMinted(avatarId, amount);
         }
     }
 
@@ -760,6 +770,12 @@ contract Governance is Multicall, Ownable {
 
     function redeemAgio() public {
         IAuctionHouse(auctionHouseContract).redeemAgioTo(msg.sender);
+    }
+
+    ///todo remove before prod
+    function giveupOwnership() public onlyOwner {
+        IBomb(bombContract).transferOwnership(owner());
+        IMOPNToken(mtContract).transferOwnership(owner());
     }
 
     function _addMTAW(

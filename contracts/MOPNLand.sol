@@ -24,12 +24,16 @@ contract MOPNLand is ERC721, Ownable {
         return _tokenIdCounter.current();
     }
 
-    address public metaDataRenderAddress;
+    address public metadataRenderAddress;
 
-    function setMetaDataRender(
-        address metaDataRenderAddress_
-    ) public onlyOwner {
-        metaDataRenderAddress = metaDataRenderAddress_;
+    address public auctionAddress;
+
+    function setRender(address metaDataRenderAddress_) public onlyOwner {
+        metadataRenderAddress = metaDataRenderAddress_;
+    }
+
+    function setAuction(address auctionAddress_) public onlyOwner {
+        auctionAddress = auctionAddress_;
     }
 
     function tokenURI(
@@ -37,9 +41,9 @@ contract MOPNLand is ERC721, Ownable {
     ) public view override returns (string memory tokenuri) {
         _requireMinted(tokenId);
 
-        if (metaDataRenderAddress != address(0)) {
+        if (metadataRenderAddress != address(0)) {
             ILandMetaDataRender metaDataRender = ILandMetaDataRender(
-                metaDataRenderAddress
+                metadataRenderAddress
             );
             tokenuri = metaDataRender.constructTokenURI(tokenId);
         }

@@ -35,8 +35,6 @@ contract AuctionHouse is Multicall, Ownable {
 
     event BombSold(address indexed buyer, uint256 amount, uint256 price);
 
-    IGovernance private Governance;
-
     constructor(uint256 bombStartTimestamp, uint256 landStartTimestamp) {
         bombRound = 10 ** 14 + bombStartTimestamp * 10 ** 3;
         landRound = 10 ** 11 + landStartTimestamp;
@@ -50,7 +48,7 @@ contract AuctionHouse is Multicall, Ownable {
     function setGovernanceContract(
         address governanceContract_
     ) public onlyOwner {
-        Governance = IGovernance(governanceContract_);
+        governanceContract = governanceContract_;
     }
 
     /**
@@ -71,18 +69,15 @@ contract AuctionHouse is Multicall, Ownable {
 
         if (price > 0) {
             require(
-                IMOPNToken(Governance.mtContract()).balanceOf(msg.sender) >
-                    price,
+                IMOPNToken(IGovernance(governanceContract).mtContract())
+                    .balanceOf(msg.sender) > price,
                 "mopn token not enough"
             );
-            IMOPNToken(Governance.mtContract()).transferFrom(
-                msg.sender,
-                address(this),
-                price
-            );
+            IMOPNToken(IGovernance(governanceContract).mtContract())
+                .transferFrom(msg.sender, address(this), price);
         }
 
-        Governance.mintBomb(msg.sender, amount);
+        IGovernance(governanceContract).mintBomb(msg.sender, amount);
 
         bombWalletData[msg.sender] =
             (getBombWalletTotalSpend(msg.sender) + price) *
@@ -256,7 +251,10 @@ contract AuctionHouse is Multicall, Ownable {
         uint256 agio = getAgio(to);
         if (agio > 0) {
             bombWalletData[to] = 0;
-            IMOPNToken(Governance.mtContract()).transfer(to, agio);
+            IMOPNToken(IGovernance(governanceContract).mtContract()).transfer(
+                to,
+                agio
+            );
         }
     }
 
@@ -266,7 +264,9 @@ contract AuctionHouse is Multicall, Ownable {
     function settleBombPreviousRound(uint256 roundId, uint256 price) internal {
         if (price > 0) {
             price = price * bombRoundProduce;
-            IMOPNToken(Governance.mtContract()).burn(price);
+            IMOPNToken(IGovernance(governanceContract).mtContract()).burn(
+                price
+            );
         }
         bombRoundData[roundId] = price;
         bombRound = (roundId + 1) * 10 ** 14 + block.timestamp * 10 ** 3;
@@ -306,14 +306,17 @@ contract AuctionHouse is Multicall, Ownable {
 
         if (price > 0) {
             require(
-                IMOPNToken(Governance.mtContract()).balanceOf(msg.sender) >
-                    price,
+                IMOPNToken(IGovernance(governanceContract).mtContract())
+                    .balanceOf(msg.sender) > price,
                 "MOPNToken not enough"
             );
-            IMOPNToken(Governance.mtContract()).burnFrom(msg.sender, price);
+            IMOPNToken(IGovernance(governanceContract).mtContract()).burnFrom(
+                msg.sender,
+                price
+            );
         }
 
-        Governance.mintLand(msg.sender);
+        IGovernance(governanceContract).mintLand(msg.sender);
 
         landRound = (roundId + 1) * 10 ** 11 + block.timestamp;
     }

@@ -100,7 +100,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
     uint256 public currentAvatarId;
 
-    IGovernance private Governance;
+    address public governanceContract;
 
     /**
      * @dev set the governance contract address
@@ -108,7 +108,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
      * @param governanceContract_ Governance Contract Address
      */
     function setGovernanceContract(address governanceContract_) public {
-        Governance = IGovernance(governanceContract_);
+        governanceContract = governanceContract_;
     }
 
     /**
@@ -121,10 +121,10 @@ contract Avatar is IAvatar, Multicall, Ownable {
     ) public view returns (AvatarDataOutput memory avatarData) {
         if (avatarNoumenon[avatarId].setData > 0) {
             avatarData.tokenId = avatarNoumenon[avatarId].tokenId;
+            avatarData.avatarId = avatarId;
             avatarData.COID = getAvatarCOID(avatarId);
-            avatarData.contractAddress = Governance.getCollectionContract(
-                avatarData.COID
-            );
+            avatarData.contractAddress = IGovernance(governanceContract)
+                .getCollectionContract(avatarData.COID);
             avatarData.BombUsed = getAvatarBombUsed(avatarId);
             avatarData.tileCoordinate = getAvatarCoordinate(avatarId);
         }
@@ -179,7 +179,8 @@ contract Avatar is IAvatar, Multicall, Ownable {
         for (uint256 i = 0; i < heightabs; i++) {
             for (uint256 j = 0; j < widthabs; j++) {
                 avatarDatas[i * widthabs + j] = getAvatarByAvatarId(
-                    IMap(Governance.mapContract()).getTileAvatar(coordinate)
+                    IMap(IGovernance(governanceContract).mapContract())
+                        .getTileAvatar(coordinate)
                 );
                 avatarDatas[i * widthabs + j].tileCoordinate = coordinate;
                 coordinate = width > 0
@@ -224,9 +225,10 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint32[] memory coordinates
     ) public view returns (AvatarDataOutput[] memory avatarDatas) {
         avatarDatas = new AvatarDataOutput[](coordinates.length);
-        for (uint256 i; i < coordinates.length; i++) {
-            avatarDatas[coordinates[i]] = getAvatarByAvatarId(
-                IMap(Governance.mapContract()).getTileAvatar(coordinates[i])
+        for (uint256 i = 0; i < coordinates.length; i++) {
+            avatarDatas[i] = getAvatarByAvatarId(
+                IMap(IGovernance(governanceContract).mapContract())
+                    .getTileAvatar(coordinates[i])
             );
         }
     }
@@ -322,7 +324,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         require(COID > 0, "avatar not exist");
         return
             ownerOf(
-                Governance.getCollectionContract(COID),
+                IGovernance(governanceContract).getCollectionContract(COID),
                 avatarNoumenon[avatarId].tokenId,
                 delegateWallet,
                 vault
@@ -349,7 +351,10 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 ownerOf(collectionContract, tokenId, delegateWallet, vault),
             "caller is not token owner"
         );
-        uint256 COID = Governance.generateCOID(collectionContract, proofs);
+        uint256 COID = IGovernance(governanceContract).generateCOID(
+            collectionContract,
+            proofs
+        );
         require(tokenMap[collectionContract][tokenId] == 0, "avatar exist");
 
         currentAvatarId++;
@@ -383,7 +388,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
         uint256 COID = getAvatarCOID(avatarId);
 
-        IMap(Governance.mapContract()).avatarSet(
+        IMap(IGovernance(governanceContract).mapContract()).avatarSet(
             avatarId,
             COID,
             params.tileCoordinate,
@@ -392,8 +397,8 @@ contract Avatar is IAvatar, Multicall, Ownable {
         );
 
         setAvatarCoordinate(avatarId, params.tileCoordinate);
-        Governance.addCollectionOnMapNum(COID);
-        Governance.redeemCollectionInboxMT(avatarId, COID);
+        IGovernance(governanceContract).addCollectionOnMapNum(COID);
+        IGovernance(governanceContract).redeemCollectionInboxMT(avatarId, COID);
 
         emit AvatarJumpIn(avatarId, COID, params.LandId, params.tileCoordinate);
     }
@@ -419,9 +424,12 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint256 COID = getAvatarCOID(avatarId);
         uint32 orgCoordinate = getAvatarCoordinate(avatarId);
         require(orgCoordinate != 0, "avatar not on map");
-        IMap(Governance.mapContract()).avatarRemove(orgCoordinate, 0);
+        IMap(IGovernance(governanceContract).mapContract()).avatarRemove(
+            orgCoordinate,
+            0
+        );
 
-        IMap(Governance.mapContract()).avatarSet(
+        IMap(IGovernance(governanceContract).mapContract()).avatarSet(
             avatarId,
             COID,
             params.tileCoordinate,
@@ -460,28 +468,30 @@ contract Avatar is IAvatar, Multicall, Ownable {
         require(avatarId > 0, "avatar not exist");
         addAvatarBombUsed(avatarId);
         if (getAvatarCoordinate(avatarId) > 0) {
-            Governance.burnBomb(
+            IGovernance(governanceContract).burnBomb(
                 msg.sender,
                 1,
                 avatarId,
                 getAvatarCOID(avatarId),
-                IMap(Governance.mapContract()).getTileLandId(
-                    getAvatarCoordinate(avatarId)
-                )
+                IMap(IGovernance(governanceContract).mapContract())
+                    .getTileLandId(getAvatarCoordinate(avatarId))
             );
         } else {
-            Governance.burnBomb(msg.sender, 1, 0, 0, 0);
+            IGovernance(governanceContract).burnBomb(msg.sender, 1, 0, 0, 0);
         }
 
         uint256[] memory attackAvatarIds = new uint256[](7);
         uint32[] memory victimsCoordinates = new uint32[](7);
         for (uint256 i = 0; i < 7; i++) {
-            uint256 attackAvatarId = IMap(Governance.mapContract())
-                .avatarRemove(params.tileCoordinate, avatarId);
+            uint256 attackAvatarId = IMap(
+                IGovernance(governanceContract).mapContract()
+            ).avatarRemove(params.tileCoordinate, avatarId);
 
             if (attackAvatarId > 0) {
                 setAvatarCoordinate(attackAvatarId, 0);
-                Governance.subCollectionOnMapNum(getAvatarCOID(attackAvatarId));
+                IGovernance(governanceContract).subCollectionOnMapNum(
+                    getAvatarCOID(attackAvatarId)
+                );
                 attackAvatarIds[i] = attackAvatarId;
                 victimsCoordinates[i] = params.tileCoordinate;
             }
@@ -518,7 +528,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint256 avatarId,
         uint256 linkedAvatarId,
         uint32 tileCoordinate
-    ) internal {
+    ) internal view {
         uint256 COID = getAvatarCOID(avatarId);
         require(COID > 0, "avatar not exist");
 
@@ -531,7 +541,8 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 revert linkAvatarError();
             }
         } else {
-            uint256 collectionOnMapNum = Governance.getCollectionOnMapNum(COID);
+            uint256 collectionOnMapNum = IGovernance(governanceContract)
+                .getCollectionOnMapNum(COID);
             if (collectionOnMapNum > 0) {
                 if (
                     !(getAvatarCoordinate(avatarId) > 0 &&
@@ -564,7 +575,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
     modifier onlyMap() {
         require(
-            msg.sender == Governance.mapContract() ||
+            msg.sender == IGovernance(governanceContract).mapContract() ||
                 msg.sender == address(this),
             "not allowed"
         );

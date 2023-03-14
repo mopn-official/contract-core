@@ -7,4 +7,6 @@ interface IBomb is IERC1155 {
     function mint(address to, uint256 id, uint256 amount) external;
 
     function burn(address from, uint256 id, uint256 amount) external;
+
+    function transferOwnership(address newOwner) external;
 }

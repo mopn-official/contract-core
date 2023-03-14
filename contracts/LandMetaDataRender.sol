@@ -7,8 +7,7 @@ import "./interfaces/IGovernance.sol";
 import "./libraries/NFTMetaData.sol";
 
 contract LandMetaDataRender is ILandMetaDataRender {
-    IMap private Map;
-    IGovernance private Governance;
+    address public governanceContract;
 
     /**
      * @dev set the governance contract address
@@ -16,8 +15,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
      * @param governanceContract_ Governance Contract Address
      */
     function setGovernanceContract(address governanceContract_) public {
-        Governance = IGovernance(governanceContract_);
-        Map = IMap(Governance.mapContract());
+        governanceContract = governanceContract_;
     }
 
     function constructTokenURI(
@@ -31,7 +29,8 @@ contract LandMetaDataRender is ILandMetaDataRender {
         );
 
         tileDatas[0].tileMTAW = TileMath.getTileMTAW(tileCoordinate);
-        uint256 COID = Map.getTileCOID(tileCoordinate);
+        uint256 COID = IMap(IGovernance(governanceContract).mapContract())
+            .getTileCOID(tileCoordinate);
         if (COID > 0) {
             tileDatas[0].color = COID;
             tileDatas[1].color = COID;
@@ -53,7 +52,8 @@ contract LandMetaDataRender is ILandMetaDataRender {
                     tileDatas[index].tileMTAW = TileMath.getTileMTAW(
                         tileCoordinate
                     );
-                    COID = Map.getTileCOID(tileCoordinate);
+                    COID = IMap(IGovernance(governanceContract).mapContract())
+                        .getTileCOID(tileCoordinate);
                     if (COID > 0) {
                         uint32[3] memory tileCoordinateArr = TileMath
                             .coordinateIntToArr(tileCoordinate);
@@ -127,7 +127,8 @@ contract LandMetaDataRender is ILandMetaDataRender {
             NFTMetaData.constructTokenURI(
                 LandId,
                 tileDatas,
-                (Governance.getLandHolderRedeemed(LandId) / 10 ** 8)
+                (IGovernance(governanceContract).getLandHolderRedeemed(LandId) /
+                    10 ** 8)
             );
     }
 }

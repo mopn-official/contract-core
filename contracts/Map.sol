@@ -61,12 +61,12 @@ contract Map is Ownable {
         return avatarIds;
     }
 
-    IGovernance private Governance;
+    address public governanceContract;
 
     function setGovernanceContract(
         address governanceContract_
     ) public onlyOwner {
-        Governance = IGovernance(governanceContract_);
+        governanceContract = governanceContract_;
     }
 
     /**
@@ -98,7 +98,8 @@ contract Map is Ownable {
                 "LandId error"
             );
             require(
-                ILand(Governance.landContract()).nextTokenId() > LandId,
+                ILand(IGovernance(governanceContract).landContract())
+                    .nextTokenId() > LandId,
                 "Land Not Open"
             );
         }
@@ -123,7 +124,12 @@ contract Map is Ownable {
             }
         }
 
-        Governance.addMTAW(avatarId, COID, LandId, TileMTAW);
+        IGovernance(governanceContract).addMTAW(
+            avatarId,
+            COID,
+            LandId,
+            TileMTAW
+        );
     }
 
     /**
@@ -138,8 +144,14 @@ contract Map is Ownable {
         avatarId = getTileAvatar(tileCoordinate);
         if (avatarId > 0 && avatarId != excludeAvatarId) {
             uint32 LandId = getTileLandId(tileCoordinate);
-            Governance.subMTAW(avatarId, getTileCOID(tileCoordinate), LandId);
+            IGovernance(governanceContract).subMTAW(
+                avatarId,
+                getTileCOID(tileCoordinate),
+                LandId
+            );
             tiles[tileCoordinate] = LandId;
+        } else {
+            avatarId = 0;
         }
     }
 
@@ -154,7 +166,10 @@ contract Map is Ownable {
     }
 
     modifier onlyAvatar() {
-        require(msg.sender == Governance.avatarContract(), "not allowed");
+        require(
+            msg.sender == IGovernance(governanceContract).avatarContract(),
+            "not allowed"
+        );
         _;
     }
 }
