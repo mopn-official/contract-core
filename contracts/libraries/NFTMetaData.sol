@@ -149,10 +149,8 @@ library NFTMetaData {
                 "hsl(",
                 Strings.toString(h),
                 ",",
-                Strings.toString(50 - ringNum / 3),
-                "%, ",
-                Strings.toString(60 + ringNum / 3),
-                "%)"
+                Strings.toString(65 - ringNum / 2),
+                "%, 80%)"
             );
     }
 

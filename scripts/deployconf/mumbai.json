@@ -21,7 +21,7 @@
     "verified": true
   },
   "NFTMetaData": {
-    "address": "0x3EE256Eeef106798ED679a17A38d475840213Fac",
+    "address": "0xa2403eA012b512CC7cFb51a8F990ceCFBFF974b4",
     "verified": true,
     "libraries": [
       "TileMath",
@@ -99,7 +99,7 @@
     ]
   },
   "LandMetaDataRender": {
-    "address": "0x3CA2a4F45730E684bD09105C022D742Cd3eC944d",
+    "address": "0x3cc164aD930b9e0C47357a1Cfe067c713e2645d3",
     "verified": true,
     "libraries": [
       "TileMath",
@@ -150,7 +150,7 @@
       },
       {
         "contracts": [
-          "Governance"
+          "LandMetaDataRender"
         ],
         "attributes": [
           "metadataRenderAddress"

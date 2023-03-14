@@ -119,6 +119,7 @@ async function main() {
   for (let i = 0; i < deployConf.contracts.length; i++) {
     contractName = deployConf.contracts[i];
     if (!deployConf[contractName].verified) {
+      console.log("begin to verify ", contractName, " at ", deployConf[contractName].address);
       try {
         await hre.run("verify:verify", {
           address: deployConf[contractName].address,
@@ -126,8 +127,13 @@ async function main() {
             ? deployConf[contractName].constructparams
             : [],
         });
+        deployConf[contractName].verified = true;
+        saveConf(deployConf);
       } catch (e) {
-        if (e.toString() == "Reason: Already Verified") {
+        if (
+          e.toString() == "Reason: Already Verified" ||
+          e.toString() == "NomicLabsHardhatPluginError: Contract source code already verified"
+        ) {
           deployConf[contractName].verified = true;
           saveConf(deployConf);
         } else {
@@ -163,7 +169,6 @@ function saveConf(deployConf) {
     "utf8",
     function (err) {
       if (err) throw err;
-      console.log("complete");
     }
   );
 }
