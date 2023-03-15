@@ -1,167 +1,167 @@
 {
-  "contracts": [
-    "TileMath",
-    "NFTSVG",
-    "NFTMetaData",
-    "AuctionHouse",
-    "Avatar",
-    "Bomb",
-    "Governance",
-    "LandMetaDataRender",
-    "Map",
-    "MOPNLand",
-    "MOPNToken"
-  ],
-  "TileMath": {
-    "address": "0x48D9Aed3b3c70aa9B246c88D08c6be80DdFcA41e",
-    "verified": true
-  },
-  "NFTSVG": {
-    "address": "0x5bC063B049F079D3aC2f357351fDdA1ACFE137C6",
-    "verified": true
-  },
-  "NFTMetaData": {
-    "address": "0xa2403eA012b512CC7cFb51a8F990ceCFBFF974b4",
-    "verified": true,
-    "libraries": [
-      "TileMath",
-      "NFTSVG"
-    ]
-  },
-  "AuctionHouse": {
-    "address": "0x54D56C784f964493b4EA3cAc8209585bd88600B2",
-    "verified": true,
-    "constructparams": [
-      1677825096,
-      1677825096
+    "contracts": [
+        "TileMath",
+        "NFTSVG",
+        "NFTMetaData",
+        "AuctionHouse",
+        "Avatar",
+        "Bomb",
+        "Governance",
+        "LandMetaDataRender",
+        "Map",
+        "MOPNLand",
+        "MOPNToken"
     ],
-    "crossContractCheck": [
-      {
-        "contracts": [
-          "Governance"
+    "TileMath": {
+        "address": "0x48D9Aed3b3c70aa9B246c88D08c6be80DdFcA41e",
+        "verified": true
+    },
+    "NFTSVG": {
+        "address": "0x5bC063B049F079D3aC2f357351fDdA1ACFE137C6",
+        "verified": true
+    },
+    "NFTMetaData": {
+        "address": "0x8DFbE0be7A9d5A1f3c4e09260a62c0f15A846760",
+        "verified": true,
+        "libraries": [
+            "TileMath",
+            "NFTSVG"
+        ]
+    },
+    "AuctionHouse": {
+        "address": "0x54D56C784f964493b4EA3cAc8209585bd88600B2",
+        "verified": true,
+        "constructparams": [
+            1677825096,
+            1677825096
         ],
-        "attributes": [
-          "governanceContract"
+        "crossContractCheck": [
+            {
+                "contracts": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "Avatar": {
+        "address": "0x75c57edC21d7187dACE7468D461d128E5C1f4982",
+        "verified": true,
+        "libraries": [
+            "TileMath"
         ],
-        "updateMethod": "setGovernanceContract"
-      }
-    ]
-  },
-  "Avatar": {
-    "address": "0x75c57edC21d7187dACE7468D461d128E5C1f4982",
-    "verified": true,
-    "libraries": [
-      "TileMath"
-    ],
-    "crossContractCheck": [
-      {
-        "contracts": [
-          "Governance"
+        "crossContractCheck": [
+            {
+                "contracts": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "Bomb": {
+        "address": "0x21a9715a0c4687b18FeF02e1a51fdca30191A153",
+        "verified": true,
+        "transOwnerTo": "Governance"
+    },
+    "Governance": {
+        "address": "0xFf5782cEC17Fccd0138A10C6e8ca6bd8e6bC3447",
+        "verified": true,
+        "constructparams": [
+            0
         ],
-        "attributes": [
-          "governanceContract"
+        "crossContractCheck": [
+            {
+                "contracts": [
+                    "AuctionHouse",
+                    "Avatar",
+                    "Bomb",
+                    "MOPNToken",
+                    "Map",
+                    "MOPNLand"
+                ],
+                "attributes": [
+                    "auctionHouseContract",
+                    "avatarContract",
+                    "bombContract",
+                    "mtContract",
+                    "mapContract",
+                    "landContract"
+                ],
+                "updateMethod": "updateMOPNContracts"
+            }
+        ]
+    },
+    "LandMetaDataRender": {
+        "address": "0x222Ce83212d8bCe1d3Bb48a8E0A1453945bB3EE3",
+        "verified": true,
+        "libraries": [
+            "TileMath",
+            "NFTMetaData"
         ],
-        "updateMethod": "setGovernanceContract"
-      }
-    ]
-  },
-  "Bomb": {
-    "address": "0x21a9715a0c4687b18FeF02e1a51fdca30191A153",
-    "verified": true,
-    "transOwnerTo": "Governance"
-  },
-  "Governance": {
-    "address": "0xFf5782cEC17Fccd0138A10C6e8ca6bd8e6bC3447",
-    "verified": true,
-    "constructparams": [
-      0
-    ],
-    "crossContractCheck": [
-      {
-        "contracts": [
-          "AuctionHouse",
-          "Avatar",
-          "Bomb",
-          "MOPNToken",
-          "Map",
-          "MOPNLand"
+        "crossContractCheck": [
+            {
+                "contracts": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "Map": {
+        "address": "0xfE098984271E10064E85af124233354CB8e58824",
+        "verified": true,
+        "libraries": [
+            "TileMath"
         ],
-        "attributes": [
-          "auctionHouseContract",
-          "avatarContract",
-          "bombContract",
-          "mtContract",
-          "mapContract",
-          "landContract"
-        ],
-        "updateMethod": "updateMOPNContracts"
-      }
-    ]
-  },
-  "LandMetaDataRender": {
-    "address": "0x3cc164aD930b9e0C47357a1Cfe067c713e2645d3",
-    "verified": true,
-    "libraries": [
-      "TileMath",
-      "NFTMetaData"
-    ],
-    "crossContractCheck": [
-      {
-        "contracts": [
-          "Governance"
-        ],
-        "attributes": [
-          "governanceContract"
-        ],
-        "updateMethod": "setGovernanceContract"
-      }
-    ]
-  },
-  "Map": {
-    "address": "0xfE098984271E10064E85af124233354CB8e58824",
-    "verified": false,
-    "libraries": [
-      "TileMath"
-    ],
-    "crossContractCheck": [
-      {
-        "contracts": [
-          "Governance"
-        ],
-        "attributes": [
-          "governanceContract"
-        ],
-        "updateMethod": "setGovernanceContract"
-      }
-    ]
-  },
-  "MOPNLand": {
-    "address": "0xBFe8B57039D81F8e841bF123309635AE195499D6",
-    "verified": true,
-    "crossContractCheck": [
-      {
-        "contracts": [
-          "Governance"
-        ],
-        "attributes": [
-          "auctionAddress"
-        ],
-        "updateMethod": "setAuction"
-      },
-      {
-        "contracts": [
-          "LandMetaDataRender"
-        ],
-        "attributes": [
-          "metadataRenderAddress"
-        ],
-        "updateMethod": "setRender"
-      }
-    ]
-  },
-  "MOPNToken": {
-    "address": "0x9eF0A20Bea4068Ceb5191afdAEC07eA8A96c7fD2",
-    "verified": true,
-    "transOwnerTo": "Governance"
-  }
+        "crossContractCheck": [
+            {
+                "contracts": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "MOPNLand": {
+        "address": "0xBFe8B57039D81F8e841bF123309635AE195499D6",
+        "verified": true,
+        "crossContractCheck": [
+            {
+                "contracts": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "auctionAddress"
+                ],
+                "updateMethod": "setAuction"
+            },
+            {
+                "contracts": [
+                    "LandMetaDataRender"
+                ],
+                "attributes": [
+                    "metadataRenderAddress"
+                ],
+                "updateMethod": "setRender"
+            }
+        ]
+    },
+    "MOPNToken": {
+        "address": "0x9eF0A20Bea4068Ceb5191afdAEC07eA8A96c7fD2",
+        "verified": true,
+        "transOwnerTo": "Governance"
+    }
 }

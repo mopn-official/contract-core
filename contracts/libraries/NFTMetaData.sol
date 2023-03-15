@@ -138,18 +138,16 @@ library NFTMetaData {
         if (landId == 0) {
             return abi.encodePacked("hsl(0, 100%, 100%)");
         }
-        uint256 ringNum = TileMath.LandRingNum(landId);
-        uint256 landRingPos = TileMath.LandRingPos(landId);
-        uint256 h = landRingPos == 0
-            ? 0
-            : (360 * landRingPos) / (3 * ringNum * ringNum + 3 * ringNum);
+        uint256 round = (landId / 360) + 1;
+        uint256 pos = landId % 360;
+        uint256 h = 30 * (pos % 12) + (pos / 12);
 
         return
             abi.encodePacked(
                 "hsl(",
                 Strings.toString(h),
                 ",",
-                Strings.toString(65 - ringNum / 2),
+                Strings.toString(66 - round),
                 "%, 80%)"
             );
     }
