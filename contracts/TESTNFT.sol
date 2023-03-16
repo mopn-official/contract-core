@@ -10,13 +10,23 @@ contract TESTNFT is ERC721, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721("MyToken", "MTK") {}
+    constructor() ERC721("MOPNTest", "MOPNTest") {}
 
     function safeMint(address to, uint256 amount) public {
         for (uint256 i = 0; i < amount; i++) {
             _safeMint(to, _tokenIdCounter.current());
             _tokenIdCounter.increment();
         }
+    }
+
+    string public baseURI;
+
+    function setBaseURI(string memory baseURI_) public onlyOwner {
+        baseURI = baseURI_;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
     }
 
     function nextTokenId() public view returns (uint256) {

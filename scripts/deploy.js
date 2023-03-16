@@ -67,24 +67,22 @@ async function main() {
   }
   console.log("transfer owner check finish");
 
-  console.log("cross Contract check start");
+  console.log("contract attributes  check start");
   for (let i = 0; i < deployConf.contracts.length; i++) {
     contractName = deployConf.contracts[i];
-    if (deployConf[contractName].crossContractCheck) {
-      for (let j = 0; j < deployConf[contractName].crossContractCheck.length; j++) {
+    if (deployConf[contractName].attributesCheck) {
+      for (let j = 0; j < deployConf[contractName].attributesCheck.length; j++) {
         contract = await ethers.getContractAt(contractName, deployConf[contractName].address);
         let needupdate = false;
         let updateParams = [];
-        for (let k = 0; k < deployConf[contractName].crossContractCheck[j].contracts.length; k++) {
-          const expectAttr = ethers.utils.isAddress(
-            deployConf[contractName].crossContractCheck[j].contracts[k]
-          )
-            ? deployConf[contractName].crossContractCheck[j].contracts[j]
-            : deployConf[deployConf[contractName].crossContractCheck[j].contracts[k]].address;
+        for (let k = 0; k < deployConf[contractName].attributesCheck[j].expectValue.length; k++) {
+          const expectAttr = deployConf[deployConf[contractName].attributesCheck[j].expectValue[k]]
+            ? deployConf[deployConf[contractName].attributesCheck[j].expectValue[k]].address
+            : deployConf[contractName].attributesCheck[j].expectValue[k];
           updateParams.push(expectAttr);
 
           const currentAttr = await eval(
-            "contract." + deployConf[contractName].crossContractCheck[j].attributes[k] + "()"
+            "contract." + deployConf[contractName].attributesCheck[j].attributes[k] + "()"
           );
 
           if (expectAttr != currentAttr) {
@@ -97,11 +95,11 @@ async function main() {
             "'s attr",
             j,
             " needs to update, begin to call ",
-            deployConf[contractName].crossContractCheck[j].updateMethod
+            deployConf[contractName].attributesCheck[j].updateMethod
           );
           const updatetx = await eval(
             "contract." +
-              deployConf[contractName].crossContractCheck[j].updateMethod +
+              deployConf[contractName].attributesCheck[j].updateMethod +
               "(...updateParams)"
           );
           await updatetx.wait();
@@ -126,6 +124,9 @@ async function main() {
           constructorArguments: deployConf[contractName].constructparams
             ? deployConf[contractName].constructparams
             : [],
+          contract: deployConf[contractName].verifycontract
+            ? deployConf[contractName].verifycontract
+            : "",
         });
         deployConf[contractName].verified = true;
         saveConf(deployConf);
