@@ -2,14 +2,37 @@
 pragma solidity ^0.8.17;
 
 interface IAvatar {
-    struct AvatarDataOutput {
-        address contractAddress;
-        uint256 tokenId;
-        uint256 avatarId;
-        uint256 COID;
-        uint256 BombUsed;
-        uint32 tileCoordinate;
-    }
+    function getNFTAvatarId(
+        address contractAddress,
+        uint256 tokenId
+    ) external view returns (uint256);
+
+    /**
+     * @notice get avatar collection id
+     * @param avatarId avatar Id
+     * @return COID colletion id
+     */
+    function getAvatarCOID(uint256 avatarId) external view returns (uint256);
+
+    function getAvatarTokenId(uint256 avatarId) external view returns (uint256);
+
+    /**
+     * @notice get avatar bomb used number
+     * @param avatarId avatar Id
+     * @return bomb used number
+     */
+    function getAvatarBombUsed(
+        uint256 avatarId
+    ) external view returns (uint256);
+
+    /**
+     * @notice get avatar on map coordinate
+     * @param avatarId avatar Id
+     * @return tileCoordinate tile coordinate
+     */
+    function getAvatarCoordinate(
+        uint256 avatarId
+    ) external view returns (uint32);
 
     /**
      * @notice Avatar On Map Action Params
@@ -53,68 +76,6 @@ interface IAvatar {
         DelegateWallet delegateWallet,
         address vault
     ) external view returns (address);
-
-    /**
-     * @notice get avatar info by avatarId
-     * @param avatarId avatar Id
-     * @return avatarData avatar data format struct AvatarDataOutput
-     */
-    function getAvatarByAvatarId(
-        uint256 avatarId
-    ) external view returns (AvatarDataOutput memory avatarData);
-
-    /**
-     * @notice get avatar info by nft contractAddress and tokenId
-     * @param collection  collection contract address
-     * @param tokenId  token Id
-     * @return avatarData avatar data format struct AvatarDataOutput
-     */
-    function getAvatarByNFT(
-        address collection,
-        uint256 tokenId
-    ) external view returns (AvatarDataOutput memory avatarData);
-
-    /**
-     * @notice get avatar infos by nft contractAddresses and tokenIds
-     * @param collections array of collection contract address
-     * @param tokenIds array of token Ids
-     * @return avatarDatas avatar datas format struct AvatarDataOutput
-     */
-    function getAvatarsByNFTs(
-        address[] memory collections,
-        uint256[] memory tokenIds
-    ) external view returns (AvatarDataOutput[] memory avatarDatas);
-
-    /**
-     * @notice get avatar infos by tile sets start by start coordinate and range by width and height
-     * @param startCoordinate start tile coordinate
-     * @param width range width
-     * @param height range height
-     */
-    function getAvatarsByCoordinateRange(
-        uint32 startCoordinate,
-        int32 width,
-        int32 height
-    ) external view returns (AvatarDataOutput[] memory avatarDatas);
-
-    /**
-     * @notice get avatar infos by tile sets start by start coordinate and end by end coordinates
-     * @param startCoordinate start tile coordinate
-     * @param endCoordinate end tile coordinate
-     */
-    function getAvatarsByStartEndCoordinate(
-        uint32 startCoordinate,
-        uint32 endCoordinate
-    ) external view returns (AvatarDataOutput[] memory avatarDatas);
-
-    /**
-     * @notice get avatars by coordinate array
-     * @param coordinates array of token Ids
-     * @return avatarDatas avatar datas format struct AvatarDataOutput
-     */
-    function getAvatarsByCoordinates(
-        uint32[] memory coordinates
-    ) external view returns (AvatarDataOutput[] memory avatarDatas);
 
     /**
      * @notice mint an avatar for a NFT

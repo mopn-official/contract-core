@@ -111,126 +111,11 @@ contract Avatar is IAvatar, Multicall, Ownable {
         governanceContract = governanceContract_;
     }
 
-    /**
-     * @notice get avatar info by avatarId
-     * @param avatarId avatar Id
-     * @return avatarData avatar data format struct AvatarDataOutput
-     */
-    function getAvatarByAvatarId(
-        uint256 avatarId
-    ) public view returns (AvatarDataOutput memory avatarData) {
-        if (avatarNoumenon[avatarId].setData > 0) {
-            avatarData.tokenId = avatarNoumenon[avatarId].tokenId;
-            avatarData.avatarId = avatarId;
-            avatarData.COID = getAvatarCOID(avatarId);
-            avatarData.contractAddress = IGovernance(governanceContract)
-                .getCollectionContract(avatarData.COID);
-            avatarData.BombUsed = getAvatarBombUsed(avatarId);
-            avatarData.tileCoordinate = getAvatarCoordinate(avatarId);
-        }
-    }
-
-    /**
-     * @notice get avatar info by nft contractAddress and tokenId
-     * @param collection  collection contract address
-     * @param tokenId  token Id
-     * @return avatarData avatar data format struct AvatarDataOutput
-     */
-    function getAvatarByNFT(
-        address collection,
+    function getNFTAvatarId(
+        address contractAddress,
         uint256 tokenId
-    ) public view returns (AvatarDataOutput memory avatarData) {
-        avatarData = getAvatarByAvatarId(tokenMap[collection][tokenId]);
-    }
-
-    /**
-     * @notice get avatar infos by nft contractAddresses and tokenIds
-     * @param collections array of collection contract address
-     * @param tokenIds array of token Ids
-     * @return avatarDatas avatar datas format struct AvatarDataOutput
-     */
-    function getAvatarsByNFTs(
-        address[] calldata collections,
-        uint256[] calldata tokenIds
-    ) public view returns (AvatarDataOutput[] memory avatarDatas) {
-        avatarDatas = new AvatarDataOutput[](collections.length);
-        for (uint256 i = 0; i < collections.length; i++) {
-            avatarDatas[i] = getAvatarByAvatarId(
-                tokenMap[collections[i]][tokenIds[i]]
-            );
-        }
-    }
-
-    /**
-     * @notice get avatar infos by tile sets start by start coordinate and range by width and height
-     * @param startCoordinate start tile coordinate
-     * @param width range width
-     * @param height range height
-     */
-    function getAvatarsByCoordinateRange(
-        uint32 startCoordinate,
-        int32 width,
-        int32 height
-    ) public view returns (AvatarDataOutput[] memory avatarDatas) {
-        uint32 coordinate = startCoordinate;
-        uint256 widthabs = SignedMath.abs(width);
-        uint256 heightabs = SignedMath.abs(height);
-        avatarDatas = new AvatarDataOutput[](widthabs * heightabs);
-        for (uint256 i = 0; i < heightabs; i++) {
-            for (uint256 j = 0; j < widthabs; j++) {
-                avatarDatas[i * widthabs + j] = getAvatarByAvatarId(
-                    IMap(IGovernance(governanceContract).mapContract())
-                        .getTileAvatar(coordinate)
-                );
-                avatarDatas[i * widthabs + j].tileCoordinate = coordinate;
-                coordinate = width > 0
-                    ? coordinate.neighbor((j % 2 == 0 ? 5 : 0))
-                    : coordinate.neighbor((j % 2 == 0 ? 3 : 2));
-            }
-            startCoordinate = startCoordinate.neighbor(height > 0 ? 1 : 4);
-            coordinate = startCoordinate;
-        }
-    }
-
-    /**
-     * @notice get avatar infos by tile sets start by start coordinate and end by end coordinates
-     * @param startCoordinate start tile coordinate
-     * @param endCoordinate end tile coordinate
-     */
-    function getAvatarsByStartEndCoordinate(
-        uint32 startCoordinate,
-        uint32 endCoordinate
-    ) public view returns (AvatarDataOutput[] memory avatarDatas) {
-        TileMath.XYCoordinate memory startxy = startCoordinate.coordinateToXY();
-        TileMath.XYCoordinate memory endxy = endCoordinate.coordinateToXY();
-        int32 width = endxy.x - startxy.x;
-        int32 height;
-        if (width > 0) {
-            height = startxy.y - (width / 2) - endxy.y;
-            width += 1;
-        } else {
-            height = startxy.y + (width / 2) - endxy.y;
-            width -= 1;
-        }
-
-        return getAvatarsByCoordinateRange(startCoordinate, width, height);
-    }
-
-    /**
-     * @notice get avatars by coordinate array
-     * @param coordinates array of coordinates
-     * @return avatarDatas avatar datas format struct AvatarDataOutput
-     */
-    function getAvatarsByCoordinates(
-        uint32[] memory coordinates
-    ) public view returns (AvatarDataOutput[] memory avatarDatas) {
-        avatarDatas = new AvatarDataOutput[](coordinates.length);
-        for (uint256 i = 0; i < coordinates.length; i++) {
-            avatarDatas[i] = getAvatarByAvatarId(
-                IMap(IGovernance(governanceContract).mapContract())
-                    .getTileAvatar(coordinates[i])
-            );
-        }
+    ) public view returns (uint256) {
+        return tokenMap[contractAddress][tokenId];
     }
 
     /**
@@ -240,6 +125,10 @@ contract Avatar is IAvatar, Multicall, Ownable {
      */
     function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
         return (avatarNoumenon[avatarId].setData % 10 ** 18) / 10 ** 8;
+    }
+
+    function getAvatarTokenId(uint256 avatarId) public view returns (uint256) {
+        return avatarNoumenon[avatarId].tokenId;
     }
 
     /**
