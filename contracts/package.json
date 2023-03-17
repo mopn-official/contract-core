@@ -1,7 +1,7 @@
 {
   "name": "@mopn/core",
   "description": "This project is the core contracts of mopn.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "files": [
     "**/*.sol",
     "/build/contracts/*.json",
