@@ -1,13 +1,21 @@
-# Sample Hardhat Project
+# MOPN Core Contracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Website: https://mopn.xyz/
 
-Try running some of the following tasks:
+Twitter: https://twitter.com/mopnxyz
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+Litepaper: https://litepaper.mopn.xyz/
+
+Github: https://github.com/mopn-official
+
+Medium: http://mopn.medium.com/
+
+Snapshot: https://snapshot.org/#/mopn.eth
+
+Telegram: https://t.me/mopnxyz
+
+## Land NFT
+
+Land: https://mopn.xyz/land
+
+Opensea: https://opensea.io/collection/mopn

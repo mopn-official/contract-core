@@ -1,0 +1,27 @@
+{
+  "name": "@mopn/core",
+  "description": "This project is the core contracts of mopn.",
+  "version": "0.0.1",
+  "files": [
+    "**/*.sol",
+    "/build/contracts/*.json",
+    "!/mocks/**/*",
+    "!TESTNFT*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mopn-official/contract-core.git"
+  },
+  "keywords": [
+    "mopn",
+    "core",
+    "web3game",
+    "gamefi"
+  ],
+  "author": "cyanface",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mopn-official/contract-core/issues"
+  },
+  "homepage": "https://mopn.xyz"
+}

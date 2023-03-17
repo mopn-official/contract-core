@@ -1,8 +1,7 @@
 {
-  "name": "core",
-  "description": "This project is the core of mopn.",
+  "name": "@mopn/core",
+  "description": "This project is the core contracts of mopn.",
   "version": "0.0.1",
-  "main": "hardhat.config.js",
   "directories": {
     "test": "test"
   },
@@ -11,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mopn-official/core.git"
+    "url": "git+https://github.com/mopn-official/contract-core.git"
   },
   "keywords": [
     "mopn",
@@ -20,11 +19,11 @@
     "gamefi"
   ],
   "author": "cyanface",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mopn-official/core/issues"
+    "url": "https://github.com/mopn-official/contract-core/issues"
   },
-  "homepage": "https://github.com/mopn-official/core#readme",
+  "homepage": "https://mopn.xyz",
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.1",
     "@openzeppelin/merkle-tree": "^1.0.2",
