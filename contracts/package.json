@@ -23,5 +23,11 @@
   "bugs": {
     "url": "https://github.com/mopn-official/contract-core/issues"
   },
-  "homepage": "https://mopn.xyz"
+  "homepage": "https://mopn.xyz",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.1",
+    "base64-sol": "^1.1.0",
+    "erc721a": "^4.2.3",
+    "operator-filter-registry": "github:ProjectOpenSea/operator-filter-registry"
+  }
 }
