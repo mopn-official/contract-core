@@ -67,7 +67,7 @@ async function main() {
   }
   console.log("transfer owner check finish");
 
-  console.log("contract attributes  check start");
+  console.log("contract attributes check start");
   for (let i = 0; i < deployConf.contracts.length; i++) {
     contractName = deployConf.contracts[i];
     if (deployConf[contractName].attributesCheck) {
@@ -111,41 +111,43 @@ async function main() {
       }
     }
   }
-  console.log("cross Contract check finish");
+  console.log("Contract attributes check finish");
 
-  console.log("begin verify contracts on " + hre.network.name + "scan");
-  for (let i = 0; i < deployConf.contracts.length; i++) {
-    contractName = deployConf.contracts[i];
-    if (!deployConf[contractName].verified) {
-      console.log("begin to verify ", contractName, " at ", deployConf[contractName].address);
-      try {
-        await hre.run("verify:verify", {
-          address: deployConf[contractName].address,
-          constructorArguments: deployConf[contractName].constructparams
-            ? deployConf[contractName].constructparams
-            : [],
-          contract: deployConf[contractName].verifycontract
-            ? deployConf[contractName].verifycontract
-            : "",
-        });
-        deployConf[contractName].verified = true;
-        saveConf(deployConf);
-      } catch (e) {
-        if (
-          e.toString() == "Reason: Already Verified" ||
-          e.toString() == "NomicLabsHardhatPluginError: Contract source code already verified"
-        ) {
+  if (hre.network.config.chainId != 1337) {
+    console.log("begin verify contracts on " + hre.network.name + "scan");
+    for (let i = 0; i < deployConf.contracts.length; i++) {
+      contractName = deployConf.contracts[i];
+      if (!deployConf[contractName].verified) {
+        console.log("begin to verify ", contractName, " at ", deployConf[contractName].address);
+        try {
+          await hre.run("verify:verify", {
+            address: deployConf[contractName].address,
+            constructorArguments: deployConf[contractName].constructparams
+              ? deployConf[contractName].constructparams
+              : [],
+            contract: deployConf[contractName].verifycontract
+              ? deployConf[contractName].verifycontract
+              : "",
+          });
           deployConf[contractName].verified = true;
           saveConf(deployConf);
-        } else {
-          console.log("verify failed " + e.toString());
+        } catch (e) {
+          if (
+            e.toString() == "Reason: Already Verified" ||
+            e.toString() == "NomicLabsHardhatPluginError: Contract source code already verified"
+          ) {
+            deployConf[contractName].verified = true;
+            saveConf(deployConf);
+          } else {
+            console.log("verify failed " + e.toString());
+          }
         }
+      } else {
+        console.log(contractName, " already verified");
       }
-    } else {
-      console.log(contractName, " already verified");
     }
+    console.log("all contracts verifed");
   }
-  console.log("all contracts verifed");
 }
 
 function loadConf() {

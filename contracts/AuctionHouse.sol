@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IGovernance.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";

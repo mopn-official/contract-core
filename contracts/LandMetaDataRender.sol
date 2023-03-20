@@ -21,6 +21,8 @@ contract LandMetaDataRender is ILandMetaDataRender {
     function constructTokenURI(
         uint256 LandId_
     ) public view returns (string memory) {
+        IMap map = IMap(IGovernance(governanceContract).mapContract());
+
         uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
         uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
@@ -29,8 +31,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
         );
 
         tileDatas[0].tileMTAW = TileMath.getTileMTAW(tileCoordinate);
-        uint256 COID = IMap(IGovernance(governanceContract).mapContract())
-            .getTileCOID(tileCoordinate);
+        uint256 COID = map.getTileCOID(tileCoordinate);
         if (COID > 0) {
             tileDatas[0].color = COID;
             tileDatas[1].color = COID;
@@ -52,8 +53,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
                     tileDatas[index].tileMTAW = TileMath.getTileMTAW(
                         tileCoordinate
                     );
-                    COID = IMap(IGovernance(governanceContract).mapContract())
-                        .getTileCOID(tileCoordinate);
+                    COID = map.getTileCOID(tileCoordinate);
                     if (COID > 0) {
                         uint32[3] memory tileCoordinateArr = TileMath
                             .coordinateIntToArr(tileCoordinate);
@@ -127,8 +127,8 @@ contract LandMetaDataRender is ILandMetaDataRender {
             NFTMetaData.constructTokenURI(
                 LandId,
                 tileDatas,
-                (IGovernance(governanceContract).getLandHolderRedeemed(LandId) /
-                    10 ** 8)
+                ((map.getLandHolderTotalMinted(LandId) +
+                    map.getLandHolderInboxMT(LandId)) / 10 ** 8)
             );
     }
 }

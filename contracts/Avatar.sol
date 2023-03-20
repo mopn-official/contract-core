@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
 import "./interfaces/IAvatar.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IMap.sol";
@@ -107,7 +106,9 @@ contract Avatar is IAvatar, Multicall, Ownable {
      * @dev this function also get the Map contract from the governances
      * @param governanceContract_ Governance Contract Address
      */
-    function setGovernanceContract(address governanceContract_) public {
+    function setGovernanceContract(
+        address governanceContract_
+    ) public onlyOwner {
         governanceContract = governanceContract_;
     }
 
@@ -287,7 +288,8 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
         setAvatarCoordinate(avatarId, params.tileCoordinate);
         IGovernance(governanceContract).addCollectionOnMapNum(COID);
-        IGovernance(governanceContract).redeemCollectionInboxMT(avatarId, COID);
+        IMap(IGovernance(governanceContract).mapContract())
+            .redeemCollectionInboxMT(avatarId, COID);
 
         emit AvatarJumpIn(avatarId, COID, params.LandId, params.tileCoordinate);
     }
@@ -356,18 +358,18 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
         require(avatarId > 0, "avatar not exist");
         addAvatarBombUsed(avatarId);
+
         if (getAvatarCoordinate(avatarId) > 0) {
-            IGovernance(governanceContract).burnBomb(
-                msg.sender,
-                1,
+            IMap(IGovernance(governanceContract).mapContract()).addMTAW(
                 avatarId,
                 getAvatarCOID(avatarId),
                 IMap(IGovernance(governanceContract).mapContract())
-                    .getTileLandId(getAvatarCoordinate(avatarId))
+                    .getTileLandId(getAvatarCoordinate(avatarId)),
+                1
             );
-        } else {
-            IGovernance(governanceContract).burnBomb(msg.sender, 1, 0, 0, 0);
         }
+
+        IGovernance(governanceContract).burnBomb(msg.sender, 1);
 
         uint256[] memory attackAvatarIds = new uint256[](7);
         uint32[] memory victimsCoordinates = new uint32[](7);

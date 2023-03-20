@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
 import "./interfaces/IAvatar.sol";
+import "./interfaces/IMap.sol";
 import "./interfaces/IAuctionHouse.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IBomb.sol";
@@ -16,255 +16,7 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
 contract Governance is Multicall, Ownable {
-    uint256 public constant MTProducePerBlock = 600000000000;
-
-    uint256 public constant MTProduceReduceInterval = 50000;
-
-    uint256 public MTProduceStartBlock;
-
-    /// @notice PerMTAWMinted * 10 ** 24 + LastPerMTAWMintedCalcBlock * 10 ** 12 + TotalMTAWs
-    uint256 public MTProduceData;
-
-    /// @notice MT Inbox * 10 ** 52 + Total Minted MT * 10 ** 32 + PerMTAWMinted * 10 ** 12 + TotalMTAWs
-    mapping(uint256 => uint256) public AvatarMTs;
-
-    mapping(uint256 => uint256) public CollectionMTs;
-
-    mapping(uint32 => uint256) public LandHolderMTs;
-
-    event AvatarMTMinted(uint256 indexed avatarId, uint256 amount);
-
-    event CollectionMTMinted(uint256 indexed COID, uint256 amount);
-
     event MTClaimed(address indexed to, uint256 amount);
-
-    constructor(uint256 MTProduceStartBlock_) {
-        MTProduceStartBlock = MTProduceStartBlock_;
-    }
-
-    /**
-     * @notice get settled Per MT Allocation Weight minted mopn token number
-     */
-    function getPerMTAWMinted() public view returns (uint256) {
-        return MTProduceData / 10 ** 24;
-    }
-
-    /**
-     * @notice get MT last minted settlement block number
-     */
-    function getLastPerMTAWMintedCalcBlock() public view returns (uint256) {
-        return (MTProduceData % 10 ** 24) / 10 ** 12;
-    }
-
-    /**
-     * @notice get total mopn token allocation weights
-     */
-    function getTotalMTAWs() public view returns (uint256) {
-        return MTProduceData % 10 ** 12;
-    }
-
-    /**
-     * add on map mining mopn token allocation weight
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     * @param LandId mopn Land Id
-     * @param amount EAW amount
-     */
-    function addMTAW(
-        uint256 avatarId,
-        uint256 COID,
-        uint32 LandId,
-        uint256 amount
-    ) public onlyMap {
-        _addMTAW(avatarId, COID, LandId, amount);
-    }
-
-    /**
-     * substruct on map mining mopn token allocation weight
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     * @param LandId mopn Land Id
-     */
-    function subMTAW(
-        uint256 avatarId,
-        uint256 COID,
-        uint32 LandId
-    ) public onlyMap {
-        _subMTAW(avatarId, COID, LandId);
-    }
-
-    uint256[] MTPPBMap = [
-        600000000000,
-        133576606537,
-        29737849684,
-        6620468402,
-        1473899498,
-        328130815,
-        73050994,
-        16263166,
-        3620622,
-        806043,
-        179440,
-        39941,
-        8885,
-        1970,
-        431,
-        87,
-        13
-    ];
-
-    uint256 MTPPBZeroTriger = 8211;
-
-    /**
-     * @notice get current mopn token produce per block
-     * @param reduceTimes mopn token produce reduce times
-     */
-    function currentMTPPB(
-        uint256 reduceTimes
-    ) public view returns (uint256 MTPPB) {
-        if (reduceTimes <= MTPPBZeroTriger) {
-            uint256 mapKey = reduceTimes / 500;
-            if (mapKey >= MTPPBMap.length) {
-                mapKey = MTPPBMap.length - 1;
-            }
-            MTPPB = MTPPBMap[mapKey];
-            reduceTimes -= mapKey * 500;
-            if (reduceTimes > 0) {
-                while (true) {
-                    if (reduceTimes > 17) {
-                        MTPPB = (MTPPB * 997 ** 17) / (1000 ** 17);
-                    } else {
-                        MTPPB =
-                            (MTPPB * 997 ** reduceTimes) /
-                            (1000 ** reduceTimes);
-                        break;
-                    }
-                    reduceTimes -= 17;
-                }
-            }
-        }
-    }
-
-    /**
-     * @notice settle per mopn token allocation weight mint mopn token
-     */
-    function settlePerMTAWMinted() public {
-        if (block.number > getLastPerMTAWMintedCalcBlock()) {
-            uint256 PerMTAWMinted = calcPerMTAWMinted();
-            MTProduceData =
-                PerMTAWMinted *
-                10 ** 24 +
-                block.number *
-                10 ** 12 +
-                getTotalMTAWs();
-        }
-    }
-
-    function calcPerMTAWMinted() public view returns (uint256) {
-        uint256 TotalMTAWs = getTotalMTAWs();
-        uint256 PerMTAWMinted = getPerMTAWMinted();
-        if (TotalMTAWs > 0) {
-            uint256 LastPerMTAWMintedCalcBlock = getLastPerMTAWMintedCalcBlock();
-            uint256 reduceTimes = (LastPerMTAWMintedCalcBlock -
-                MTProduceStartBlock) / MTProduceReduceInterval;
-            uint256 nextReduceBlock = MTProduceStartBlock +
-                MTProduceReduceInterval +
-                reduceTimes *
-                MTProduceReduceInterval;
-
-            while (true) {
-                if (block.number > nextReduceBlock) {
-                    PerMTAWMinted +=
-                        ((nextReduceBlock - LastPerMTAWMintedCalcBlock) *
-                            currentMTPPB(reduceTimes)) /
-                        TotalMTAWs;
-                    LastPerMTAWMintedCalcBlock = nextReduceBlock;
-                    reduceTimes++;
-                    nextReduceBlock += MTProduceReduceInterval;
-                } else {
-                    PerMTAWMinted +=
-                        ((block.number - LastPerMTAWMintedCalcBlock) *
-                            currentMTPPB(reduceTimes)) /
-                        TotalMTAWs;
-                    break;
-                }
-            }
-        }
-        return PerMTAWMinted;
-    }
-
-    /**
-     * @notice get avatar settled unclaimed minted mopn token
-     * @param avatarId avatar Id
-     */
-    function getAvatarSettledInboxMT(
-        uint256 avatarId
-    ) public view returns (uint256) {
-        return AvatarMTs[avatarId] / 10 ** 52;
-    }
-
-    function getAvatarTotalMinted(
-        uint256 avatarId
-    ) public view returns (uint256) {
-        return (AvatarMTs[avatarId] % 10 ** 52) / 10 ** 32;
-    }
-
-    /**
-     * @notice get avatar settled per mopn token allocation weight minted mopn token number
-     * @param avatarId avatar Id
-     */
-    function getAvatarPerMTAWMinted(
-        uint256 avatarId
-    ) public view returns (uint256) {
-        return (AvatarMTs[avatarId] % 10 ** 32) / 10 ** 12;
-    }
-
-    /**
-     * @notice get avatar on map mining mopn token allocation weight
-     * @param avatarId avatar Id
-     */
-    function getAvatarMTAW(uint256 avatarId) public view returns (uint256) {
-        return AvatarMTs[avatarId] % 10 ** 12;
-    }
-
-    /**
-     * @notice mint avatar mopn token
-     * @param avatarId avatar Id
-     */
-    function mintAvatarMT(uint256 avatarId) public {
-        uint256 AvatarMTAW = getAvatarMTAW(avatarId);
-        uint256 AvatarPerMTAWMinted = getAvatarPerMTAWMinted(avatarId);
-        uint256 PerMTAWMinted = getPerMTAWMinted();
-        if (AvatarPerMTAWMinted < PerMTAWMinted && AvatarMTAW > 0) {
-            uint256 amount = ((((PerMTAWMinted - AvatarPerMTAWMinted) *
-                AvatarMTAW) * 90) / 100);
-            AvatarMTs[avatarId] +=
-                amount *
-                10 ** 52 +
-                (PerMTAWMinted - AvatarPerMTAWMinted) *
-                10 ** 12;
-            emit AvatarMTMinted(avatarId, amount);
-        }
-    }
-
-    /**
-     * @notice get avatar realtime unclaimed minted mopn token
-     * @param avatarId avatar Id
-     */
-    function getAvatarInboxMT(
-        uint256 avatarId
-    ) public view returns (uint256 inbox) {
-        inbox = getAvatarSettledInboxMT(avatarId);
-        uint256 PerMTAWMinted = calcPerMTAWMinted();
-        uint256 AvatarPerMTAWMinted = getAvatarPerMTAWMinted(avatarId);
-        uint256 AvatarMTAW = getAvatarMTAW(avatarId);
-
-        if (AvatarPerMTAWMinted < PerMTAWMinted && AvatarMTAW > 0) {
-            inbox +=
-                (((PerMTAWMinted - AvatarPerMTAWMinted) * AvatarMTAW) * 90) /
-                100;
-        }
-    }
 
     /**
      * @notice redeem avatar unclaimed minted mopn token
@@ -286,18 +38,14 @@ contract Governance is Multicall, Ownable {
                 ),
             "not your avatar"
         );
-        settlePerMTAWMinted();
-        mintAvatarMT(avatarId);
+        IMap(mapContract).settlePerMTAWMinted();
+        IMap(mapContract).mintAvatarMT(avatarId);
 
-        uint256 amount = getAvatarSettledInboxMT(avatarId);
-        require(amount > 0, "empty");
-
-        AvatarMTs[avatarId] =
-            (AvatarMTs[avatarId] % (10 ** 52)) +
-            amount *
-            10 ** 32;
-        IMOPNToken(mtContract).mint(msg.sender, amount);
-        emit MTClaimed(msg.sender, amount);
+        uint256 amount = IMap(mapContract).claimAvatarSettledIndexMT(avatarId);
+        if (amount > 0) {
+            IMOPNToken(mtContract).mint(msg.sender, amount);
+            emit MTClaimed(msg.sender, amount);
+        }
     }
 
     /**
@@ -317,7 +65,7 @@ contract Governance is Multicall, Ownable {
             "delegateWallets incorrect"
         );
 
-        settlePerMTAWMinted();
+        IMap(mapContract).settlePerMTAWMinted();
         uint256 totalamount;
         for (uint256 i = 0; i < avatarIds.length; i++) {
             if (delegateWallets.length > 0) {
@@ -341,185 +89,16 @@ contract Governance is Multicall, Ownable {
                     "not your avatar"
                 );
             }
-            mintAvatarMT(avatarIds[i]);
+            IMap(mapContract).mintAvatarMT(avatarIds[i]);
 
-            uint256 amount = getAvatarSettledInboxMT(avatarIds[i]);
-            if (amount > 0) {
-                AvatarMTs[avatarIds[i]] =
-                    (AvatarMTs[avatarIds[i]] % (10 ** 52)) +
-                    amount *
-                    10 ** 32;
-                totalamount += amount;
-            }
+            totalamount += IMap(mapContract).claimAvatarSettledIndexMT(
+                avatarIds[i]
+            );
         }
 
-        IMOPNToken(mtContract).mint(msg.sender, totalamount);
-        emit MTClaimed(msg.sender, totalamount);
-    }
-
-    /**
-     * @notice get collection settled minted unclaimed mopn token
-     * @param COID collection Id
-     */
-    function getCollectionSettledInboxMT(
-        uint256 COID
-    ) public view returns (uint256) {
-        return CollectionMTs[COID] / 10 ** 52;
-    }
-
-    function getCollectionTotalMinted(
-        uint256 COID
-    ) public view returns (uint256) {
-        return (CollectionMTs[COID] % 10 ** 52) / 10 ** 32;
-    }
-
-    /**
-     * @notice get collection settled per mopn token allocation weight minted mopn token number
-     * @param COID collection Id
-     */
-    function getCollectionPerMTAWMinted(
-        uint256 COID
-    ) public view returns (uint256) {
-        return (CollectionMTs[COID] % 10 ** 32) / 10 ** 12;
-    }
-
-    /**
-     * @notice get collection on map mining mopn token allocation weight
-     * @param COID collection Id
-     */
-    function getCollectionMTAW(uint256 COID) public view returns (uint256) {
-        return CollectionMTs[COID] % 10 ** 12;
-    }
-
-    /**
-     * @notice mint collection mopn token
-     * @param COID collection Id
-     */
-    function mintCollectionMT(uint256 COID) public {
-        uint256 CollectionMTAW = getCollectionMTAW(COID);
-        uint256 PerMTAWMinted = getPerMTAWMinted();
-        uint256 CollectionPerMTAWMinted = getCollectionPerMTAWMinted(COID);
-        if (CollectionPerMTAWMinted < PerMTAWMinted && CollectionMTAW > 0) {
-            uint256 amount = ((((PerMTAWMinted - CollectionPerMTAWMinted) *
-                CollectionMTAW) * 5) / 100);
-            CollectionMTs[COID] +=
-                amount *
-                10 ** 52 +
-                (PerMTAWMinted - CollectionPerMTAWMinted) *
-                10 ** 12;
-            emit CollectionMTMinted(COID, amount);
-        }
-    }
-
-    /**
-     * @notice get collection realtime unclaimed minted mopn token
-     * @param COID collection Id
-     */
-    function getCollectionInboxMT(
-        uint256 COID
-    ) public view returns (uint256 inbox) {
-        inbox = getCollectionSettledInboxMT(COID);
-        uint256 PerMTAWMinted = calcPerMTAWMinted();
-        uint256 CollectionPerMTAWMinted = getCollectionPerMTAWMinted(COID);
-        uint256 CollectionMTAW = getCollectionMTAW(COID);
-
-        if (CollectionPerMTAWMinted < PerMTAWMinted && CollectionMTAW > 0) {
-            inbox +=
-                (((PerMTAWMinted - CollectionPerMTAWMinted) * CollectionMTAW) *
-                    5) /
-                100;
-        }
-    }
-
-    /**
-     * @notice redeem 1/collectionOnMapNFTNumber of collection unclaimed minted mopn token to a avatar
-     * only avatar contract can calls
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     */
-    function redeemCollectionInboxMT(
-        uint256 avatarId,
-        uint256 COID
-    ) public onlyAvatar {
-        uint256 amount = getCollectionSettledInboxMT(COID);
-        if (amount > 0) {
-            amount = amount / (getCollectionOnMapNum(COID) + 1);
-            CollectionMTs[COID] -= amount * (10 ** 52);
-            CollectionMTs[COID] += amount * (10 ** 32);
-            AvatarMTs[avatarId] += amount * (10 ** 52);
-            emit AvatarMTMinted(avatarId, amount);
-        }
-    }
-
-    /**
-     * @notice get Land holder settled minted unclaimed mopn token
-     * @param LandId MOPN Land Id
-     */
-    function getLandHolderSettledInboxMT(
-        uint32 LandId
-    ) public view returns (uint256) {
-        return LandHolderMTs[LandId] / 10 ** 52;
-    }
-
-    function getLandHolderTotalMinted(
-        uint32 LandId
-    ) public view returns (uint256) {
-        return (LandHolderMTs[LandId] % 10 ** 52) / 10 ** 32;
-    }
-
-    /**
-     * @notice get Land holder settled per mopn token allocation weight minted mopn token number
-     * @param LandId MOPN Land Id
-     */
-    function getLandHolderPerMTAWMinted(
-        uint32 LandId
-    ) public view returns (uint256) {
-        return (LandHolderMTs[LandId] % 10 ** 32) / 10 ** 12;
-    }
-
-    /**
-     * @notice get Land holder on map mining mopn token allocation weight
-     * @param LandId MOPN Land Id
-     */
-    function getLandHolderMTAW(uint32 LandId) public view returns (uint256) {
-        return LandHolderMTs[LandId] % 10 ** 12;
-    }
-
-    /**
-     * @notice mint Land holder mopn token
-     * @param LandId MOPN Land Id
-     */
-    function mintLandHolderMT(uint32 LandId) public {
-        uint256 LandHolderMTAW = getLandHolderMTAW(LandId);
-        uint256 PerMTAWMinted = getPerMTAWMinted();
-        uint256 LandHolderPerMTAWMinted = getLandHolderPerMTAWMinted(LandId);
-        if (LandHolderPerMTAWMinted < PerMTAWMinted && LandHolderMTAW > 0) {
-            LandHolderMTs[LandId] +=
-                ((((PerMTAWMinted - LandHolderPerMTAWMinted) * LandHolderMTAW) *
-                    5) / 100) *
-                10 ** 52 +
-                (PerMTAWMinted - LandHolderPerMTAWMinted) *
-                10 ** 12;
-        }
-    }
-
-    /**
-     * @notice get Land holder realtime unclaimed minted mopn token
-     * @param LandId MOPN Land Id
-     */
-    function getLandHolderInboxMT(
-        uint32 LandId
-    ) public view returns (uint256 inbox) {
-        inbox = getLandHolderSettledInboxMT(LandId);
-        uint256 PerMTAWMinted = calcPerMTAWMinted();
-        uint256 LandHolderPerMTAWMinted = getLandHolderPerMTAWMinted(LandId);
-        uint256 LandHolderMTAW = getLandHolderMTAW(LandId);
-
-        if (LandHolderPerMTAWMinted < PerMTAWMinted && LandHolderMTAW > 0) {
-            inbox +=
-                (((PerMTAWMinted - LandHolderPerMTAWMinted) * LandHolderMTAW) *
-                    5) /
-                100;
+        if (totalamount > 0) {
+            IMOPNToken(mtContract).mint(msg.sender, totalamount);
+            emit MTClaimed(msg.sender, totalamount);
         }
     }
 
@@ -532,24 +111,15 @@ contract Governance is Multicall, Ownable {
             msg.sender == IERC721(landContract).ownerOf(LandId),
             "not your Land"
         );
-        settlePerMTAWMinted();
-        mintLandHolderMT(LandId);
+        IMap(mapContract).settlePerMTAWMinted();
+        IMap(mapContract).mintLandHolderMT(LandId);
 
-        uint256 amount = getLandHolderSettledInboxMT(LandId);
-        require(amount > 0, "empty");
-
-        LandHolderMTs[LandId] =
-            (LandHolderMTs[LandId] % (10 ** 52)) +
-            amount *
-            10 ** 32;
-
-        IMOPNToken(mtContract).mint(msg.sender, amount);
-    }
-
-    function getLandHolderRedeemed(
-        uint32 LandId
-    ) public view returns (uint256) {
-        return getLandHolderTotalMinted(LandId) + getLandHolderInboxMT(LandId);
+        uint256 amount = IMap(mapContract).claimLandHolderSettledIndexMT(
+            LandId
+        );
+        if (amount > 0) {
+            IMOPNToken(mtContract).mint(msg.sender, amount);
+        }
     }
 
     bool public whiteListRequire;
@@ -700,28 +270,6 @@ contract Governance is Multicall, Ownable {
         collectionMap[getCollectionContract(COID)] += 1000000;
     }
 
-    function getCollectionInfo(
-        uint256 COID
-    )
-        public
-        view
-        returns (
-            address collectionAddress,
-            uint256 onMapNum,
-            uint256 avatarNum,
-            uint256 totalMTAWs,
-            uint256 totalMinted
-        )
-    {
-        collectionAddress = getCollectionContract(COID);
-        onMapNum = getCollectionOnMapNum(COID);
-        avatarNum = getCollectionAvatarNum(COID);
-        totalMTAWs = getCollectionMTAW(COID);
-        totalMinted =
-            getCollectionTotalMinted(COID) +
-            getCollectionInboxMT(COID);
-    }
-
     address public auctionHouseContract;
     address public avatarContract;
     address public bombContract;
@@ -750,16 +298,7 @@ contract Governance is Multicall, Ownable {
         IBomb(bombContract).mint(to, 1, amount);
     }
 
-    function burnBomb(
-        address from,
-        uint256 amount,
-        uint256 avatarId,
-        uint256 COID,
-        uint32 LandId
-    ) public onlyAvatar {
-        if (avatarId > 0 && COID > 0 && LandId > 0) {
-            _addMTAW(avatarId, COID, LandId, 1);
-        }
+    function burnBomb(address from, uint256 amount) public onlyAvatar {
         IBomb(bombContract).burn(from, 1, amount);
     }
 
@@ -776,34 +315,6 @@ contract Governance is Multicall, Ownable {
     function giveupOwnership() public onlyOwner {
         IBomb(bombContract).transferOwnership(owner());
         IMOPNToken(mtContract).transferOwnership(owner());
-    }
-
-    function _addMTAW(
-        uint256 avatarId,
-        uint256 COID,
-        uint32 LandId,
-        uint256 amount
-    ) internal {
-        settlePerMTAWMinted();
-        MTProduceData += amount;
-        mintAvatarMT(avatarId);
-        AvatarMTs[avatarId] += amount;
-        mintCollectionMT(COID);
-        CollectionMTs[COID] += amount;
-        mintLandHolderMT(LandId);
-        LandHolderMTs[LandId] += amount;
-    }
-
-    function _subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) internal {
-        settlePerMTAWMinted();
-        uint256 amount = getAvatarMTAW(avatarId);
-        MTProduceData -= amount;
-        mintAvatarMT(avatarId);
-        AvatarMTs[avatarId] -= amount;
-        mintCollectionMT(COID);
-        CollectionMTs[COID] -= amount;
-        mintLandHolderMT(LandId);
-        LandHolderMTs[LandId] -= amount;
     }
 
     modifier onlyAuctionHouse() {

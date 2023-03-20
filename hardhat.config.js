@@ -9,7 +9,8 @@ module.exports = {
   solidity: "0.8.17",
   networks: {
     localhost: {
-      url: `http://localhost:7545`,
+      url: `http://127.0.0.1:7545`,
+      chainId: 1337,
       accounts: ["39a3c68019306ff19c926041d34531d06e72ccc9fc63d32f3cdf1fd4e86587f3"],
     },
     goerli: {

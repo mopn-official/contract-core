@@ -11,10 +11,6 @@ interface IGovernance {
         Warm
     }
 
-    function getAvatarInboxMT(
-        uint256 avatarId
-    ) external view returns (uint256 inbox);
-
     /**
      * @notice redeem avatar unclaimed minted MOPN Tokens
      * @param avatarId avatar Id
@@ -27,34 +23,7 @@ interface IGovernance {
         address vault
     ) external;
 
-    function getCollectionInboxMT(
-        uint256 COID
-    ) external view returns (uint256 inbox);
-
-    function redeemCollectionInboxMT(uint256 avatarId, uint256 COID) external;
-
-    function getLandHolderInboxMT(
-        uint32 LandId
-    ) external view returns (uint256 inbox);
-
     function redeemLandHolderInboxMT(uint32 LandId) external;
-
-    function getLandHolderRedeemed(
-        uint32 LandId
-    ) external view returns (uint256);
-
-    function getCollectionInfo(
-        uint256 COID
-    )
-        external
-        view
-        returns (
-            address collectionAddress,
-            uint256 onMapNum,
-            uint256 avatarNum,
-            uint256 totalEAWs,
-            uint256 totalMinted
-        );
 
     function getCollectionContract(
         uint256 COID
@@ -88,24 +57,9 @@ interface IGovernance {
         uint256 COID
     ) external view returns (uint256);
 
-    function addMTAW(
-        uint256 avatarId,
-        uint256 COID,
-        uint32 LandId,
-        uint256 amount
-    ) external;
-
-    function subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) external;
-
     function mintBomb(address to, uint256 amount) external;
 
-    function burnBomb(
-        address from,
-        uint256 amount,
-        uint256 avatarId,
-        uint256 COID,
-        uint32 LandId
-    ) external;
+    function burnBomb(address from, uint256 amount) external;
 
     function redeemAgio() external;
 
