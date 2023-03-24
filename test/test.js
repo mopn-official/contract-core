@@ -169,7 +169,7 @@ describe("MOPN", function () {
   it("mint test nfts", async function () {
     let mintnfttx = await testnft.safeMint(owner.address, 8);
     await mintnfttx.wait();
-    mintnfttx = await testnft1.safeMint(owner.address, 1);
+    mintnfttx = await testnft1.safeMint(owner.address, 2);
     await mintnfttx.wait();
   });
 
@@ -357,6 +357,18 @@ describe("MOPN", function () {
     // 0 3 -3
     const bomb1Tx = await avatar.bomb([10001003, testnft1.address, 0, 0, address0]);
     await bomb1Tx.wait();
+
+    // const multiTx = await avatar.multicall([
+    //   avatar.interface.encodeFunctionData("mintAvatar", [
+    //     testnft1.address,
+    //     1,
+    //     testnftproofs,
+    //     0,
+    //     address0,
+    //   ]),
+    //   avatar.interface.encodeFunctionData("bomb", [[10001000, testnft1.address, 1, 0, address0]]),
+    // ]);
+    // await multiTx.wait();
 
     console.log(
       await avatar.callStatic.multicall([

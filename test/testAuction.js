@@ -1,18 +1,27 @@
 const { ethers } = require("hardhat");
 
 describe("AuctionHouse", function () {
-  let auctionHouse, governance;
+  let tileMath, auctionHouse, map;
 
   it("deploy ", async function () {
+    const TileMath = await ethers.getContractFactory("TileMath");
+    tileMath = await TileMath.deploy();
+    await tileMath.deployed();
+    console.log("TileMath", tileMath.address);
+
     const AuctionHouse = await ethers.getContractFactory("AuctionHouse");
-    auctionHouse = await AuctionHouse.deploy();
+    auctionHouse = await AuctionHouse.deploy(1677184081, 1677184081);
     await auctionHouse.deployed();
     console.log("AuctionHouse", auctionHouse.address);
 
-    const Governance = await ethers.getContractFactory("Governance");
-    governance = await Governance.deploy(0, false);
-    await governance.deployed();
-    console.log("Governance", governance.address);
+    const Map = await ethers.getContractFactory("Map", {
+      libraries: {
+        TileMath: tileMath.address,
+      },
+    });
+    map = await Map.deploy(0);
+    await map.deployed();
+    console.log("Map", map.address);
   });
 
   it("getLandPrice", async function () {
@@ -20,30 +29,32 @@ describe("AuctionHouse", function () {
   });
 
   it("getBombPrice", async function () {
-    console.log(await auctionHouse.getBombPrice(32));
+    console.log(await auctionHouse.getBombPrice(0));
+    console.log(await auctionHouse.getBombPrice(300));
+    console.log(await auctionHouse.getBombPrice(600));
+    console.log(await auctionHouse.getBombPrice(900));
+    console.log(await auctionHouse.getBombPrice(1200));
+    console.log(await auctionHouse.getBombPrice(1500));
+    console.log(await auctionHouse.getBombPrice(1800));
   });
 
-  it("currentEPPB", async function () {
-    // console.log(await governance.currentEPPB(500));
-    // console.log(await governance.currentEPPB(1000));
-    // console.log(await governance.currentEPPB(1500));
-    // console.log(await governance.currentEPPB(2000));
-    // console.log(await governance.currentEPPB(2500));
-    // console.log(await governance.currentEPPB(3000));
-    // console.log(await governance.currentEPPB(3500));
-    // console.log(await governance.currentEPPB(4000));
-    // console.log(await governance.currentEPPB(4500));
-    // console.log(await governance.currentEPPB(5000));
-    // console.log(await governance.currentEPPB(5500));
-    // console.log(await governance.currentEPPB(6000));
-    // console.log(await governance.currentEPPB(6500));
-    // console.log(await governance.currentEPPB(7000));
-    // console.log(await governance.currentEPPB(7500));
-    // console.log(await governance.currentEPPB(8000));
-    console.log(await governance.currentEPPB(499));
-    console.log(await governance.currentEPPB(500));
-    // for (let i = 8200; i < 8300; i++) {
-    //   console.log(i, await governance.currentEPPB(i));
-    // }
+  it("currentMTPPB", async function () {
+    console.log(await map.currentMTPPB(0));
+    console.log(await map.currentMTPPB(300));
+    console.log(await map.currentMTPPB(600));
+    console.log(await map.currentMTPPB(900));
+    console.log(await map.currentMTPPB(1200));
+    console.log(await map.currentMTPPB(1500));
+    console.log(await map.currentMTPPB(1800));
+  });
+
+  it("currentMTPPB1", async function () {
+    console.log(await map.currentMTPPB1(0));
+    console.log(await map.currentMTPPB1(300));
+    console.log(await map.currentMTPPB1(600));
+    console.log(await map.currentMTPPB1(900));
+    console.log(await map.currentMTPPB1(1200));
+    console.log(await map.currentMTPPB1(1500));
+    console.log(await map.currentMTPPB1(1800));
   });
 });

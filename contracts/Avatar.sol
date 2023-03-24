@@ -7,7 +7,6 @@ import "./interfaces/IMap.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -40,7 +39,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint256 setData;
     }
 
-    using Math for uint256;
     using TileMath for uint32;
 
     event AvatarMint(uint256 indexed avatarId, uint256 indexed COID);
@@ -373,10 +371,11 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
         uint256[] memory attackAvatarIds = new uint256[](7);
         uint32[] memory victimsCoordinates = new uint32[](7);
+        uint32 tileCoordinate = params.tileCoordinate;
         for (uint256 i = 0; i < 7; i++) {
             uint256 attackAvatarId = IMap(
                 IGovernance(governanceContract).mapContract()
-            ).avatarRemove(params.tileCoordinate, avatarId);
+            ).avatarRemove(tileCoordinate, avatarId);
 
             if (attackAvatarId > 0) {
                 setAvatarCoordinate(attackAvatarId, 0);
@@ -384,13 +383,13 @@ contract Avatar is IAvatar, Multicall, Ownable {
                     getAvatarCOID(attackAvatarId)
                 );
                 attackAvatarIds[i] = attackAvatarId;
-                victimsCoordinates[i] = params.tileCoordinate;
+                victimsCoordinates[i] = tileCoordinate;
             }
 
             if (i == 0) {
-                params.tileCoordinate = params.tileCoordinate.neighbor(4);
+                tileCoordinate = tileCoordinate.neighbor(4);
             } else {
-                params.tileCoordinate = params.tileCoordinate.neighbor(i - 1);
+                tileCoordinate = tileCoordinate.neighbor(i - 1);
             }
         }
         emit BombUse(

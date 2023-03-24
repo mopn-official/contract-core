@@ -7,6 +7,7 @@ import "./interfaces/IGovernance.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 error TileHasEnemy();
 error LandIdOverflow();
@@ -190,56 +191,12 @@ contract Map is Ownable, Multicall {
         return MTProduceData % 10 ** 12;
     }
 
-    uint256[] MTPPBMap = [
-        600000000000,
-        133576606537,
-        29737849684,
-        6620468402,
-        1473899498,
-        328130815,
-        73050994,
-        16263166,
-        3620622,
-        806043,
-        179440,
-        39941,
-        8885,
-        1970,
-        431,
-        87,
-        13
-    ];
-
-    uint256 MTPPBZeroTriger = 8211;
-
-    /**
-     * @notice get current mopn token produce per block
-     * @param reduceTimes mopn token produce reduce times
-     */
     function currentMTPPB(
         uint256 reduceTimes
-    ) public view returns (uint256 MTPPB) {
-        if (reduceTimes <= MTPPBZeroTriger) {
-            uint256 mapKey = reduceTimes / 500;
-            if (mapKey >= MTPPBMap.length) {
-                mapKey = MTPPBMap.length - 1;
-            }
-            MTPPB = MTPPBMap[mapKey];
-            reduceTimes -= mapKey * 500;
-            if (reduceTimes > 0) {
-                while (true) {
-                    if (reduceTimes > 17) {
-                        MTPPB = (MTPPB * 997 ** 17) / (1000 ** 17);
-                    } else {
-                        MTPPB =
-                            (MTPPB * 997 ** reduceTimes) /
-                            (1000 ** reduceTimes);
-                        break;
-                    }
-                    reduceTimes -= 17;
-                }
-            }
-        }
+    ) public pure returns (uint256 MTPPB) {
+        int128 reducePercentage = ABDKMath64x64.divu(997, 1000);
+        int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
+        return ABDKMath64x64.mulu(reducePower, 600000000000);
     }
 
     /**

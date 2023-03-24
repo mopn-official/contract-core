@@ -5,6 +5,7 @@ import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IGovernance.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 /// @title Arsenal for Bomb
 /// @author Cyanface<cyanface@outlook.com>
@@ -12,11 +13,13 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 contract AuctionHouse is Multicall, Ownable {
     address public governanceContract;
 
-    uint256 public bombRoundProduce = 100;
+    uint8 public constant bombRoundProduce = 100;
+
+    uint256 public constant bombPrice = 100000000000000;
 
     /**
      * @dev last active round and it's start timestamp and it's settlement status
-     * @notice roundId * 10 ** 14 + startTimestamp * 10 ** 3 + round sold
+     * @notice uint64 roundId + uint32 startTimestamp + uint8 round sold
      */
     uint256 public bombRound;
 
@@ -28,15 +31,23 @@ contract AuctionHouse is Multicall, Ownable {
 
     /**
      * @dev record the last participate round auction data
-     * @dev wallet address => total spend * 10 ** 14 + auction amount * 10 ** 11 + roundId * 10 + agio redeem status
+     * @dev wallet address => uint64 total spend + uint8 auction amount + uint64 roundId + uint8 agio redeem status
      */
     mapping(address => uint256) public bombWalletData;
 
     event BombSold(address indexed buyer, uint256 amount, uint256 price);
 
+    uint256 public constant landPrice = 1000000000000000;
+
+    /**
+     * @dev last active round's start timestamp
+     * @notice uint64 roundId + uint32 startTimestamp
+     */
+    uint256 public landRound;
+
     constructor(uint256 bombStartTimestamp, uint256 landStartTimestamp) {
-        bombRound = 10 ** 14 + bombStartTimestamp * 10 ** 3;
-        landRound = 10 ** 11 + landStartTimestamp;
+        bombRound = (1 << 128) | (bombStartTimestamp << 8);
+        landRound = landStartTimestamp;
     }
 
     /**
@@ -54,14 +65,14 @@ contract AuctionHouse is Multicall, Ownable {
      * @notice buy the amount of bombs at current block's price
      * @param amount the amount of bombs
      */
-    function buyBomb(uint256 amount) public {
+    function buyBomb(uint8 amount) public {
         uint256 roundStartTimestamp = getBombRoundStartTimestamp();
         require(block.timestamp > roundStartTimestamp, "auction not start");
 
         redeemAgio();
 
         uint256 roundId = getBombRoundId();
-        uint256 roundSold = getBombRoundSold() + amount;
+        uint8 roundSold = getBombRoundSold() + amount;
         require(roundSold <= bombRoundProduce, "round out of stock");
         uint256 currentPrice = getBombCurrentPrice();
         uint256 price = currentPrice * amount;
@@ -77,18 +88,17 @@ contract AuctionHouse is Multicall, Ownable {
         }
 
         IGovernance(governanceContract).mintBomb(msg.sender, amount);
-
         bombWalletData[msg.sender] =
             (getBombWalletTotalSpend(msg.sender) + price) *
             10 ** 14 +
-            amount *
+            uint256(amount) *
             10 ** 11 +
             roundId *
             10;
         if (roundSold >= bombRoundProduce) {
             settleBombPreviousRound(roundId, currentPrice);
         } else {
-            bombRound += amount;
+            updateBombRoundSold(roundSold);
         }
         emit BombSold(msg.sender, amount, currentPrice);
     }
@@ -97,20 +107,31 @@ contract AuctionHouse is Multicall, Ownable {
      * @notice get current Round Id
      * @return roundId round Id
      */
-    function getBombRoundId() public view returns (uint256 roundId) {
-        roundId = bombRound / 10 ** 14;
+    function getBombRoundId() public view returns (uint256) {
+        return uint128(bombRound >> 128);
     }
 
-    function getBombRoundStartTimestamp()
-        public
-        view
-        returns (uint256 startTimestamp)
-    {
-        startTimestamp = (bombRound % 10 ** 14) / 10 ** 3;
+    function updateBombRoundId(uint128 roundId) public {
+        uint256 mask = 0xFFFFFFFFFFFFFFFFFFFFFFFF00000000000000000000000000000000;
+        bombRound = (bombRound & mask) | (roundId << 128);
     }
 
-    function getBombRoundSold() public view returns (uint256) {
-        return bombRound % 10 ** 3;
+    function getBombRoundStartTimestamp() public view returns (uint256) {
+        return uint32((bombRound >> 8) & 0xFFFFFFFF);
+    }
+
+    function updateBombRoundStartTimestamp(uint256 startTimestamp) public {
+        uint256 mask = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000000;
+        bombRound = (bombRound & mask) | (startTimestamp << 8);
+    }
+
+    function getBombRoundSold() public view returns (uint8) {
+        return uint8(bombRound);
+    }
+
+    function updateBombRoundSold(uint8 sold) public {
+        uint256 mask = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00;
+        bombRound = (bombRound & mask) | sold;
     }
 
     function getBombWalletTotalSpend(
@@ -153,41 +174,10 @@ contract AuctionHouse is Multicall, Ownable {
         return getBombPrice((block.timestamp - roundStartTimestamp) / 60);
     }
 
-    uint256[] public bombPriceMap = [
-        100000000000000,
-        4904089407127,
-        240500929130,
-        11794380588,
-        578406967,
-        28365593,
-        1391072,
-        68218,
-        3344,
-        162
-    ];
-
-    uint256 bombZeroTrigger = 3090;
-
-    function getBombPrice(
-        uint256 reduceTimes
-    ) public view returns (uint256 price) {
-        if (reduceTimes <= bombZeroTrigger) {
-            uint256 mapKey = reduceTimes / 300;
-            if (mapKey >= bombPriceMap.length) {
-                mapKey = bombPriceMap.length - 1;
-            }
-            price = bombPriceMap[mapKey];
-            reduceTimes -= mapKey * 300;
-            while (true) {
-                if (reduceTimes > 30) {
-                    price = (price * 99 ** 30) / (100 ** 30);
-                } else {
-                    price = (price * 99 ** reduceTimes) / (100 ** reduceTimes);
-                    break;
-                }
-                reduceTimes -= 30;
-            }
-        }
+    function getBombPrice(uint256 reduceTimes) public pure returns (uint256) {
+        int128 reducePercentage = ABDKMath64x64.divu(99, 100);
+        int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
+        return ABDKMath64x64.mulu(reducePower, bombPrice);
     }
 
     /**
@@ -268,14 +258,10 @@ contract AuctionHouse is Multicall, Ownable {
             );
         }
         bombRoundData[roundId] = price;
-        bombRound = (roundId + 1) * 10 ** 14 + block.timestamp * 10 ** 3;
+        bombRound =
+            (uint256(roundId + 1) << 128) |
+            (uint256(block.timestamp) << 8);
     }
-
-    /**
-     * @dev last active round's start timestamp
-     * @notice roundId * 10 ** 11 + startTimestamp
-     */
-    uint256 public landRound;
 
     /**
      * @notice get current Land Round Id
@@ -332,42 +318,10 @@ contract AuctionHouse is Multicall, Ownable {
         return getLandPrice((block.timestamp - roundStartTimestamp) / 60);
     }
 
-    uint256[] public landPriceMap = [
-        1000000000000000,
-        49040894071284,
-        2405009291309,
-        117943805894,
-        5784069689,
-        283655947,
-        13910739,
-        682193,
-        33453,
-        1639,
-        79
-    ];
-
-    uint256 landZeroTrigger = 3330;
-
-    function getLandPrice(
-        uint256 reduceTimes
-    ) public view returns (uint256 price) {
-        if (reduceTimes <= landZeroTrigger) {
-            uint256 mapKey = reduceTimes / 300;
-            if (mapKey >= landPriceMap.length) {
-                mapKey = landPriceMap.length - 1;
-            }
-            price = landPriceMap[mapKey];
-            reduceTimes -= mapKey * 300;
-            while (true) {
-                if (reduceTimes > 30) {
-                    price = (price * 99 ** 30) / (100 ** 30);
-                } else {
-                    price = (price * 99 ** reduceTimes) / (100 ** reduceTimes);
-                    break;
-                }
-                reduceTimes -= 30;
-            }
-        }
+    function getLandPrice(uint256 reduceTimes) public pure returns (uint256) {
+        int128 reducePercentage = ABDKMath64x64.divu(99, 100);
+        int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
+        return ABDKMath64x64.mulu(reducePower, landPrice);
     }
 
     /**

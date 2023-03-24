@@ -15,7 +15,8 @@ function LandRingPos(LandId) {
 }
 
 function LandRingStartCenterTile(LandIdRingNum_) {
-  return (1000 - LandIdRingNum_ * 5) * 10000 + (1000 + LandIdRingNum_ * 11);
+  return 10001000 - LandIdRingNum_ * 49989;
+  // return (1000 - LandIdRingNum_ * 5) * 10000 + (1000 + LandIdRingNum_ * 11);
 }
 
 function LandCenterTile(LandId) {
@@ -73,6 +74,23 @@ function coordinateIntToXY(tileCoordinate) {
 
 function coordinateXYToInt(coordinateXY) {
   return (1000 + coordinateXY.x) * 10000 + 1000 + coordinateXY.y;
+}
+
+function getLandTiles(LandId) {
+  let tileCoordinate = LandCenterTile(LandId);
+  let tiles = [];
+  tiles[0] = tileCoordinate;
+  for (let i = 1; i <= 5; i++) {
+    tileCoordinate++;
+    const preringtiles = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
+    for (let j = 0; j < 6; j++) {
+      for (let k = 0; k < i; k++) {
+        tiles[preringtiles + j * i + k + 1] = tileCoordinate;
+        tileCoordinate = neighbor(tileCoordinate, j);
+      }
+    }
+  }
+  return tiles;
 }
 
 function getLandTilesEAW(LandId) {
