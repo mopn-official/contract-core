@@ -35,7 +35,7 @@ interface DelegateCashInterface {
 contract Avatar is IAvatar, Multicall, Ownable {
     struct AvatarData {
         uint256 tokenId;
-        /// @notice avatar bomb used number * 10 ** 18 + avatar nft collection id * 10 ** 10 + avatar on map coordinate
+        /// @notice uint64 avatar bomb used number + uint 64 avatar nft collection id + uint32 avatar on map coordinate
         uint256 setData;
     }
 
@@ -117,15 +117,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
         return tokenMap[contractAddress][tokenId];
     }
 
-    /**
-     * @notice get avatar collection id
-     * @param avatarId avatar Id
-     * @return COID colletion id
-     */
-    function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
-        return (avatarNoumenon[avatarId].setData % 10 ** 18) / 10 ** 8;
-    }
-
     function getAvatarTokenId(uint256 avatarId) public view returns (uint256) {
         return avatarNoumenon[avatarId].tokenId;
     }
@@ -136,7 +127,23 @@ contract Avatar is IAvatar, Multicall, Ownable {
      * @return bomb used number
      */
     function getAvatarBombUsed(uint256 avatarId) public view returns (uint256) {
-        return avatarNoumenon[avatarId].setData / 10 ** 18;
+        return uint64(avatarNoumenon[avatarId].setData >> 192);
+    }
+
+    function addAvatarBombUsed(uint256 avatarId) internal {
+        avatarNoumenon[avatarId].setData += 1 << 192;
+    }
+
+    /**
+     * @notice get avatar collection id
+     * @param avatarId avatar Id
+     * @return COID colletion id
+     */
+    function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
+        return
+            uint64(
+                (avatarNoumenon[avatarId].setData >> 128) & 0xFFFFFFFFFFFFFFFF
+            );
     }
 
     /**
@@ -147,7 +154,17 @@ contract Avatar is IAvatar, Multicall, Ownable {
     function getAvatarCoordinate(
         uint256 avatarId
     ) public view returns (uint32) {
-        return uint32(avatarNoumenon[avatarId].setData % 10 ** 8);
+        return uint32(avatarNoumenon[avatarId].setData);
+    }
+
+    function setAvatarCoordinate(
+        uint256 avatarId,
+        uint32 tileCoordinate
+    ) internal {
+        avatarNoumenon[avatarId].setData =
+            (avatarNoumenon[avatarId].setData &
+                0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000) |
+            uint256(tileCoordinate);
     }
 
     address public constant WARM_CONTRACT_ADDRESS =
@@ -247,7 +264,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
         currentAvatarId++;
 
-        avatarNoumenon[currentAvatarId].setData = COID * 10 ** 8;
+        avatarNoumenon[currentAvatarId].setData = COID << 128;
         avatarNoumenon[currentAvatarId].tokenId = tokenId;
 
         tokenMap[collectionContract][tokenId] = currentAvatarId;
@@ -398,20 +415,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
             attackAvatarIds,
             victimsCoordinates
         );
-    }
-
-    function addAvatarBombUsed(uint256 avatarId) internal {
-        avatarNoumenon[avatarId].setData += 10 ** 18;
-    }
-
-    function setAvatarCoordinate(
-        uint256 avatarId,
-        uint32 tileCoordinate
-    ) internal {
-        avatarNoumenon[avatarId].setData =
-            avatarNoumenon[avatarId].setData -
-            (avatarNoumenon[avatarId].setData % 10 ** 8) +
-            uint256(tileCoordinate);
     }
 
     function linkCheck(

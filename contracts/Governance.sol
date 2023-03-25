@@ -130,6 +130,33 @@ contract Governance is Multicall, Ownable {
 
     bytes32 public whiteListRoot;
 
+    /**
+     * @notice check if this collection is in white list
+     * @param collectionContract collection contract address
+     * @param proofs collection whitelist proofs
+     */
+    function isInWhiteList(
+        address collectionContract,
+        bytes32[] memory proofs
+    ) public view returns (bool) {
+        return
+            MerkleProof.verify(
+                proofs,
+                whiteListRoot,
+                keccak256(
+                    bytes.concat(keccak256(abi.encode(collectionContract)))
+                )
+            );
+    }
+
+    /**
+     * @notice update whitelist root
+     * @param whiteListRoot_ white list merkle tree root
+     */
+    function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
+        whiteListRoot = whiteListRoot_;
+    }
+
     // Collection Id
     uint256 COIDCounter;
 
@@ -138,7 +165,7 @@ contract Governance is Multicall, Ownable {
     /**
      * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
      *
-     * Collection address => COID * 1000000 + on map nft number
+     * Collection address => uint64 COID + uint64 minted avatar num + uint64 on map nft number
      */
     mapping(address => uint256) public collectionMap;
 
@@ -159,7 +186,7 @@ contract Governance is Multicall, Ownable {
     function getCollectionCOID(
         address collectionContract
     ) public view returns (uint256) {
-        return collectionMap[collectionContract] / 10 ** 16;
+        return uint64(collectionMap[collectionContract] >> 128);
     }
 
     /**
@@ -171,7 +198,7 @@ contract Governance is Multicall, Ownable {
     ) public view returns (uint256[] memory COIDs) {
         COIDs = new uint256[](collectionContracts.length);
         for (uint256 i = 0; i < collectionContracts.length; i++) {
-            COIDs[i] = collectionMap[collectionContracts[i]] / 10 ** 16;
+            COIDs[i] = uint64(collectionMap[collectionContracts[i]] >> 128);
         }
     }
 
@@ -203,9 +230,8 @@ contract Governance is Multicall, Ownable {
             COIDCounter++;
             COIDMap[COIDCounter] = collectionContract;
             collectionMap[collectionContract] =
-                COIDCounter *
-                10 ** 16 +
-                1000000;
+                (COIDCounter << 128) |
+                (uint256(1) << 64);
             COID = COIDCounter;
         } else {
             addCollectionAvatarNum(COID);
@@ -213,38 +239,11 @@ contract Governance is Multicall, Ownable {
     }
 
     /**
-     * @notice check if this collection is in white list
-     * @param collectionContract collection contract address
-     * @param proofs collection whitelist proofs
-     */
-    function isInWhiteList(
-        address collectionContract,
-        bytes32[] memory proofs
-    ) public view returns (bool) {
-        return
-            MerkleProof.verify(
-                proofs,
-                whiteListRoot,
-                keccak256(
-                    bytes.concat(keccak256(abi.encode(collectionContract)))
-                )
-            );
-    }
-
-    /**
-     * @notice update whitelist root
-     * @param whiteListRoot_ white list merkle tree root
-     */
-    function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
-        whiteListRoot = whiteListRoot_;
-    }
-
-    /**
      * @notice get NFT collection On map avatar number
      * @param COID collection Id
      */
     function getCollectionOnMapNum(uint256 COID) public view returns (uint256) {
-        return collectionMap[getCollectionContract(COID)] % 1000000;
+        return uint64(collectionMap[getCollectionContract(COID)]);
     }
 
     function addCollectionOnMapNum(uint256 COID) public onlyAvatar {
@@ -262,12 +261,11 @@ contract Governance is Multicall, Ownable {
     function getCollectionAvatarNum(
         uint256 COID
     ) public view returns (uint256) {
-        return
-            (collectionMap[getCollectionContract(COID)] % 10 ** 16) / 1000000;
+        return uint64(collectionMap[getCollectionContract(COID)] >> 64);
     }
 
     function addCollectionAvatarNum(uint256 COID) public onlyAvatar {
-        collectionMap[getCollectionContract(COID)] += 1000000;
+        collectionMap[getCollectionContract(COID)] += uint256(1) << 64;
     }
 
     address public auctionHouseContract;

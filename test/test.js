@@ -91,6 +91,8 @@ describe("MOPN", function () {
     mt = await MOPNToken.deploy();
     await mt.deployed();
     console.log("MOPNToken", mt.address);
+
+    mtdecimals = await mt.decimals();
   });
 
   it("deploy MOPN contracts", async function () {
@@ -252,15 +254,7 @@ describe("MOPN", function () {
     const jumpIn8Tx = await avatar.jumpIn([10041000, testnft1.address, 0, 0, 0, 0, address0]);
     await jumpIn8Tx.wait();
 
-    console.log(await avatar.getAvatarCoordinate(1));
-    console.log(await avatar.getAvatarCoordinate(2));
-    console.log(await avatar.getAvatarCoordinate(3));
-    console.log(await avatar.getAvatarCoordinate(4));
-    console.log(await avatar.getAvatarCoordinate(5));
-    console.log(await avatar.getAvatarCoordinate(6));
-    console.log(await avatar.getAvatarCoordinate(7));
-    console.log(await avatar.getAvatarCoordinate(8));
-    console.log(await avatar.getAvatarCoordinate(9));
+    await avatarInfo();
   });
 
   it("test moveTo", async function () {
@@ -270,15 +264,7 @@ describe("MOPN", function () {
   });
 
   it("test redeemAvatarInboxMT", async function () {
-    mtdecimals = await mt.decimals();
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(1), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(2), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(3), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(4), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(5), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(6), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(7), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(8), mtdecimals));
+    await avatarInfo();
 
     console.log(
       "wallet balance",
@@ -299,14 +285,7 @@ describe("MOPN", function () {
     ]);
     await multi10Tx.wait();
 
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(1), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(2), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(3), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(4), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(5), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(6), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(7), mtdecimals));
-    console.log(ethers.utils.formatUnits(await map.getAvatarInboxMT(8), mtdecimals));
+    await avatarInfo();
 
     console.log(
       "wallet balance",
@@ -321,27 +300,36 @@ describe("MOPN", function () {
     );
     await allowanceTx.wait();
 
-    console.log("Current Bomb Data", await auctionHouse.getBombCurrentData());
-
+    console.log("Current Bomb round", await auctionHouse.getBombRoundId());
+    console.log("Current Bomb round sold", await auctionHouse.getBombRoundSold());
     console.log(
-      "current 100 bomb price",
-      ethers.utils.formatUnits((await auctionHouse.getBombCurrentPrice()) * 100, mtdecimals)
+      "current bomb price",
+      ethers.utils.formatUnits(await auctionHouse.getBombCurrentPrice(), mtdecimals)
     );
+
     const buybombtx = await auctionHouse.buyBomb(100);
     await buybombtx.wait();
 
-    console.log("Current Bomb Data", await auctionHouse.getBombCurrentData());
+    console.log("Current Bomb round", await auctionHouse.getBombRoundId());
+    console.log("Current Bomb round sold", await auctionHouse.getBombRoundSold());
+    console.log(
+      "current bomb price",
+      ethers.utils.formatUnits(await auctionHouse.getBombCurrentPrice(), mtdecimals)
+    );
 
     console.log(
       "wallet balance",
       ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
     );
 
-    console.log("Current Land Data", await auctionHouse.getLandCurrentData());
+    console.log("Current Bomb round", await auctionHouse.getLandRoundId());
+    console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
+
     const buylandtx = await auctionHouse.buyLand();
     await buylandtx.wait();
 
-    console.log("Current Land Data", await auctionHouse.getLandCurrentData());
+    console.log("Current Bomb round", await auctionHouse.getLandRoundId());
+    console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
 
     console.log(
       "wallet balance",
@@ -350,6 +338,7 @@ describe("MOPN", function () {
   });
 
   it("test bomb", async function () {
+    await collectionInfo();
     // -2 3 -1
     const bombTx = await avatar.bomb([09981003, testnft1.address, 0, 0, address0]);
     await bombTx.wait();
@@ -358,31 +347,21 @@ describe("MOPN", function () {
     const bomb1Tx = await avatar.bomb([10001003, testnft1.address, 0, 0, address0]);
     await bomb1Tx.wait();
 
-    // const multiTx = await avatar.multicall([
-    //   avatar.interface.encodeFunctionData("mintAvatar", [
-    //     testnft1.address,
-    //     1,
-    //     testnftproofs,
-    //     0,
-    //     address0,
-    //   ]),
-    //   avatar.interface.encodeFunctionData("bomb", [[10001000, testnft1.address, 1, 0, address0]]),
-    // ]);
-    // await multiTx.wait();
+    await avatarInfo();
 
-    console.log(
-      await avatar.callStatic.multicall([
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [0]),
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [1]),
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [2]),
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [3]),
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [4]),
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [5]),
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [6]),
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [7]),
-        avatar.interface.encodeFunctionData("getAvatarCoordinate", [8]),
-      ])
-    );
+    // console.log(
+    //   await avatar.callStatic.multicall([
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [0]),
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [1]),
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [2]),
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [3]),
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [4]),
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [5]),
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [6]),
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [7]),
+    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [8]),
+    //   ])
+    // );
 
     console.log(
       "wallet balance",
@@ -397,5 +376,40 @@ describe("MOPN", function () {
       []
     );
     await batchRedeemMTTx.wait();
+
+    await collectionInfo();
   });
+
+  const avatarInfo = async () => {
+    for (let i = 1; i < 10; i++) {
+      console.log(
+        "avatarId",
+        i,
+        "COID",
+        (await avatar.getAvatarCOID(i)).toString(),
+        "coordinate",
+        await avatar.getAvatarCoordinate(i),
+        "getAvatarBombUsed",
+        await avatar.getAvatarBombUsed(i),
+        "getAvatarInboxMT",
+        ethers.utils.formatUnits(await map.getAvatarInboxMT(i), mtdecimals)
+      );
+    }
+  };
+
+  const collectionInfo = async () => {
+    for (let i = 1; i < 3; i++) {
+      const collectionAddress = await governance.getCollectionContract(i);
+      console.log(
+        "COID",
+        i,
+        "collectionAddress",
+        collectionAddress,
+        "minted avatar number",
+        (await governance.getCollectionAvatarNum(i)).toString(),
+        "on map avatar number",
+        (await governance.getCollectionOnMapNum(i)).toString()
+      );
+    }
+  };
 });

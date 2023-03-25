@@ -31,7 +31,7 @@ contract AuctionHouse is Multicall, Ownable {
 
     /**
      * @dev record the last participate round auction data
-     * @dev wallet address => uint64 total spend + uint8 auction amount + uint64 roundId + uint8 agio redeem status
+     * @dev wallet address => uint64 total spend + uint64 roundId + uint8 auction amount + uint8 agio redeem status
      */
     mapping(address => uint256) public bombWalletData;
 
@@ -46,8 +46,8 @@ contract AuctionHouse is Multicall, Ownable {
     uint256 public landRound;
 
     constructor(uint256 bombStartTimestamp, uint256 landStartTimestamp) {
-        bombRound = (1 << 128) | (bombStartTimestamp << 8);
-        landRound = landStartTimestamp;
+        bombRound = (uint256(1) << 192) | (bombStartTimestamp << 160);
+        landRound = (uint256(1) << 192) | (landStartTimestamp << 160);
     }
 
     /**
@@ -71,7 +71,7 @@ contract AuctionHouse is Multicall, Ownable {
 
         redeemAgio();
 
-        uint256 roundId = getBombRoundId();
+        uint64 roundId = getBombRoundId();
         uint8 roundSold = getBombRoundSold() + amount;
         require(roundSold <= bombRoundProduce, "round out of stock");
         uint256 currentPrice = getBombCurrentPrice();
@@ -88,17 +88,19 @@ contract AuctionHouse is Multicall, Ownable {
         }
 
         IGovernance(governanceContract).mintBomb(msg.sender, amount);
+
         bombWalletData[msg.sender] =
-            (getBombWalletTotalSpend(msg.sender) + price) *
-            10 ** 14 +
-            uint256(amount) *
-            10 ** 11 +
-            roundId *
-            10;
+            (uint256(getBombWalletTotalSpend(msg.sender) + price) << 192) |
+            (uint256(roundId) << 128) |
+            (uint256(amount) << 120);
+
         if (roundSold >= bombRoundProduce) {
             settleBombPreviousRound(roundId, currentPrice);
         } else {
-            updateBombRoundSold(roundSold);
+            bombRound =
+                (bombRound &
+                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00) |
+                uint256(roundSold);
         }
         emit BombSold(msg.sender, amount, currentPrice);
     }
@@ -107,55 +109,38 @@ contract AuctionHouse is Multicall, Ownable {
      * @notice get current Round Id
      * @return roundId round Id
      */
-    function getBombRoundId() public view returns (uint256) {
-        return uint128(bombRound >> 128);
+    function getBombRoundId() public view returns (uint64) {
+        return uint64(bombRound >> 192);
     }
 
-    function updateBombRoundId(uint128 roundId) public {
-        uint256 mask = 0xFFFFFFFFFFFFFFFFFFFFFFFF00000000000000000000000000000000;
-        bombRound = (bombRound & mask) | (roundId << 128);
-    }
-
-    function getBombRoundStartTimestamp() public view returns (uint256) {
-        return uint32((bombRound >> 8) & 0xFFFFFFFF);
-    }
-
-    function updateBombRoundStartTimestamp(uint256 startTimestamp) public {
-        uint256 mask = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000000;
-        bombRound = (bombRound & mask) | (startTimestamp << 8);
+    function getBombRoundStartTimestamp() public view returns (uint32) {
+        return uint32((bombRound >> 160) & 0xFFFFFFFF);
     }
 
     function getBombRoundSold() public view returns (uint8) {
         return uint8(bombRound);
     }
 
-    function updateBombRoundSold(uint8 sold) public {
-        uint256 mask = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00;
-        bombRound = (bombRound & mask) | sold;
-    }
-
     function getBombWalletTotalSpend(
         address wallet
-    ) public view returns (uint256) {
-        return bombWalletData[wallet] / 10 ** 14;
+    ) public view returns (uint64) {
+        return uint64(bombWalletData[wallet] >> 192);
+    }
+
+    function getBombWalletRoundId(address wallet) public view returns (uint64) {
+        return uint64((bombWalletData[wallet] >> 128) & 0xFFFFFFFFFFFFFFFF);
     }
 
     function getBombWalletAuctionAmount(
         address wallet
-    ) public view returns (uint256) {
-        return (bombWalletData[wallet] % 10 ** 14) / 10 ** 11;
-    }
-
-    function getBombWalletRoundId(
-        address wallet
-    ) public view returns (uint256) {
-        return (bombWalletData[wallet] % 10 ** 11) / 10;
+    ) public view returns (uint8) {
+        return uint8((bombWalletData[wallet] >> 120) & 0xFF);
     }
 
     function getBombWalletAgioRedeemStatus(
         address wallet
-    ) public view returns (uint256) {
-        return bombWalletData[wallet] % 10;
+    ) public view returns (uint8) {
+        return uint8(bombWalletData[wallet]);
     }
 
     function getBombRoundPrice(uint256 roundId) public view returns (uint256) {
@@ -214,9 +199,9 @@ contract AuctionHouse is Multicall, Ownable {
         if (getBombWalletAgioRedeemStatus(to) == 1) {
             return 0;
         }
-        uint256 roundId = getBombWalletRoundId(to);
+        uint64 roundId = getBombWalletRoundId(to);
         if (roundId != getBombRoundId()) {
-            uint256 amount = getBombWalletAuctionAmount(to);
+            uint8 amount = getBombWalletAuctionAmount(to);
             agio =
                 (getBombWalletTotalSpend(to) /
                     amount -
@@ -250,7 +235,7 @@ contract AuctionHouse is Multicall, Ownable {
     /**
      * @notice make the last round settlement
      */
-    function settleBombPreviousRound(uint256 roundId, uint256 price) internal {
+    function settleBombPreviousRound(uint64 roundId, uint256 price) internal {
         if (price > 0) {
             price = price * bombRoundProduce;
             IMOPNToken(IGovernance(governanceContract).mtContract()).burn(
@@ -259,24 +244,20 @@ contract AuctionHouse is Multicall, Ownable {
         }
         bombRoundData[roundId] = price;
         bombRound =
-            (uint256(roundId + 1) << 128) |
-            (uint256(block.timestamp) << 8);
+            (uint256(roundId + 1) << 192) |
+            (uint256(block.timestamp) << 160);
     }
 
     /**
      * @notice get current Land Round Id
      * @return roundId round Id
      */
-    function getLandRoundId() public view returns (uint256 roundId) {
-        roundId = landRound / 10 ** 11;
+    function getLandRoundId() public view returns (uint64) {
+        return uint64(landRound >> 192);
     }
 
-    function getLandRoundStartTimestamp()
-        public
-        view
-        returns (uint256 startTimestamp)
-    {
-        startTimestamp = (landRound % 10 ** 11);
+    function getLandRoundStartTimestamp() public view returns (uint32) {
+        return uint32((landRound >> 160) & 0xFFFFFFFF);
     }
 
     /**
@@ -286,7 +267,7 @@ contract AuctionHouse is Multicall, Ownable {
         uint256 roundStartTimestamp = getLandRoundStartTimestamp();
         require(block.timestamp > roundStartTimestamp, "auction not start");
 
-        uint256 roundId = getLandRoundId();
+        uint64 roundId = getLandRoundId();
         uint256 price = getLandCurrentPrice();
 
         if (price > 0) {
@@ -303,7 +284,9 @@ contract AuctionHouse is Multicall, Ownable {
 
         IGovernance(governanceContract).mintLand(msg.sender);
 
-        landRound = (roundId + 1) * 10 ** 11 + block.timestamp;
+        landRound =
+            (uint256(roundId + 1) << 192) |
+            (uint256(block.timestamp) << 160);
     }
 
     /**

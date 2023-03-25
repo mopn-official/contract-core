@@ -19,7 +19,7 @@ error LandIdOverflow();
 contract Map is Ownable, Multicall {
     using TileMath for uint32;
 
-    // Tile => avatarId * 10 ** 16 + COID * 10 ** 6 + MOPN Land Id
+    // Tile => uint64 avatarId + uint64 COID + uint32 MOPN Land Id
     mapping(uint32 => uint256) public tiles;
 
     uint256 public constant MTProducePerBlock = 600000000000;
@@ -28,10 +28,10 @@ contract Map is Ownable, Multicall {
 
     uint256 public MTProduceStartBlock;
 
-    /// @notice PerMTAWMinted * 10 ** 24 + LastPerMTAWMintedCalcBlock * 10 ** 12 + TotalMTAWs
+    /// @notice uint64 PerMTAWMinted + uint64 LastPerMTAWMintedCalcBlock + uint64 TotalMTAWs
     uint256 public MTProduceData;
 
-    /// @notice MT Inbox * 10 ** 52 + Total Minted MT * 10 ** 32 + PerMTAWMinted * 10 ** 12 + TotalMTAWs
+    /// @notice uint64 MT Inbox + uint64 Total Minted MT + uint64 PerMTAWMinted + uint64 TotalMTAWs
     mapping(uint256 => uint256) public AvatarMTs;
 
     mapping(uint256 => uint256) public CollectionMTs;
@@ -53,7 +53,7 @@ contract Map is Ownable, Multicall {
     function getTileAvatar(
         uint32 tileCoordinate
     ) public view returns (uint256) {
-        return tiles[tileCoordinate] / 10 ** 16;
+        return uint64(tiles[tileCoordinate] >> 192);
     }
 
     /**
@@ -61,7 +61,7 @@ contract Map is Ownable, Multicall {
      * @param tileCoordinate tile coordinate
      */
     function getTileCOID(uint32 tileCoordinate) public view returns (uint256) {
-        return (tiles[tileCoordinate] % 10 ** 16) / 10 ** 6;
+        return uint64(tiles[tileCoordinate] >> 128);
     }
 
     /**
@@ -69,7 +69,7 @@ contract Map is Ownable, Multicall {
      * @param tileCoordinate tile coordinate
      */
     function getTileLandId(uint32 tileCoordinate) public view returns (uint32) {
-        return uint32(tiles[tileCoordinate] % 10 ** 6);
+        return uint32(tiles[tileCoordinate]);
     }
 
     /**
@@ -81,7 +81,7 @@ contract Map is Ownable, Multicall {
     ) public view returns (uint256[] memory) {
         uint256[] memory avatarIds = new uint256[](tileCoordinates.length);
         for (uint256 i = 0; i < tileCoordinates.length; i++) {
-            avatarIds[i] = tiles[tileCoordinates[i]] / 10 ** 16;
+            avatarIds[i] = uint64(tiles[tileCoordinates[i]] >> 192);
         }
         return avatarIds;
     }
@@ -130,7 +130,10 @@ contract Map is Ownable, Multicall {
 
         uint256 TileMTAW = tileCoordinate.getTileMTAW() + BombUsed;
 
-        tiles[tileCoordinate] = avatarId * 10 ** 16 + COID * 10 ** 6 + LandId;
+        tiles[tileCoordinate] =
+            (avatarId << 192) |
+            (COID << 128) |
+            uint256(LandId);
         tileCoordinate = tileCoordinate.neighbor(4);
 
         for (uint256 i = 0; i < 18; i++) {
@@ -174,21 +177,21 @@ contract Map is Ownable, Multicall {
      * @notice get settled Per MT Allocation Weight minted mopn token number
      */
     function getPerMTAWMinted() public view returns (uint256) {
-        return MTProduceData / 10 ** 24;
+        return uint64(MTProduceData >> 128);
     }
 
     /**
      * @notice get MT last minted settlement block number
      */
     function getLastPerMTAWMintedCalcBlock() public view returns (uint256) {
-        return (MTProduceData % 10 ** 24) / 10 ** 12;
+        return uint64(MTProduceData >> 64);
     }
 
     /**
      * @notice get total mopn token allocation weights
      */
     function getTotalMTAWs() public view returns (uint256) {
-        return MTProduceData % 10 ** 12;
+        return uint64(MTProduceData);
     }
 
     function currentMTPPB(
@@ -206,10 +209,8 @@ contract Map is Ownable, Multicall {
         if (block.number > getLastPerMTAWMintedCalcBlock()) {
             uint256 PerMTAWMinted = calcPerMTAWMinted();
             MTProduceData =
-                PerMTAWMinted *
-                10 ** 24 +
-                block.number *
-                10 ** 12 +
+                (PerMTAWMinted << 128) |
+                (block.number << 64) |
                 getTotalMTAWs();
         }
     }
@@ -254,13 +255,13 @@ contract Map is Ownable, Multicall {
     function getAvatarSettledInboxMT(
         uint256 avatarId
     ) public view returns (uint256) {
-        return AvatarMTs[avatarId] / 10 ** 52;
+        return uint64(AvatarMTs[avatarId] >> 192);
     }
 
     function getAvatarTotalMinted(
         uint256 avatarId
     ) public view returns (uint256) {
-        return (AvatarMTs[avatarId] % 10 ** 52) / 10 ** 32;
+        return uint64(AvatarMTs[avatarId] >> 128);
     }
 
     /**
@@ -270,7 +271,7 @@ contract Map is Ownable, Multicall {
     function getAvatarPerMTAWMinted(
         uint256 avatarId
     ) public view returns (uint256) {
-        return (AvatarMTs[avatarId] % 10 ** 32) / 10 ** 12;
+        return uint64(AvatarMTs[avatarId] >> 64);
     }
 
     /**
@@ -278,7 +279,7 @@ contract Map is Ownable, Multicall {
      * @param avatarId avatar Id
      */
     function getAvatarMTAW(uint256 avatarId) public view returns (uint256) {
-        return AvatarMTs[avatarId] % 10 ** 12;
+        return uint64(AvatarMTs[avatarId]);
     }
 
     /**
@@ -293,10 +294,8 @@ contract Map is Ownable, Multicall {
             uint256 amount = ((((PerMTAWMinted - AvatarPerMTAWMinted) *
                 AvatarMTAW) * 90) / 100);
             AvatarMTs[avatarId] +=
-                amount *
-                10 ** 52 +
-                (PerMTAWMinted - AvatarPerMTAWMinted) *
-                10 ** 12;
+                (amount << 192) |
+                ((PerMTAWMinted - AvatarPerMTAWMinted) << 64);
             emit AvatarMTMinted(avatarId, amount);
         }
     }
@@ -306,10 +305,8 @@ contract Map is Ownable, Multicall {
     ) public returns (uint256 amount) {
         amount = getAvatarSettledInboxMT(avatarId);
         if (amount > 0) {
-            AvatarMTs[avatarId] =
-                (AvatarMTs[avatarId] % (10 ** 52)) +
-                amount *
-                10 ** 32;
+            AvatarMTs[avatarId] -= amount << 192;
+            AvatarMTs[avatarId] += amount << 128;
         }
     }
 
@@ -339,13 +336,13 @@ contract Map is Ownable, Multicall {
     function getCollectionSettledInboxMT(
         uint256 COID
     ) public view returns (uint256) {
-        return CollectionMTs[COID] / 10 ** 52;
+        return uint64(CollectionMTs[COID] >> 192);
     }
 
     function getCollectionTotalMinted(
         uint256 COID
     ) public view returns (uint256) {
-        return (CollectionMTs[COID] % 10 ** 52) / 10 ** 32;
+        return uint64(CollectionMTs[COID] >> 128);
     }
 
     /**
@@ -355,7 +352,7 @@ contract Map is Ownable, Multicall {
     function getCollectionPerMTAWMinted(
         uint256 COID
     ) public view returns (uint256) {
-        return (CollectionMTs[COID] % 10 ** 32) / 10 ** 12;
+        return uint64(CollectionMTs[COID] >> 64);
     }
 
     /**
@@ -363,7 +360,7 @@ contract Map is Ownable, Multicall {
      * @param COID collection Id
      */
     function getCollectionMTAW(uint256 COID) public view returns (uint256) {
-        return CollectionMTs[COID] % 10 ** 12;
+        return uint64(CollectionMTs[COID]);
     }
 
     /**
@@ -378,10 +375,8 @@ contract Map is Ownable, Multicall {
             uint256 amount = ((((PerMTAWMinted - CollectionPerMTAWMinted) *
                 CollectionMTAW) * 5) / 100);
             CollectionMTs[COID] +=
-                amount *
-                10 ** 52 +
-                (PerMTAWMinted - CollectionPerMTAWMinted) *
-                10 ** 12;
+                (amount << 192) |
+                ((PerMTAWMinted - CollectionPerMTAWMinted) << 64);
             emit CollectionMTMinted(COID, amount);
         }
     }
@@ -422,9 +417,9 @@ contract Map is Ownable, Multicall {
                 amount /
                 (IGovernance(governanceContract).getCollectionOnMapNum(COID) +
                     1);
-            CollectionMTs[COID] -= amount * (10 ** 52);
-            CollectionMTs[COID] += amount * (10 ** 32);
-            AvatarMTs[avatarId] += amount * (10 ** 52);
+            CollectionMTs[COID] -= amount << 192;
+            CollectionMTs[COID] += amount << 128;
+            AvatarMTs[avatarId] += amount << 192;
             emit AvatarMTMinted(avatarId, amount);
         }
     }
@@ -436,13 +431,13 @@ contract Map is Ownable, Multicall {
     function getLandHolderSettledInboxMT(
         uint32 LandId
     ) public view returns (uint256) {
-        return LandHolderMTs[LandId] / 10 ** 52;
+        return uint64(LandHolderMTs[LandId] >> 192);
     }
 
     function getLandHolderTotalMinted(
         uint32 LandId
     ) public view returns (uint256) {
-        return (LandHolderMTs[LandId] % 10 ** 52) / 10 ** 32;
+        return uint64(LandHolderMTs[LandId] >> 128);
     }
 
     /**
@@ -452,7 +447,7 @@ contract Map is Ownable, Multicall {
     function getLandHolderPerMTAWMinted(
         uint32 LandId
     ) public view returns (uint256) {
-        return (LandHolderMTs[LandId] % 10 ** 32) / 10 ** 12;
+        return uint64(LandHolderMTs[LandId] >> 64);
     }
 
     /**
@@ -460,7 +455,7 @@ contract Map is Ownable, Multicall {
      * @param LandId MOPN Land Id
      */
     function getLandHolderMTAW(uint32 LandId) public view returns (uint256) {
-        return LandHolderMTs[LandId] % 10 ** 12;
+        return uint64(LandHolderMTs[LandId]);
     }
 
     /**
@@ -472,12 +467,11 @@ contract Map is Ownable, Multicall {
         uint256 PerMTAWMinted = getPerMTAWMinted();
         uint256 LandHolderPerMTAWMinted = getLandHolderPerMTAWMinted(LandId);
         if (LandHolderPerMTAWMinted < PerMTAWMinted && LandHolderMTAW > 0) {
+            uint256 amount = (((PerMTAWMinted - LandHolderPerMTAWMinted) *
+                LandHolderMTAW) * 5) / 100;
             LandHolderMTs[LandId] +=
-                ((((PerMTAWMinted - LandHolderPerMTAWMinted) * LandHolderMTAW) *
-                    5) / 100) *
-                10 ** 52 +
-                (PerMTAWMinted - LandHolderPerMTAWMinted) *
-                10 ** 12;
+                (amount << 192) |
+                ((PerMTAWMinted - LandHolderPerMTAWMinted) << 64);
         }
     }
 
@@ -486,10 +480,8 @@ contract Map is Ownable, Multicall {
     ) public returns (uint256 amount) {
         amount = getLandHolderSettledInboxMT(LandId);
         if (amount > 0) {
-            LandHolderMTs[LandId] =
-                (LandHolderMTs[LandId] % (10 ** 52)) +
-                amount *
-                10 ** 32;
+            LandHolderMTs[LandId] -= amount << 192;
+            LandHolderMTs[LandId] += amount << 128;
         }
     }
 
