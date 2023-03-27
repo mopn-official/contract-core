@@ -20,16 +20,28 @@ function auctionMint(address to, uint256 amount) public
 function nextTokenId() public view returns (uint256)
 ```
 
-### metaDataRenderAddress
+### metadataRenderAddress
 
 ```solidity
-address metaDataRenderAddress
+address metadataRenderAddress
 ```
 
-### setMetaDataRender
+### auctionAddress
 
 ```solidity
-function setMetaDataRender(address metaDataRenderAddress_) public
+address auctionAddress
+```
+
+### setRender
+
+```solidity
+function setRender(address metaDataRenderAddress_) public
+```
+
+### setAuction
+
+```solidity
+function setAuction(address auctionAddress_) public
 ```
 
 ### tokenURI

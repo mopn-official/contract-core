@@ -20,3 +20,9 @@ function burn(uint256 amount) external
 function burnFrom(address account, uint256 amount) external
 ```
 
+### transferOwnership
+
+```solidity
+function transferOwnership(address newOwner) external
+```
+

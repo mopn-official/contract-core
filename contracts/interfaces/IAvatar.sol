@@ -44,20 +44,10 @@ interface IAvatar {
      * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
      * @param vault cold wallet address
      */
-    struct OnMapParams {
-        uint32 tileCoordinate;
+    struct NFTParams {
         address collectionContract;
         uint256 tokenId;
-        uint256 linkedAvatarId;
-        uint32 LandId;
-        DelegateWallet delegateWallet;
-        address vault;
-    }
-
-    struct BombParams {
-        uint32 tileCoordinate;
-        address collectionContract;
-        uint256 tokenId;
+        bytes32[] proofs;
         DelegateWallet delegateWallet;
         address vault;
     }
@@ -78,36 +68,19 @@ interface IAvatar {
     ) external view returns (address);
 
     /**
-     * @notice mint an avatar for a NFT
-     * @param collectionContract NFT collection Contract Address
-     * @param tokenId NFT tokenId
-     * @param proofs NFT collection whitelist proof
-     * @param delegateWallet DelegateWallet enum to specify protocol
-     * @param vault cold wallet address
+     * @notice an on map avatar move to a new tile
+     * @param params NFTParams
      */
-    function mintAvatar(
-        address collectionContract,
-        uint256 tokenId,
-        bytes32[] memory proofs,
-        DelegateWallet delegateWallet,
-        address vault
+    function moveTo(
+        NFTParams calldata params,
+        uint32 tileCoordinate,
+        uint256 linkedAvatarId,
+        uint32 LandId
     ) external;
 
     /**
-     * @notice an off map avatar jump in to the map
-     * @param params OnMapParams
-     */
-    function jumpIn(OnMapParams calldata params) external;
-
-    /**
-     * @notice an on map avatar move to a new tile
-     * @param params OnMapParams
-     */
-    function moveTo(OnMapParams calldata params) external;
-
-    /**
      * @notice throw a bomb to a tile
-     * @param params BombParams
+     * @param params NFTParams
      */
-    function bomb(BombParams calldata params) external;
+    function bomb(NFTParams calldata params, uint32 tileCoordinate) external;
 }

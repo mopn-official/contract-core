@@ -175,93 +175,101 @@ describe("MOPN", function () {
     await mintnfttx.wait();
   });
 
-  it("test multicall jumpIn", async function () {
-    const multiTx = await avatar.multicall([
-      avatar.interface.encodeFunctionData("mintAvatar", [
-        testnft.address,
-        0,
-        testnftproofs,
-        0,
-        address0,
-      ]),
-      avatar.interface.encodeFunctionData("jumpIn", [
-        [10001000, testnft.address, 0, 0, 0, 0, address0],
-      ]),
-    ]);
-    await multiTx.wait();
+  it("test moveTo (first jump)", async function () {
+    // 0 0 0
+    let moveToTx = await avatar.moveTo(
+      [testnft.address, 0, testnftproofs, 0, address0],
+      10001000,
+      0,
+      0
+    );
+    await moveToTx.wait();
 
-    const multi1Tx = await avatar.multicall([
-      avatar.interface.encodeFunctionData("mintAvatar", [
-        testnft.address,
-        1,
-        testnftproofs,
-        0,
-        address0,
-      ]),
-      avatar.interface.encodeFunctionData("jumpIn", [
-        [10001003, testnft.address, 1, 1, 0, 0, address0],
-      ]),
-    ]);
-    await multi1Tx.wait();
-  });
-  it("test jumpIn", async function () {
-    const mintTx2 = await avatar.mintAvatar(testnft.address, 2, testnftproofs, 0, address0);
-    await mintTx2.wait();
+    // 0 3 -3
+    moveToTx = await avatar.moveTo(
+      [testnft.address, 1, testnftproofs, 0, address0],
+      10001003,
+      1,
+      0
+    );
+    await moveToTx.wait();
 
     // 0 2 -2
-    const jumpIn2Tx = await avatar.jumpIn([10001002, testnft.address, 2, 2, 0, 0, address0]);
-    await jumpIn2Tx.wait();
-
-    const mintTx3 = await avatar.mintAvatar(testnft.address, 3, testnftproofs, 0, address0);
-    await mintTx3.wait();
+    moveToTx = await avatar.moveTo(
+      [testnft.address, 2, testnftproofs, 0, address0],
+      10001002,
+      2,
+      0
+    );
+    await moveToTx.wait();
 
     // 1 2 -3
-    const jumpIn3Tx = await avatar.jumpIn([10011002, testnft.address, 3, 3, 0, 0, address0]);
-    await jumpIn3Tx.wait();
-
-    const mintTx4 = await avatar.mintAvatar(testnft.address, 4, testnftproofs, 0, address0);
-    await mintTx4.wait();
+    moveToTx = await avatar.moveTo(
+      [testnft.address, 3, testnftproofs, 0, address0],
+      10011002,
+      3,
+      0
+    );
+    await moveToTx.wait();
 
     // -1 3 -2
-    const jumpIn4Tx = await avatar.jumpIn([09991003, testnft.address, 4, 4, 0, 0, address0]);
-    await jumpIn4Tx.wait();
-
-    const mintTx5 = await avatar.mintAvatar(testnft.address, 5, testnftproofs, 0, address0);
-    await mintTx5.wait();
+    moveToTx = await avatar.moveTo(
+      [testnft.address, 4, testnftproofs, 0, address0],
+      09991003,
+      4,
+      0
+    );
+    await moveToTx.wait();
 
     // -1 4 -3
-    const jumpIn5Tx = await avatar.jumpIn([09991004, testnft.address, 5, 2, 0, 0, address0]);
-    await jumpIn5Tx.wait();
-
-    const mintTx6 = await avatar.mintAvatar(testnft.address, 6, testnftproofs, 0, address0);
-    await mintTx6.wait();
+    moveToTx = await avatar.moveTo(
+      [testnft.address, 5, testnftproofs, 0, address0],
+      09991004,
+      2,
+      0
+    );
+    await moveToTx.wait();
 
     // 0 4 -4
-    const jumpIn6Tx = await avatar.jumpIn([10001004, testnft.address, 6, 2, 0, 0, address0]);
-    await jumpIn6Tx.wait();
-
-    const mintTx7 = await avatar.mintAvatar(testnft.address, 7, testnftproofs, 0, address0);
-    await mintTx7.wait();
+    moveToTx = await avatar.moveTo(
+      [testnft.address, 6, testnftproofs, 0, address0],
+      10001004,
+      2,
+      0
+    );
+    await moveToTx.wait();
 
     // 1 3 -4
-    const jumpIn7Tx = await avatar.jumpIn([10011003, testnft.address, 7, 2, 0, 0, address0]);
-    await jumpIn7Tx.wait();
-
-    const mintTx8 = await avatar.mintAvatar(testnft1.address, 0, testnftproofs, 0, address0);
-    await mintTx8.wait();
+    moveToTx = await avatar.moveTo(
+      [testnft.address, 7, testnftproofs, 0, address0],
+      10011003,
+      2,
+      0
+    );
+    await moveToTx.wait();
 
     // 4 0 -4
-    const jumpIn8Tx = await avatar.jumpIn([10041000, testnft1.address, 0, 0, 0, 0, address0]);
-    await jumpIn8Tx.wait();
+    moveToTx = await avatar.moveTo(
+      [testnft1.address, 0, testnftproofs, 0, address0],
+      10041000,
+      0,
+      0
+    );
+    await moveToTx.wait();
 
     await avatarInfo();
   });
 
-  it("test moveTo", async function () {
-    // 1, 0, -1;
-    const moveTo4Tx = await avatar.moveTo([10011000, testnft.address, 0, 2, 0, 0, address0]);
-    await moveTo4Tx.wait();
-  });
+  // it("test moveTo", async function () {
+  //   // 1, 0, -1;
+  //   const moveToTx = await avatar.moveTo(
+  //     [testnft.address, 0, testnftproofs, 0, address0],
+  //     10011000,
+  //     2,
+  //     0
+  //   );
+  //   await moveToTx.wait();
+  // });
 
   it("test redeemAvatarInboxMT", async function () {
     await avatarInfo();
@@ -340,11 +348,11 @@ describe("MOPN", function () {
   it("test bomb", async function () {
     await collectionInfo();
     // -2 3 -1
-    const bombTx = await avatar.bomb([09981003, testnft1.address, 0, 0, address0]);
+    const bombTx = await avatar.bomb([testnft1.address, 0, testnftproofs, 0, address0], 09981003);
     await bombTx.wait();
 
     // 0 3 -3
-    const bomb1Tx = await avatar.bomb([10001003, testnft1.address, 0, 0, address0]);
+    const bomb1Tx = await avatar.bomb([testnft1.address, 1, testnftproofs, 0, address0], 10001003);
     await bomb1Tx.wait();
 
     await avatarInfo();
@@ -390,7 +398,7 @@ describe("MOPN", function () {
         "coordinate",
         await avatar.getAvatarCoordinate(i),
         "getAvatarBombUsed",
-        await avatar.getAvatarBombUsed(i),
+        (await avatar.getAvatarBombUsed(i)).toString(),
         "getAvatarInboxMT",
         ethers.utils.formatUnits(await map.getAvatarInboxMT(i), mtdecimals)
       );

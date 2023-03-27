@@ -212,30 +212,28 @@ contract Governance is Multicall, Ownable {
         bytes32[] memory proofs
     ) public returns (uint256 COID) {
         COID = getCollectionCOID(collectionContract);
-        if (COID == 0) {
-            if (whiteListRequire) {
-                require(
-                    isInWhiteList(collectionContract, proofs),
-                    "not in whitelist"
-                );
-            } else {
-                require(
-                    IERC165(collectionContract).supportsInterface(
-                        type(IERC721).interfaceId
-                    ),
-                    "not a erc721 compatible nft"
-                );
-            }
+        require(COID == 0, "COID exist");
 
-            COIDCounter++;
-            COIDMap[COIDCounter] = collectionContract;
-            collectionMap[collectionContract] =
-                (COIDCounter << 128) |
-                (uint256(1) << 64);
-            COID = COIDCounter;
+        if (whiteListRequire) {
+            require(
+                isInWhiteList(collectionContract, proofs),
+                "not in whitelist"
+            );
         } else {
-            addCollectionAvatarNum(COID);
+            require(
+                IERC165(collectionContract).supportsInterface(
+                    type(IERC721).interfaceId
+                ),
+                "not a erc721 compatible nft"
+            );
         }
+
+        COIDCounter++;
+        COIDMap[COIDCounter] = collectionContract;
+        collectionMap[collectionContract] =
+            (COIDCounter << 128) |
+            (uint256(1) << 64);
+        COID = COIDCounter;
     }
 
     /**

@@ -2,6 +2,12 @@
 
 ## LandMetaDataRender
 
+### governanceContract
+
+```solidity
+address governanceContract
+```
+
 ### setGovernanceContract
 
 ```solidity

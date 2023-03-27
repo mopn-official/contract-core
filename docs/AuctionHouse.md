@@ -13,7 +13,13 @@ address governanceContract
 ### bombRoundProduce
 
 ```solidity
-uint256 bombRoundProduce
+uint8 bombRoundProduce
+```
+
+### bombPrice
+
+```solidity
+uint256 bombPrice
 ```
 
 ### bombRound
@@ -22,7 +28,7 @@ uint256 bombRoundProduce
 uint256 bombRound
 ```
 
-roundId * 10 ** 14 + startTimestamp * 10 ** 3 + round sold
+uint64 roundId + uint32 startTimestamp + uint8 round sold
 
 _last active round and it's start timestamp and it's settlement status_
 
@@ -42,13 +48,29 @@ mapping(address => uint256) bombWalletData
 ```
 
 _record the last participate round auction data
-wallet address => total spend * 10 ** 14 + auction amount * 10 ** 11 + roundId * 10 + agio redeem status_
+wallet address => uint64 total spend + uint64 roundId + uint8 auction amount + uint8 agio redeem status_
 
 ### BombSold
 
 ```solidity
 event BombSold(address buyer, uint256 amount, uint256 price)
 ```
+
+### landPrice
+
+```solidity
+uint256 landPrice
+```
+
+### landRound
+
+```solidity
+uint256 landRound
+```
+
+uint64 roundId + uint32 startTimestamp
+
+_last active round's start timestamp_
 
 ### constructor
 
@@ -74,7 +96,7 @@ this function also get the mopn token contract from the governances_
 ### buyBomb
 
 ```solidity
-function buyBomb(uint256 amount) public
+function buyBomb(uint8 amount) public
 ```
 
 buy the amount of bombs at current block's price
@@ -83,12 +105,12 @@ buy the amount of bombs at current block's price
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| amount | uint256 | the amount of bombs |
+| amount | uint8 | the amount of bombs |
 
 ### getBombRoundId
 
 ```solidity
-function getBombRoundId() public view returns (uint256 roundId)
+function getBombRoundId() public view returns (uint64)
 ```
 
 get current Round Id
@@ -97,42 +119,42 @@ get current Round Id
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| roundId | uint256 | round Id |
+| [0] | uint64 | roundId round Id |
 
 ### getBombRoundStartTimestamp
 
 ```solidity
-function getBombRoundStartTimestamp() public view returns (uint256 startTimestamp)
+function getBombRoundStartTimestamp() public view returns (uint32)
 ```
 
 ### getBombRoundSold
 
 ```solidity
-function getBombRoundSold() public view returns (uint256)
+function getBombRoundSold() public view returns (uint8)
 ```
 
 ### getBombWalletTotalSpend
 
 ```solidity
-function getBombWalletTotalSpend(address wallet) public view returns (uint256)
-```
-
-### getBombWalletAuctionAmount
-
-```solidity
-function getBombWalletAuctionAmount(address wallet) public view returns (uint256)
+function getBombWalletTotalSpend(address wallet) public view returns (uint64)
 ```
 
 ### getBombWalletRoundId
 
 ```solidity
-function getBombWalletRoundId(address wallet) public view returns (uint256)
+function getBombWalletRoundId(address wallet) public view returns (uint64)
+```
+
+### getBombWalletAuctionAmount
+
+```solidity
+function getBombWalletAuctionAmount(address wallet) public view returns (uint8)
 ```
 
 ### getBombWalletAgioRedeemStatus
 
 ```solidity
-function getBombWalletAgioRedeemStatus(address wallet) public view returns (uint256)
+function getBombWalletAgioRedeemStatus(address wallet) public view returns (uint8)
 ```
 
 ### getBombRoundPrice
@@ -155,22 +177,10 @@ get the current auction price by block.timestamp
 | ---- | ---- | ----------- |
 | [0] | uint256 | price current auction price |
 
-### bombPriceMap
-
-```solidity
-uint256[] bombPriceMap
-```
-
-### bombZeroTrigger
-
-```solidity
-uint256 bombZeroTrigger
-```
-
 ### getBombPrice
 
 ```solidity
-function getBombPrice(uint256 reduceTimes) public view returns (uint256 price)
+function getBombPrice(uint256 reduceTimes) public pure returns (uint256)
 ```
 
 ### getBombCurrentData
@@ -227,25 +237,15 @@ function _redeemAgio(address to) internal
 ### settleBombPreviousRound
 
 ```solidity
-function settleBombPreviousRound(uint256 roundId, uint256 price) internal
+function settleBombPreviousRound(uint64 roundId, uint256 price) internal
 ```
 
 make the last round settlement
 
-### landRound
-
-```solidity
-uint256 landRound
-```
-
-roundId * 10 ** 11 + startTimestamp
-
-_last active round's start timestamp_
-
 ### getLandRoundId
 
 ```solidity
-function getLandRoundId() public view returns (uint256 roundId)
+function getLandRoundId() public view returns (uint64)
 ```
 
 get current Land Round Id
@@ -254,12 +254,12 @@ get current Land Round Id
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| roundId | uint256 | round Id |
+| [0] | uint64 | roundId round Id |
 
 ### getLandRoundStartTimestamp
 
 ```solidity
-function getLandRoundStartTimestamp() public view returns (uint256 startTimestamp)
+function getLandRoundStartTimestamp() public view returns (uint32)
 ```
 
 ### buyLand
@@ -284,22 +284,10 @@ get the current auction price for land
 | ---- | ---- | ----------- |
 | [0] | uint256 | price current auction price |
 
-### landPriceMap
-
-```solidity
-uint256[] landPriceMap
-```
-
-### landZeroTrigger
-
-```solidity
-uint256 landZeroTrigger
-```
-
 ### getLandPrice
 
 ```solidity
-function getLandPrice(uint256 reduceTimes) public view returns (uint256 price)
+function getLandPrice(uint256 reduceTimes) public pure returns (uint256)
 ```
 
 ### getLandCurrentData

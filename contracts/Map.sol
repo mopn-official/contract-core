@@ -72,20 +72,6 @@ contract Map is Ownable, Multicall {
         return uint32(tiles[tileCoordinate]);
     }
 
-    /**
-     * @notice batch call for {getTileAvatar}
-     * @param tileCoordinates tile coordinate
-     */
-    function getTilesAvatars(
-        uint32[] memory tileCoordinates
-    ) public view returns (uint256[] memory) {
-        uint256[] memory avatarIds = new uint256[](tileCoordinates.length);
-        for (uint256 i = 0; i < tileCoordinates.length; i++) {
-            avatarIds[i] = uint64(tiles[tileCoordinates[i]] >> 192);
-        }
-        return avatarIds;
-    }
-
     address public governanceContract;
 
     function setGovernanceContract(
@@ -302,7 +288,7 @@ contract Map is Ownable, Multicall {
 
     function claimAvatarSettledIndexMT(
         uint256 avatarId
-    ) public returns (uint256 amount) {
+    ) public onlyOwner returns (uint256 amount) {
         amount = getAvatarSettledInboxMT(avatarId);
         if (amount > 0) {
             AvatarMTs[avatarId] -= amount << 192;
@@ -477,7 +463,7 @@ contract Map is Ownable, Multicall {
 
     function claimLandHolderSettledIndexMT(
         uint32 LandId
-    ) public returns (uint256 amount) {
+    ) public onlyOwner returns (uint256 amount) {
         amount = getLandHolderSettledInboxMT(LandId);
         if (amount > 0) {
             LandHolderMTs[LandId] -= amount << 192;

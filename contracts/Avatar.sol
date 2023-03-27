@@ -238,86 +238,43 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
     /**
      * @notice mint an avatar for a NFT
-     * @param collectionContract NFT collection Contract Address
-     * @param tokenId NFT tokenId
-     * @param proofs NFT collection whitelist proof
-     * @param delegateWallet DelegateWallet enum to specify protocol
-     * @param vault cold wallet address
+     * @param params NFTParams
      */
-    function mintAvatar(
-        address collectionContract,
-        uint256 tokenId,
-        bytes32[] memory proofs,
-        DelegateWallet delegateWallet,
-        address vault
-    ) public {
-        require(
-            msg.sender ==
-                ownerOf(collectionContract, tokenId, delegateWallet, vault),
-            "caller is not token owner"
+    function mintAvatar(NFTParams calldata params) internal returns (uint256) {
+        uint256 COID = IGovernance(governanceContract).getCollectionCOID(
+            params.collectionContract
         );
-        uint256 COID = IGovernance(governanceContract).generateCOID(
-            collectionContract,
-            proofs
-        );
-        require(tokenMap[collectionContract][tokenId] == 0, "avatar exist");
+        if (COID == 0) {
+            COID = IGovernance(governanceContract).generateCOID(
+                params.collectionContract,
+                params.proofs
+            );
+        }
+
+        IGovernance(governanceContract).addCollectionAvatarNum(COID);
 
         currentAvatarId++;
 
         avatarNoumenon[currentAvatarId].setData = COID << 128;
-        avatarNoumenon[currentAvatarId].tokenId = tokenId;
+        avatarNoumenon[currentAvatarId].tokenId = params.tokenId;
 
-        tokenMap[collectionContract][tokenId] = currentAvatarId;
+        tokenMap[params.collectionContract][params.tokenId] = currentAvatarId;
         emit AvatarMint(currentAvatarId, COID);
-    }
-
-    /**
-     * @notice an off map avatar jump in to the map
-     * @param params OnMapParams
-     */
-    function jumpIn(
-        OnMapParams calldata params
-    )
-        public
-        tileCheck(params.tileCoordinate)
-        ownerCheck(
-            params.collectionContract,
-            params.tokenId,
-            params.delegateWallet,
-            params.vault
-        )
-    {
-        uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
-        linkCheck(avatarId, params.linkedAvatarId, params.tileCoordinate);
-        require(getAvatarCoordinate(avatarId) == 0, "avatar is on map");
-
-        uint256 COID = getAvatarCOID(avatarId);
-
-        IMap(IGovernance(governanceContract).mapContract()).avatarSet(
-            avatarId,
-            COID,
-            params.tileCoordinate,
-            params.LandId,
-            getAvatarBombUsed(avatarId)
-        );
-
-        setAvatarCoordinate(avatarId, params.tileCoordinate);
-        IGovernance(governanceContract).addCollectionOnMapNum(COID);
-        IMap(IGovernance(governanceContract).mapContract())
-            .redeemCollectionInboxMT(avatarId, COID);
-
-        emit AvatarJumpIn(avatarId, COID, params.LandId, params.tileCoordinate);
+        return currentAvatarId;
     }
 
     /**
      * @notice an on map avatar move to a new tile
-     * @param params OnMapParams
+     * @param params NFTParams
      */
     function moveTo(
-        OnMapParams calldata params
+        NFTParams calldata params,
+        uint32 tileCoordinate,
+        uint256 linkedAvatarId,
+        uint32 LandId
     )
         public
-        tileCheck(params.tileCoordinate)
+        tileCheck(tileCoordinate)
         ownerCheck(
             params.collectionContract,
             params.tokenId,
@@ -326,43 +283,55 @@ contract Avatar is IAvatar, Multicall, Ownable {
         )
     {
         uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
-        linkCheck(avatarId, params.linkedAvatarId, params.tileCoordinate);
+        if (avatarId == 0) {
+            avatarId = mintAvatar(params);
+        }
+        linkCheck(avatarId, linkedAvatarId, tileCoordinate);
+
         uint256 COID = getAvatarCOID(avatarId);
         uint32 orgCoordinate = getAvatarCoordinate(avatarId);
-        require(orgCoordinate != 0, "avatar not on map");
-        IMap(IGovernance(governanceContract).mapContract()).avatarRemove(
-            orgCoordinate,
-            0
-        );
+        if (orgCoordinate > 0) {
+            IMap(IGovernance(governanceContract).mapContract()).avatarRemove(
+                orgCoordinate,
+                0
+            );
+
+            emit AvatarMove(
+                avatarId,
+                COID,
+                LandId,
+                orgCoordinate,
+                tileCoordinate
+            );
+        } else {
+            IGovernance(governanceContract).addCollectionOnMapNum(COID);
+            IMap(IGovernance(governanceContract).mapContract())
+                .redeemCollectionInboxMT(avatarId, COID);
+
+            emit AvatarJumpIn(avatarId, COID, LandId, tileCoordinate);
+        }
 
         IMap(IGovernance(governanceContract).mapContract()).avatarSet(
             avatarId,
             COID,
-            params.tileCoordinate,
-            params.LandId,
+            tileCoordinate,
+            LandId,
             getAvatarBombUsed(avatarId)
         );
 
-        setAvatarCoordinate(avatarId, params.tileCoordinate);
-
-        emit AvatarMove(
-            avatarId,
-            COID,
-            params.LandId,
-            orgCoordinate,
-            params.tileCoordinate
-        );
+        setAvatarCoordinate(avatarId, tileCoordinate);
     }
 
     /**
      * @notice throw a bomb to a tile
-     * @param params OnMapParams
+     * @param params NFTParams
      */
     function bomb(
-        BombParams memory params
+        NFTParams calldata params,
+        uint32 tileCoordinate
     )
         public
-        tileCheck(params.tileCoordinate)
+        tileCheck(tileCoordinate)
         ownerCheck(
             params.collectionContract,
             params.tokenId,
@@ -371,7 +340,9 @@ contract Avatar is IAvatar, Multicall, Ownable {
         )
     {
         uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
-        require(avatarId > 0, "avatar not exist");
+        if (avatarId == 0) {
+            avatarId = mintAvatar(params);
+        }
         addAvatarBombUsed(avatarId);
 
         if (getAvatarCoordinate(avatarId) > 0) {
@@ -388,7 +359,8 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
         uint256[] memory attackAvatarIds = new uint256[](7);
         uint32[] memory victimsCoordinates = new uint32[](7);
-        uint32 tileCoordinate = params.tileCoordinate;
+        uint32 orgTileCoordinate = tileCoordinate;
+
         for (uint256 i = 0; i < 7; i++) {
             uint256 attackAvatarId = IMap(
                 IGovernance(governanceContract).mapContract()
@@ -409,9 +381,10 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 tileCoordinate = tileCoordinate.neighbor(i - 1);
             }
         }
+
         emit BombUse(
             avatarId,
-            params.tileCoordinate,
+            orgTileCoordinate,
             attackAvatarIds,
             victimsCoordinates
         );

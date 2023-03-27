@@ -12,12 +12,6 @@ enum DelegateWallet {
 }
 ```
 
-### getAvatarInboxMT
-
-```solidity
-function getAvatarInboxMT(uint256 avatarId) external view returns (uint256 inbox)
-```
-
 ### redeemAvatarInboxMT
 
 ```solidity
@@ -34,40 +28,10 @@ redeem avatar unclaimed minted MOPN Tokens
 | delegateWallet | enum IGovernance.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
 | vault | address | cold wallet address |
 
-### getCollectionInboxMT
-
-```solidity
-function getCollectionInboxMT(uint256 COID) external view returns (uint256 inbox)
-```
-
-### redeemCollectionInboxMT
-
-```solidity
-function redeemCollectionInboxMT(uint256 avatarId, uint256 COID) external
-```
-
-### getLandHolderInboxMT
-
-```solidity
-function getLandHolderInboxMT(uint32 LandId) external view returns (uint256 inbox)
-```
-
 ### redeemLandHolderInboxMT
 
 ```solidity
 function redeemLandHolderInboxMT(uint32 LandId) external
-```
-
-### getLandHolderRedeemed
-
-```solidity
-function getLandHolderRedeemed(uint32 LandId) external view returns (uint256)
-```
-
-### getCollectionInfo
-
-```solidity
-function getCollectionInfo(uint256 COID) external view returns (address collectionAddress, uint256 onMapNum, uint256 avatarNum, uint256 totalEAWs, uint256 totalMinted)
 ```
 
 ### getCollectionContract
@@ -124,16 +88,10 @@ function subCollectionOnMapNum(uint256 COID) external
 function getCollectionOnMapNum(uint256 COID) external view returns (uint256)
 ```
 
-### addMTAW
+### addCollectionAvatarNum
 
 ```solidity
-function addMTAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) external
-```
-
-### subMTAW
-
-```solidity
-function subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) external
+function addCollectionAvatarNum(uint256 COID) external
 ```
 
 ### mintBomb
@@ -145,7 +103,7 @@ function mintBomb(address to, uint256 amount) external
 ### burnBomb
 
 ```solidity
-function burnBomb(address from, uint256 amount, uint256 avatarId, uint256 COID, uint32 LandId) external
+function burnBomb(address from, uint256 amount) external
 ```
 
 ### redeemAgio

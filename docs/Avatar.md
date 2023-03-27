@@ -120,6 +120,12 @@ mapping(address => mapping(uint256 => uint256)) tokenMap
 uint256 currentAvatarId
 ```
 
+### governanceContract
+
+```solidity
+address governanceContract
+```
+
 ### setGovernanceContract
 
 ```solidity
@@ -135,138 +141,17 @@ this function also get the Map contract from the governances_
 | ---- | ---- | ----------- |
 | governanceContract_ | address | Governance Contract Address |
 
-### getAvatarByAvatarId
+### getNFTAvatarId
 
 ```solidity
-function getAvatarByAvatarId(uint256 avatarId) public view returns (struct IAvatar.AvatarDataOutput avatarData)
+function getNFTAvatarId(address contractAddress, uint256 tokenId) public view returns (uint256)
 ```
 
-get avatar info by avatarId
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarData | struct IAvatar.AvatarDataOutput | avatar data format struct AvatarDataOutput |
-
-### getAvatarByNFT
+### getAvatarTokenId
 
 ```solidity
-function getAvatarByNFT(address collection, uint256 tokenId) public view returns (struct IAvatar.AvatarDataOutput avatarData)
+function getAvatarTokenId(uint256 avatarId) public view returns (uint256)
 ```
-
-get avatar info by nft contractAddress and tokenId
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| collection | address | collection contract address |
-| tokenId | uint256 | token Id |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarData | struct IAvatar.AvatarDataOutput | avatar data format struct AvatarDataOutput |
-
-### getAvatarsByNFTs
-
-```solidity
-function getAvatarsByNFTs(address[] collections, uint256[] tokenIds) public view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
-```
-
-get avatar infos by nft contractAddresses and tokenIds
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| collections | address[] | array of collection contract address |
-| tokenIds | uint256[] | array of token Ids |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarDatas | struct IAvatar.AvatarDataOutput[] | avatar datas format struct AvatarDataOutput |
-
-### getAvatarsByCoordinateRange
-
-```solidity
-function getAvatarsByCoordinateRange(uint32 startCoordinate, int32 width, int32 height) public view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
-```
-
-get avatar infos by tile sets start by start coordinate and range by width and height
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| startCoordinate | uint32 | start tile coordinate |
-| width | int32 | range width |
-| height | int32 | range height |
-
-### getAvatarsByStartEndCoordinate
-
-```solidity
-function getAvatarsByStartEndCoordinate(uint32 startCoordinate, uint32 endCoordinate) public view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
-```
-
-get avatar infos by tile sets start by start coordinate and end by end coordinates
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| startCoordinate | uint32 | start tile coordinate |
-| endCoordinate | uint32 | end tile coordinate |
-
-### getAvatarsByCoordinates
-
-```solidity
-function getAvatarsByCoordinates(uint32[] coordinates) public view returns (struct IAvatar.AvatarDataOutput[] avatarDatas)
-```
-
-get avatars by coordinate array
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| coordinates | uint32[] | array of coordinates |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarDatas | struct IAvatar.AvatarDataOutput[] | avatar datas format struct AvatarDataOutput |
-
-### getAvatarCOID
-
-```solidity
-function getAvatarCOID(uint256 avatarId) public view returns (uint256)
-```
-
-get avatar collection id
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | uint256 | COID colletion id |
 
 ### getAvatarBombUsed
 
@@ -288,6 +173,32 @@ get avatar bomb used number
 | ---- | ---- | ----------- |
 | [0] | uint256 | bomb used number |
 
+### addAvatarBombUsed
+
+```solidity
+function addAvatarBombUsed(uint256 avatarId) internal
+```
+
+### getAvatarCOID
+
+```solidity
+function getAvatarCOID(uint256 avatarId) public view returns (uint256)
+```
+
+get avatar collection id
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| avatarId | uint256 | avatar Id |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | COID colletion id |
+
 ### getAvatarCoordinate
 
 ```solidity
@@ -307,6 +218,12 @@ get avatar on map coordinate
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | [0] | uint32 | tileCoordinate tile coordinate |
+
+### setAvatarCoordinate
+
+```solidity
+function setAvatarCoordinate(uint256 avatarId, uint32 tileCoordinate) internal
+```
 
 ### WARM_CONTRACT_ADDRESS
 
@@ -369,7 +286,7 @@ get the original owner of a avatar linked nft
 ### mintAvatar
 
 ```solidity
-function mintAvatar(address collectionContract, uint256 tokenId, bytes32[] proofs, enum IAvatar.DelegateWallet delegateWallet, address vault) public
+function mintAvatar(struct IAvatar.NFTParams params) internal returns (uint256)
 ```
 
 mint an avatar for a NFT
@@ -378,30 +295,12 @@ mint an avatar for a NFT
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| collectionContract | address | NFT collection Contract Address |
-| tokenId | uint256 | NFT tokenId |
-| proofs | bytes32[] | NFT collection whitelist proof |
-| delegateWallet | enum IAvatar.DelegateWallet | DelegateWallet enum to specify protocol |
-| vault | address | cold wallet address |
-
-### jumpIn
-
-```solidity
-function jumpIn(struct IAvatar.OnMapParams params) public
-```
-
-an off map avatar jump in to the map
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| params | struct IAvatar.OnMapParams | OnMapParams |
+| params | struct IAvatar.NFTParams | NFTParams |
 
 ### moveTo
 
 ```solidity
-function moveTo(struct IAvatar.OnMapParams params) public
+function moveTo(struct IAvatar.NFTParams params, uint32 tileCoordinate, uint256 linkedAvatarId, uint32 LandId) public
 ```
 
 an on map avatar move to a new tile
@@ -410,12 +309,15 @@ an on map avatar move to a new tile
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| params | struct IAvatar.OnMapParams | OnMapParams |
+| params | struct IAvatar.NFTParams | NFTParams |
+| tileCoordinate | uint32 |  |
+| linkedAvatarId | uint256 |  |
+| LandId | uint32 |  |
 
 ### bomb
 
 ```solidity
-function bomb(struct IAvatar.BombParams params) public
+function bomb(struct IAvatar.NFTParams params, uint32 tileCoordinate) public
 ```
 
 throw a bomb to a tile
@@ -424,24 +326,13 @@ throw a bomb to a tile
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| params | struct IAvatar.BombParams | OnMapParams |
-
-### addAvatarBombUsed
-
-```solidity
-function addAvatarBombUsed(uint256 avatarId) internal
-```
-
-### setAvatarCoordinate
-
-```solidity
-function setAvatarCoordinate(uint256 avatarId, uint32 tileCoordinate) internal
-```
+| params | struct IAvatar.NFTParams | NFTParams |
+| tileCoordinate | uint32 |  |
 
 ### linkCheck
 
 ```solidity
-function linkCheck(uint256 avatarId, uint256 linkedAvatarId, uint32 tileCoordinate) internal
+function linkCheck(uint256 avatarId, uint256 linkedAvatarId, uint32 tileCoordinate) internal view
 ```
 
 ### tileCheck

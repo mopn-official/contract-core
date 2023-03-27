@@ -120,15 +120,17 @@ async function main() {
       if (!deployConf[contractName].verified) {
         console.log("begin to verify ", contractName, " at ", deployConf[contractName].address);
         try {
-          await hre.run("verify:verify", {
+          let verifyData = {
             address: deployConf[contractName].address,
             constructorArguments: deployConf[contractName].constructparams
               ? deployConf[contractName].constructparams
               : [],
-            contract: deployConf[contractName].verifycontract
-              ? deployConf[contractName].verifycontract
-              : "",
-          });
+          };
+          if (deployConf[contractName].verifycontract) {
+            verifyData.contract = deployConf[contractName].verifycontract;
+          }
+          await hre.run("verify:verify", verifyData);
+
           deployConf[contractName].verified = true;
           saveConf(deployConf);
         } catch (e) {
