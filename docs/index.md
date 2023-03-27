@@ -26,5 +26,3 @@
 | MOPNToken      | [Energy Doc](MOPNToken.md)          | Goerli: [0x3f120eCED583eE4FD8749a97C372E0eD75C42e03](https://goerli.etherscan.io/address/0x3f120eCED583eE4FD8749a97C372E0eD75C42e03) |
 | MOPNLand(Fake) | [MOPNLand Doc](MOPNLand.md)         | Goerli: [0x86ce13c583872090d041cbD249dEbb2Eec105cc2](https://goerli.etherscan.io/address/0x86ce13c583872090d041cbD249dEbb2Eec105cc2) |
 | TESTNFT        | [TESTNFT Doc](TESTNFT.md)           | Goerli: [0xb33a329679e005CFD50Af2f477d30800F8ff05E7](https://goerli.etherscan.io/address/0xb33a329679e005CFD50Af2f477d30800F8ff05E7) |
-| TESTNFT1       | [TESTNFT Doc](TESTNFT.md)           |                                                                                                                                      |
-| TESTNFT2       | [TESTNFT Doc](TESTNFT.md)           |                                                                                                                                      |
