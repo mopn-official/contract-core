@@ -1,5 +1,6 @@
 const { ethers } = require("hardhat");
 const fs = require("fs");
+const { verify } = require("crypto");
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -32,7 +33,7 @@ async function main() {
         contract = await Contract.deploy();
       }
 
-      console.log("https://mumbai.polygonscan.com/tx/" + contract.deployTransaction.hash);
+      console.log(deployConf["blockScanUrl"] + "tx/" + contract.deployTransaction.hash);
       await contract.deployed();
       deployConf[contractName].address = contract.address;
       deployConf[contractName].verified = false;
@@ -120,7 +121,7 @@ async function main() {
       if (!deployConf[contractName].verified) {
         console.log("begin to verify ", contractName, " at ", deployConf[contractName].address);
         try {
-          let verifyData = {
+          const verifyData = {
             address: deployConf[contractName].address,
             constructorArguments: deployConf[contractName].constructparams
               ? deployConf[contractName].constructparams
@@ -130,7 +131,6 @@ async function main() {
             verifyData.contract = deployConf[contractName].verifycontract;
           }
           await hre.run("verify:verify", verifyData);
-
           deployConf[contractName].verified = true;
           saveConf(deployConf);
         } catch (e) {

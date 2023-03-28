@@ -1,4 +1,5 @@
 {
+    "blockScanUrl": "https://mumbai.polygonscan.com/",
     "contracts": [
         "TileMath",
         "NFTSVG",

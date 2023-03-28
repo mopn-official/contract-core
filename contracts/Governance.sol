@@ -238,11 +238,6 @@ contract Governance is Multicall, Ownable {
         IBomb(bombContract).burn(from, 1, amount);
     }
 
-    // Land
-    function mintLand(address to) public onlyAuctionHouse {
-        ILand(landContract).auctionMint(to, 1);
-    }
-
     function redeemAgio() public {
         IAuctionHouse(auctionHouseContract).redeemAgioTo(msg.sender);
     }

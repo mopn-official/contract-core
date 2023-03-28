@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IGovernance.sol";
+import "./interfaces/ILand.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
@@ -217,7 +218,7 @@ contract AuctionHouse is Multicall, Ownable {
         _redeemAgio(msg.sender);
     }
 
-    function redeemAgioTo(address to) public onlyOwner {
+    function redeemAgioTo(address to) public {
         _redeemAgio(to);
     }
 
@@ -282,7 +283,10 @@ contract AuctionHouse is Multicall, Ownable {
             );
         }
 
-        IGovernance(governanceContract).mintLand(msg.sender);
+        ILand(IGovernance(governanceContract).landContract()).auctionMint(
+            msg.sender,
+            1
+        );
 
         landRound =
             (uint256(roundId + 1) << 192) |
