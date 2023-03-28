@@ -1,16 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-interface IGovernance {
-    /**
-     * @notice Delegate Wallet Protocols
-     */
-    enum DelegateWallet {
-        None,
-        DelegateCash,
-        Warm
-    }
+import "./IAvatar.sol";
 
+interface IGovernance {
     /**
      * @notice redeem avatar unclaimed minted MOPN Tokens
      * @param avatarId avatar Id
@@ -19,7 +12,7 @@ interface IGovernance {
      */
     function redeemAvatarInboxMT(
         uint256 avatarId,
-        DelegateWallet delegateWallet,
+        IAvatar.DelegateWallet delegateWallet,
         address vault
     ) external;
 

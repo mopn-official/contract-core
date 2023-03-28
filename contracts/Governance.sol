@@ -29,76 +29,18 @@ contract Governance is Multicall, Ownable {
         IAvatar.DelegateWallet delegateWallet,
         address vault
     ) public {
-        require(
-            msg.sender ==
-                IAvatar(avatarContract).ownerOf(
-                    avatarId,
-                    delegateWallet,
-                    vault
-                ),
-            "not your avatar"
+        address nftOwner = IAvatar(avatarContract).ownerOf(
+            avatarId,
+            delegateWallet,
+            vault
         );
         IMap(mapContract).settlePerMTAWMinted();
         IMap(mapContract).mintAvatarMT(avatarId);
 
         uint256 amount = IMap(mapContract).claimAvatarSettledIndexMT(avatarId);
         if (amount > 0) {
-            IMOPNToken(mtContract).mint(msg.sender, amount);
-            emit MTClaimed(msg.sender, amount);
-        }
-    }
-
-    /**
-     * @notice batch redeem avatar unclaimed minted mopn token
-     * @param avatarIds avatar Ids
-     * @param delegateWallets Delegate coldwallet to specify hotwallet protocol
-     * @param vaults cold wallet address
-     */
-    function batchRedeemAvatarInboxMT(
-        uint256[] memory avatarIds,
-        IAvatar.DelegateWallet[] memory delegateWallets,
-        address[] memory vaults
-    ) public {
-        require(
-            delegateWallets.length == 0 ||
-                delegateWallets.length == avatarIds.length,
-            "delegateWallets incorrect"
-        );
-
-        IMap(mapContract).settlePerMTAWMinted();
-        uint256 totalamount;
-        for (uint256 i = 0; i < avatarIds.length; i++) {
-            if (delegateWallets.length > 0) {
-                require(
-                    msg.sender ==
-                        IAvatar(avatarContract).ownerOf(
-                            avatarIds[i],
-                            delegateWallets[i],
-                            vaults[i]
-                        ),
-                    "not your avatar"
-                );
-            } else {
-                require(
-                    msg.sender ==
-                        IAvatar(avatarContract).ownerOf(
-                            avatarIds[i],
-                            IAvatar.DelegateWallet.None,
-                            address(0)
-                        ),
-                    "not your avatar"
-                );
-            }
-            IMap(mapContract).mintAvatarMT(avatarIds[i]);
-
-            totalamount += IMap(mapContract).claimAvatarSettledIndexMT(
-                avatarIds[i]
-            );
-        }
-
-        if (totalamount > 0) {
-            IMOPNToken(mtContract).mint(msg.sender, totalamount);
-            emit MTClaimed(msg.sender, totalamount);
+            IMOPNToken(mtContract).mint(nftOwner, amount);
+            emit MTClaimed(nftOwner, amount);
         }
     }
 
@@ -107,10 +49,7 @@ contract Governance is Multicall, Ownable {
      * @param LandId MOPN Land Id
      */
     function redeemLandHolderInboxMT(uint32 LandId) public {
-        require(
-            msg.sender == IERC721(landContract).ownerOf(LandId),
-            "not your Land"
-        );
+        address landOwner = IERC721(landContract).ownerOf(LandId);
         IMap(mapContract).settlePerMTAWMinted();
         IMap(mapContract).mintLandHolderMT(LandId);
 
@@ -118,8 +57,8 @@ contract Governance is Multicall, Ownable {
             LandId
         );
         if (amount > 0) {
-            IMOPNToken(mtContract).mint(msg.sender, amount);
-            emit MTClaimed(msg.sender, amount);
+            IMOPNToken(mtContract).mint(landOwner, amount);
+            emit MTClaimed(landOwner, amount);
         }
     }
 
