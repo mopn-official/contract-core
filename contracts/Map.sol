@@ -42,6 +42,8 @@ contract Map is Ownable, Multicall {
 
     event CollectionMTMinted(uint256 indexed COID, uint256 amount);
 
+    event LandHolderMTMinted(uint32 indexed LandId, uint256 amount);
+
     constructor(uint256 MTProduceStartBlock_) {
         MTProduceStartBlock = MTProduceStartBlock_;
     }
@@ -458,6 +460,7 @@ contract Map is Ownable, Multicall {
             LandHolderMTs[LandId] +=
                 (amount << 192) |
                 ((PerMTAWMinted - LandHolderPerMTAWMinted) << 64);
+            emit LandHolderMTMinted(LandId, amount);
         }
     }
 

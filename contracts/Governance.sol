@@ -119,6 +119,7 @@ contract Governance is Multicall, Ownable {
         );
         if (amount > 0) {
             IMOPNToken(mtContract).mint(msg.sender, amount);
+            emit MTClaimed(msg.sender, amount);
         }
     }
 
