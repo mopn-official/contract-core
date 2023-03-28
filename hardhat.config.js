@@ -30,7 +30,7 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     mumbai: {
-      url: "https://polygon-mumbai.infura.io/v3/1151f1c1883542b2aad91169712e8338",
+      url: process.env.POLYGON_MUMBAI_URL,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
@@ -45,7 +45,7 @@ module.exports = {
       sepolia: process.env.ETHERSCAN_API_KEY,
       goerli: process.env.ETHERSCAN_API_KEY,
       rinkeby: process.env.ETHERSCAN_API_KEY,
-      polygonMumbai: "45ZC482KWEWDP85GRZF9K8U3CWRBEKPAB7",
+      polygonMumbai: process.env.POLYSCAN_API_KEY,
     },
   },
   docgen: {

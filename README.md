@@ -5,7 +5,7 @@
 ### Installation
 
 ```
-$ npm install @openzeppelin/contracts
+$ npm i @mopn/core
 ```
 
 [Contract Api Docs](docs/index.md)
