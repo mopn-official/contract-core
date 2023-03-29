@@ -26,18 +26,6 @@ interface IMap {
     ) external view returns (uint32);
 
     /**
-     * @notice get Land holder realtime unclaimed minted mopn token
-     * @param LandId MOPN Land Id
-     */
-    function getLandHolderInboxMT(
-        uint32 LandId
-    ) external view returns (uint256 inbox);
-
-    function getLandHolderTotalMinted(
-        uint32 LandId
-    ) external view returns (uint256);
-
-    /**
      * add on map mining mopn token allocation weight
      * @param avatarId avatar Id
      * @param COID collection Id
@@ -59,19 +47,45 @@ interface IMap {
         uint256 avatarId
     ) external returns (uint256 amount);
 
-    function mintLandHolderMT(uint32 LandId) external;
-
-    function claimLandHolderSettledIndexMT(
-        uint32 LandId
-    ) external returns (uint256 amount);
-
     function getAvatarInboxMT(
         uint256 avatarId
     ) external view returns (uint256 inbox);
+
+    function getAvatarTotalMinted(
+        uint256 avatarId
+    ) external view returns (uint256);
+
+    function getAvatarMTAW(uint256 avatarId) external view returns (uint256);
 
     function getCollectionInboxMT(
         uint256 COID
     ) external view returns (uint256 inbox);
 
+    function getCollectionMTAW(uint256 COID) external view returns (uint256);
+
+    function getCollectionTotalMinted(
+        uint256 COID
+    ) external view returns (uint256);
+
     function redeemCollectionInboxMT(uint256 avatarId, uint256 COID) external;
+
+    /**
+     * @notice get Land holder realtime unclaimed minted mopn token
+     * @param LandId MOPN Land Id
+     */
+    function getLandHolderInboxMT(
+        uint32 LandId
+    ) external view returns (uint256 inbox);
+
+    function getLandHolderTotalMinted(
+        uint32 LandId
+    ) external view returns (uint256);
+
+    function getLandHolderMTAW(uint32 LandId) external view returns (uint256);
+
+    function mintLandHolderMT(uint32 LandId) external;
+
+    function claimLandHolderSettledIndexMT(
+        uint32 LandId
+    ) external returns (uint256 amount);
 }

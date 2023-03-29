@@ -52,6 +52,10 @@ interface IGovernance {
 
     function addCollectionAvatarNum(uint256 COID) external;
 
+    function getCollectionAvatarNum(
+        uint256 COID
+    ) external view returns (uint256);
+
     function mintBomb(address to, uint256 amount) external;
 
     function burnBomb(address from, uint256 amount) external;
