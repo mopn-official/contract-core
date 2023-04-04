@@ -2,10 +2,10 @@
 
 | Name         | Doc                                 | Address                                                                                                                                 |
 | ------------ | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| AuctionHouse | [AuctionHouse Doc](AuctionHouse.md) | Mumbai: [0x229716831e279c82e766610c6930B0EC4CD0B75C](https://mumbai.polygonscan.com/address/0x229716831e279c82e766610c6930B0EC4CD0B75C) |
-| Avatar       | [Avatar Doc](Avatar.md)             | Mumbai: [0x7Cd59147D023c9C8d4E0230E26A294e9F5772008](https://mumbai.polygonscan.com/address/0x7Cd59147D023c9C8d4E0230E26A294e9F5772008) |
+| AuctionHouse | [AuctionHouse Doc](AuctionHouse.md) | Mumbai: [0xAc98E24517E74AE4cD88415b44818430db8074eC](https://mumbai.polygonscan.com/address/0xAc98E24517E74AE4cD88415b44818430db8074eC) |
+| Avatar       | [Avatar Doc](Avatar.md)             | Mumbai: [0x53c9633bAC2C2F54BdE13e975b3a0302700a4e08](https://mumbai.polygonscan.com/address/0x53c9633bAC2C2F54BdE13e975b3a0302700a4e08) |
 | Governance   | [Governance Doc](Governance.md)     | Mumbai: [0xc1d453229513DfA898Ad60D3cB9FC9Cdbdbe28c2](https://mumbai.polygonscan.com/address/0xc1d453229513DfA898Ad60D3cB9FC9Cdbdbe28c2) |
-| Map          | [Map Doc](Map.md)                   | Mumbai: [0xdeBE7FCd4BEbf4C2Fc0Fa0210CD5eef455B0a8d1](https://mumbai.polygonscan.com/address/0xdeBE7FCd4BEbf4C2Fc0Fa0210CD5eef455B0a8d1) |
+| Map          | [Map Doc](Map.md)                   | Mumbai: [0xA6865F38a476aBf26Bf8098A65a0bF45929Fe709](https://mumbai.polygonscan.com/address/0xA6865F38a476aBf26Bf8098A65a0bF45929Fe709) |
 | TileMath     | [TileMath Doc](TileMath.md)         | Mumbai: [0xC2c4735394e15AC990Ea67D2885A5953cFe773d5](https://mumbai.polygonscan.com/address/0xC2c4735394e15AC990Ea67D2885A5953cFe773d5) |
 | Bomb         | [Bomb Doc](Bomb.md)                 | Mumbai: [0xF86DE4ECC56B6D34f3DCB6f8b3dA6f5e75b5C2b6](https://mumbai.polygonscan.com/address/0xF86DE4ECC56B6D34f3DCB6f8b3dA6f5e75b5C2b6) |
 | MOPNToken    | [Energy Doc](MOPNToken.md)          | Mumbai: [0xa9e885E8eF42991b1b48320e74595eF5719642Ee](https://mumbai.polygonscan.com/address/0xa9e885E8eF42991b1b48320e74595eF5719642Ee) |
