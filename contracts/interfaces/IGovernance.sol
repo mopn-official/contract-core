@@ -64,6 +64,8 @@ interface IGovernance {
 
     function mintLand(address to) external;
 
+    function auctionHouseContract() external view returns (address);
+
     function avatarContract() external view returns (address);
 
     function bombContract() external view returns (address);
