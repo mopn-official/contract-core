@@ -88,4 +88,6 @@ interface IMap {
     function claimLandHolderSettledIndexMT(
         uint32 LandId
     ) external returns (uint256 amount);
+
+    function transferOwnership(address newOwner) external;
 }
