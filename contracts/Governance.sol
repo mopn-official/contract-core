@@ -255,6 +255,7 @@ contract Governance is Multicall, Ownable {
     function giveupOwnership() public onlyOwner {
         IBomb(bombContract).transferOwnership(owner());
         IMOPNToken(mtContract).transferOwnership(owner());
+        IMap(mapContract).transferOwnership(owner());
     }
 
     modifier onlyAuctionHouse() {
