@@ -12,6 +12,15 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
+/*
+.___  ___.   ______   .______   .__   __. 
+|   \/   |  /  __  \  |   _  \  |  \ |  | 
+|  \  /  | |  |  |  | |  |_)  | |   \|  | 
+|  |\/|  | |  |  |  | |   ___/  |  . `  | 
+|  |  |  | |  `--'  | |  |      |  |\   | 
+|__|  |__|  \______/  | _|      |__| \__| 
+*/
+
 /// @title Governance of MOPN
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner

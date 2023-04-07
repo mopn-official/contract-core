@@ -260,16 +260,16 @@ describe("MOPN", function () {
     await avatarInfo();
   });
 
-  // it("test moveTo", async function () {
-  //   // 1, 0, -1;
-  //   const moveToTx = await avatar.moveTo(
-  //     [testnft.address, 0, testnftproofs, 0, address0],
-  //     10011000,
-  //     2,
-  //     0
-  //   );
-  //   await moveToTx.wait();
-  // });
+  it("test unlinkerror", async function () {
+    // 4, -4, 0;
+    const moveToTx = await avatar.moveTo(
+      [testnft1.address, 1, testnftproofs, 0, address0],
+      10040996,
+      8,
+      0
+    );
+    await moveToTx.wait();
+  });
 
   it("test redeemAvatarInboxMT", async function () {
     await avatarInfo();
