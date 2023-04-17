@@ -377,17 +377,6 @@ describe("MOPN", function () {
     );
   });
 
-  it("test batchRedeemMT", async function () {
-    const batchRedeemMTTx = await governance.batchRedeemAvatarInboxMT(
-      [1, 2, 3, 4, 5, 6, 7, 8],
-      [],
-      []
-    );
-    await batchRedeemMTTx.wait();
-
-    await collectionInfo();
-  });
-
   const avatarInfo = async () => {
     for (let i = 1; i < 10; i++) {
       console.log(

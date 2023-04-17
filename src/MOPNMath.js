@@ -2,7 +2,7 @@ const centerTiles = require("./LandCenterTiles.json");
 
 function LandRingNum(LandId) {
   let n = Math.floor((Math.sqrt(9 + 12 * (LandId - 1)) - 3) / 6);
-  if (3 * n * n + 3 * n + 1 == LandId) {
+  if (3 * n * n + 3 * n == LandId) {
     return n;
   } else {
     return n + 1;
@@ -11,7 +11,7 @@ function LandRingNum(LandId) {
 
 function LandRingPos(LandId) {
   const ringNum = LandRingNum(LandId) - 1;
-  return LandId - (3 * ringNum * ringNum + 3 * ringNum + 1);
+  return LandId - (3 * ringNum * ringNum + 3 * ringNum);
 }
 
 function LandRingStartCenterTile(LandIdRingNum_) {
@@ -20,7 +20,7 @@ function LandRingStartCenterTile(LandIdRingNum_) {
 }
 
 function LandCenterTile(LandId) {
-  if (LandId == 1) {
+  if (LandId == 0) {
     return 10001000;
   }
 

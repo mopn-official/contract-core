@@ -3,7 +3,7 @@ const fs = require("fs");
 
 CenterTileArr = {};
 
-for (let i = 1; i < 10982; i++) {
+for (let i = 0; i < 10981; i++) {
   CenterTileArr[hexGridsMath.LandCenterTile(i)] = i;
 }
 

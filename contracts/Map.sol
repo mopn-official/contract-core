@@ -290,7 +290,7 @@ contract Map is Ownable, Multicall {
 
     function claimAvatarSettledIndexMT(
         uint256 avatarId
-    ) public onlyOwner returns (uint256 amount) {
+    ) public onlyGovernance returns (uint256 amount) {
         amount = getAvatarSettledInboxMT(avatarId);
         if (amount > 0) {
             AvatarMTs[avatarId] -= amount << 192;
@@ -466,7 +466,7 @@ contract Map is Ownable, Multicall {
 
     function claimLandHolderSettledIndexMT(
         uint32 LandId
-    ) public onlyOwner returns (uint256 amount) {
+    ) public onlyGovernance returns (uint256 amount) {
         amount = getLandHolderSettledInboxMT(LandId);
         if (amount > 0) {
             LandHolderMTs[LandId] -= amount << 192;
@@ -551,6 +551,11 @@ contract Map is Ownable, Multicall {
                 "LandId error"
             );
         }
+        _;
+    }
+
+    modifier onlyGovernance() {
+        require(msg.sender == governanceContract, "not allowed");
         _;
     }
 

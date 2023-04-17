@@ -58,7 +58,7 @@ library TileMath {
 
         uint32 sidepos = 0;
         if (LandIdRingNum_ > 1) {
-            sidepos = (LandIdRingPos_) % LandIdRingNum_;
+            sidepos = (LandIdRingPos_ - 1) % LandIdRingNum_;
         }
         if (side == 1) {
             tileCoordinate = (startTile[0] + sidepos * 11) * 10000;
