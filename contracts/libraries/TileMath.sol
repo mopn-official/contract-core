@@ -9,13 +9,12 @@ library TileMath {
         int32 y;
     }
 
-    error TileCoordinateError();
-
     function check(uint32 tileCoordinate) public pure {
         uint32[3] memory coodinateArr = coordinateIntToArr(tileCoordinate);
-        if (coodinateArr[0] + coodinateArr[1] + coodinateArr[2] != 3000) {
-            revert TileCoordinateError();
-        }
+        require(
+            coodinateArr[0] + coodinateArr[1] + coodinateArr[2] == 3000,
+            "tile coordinate overflow"
+        );
     }
 
     function LandRingNum(uint32 LandId) public pure returns (uint32 n) {

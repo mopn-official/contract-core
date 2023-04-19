@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract MOPNLand is ERC721, Ownable {
+    uint256 public constant MAX_SUPPLY = 10981;
+
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;

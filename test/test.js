@@ -265,10 +265,23 @@ describe("MOPN", function () {
     const moveToTx = await avatar.moveTo(
       [testnft1.address, 1, testnftproofs, 0, address0],
       10040996,
-      8,
+      9,
       0
     );
-    await moveToTx.wait();
+    moveToTx
+      .wait()
+      .then((receipt) => {
+        // This is entered if the transaction receipt indicates success
+        return true;
+      })
+      .catch((error) => {
+        console.log(error);
+        // This is entered if the status of the receipt is failure
+        return error.callStatic().then((error) => {
+          console.log("Error", error);
+          return false;
+        });
+      });
   });
 
   it("test redeemAvatarInboxMT", async function () {

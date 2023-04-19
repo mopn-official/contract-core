@@ -100,11 +100,13 @@ contract Map is Ownable, Multicall {
     ) public onlyAvatar {
         require(getTileAvatar(tileCoordinate) == 0, "dst Occupied");
 
-        if (LandId >= 10981) {
-            revert LandIdOverflow();
-        }
-
         if (getTileLandId(tileCoordinate) != LandId) {
+            require(
+                LandId <
+                    ILand(IGovernance(governanceContract).landContract())
+                        .MAX_SUPPLY(),
+                "landId overflow"
+            );
             require(
                 tileCoordinate.distance(LandId.LandCenterTile()) < 6,
                 "LandId error"
@@ -126,9 +128,7 @@ contract Map is Ownable, Multicall {
 
         for (uint256 i = 0; i < 18; i++) {
             uint256 tileCOID = getTileCOID(tileCoordinate);
-            if (tileCOID > 0 && tileCOID != COID) {
-                revert TileHasEnemy();
-            }
+            require(tileCOID == 0 || tileCOID == COID, "tile has enemy");
 
             if (i == 5) {
                 tileCoordinate = tileCoordinate.neighbor(4).neighbor(5);

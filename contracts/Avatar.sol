@@ -10,9 +10,6 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-error LandIdTilesNotOpen();
-error linkAvatarError();
-
 interface WarmInterface {
     function ownerOf(
         address contractAddress,
@@ -399,24 +396,22 @@ contract Avatar is IAvatar, Multicall, Ownable {
         require(COID > 0, "avatar not exist");
 
         if (linkedAvatarId > 0) {
-            require(COID == getAvatarCOID(linkedAvatarId), "link co error");
+            require(COID == getAvatarCOID(linkedAvatarId), "link to enemy");
             require(linkedAvatarId != avatarId, "link to yourself");
-            if (
-                tileCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) > 3
-            ) {
-                revert linkAvatarError();
-            }
+            require(
+                tileCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) <
+                    4,
+                "linked avatar too far away"
+            );
         } else {
             uint256 collectionOnMapNum = IGovernance(governanceContract)
                 .getCollectionOnMapNum(COID);
-            if (collectionOnMapNum > 0) {
-                if (
-                    !(getAvatarCoordinate(avatarId) > 0 &&
-                        collectionOnMapNum == 1)
-                ) {
-                    revert linkAvatarError();
-                }
-            }
+            require(
+                collectionOnMapNum == 0 ||
+                    (getAvatarCoordinate(avatarId) > 0 &&
+                        collectionOnMapNum == 1),
+                "linked avatar missing"
+            );
         }
     }
 
