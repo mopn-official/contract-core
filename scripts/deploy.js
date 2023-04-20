@@ -28,7 +28,13 @@ async function main() {
       }
 
       if (deployConf[contractName].constructparams) {
-        contract = await Contract.deploy(...deployConf[contractName].constructparams);
+        let constructparams = deployConf[contractName].constructparams;
+        for (let j = 0; j < constructparams.length; j++) {
+          if (deployConf[constructparams[j]]) {
+            constructparams[j] = deployConf[constructparams[j]].address;
+          }
+        }
+        contract = await Contract.deploy(...constructparams);
       } else {
         contract = await Contract.deploy();
       }
