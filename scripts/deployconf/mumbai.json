@@ -1,1 +1,202 @@
-{"blockScanUrl":"https://mumbai.polygonscan.com/","contracts":["TileMath","NFTSVG","NFTMetaData","AuctionHouse","Avatar","Bomb","Governance","LandMetaDataRender","Map","MOPNLand","MOPNToken","TESTNFT","TESTNFT1"],"TileMath":{"address":"0x31Fb90d5D356fCE0A6feEcE93C1Ce9f73128D309","verified":true},"NFTSVG":{"address":"0x7ec93c6A2cEAa31419F0A76b601B64dAcf87D654","verified":true},"NFTMetaData":{"address":"0x3327960ce4ec12AC0DB57d9DfA83b8296bC03FcC","verified":true,"libraries":["TileMath","NFTSVG"]},"AuctionHouse":{"address":"0xd27Eda0c8e5C93614E2E2A8cF41D6f5d4956A713","verified":true,"constructparams":[1677825096,1677825096],"attributesCheck":[{"expectValue":["Governance"],"attributes":["governanceContract"],"updateMethod":"setGovernanceContract"}]},"Avatar":{"address":"0x0f9BbE19dA22fe4a4833b8B9950c373E229823C0","verified":true,"libraries":["TileMath"],"attributesCheck":[{"expectValue":["Governance"],"attributes":["governanceContract"],"updateMethod":"setGovernanceContract"}]},"Bomb":{"address":"0x8Fc77bF3700bA3C84bc64bF393e40BabCa8679b9","verified":true,"transOwnerTo":"Governance"},"Governance":{"address":"0xB0681A64dbc59fe0dfb17BeC0b5D6d7Bf6B79B59","verified":true,"attributesCheck":[{"expectValue":["AuctionHouse","Avatar","Bomb","MOPNToken","Map","MOPNLand"],"attributes":["auctionHouseContract","avatarContract","bombContract","mtContract","mapContract","landContract"],"updateMethod":"updateMOPNContracts"}]},"LandMetaDataRender":{"address":"0x47Bddf355238412503e40Ab71C883Da6A67ebf5C","verified":true,"libraries":["TileMath","NFTMetaData"],"attributesCheck":[{"expectValue":["Governance"],"attributes":["governanceContract"],"updateMethod":"setGovernanceContract"}]},"Map":{"address":"0x12c627A7e2627f3998Ea11e7256f7592fb033C51","verified":false,"libraries":["TileMath"],"constructparams":[0],"attributesCheck":[{"expectValue":["Governance"],"attributes":["governanceContract"],"updateMethod":"setGovernanceContract"}]},"MOPNLand":{"address":"0x1fE5De44214C92a6b9235f5814A8A5e340B1e163","verified":false,"attributesCheck":[{"expectValue":["Governance"],"attributes":["auctionAddress"],"updateMethod":"setAuction"},{"expectValue":["LandMetaDataRender"],"attributes":["metadataRenderAddress"],"updateMethod":"setRender"}]},"MOPNToken":{"address":"0x450454897057D4843FE5424E0A41E9cf6f67ef54","verified":true,"transOwnerTo":"Governance"},"TESTNFT":{"address":"0x0C836ea248FF2262b08931ACCA10e9ac49D33459","verified":true,"verifycontract":"contracts/TESTNFT.sol:TESTNFT","attributesCheck":[{"expectValue":["ipfs://QmWiQE65tmpYzcokCheQmng2DCM33DEhjXcPB6PanwpAZo/"],"attributes":["baseURI"],"updateMethod":"setBaseURI"}]},"TESTNFT1":{"address":"0x6a98093f111D2e13C44709AB0A308Acd7CdB3D79","verified":true,"verifycontract":"contracts/TESTNFT1.sol:TESTNFT1","attributesCheck":[{"expectValue":["https://api.coolcatsnft.com/cat/"],"attributes":["baseURI"],"updateMethod":"setBaseURI"}]}}
+{
+    "blockScanUrl": "https://mumbai.polygonscan.com/",
+    "contracts": [
+        "TileMath",
+        "NFTSVG",
+        "NFTMetaData",
+        "AuctionHouse",
+        "Avatar",
+        "Bomb",
+        "Governance",
+        "LandMetaDataRender",
+        "Map",
+        "MOPNLand",
+        "MOPNToken",
+        "TESTNFT",
+        "TESTNFT1"
+    ],
+    "TileMath": {
+        "address": "0x31Fb90d5D356fCE0A6feEcE93C1Ce9f73128D309",
+        "verified": true
+    },
+    "NFTSVG": {
+        "address": "0x7ec93c6A2cEAa31419F0A76b601B64dAcf87D654",
+        "verified": true
+    },
+    "NFTMetaData": {
+        "address": "0x3327960ce4ec12AC0DB57d9DfA83b8296bC03FcC",
+        "verified": true,
+        "libraries": [
+            "TileMath",
+            "NFTSVG"
+        ]
+    },
+    "AuctionHouse": {
+        "address": "0xFD33460f5b967E1190ad287Ccf80821e06196F00",
+        "verified": true,
+        "constructparams": [
+            1677825096,
+            1677825096
+        ],
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "Avatar": {
+        "address": "0x8b6Dc0d8262D8D024dE5921703Bc5236D7A40746",
+        "verified": true,
+        "libraries": [
+            "TileMath"
+        ],
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "Bomb": {
+        "address": "0x6D2d96130d7a28B79BB5923454a87FdA2AE7B991",
+        "verified": true,
+        "transOwnerTo": "Governance"
+    },
+    "Governance": {
+        "address": "0x43AB6f9f671Fe524f464d4Aa93255B722292d28e",
+        "verified": true,
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "AuctionHouse",
+                    "Avatar",
+                    "Bomb",
+                    "MOPNToken",
+                    "Map",
+                    "MOPNLand"
+                ],
+                "attributes": [
+                    "auctionHouseContract",
+                    "avatarContract",
+                    "bombContract",
+                    "mtContract",
+                    "mapContract",
+                    "landContract"
+                ],
+                "updateMethod": "updateMOPNContracts"
+            }
+        ]
+    },
+    "LandMetaDataRender": {
+        "address": "0x47Bddf355238412503e40Ab71C883Da6A67ebf5C",
+        "verified": true,
+        "libraries": [
+            "TileMath",
+            "NFTMetaData"
+        ],
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "Map": {
+        "address": "0x38BCEC2aD2a82cbC262ED29e54c984F4f3d754c3",
+        "verified": true,
+        "libraries": [
+            "TileMath"
+        ],
+        "constructparams": [
+            0
+        ],
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "MOPNLand": {
+        "address": "0x1fE5De44214C92a6b9235f5814A8A5e340B1e163",
+        "verified": true,
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "auctionAddress"
+                ],
+                "updateMethod": "setAuction"
+            },
+            {
+                "expectValue": [
+                    "LandMetaDataRender"
+                ],
+                "attributes": [
+                    "metadataRenderAddress"
+                ],
+                "updateMethod": "setRender"
+            }
+        ]
+    },
+    "MOPNToken": {
+        "address": "0x9a34BB781dffE4740f8D39b35b820Afe75e9Ca07",
+        "verified": true,
+        "transOwnerTo": "Governance"
+    },
+    "TESTNFT": {
+        "address": "0x0C836ea248FF2262b08931ACCA10e9ac49D33459",
+        "verified": true,
+        "verifycontract": "contracts/TESTNFT.sol:TESTNFT",
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "ipfs://QmWiQE65tmpYzcokCheQmng2DCM33DEhjXcPB6PanwpAZo/"
+                ],
+                "attributes": [
+                    "baseURI"
+                ],
+                "updateMethod": "setBaseURI"
+            }
+        ]
+    },
+    "TESTNFT1": {
+        "address": "0x6a98093f111D2e13C44709AB0A308Acd7CdB3D79",
+        "verified": true,
+        "verifycontract": "contracts/TESTNFT1.sol:TESTNFT1",
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "https://api.coolcatsnft.com/cat/"
+                ],
+                "attributes": [
+                    "baseURI"
+                ],
+                "updateMethod": "setBaseURI"
+            }
+        ]
+    }
+}

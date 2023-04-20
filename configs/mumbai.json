@@ -1,0 +1,21 @@
+{
+    "thegraph": "https://api.thegraph.com/subgraphs/name/cyanface/mopn-mumbai",
+    "network": "mumbai",
+    "contracts": {
+        "TileMath": "0x31Fb90d5D356fCE0A6feEcE93C1Ce9f73128D309",
+        "NFTSVG": "0x7ec93c6A2cEAa31419F0A76b601B64dAcf87D654",
+        "NFTMetaData": "0x3327960ce4ec12AC0DB57d9DfA83b8296bC03FcC",
+        "AuctionHouse": "0xFD33460f5b967E1190ad287Ccf80821e06196F00",
+        "Avatar": "0x8b6Dc0d8262D8D024dE5921703Bc5236D7A40746",
+        "Bomb": "0x6D2d96130d7a28B79BB5923454a87FdA2AE7B991",
+        "Governance": "0x43AB6f9f671Fe524f464d4Aa93255B722292d28e",
+        "LandMetaDataRender": "0x47Bddf355238412503e40Ab71C883Da6A67ebf5C",
+        "Map": "0x38BCEC2aD2a82cbC262ED29e54c984F4f3d754c3",
+        "MOPNLand": "0x1fE5De44214C92a6b9235f5814A8A5e340B1e163",
+        "MOPNToken": "0x9a34BB781dffE4740f8D39b35b820Afe75e9Ca07",
+        "TESTNFT": "0x0C836ea248FF2262b08931ACCA10e9ac49D33459",
+        "TESTNFT1": "0x6a98093f111D2e13C44709AB0A308Acd7CdB3D79",
+        "MopnDataHelper": "0x41E2cB24fE82AEf9942346779FfAa818b6eB4A0A",
+        "MopnBatchHelper": "0x5E75AbEcd317E8d8F5cd6bff813B3Abc4D486D52"
+    }
+}
