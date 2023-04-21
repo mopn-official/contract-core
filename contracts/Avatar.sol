@@ -400,7 +400,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
             require(linkedAvatarId != avatarId, "link to yourself");
             require(
                 tileCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) <
-                    4,
+                    3,
                 "linked avatar too far away"
             );
         } else {

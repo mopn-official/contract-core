@@ -115,7 +115,7 @@ describe("MOPN", function () {
         TileMath: tileMath.address,
       },
     });
-    map = await Map.deploy(0);
+    map = await Map.deploy(1682062000);
     await map.deployed();
     console.log("Map", map.address);
 
@@ -176,16 +176,16 @@ describe("MOPN", function () {
   });
 
   it("test moveTo (first jump)", async function () {
-    // 0 0 0
+    // 0 1
     let moveToTx = await avatar.moveTo(
       [testnft.address, 0, testnftproofs, 0, address0],
-      10001000,
+      10001001,
       0,
       0
     );
     await moveToTx.wait();
 
-    // 0 3 -3
+    // 0 3
     moveToTx = await avatar.moveTo(
       [testnft.address, 1, testnftproofs, 0, address0],
       10001003,
@@ -194,7 +194,7 @@ describe("MOPN", function () {
     );
     await moveToTx.wait();
 
-    // 0 2 -2
+    // 0 2
     moveToTx = await avatar.moveTo(
       [testnft.address, 2, testnftproofs, 0, address0],
       10001002,
@@ -203,7 +203,7 @@ describe("MOPN", function () {
     );
     await moveToTx.wait();
 
-    // 1 2 -3
+    // 1 2
     moveToTx = await avatar.moveTo(
       [testnft.address, 3, testnftproofs, 0, address0],
       10011002,
@@ -212,7 +212,7 @@ describe("MOPN", function () {
     );
     await moveToTx.wait();
 
-    // -1 3 -2
+    // -1 3
     moveToTx = await avatar.moveTo(
       [testnft.address, 4, testnftproofs, 0, address0],
       09991003,
@@ -221,7 +221,7 @@ describe("MOPN", function () {
     );
     await moveToTx.wait();
 
-    // -1 4 -3
+    // -1 4
     moveToTx = await avatar.moveTo(
       [testnft.address, 5, testnftproofs, 0, address0],
       09991004,
@@ -230,7 +230,7 @@ describe("MOPN", function () {
     );
     await moveToTx.wait();
 
-    // 0 4 -4
+    // 0 4
     moveToTx = await avatar.moveTo(
       [testnft.address, 6, testnftproofs, 0, address0],
       10001004,
@@ -239,7 +239,7 @@ describe("MOPN", function () {
     );
     await moveToTx.wait();
 
-    // 1 3 -4
+    // 1 3
     moveToTx = await avatar.moveTo(
       [testnft.address, 7, testnftproofs, 0, address0],
       10011003,
@@ -248,7 +248,7 @@ describe("MOPN", function () {
     );
     await moveToTx.wait();
 
-    // 4 0 -4
+    // 4 0
     moveToTx = await avatar.moveTo(
       [testnft1.address, 0, testnftproofs, 0, address0],
       10041000,
@@ -260,33 +260,7 @@ describe("MOPN", function () {
     await avatarInfo();
   });
 
-  it("test unlinkerror", async function () {
-    // 4, -4, 0;
-    const moveToTx = await avatar.moveTo(
-      [testnft1.address, 1, testnftproofs, 0, address0],
-      10040996,
-      9,
-      0
-    );
-    moveToTx
-      .wait()
-      .then((receipt) => {
-        // This is entered if the transaction receipt indicates success
-        return true;
-      })
-      .catch((error) => {
-        console.log(error);
-        // This is entered if the status of the receipt is failure
-        return error.callStatic().then((error) => {
-          console.log("Error", error);
-          return false;
-        });
-      });
-  });
-
   it("test redeemAvatarInboxMT", async function () {
-    await avatarInfo();
-
     console.log(
       "wallet balance",
       ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
@@ -303,6 +277,7 @@ describe("MOPN", function () {
       governance.interface.encodeFunctionData("redeemAvatarInboxMT", [6, 0, address0]),
       governance.interface.encodeFunctionData("redeemAvatarInboxMT", [7, 0, address0]),
       governance.interface.encodeFunctionData("redeemAvatarInboxMT", [8, 0, address0]),
+      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [9, 0, address0]),
     ]);
     await multi10Tx.wait();
 

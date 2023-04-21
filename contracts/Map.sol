@@ -9,9 +9,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-error TileHasEnemy();
-error LandIdOverflow();
-
 /// @title The M(Map) of MOPN
 /// core contract for MOPN records all avatars on map
 /// @author Cyanface<cyanface@outlook.com>
@@ -22,13 +19,13 @@ contract Map is Ownable, Multicall {
     // Tile => uint64 avatarId + uint64 COID + uint32 MOPN Land Id
     mapping(uint32 => uint256) public tiles;
 
-    uint256 public constant MTProducePerBlock = 600000000000;
+    uint256 public constant MTProducePerSecond = 50000000000;
 
-    uint256 public constant MTProduceReduceInterval = 50000;
+    uint256 public constant MTProduceReduceInterval = 600000;
 
-    uint256 public MTProduceStartBlock;
+    uint256 public MTProduceStartTimestamp;
 
-    /// @notice uint64 PerMTAWMinted + uint64 LastPerMTAWMintedCalcBlock + uint64 TotalMTAWs
+    /// @notice uint64 PerMTAWMinted + uint64 LastPerMTAWMintedCalcTimestamp + uint64 TotalMTAWs
     uint256 public MTProduceData;
 
     /// @notice uint64 MT Inbox + uint64 Total Minted MT + uint64 PerMTAWMinted + uint64 TotalMTAWs
@@ -44,8 +41,8 @@ contract Map is Ownable, Multicall {
 
     event LandHolderMTMinted(uint32 indexed LandId, uint256 amount);
 
-    constructor(uint256 MTProduceStartBlock_) {
-        MTProduceStartBlock = MTProduceStartBlock_;
+    constructor(uint256 MTProduceStartTimestamp_) {
+        MTProduceStartTimestamp = MTProduceStartTimestamp_;
     }
 
     /**
@@ -169,9 +166,9 @@ contract Map is Ownable, Multicall {
     }
 
     /**
-     * @notice get MT last minted settlement block number
+     * @notice get last per mopn token allocation weight minted settlement timestamp
      */
-    function getLastPerMTAWMintedCalcBlock() public view returns (uint256) {
+    function getLastPerMTAWMintedCalcTimestamp() public view returns (uint256) {
         return uint64(MTProduceData >> 64);
     }
 
@@ -182,23 +179,27 @@ contract Map is Ownable, Multicall {
         return uint64(MTProduceData);
     }
 
-    function currentMTPPB(
+    /**
+     * get current mt produce per second
+     * @param reduceTimes reduce times
+     */
+    function currentMTPPS(
         uint256 reduceTimes
     ) public pure returns (uint256 MTPPB) {
         int128 reducePercentage = ABDKMath64x64.divu(997, 1000);
         int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, 600000000000);
+        return ABDKMath64x64.mulu(reducePower, MTProducePerSecond);
     }
 
     /**
-     * @notice settle per mopn token allocation weight mint mopn token
+     * @notice settle per mopn token allocation weight minted mopn token
      */
     function settlePerMTAWMinted() public {
-        if (block.number > getLastPerMTAWMintedCalcBlock()) {
+        if (block.timestamp > getLastPerMTAWMintedCalcTimestamp()) {
             uint256 PerMTAWMinted = calcPerMTAWMinted();
             MTProduceData =
                 (PerMTAWMinted << 128) |
-                (block.number << 64) |
+                (block.timestamp << 64) |
                 getTotalMTAWs();
         }
     }
@@ -207,27 +208,28 @@ contract Map is Ownable, Multicall {
         uint256 TotalMTAWs = getTotalMTAWs();
         uint256 PerMTAWMinted = getPerMTAWMinted();
         if (TotalMTAWs > 0) {
-            uint256 LastPerMTAWMintedCalcBlock = getLastPerMTAWMintedCalcBlock();
-            uint256 reduceTimes = (LastPerMTAWMintedCalcBlock -
-                MTProduceStartBlock) / MTProduceReduceInterval;
-            uint256 nextReduceBlock = MTProduceStartBlock +
+            uint256 LastPerMTAWMintedCalcTimestamp = getLastPerMTAWMintedCalcTimestamp();
+            uint256 reduceTimes = (LastPerMTAWMintedCalcTimestamp -
+                MTProduceStartTimestamp) / MTProduceReduceInterval;
+            uint256 nextReduceTimestamp = MTProduceStartTimestamp +
                 MTProduceReduceInterval +
                 reduceTimes *
                 MTProduceReduceInterval;
 
             while (true) {
-                if (block.number > nextReduceBlock) {
+                if (block.timestamp > nextReduceTimestamp) {
                     PerMTAWMinted +=
-                        ((nextReduceBlock - LastPerMTAWMintedCalcBlock) *
-                            currentMTPPB(reduceTimes)) /
+                        ((nextReduceTimestamp -
+                            LastPerMTAWMintedCalcTimestamp) *
+                            currentMTPPS(reduceTimes)) /
                         TotalMTAWs;
-                    LastPerMTAWMintedCalcBlock = nextReduceBlock;
+                    LastPerMTAWMintedCalcTimestamp = nextReduceTimestamp;
                     reduceTimes++;
-                    nextReduceBlock += MTProduceReduceInterval;
+                    nextReduceTimestamp += MTProduceReduceInterval;
                 } else {
                     PerMTAWMinted +=
-                        ((block.number - LastPerMTAWMintedCalcBlock) *
-                            currentMTPPB(reduceTimes)) /
+                        ((block.timestamp - LastPerMTAWMintedCalcTimestamp) *
+                            currentMTPPS(reduceTimes)) /
                         TotalMTAWs;
                     break;
                 }
