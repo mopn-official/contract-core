@@ -67,7 +67,10 @@ interface IMap {
         uint256 COID
     ) external view returns (uint256);
 
-    function redeemCollectionInboxMT(uint256 avatarId, uint256 COID) external;
+    function claimCollectionSettledInboxMT(
+        uint256 avatarId,
+        uint256 COID
+    ) external returns (uint256);
 
     /**
      * @notice get Land holder realtime unclaimed minted mopn token

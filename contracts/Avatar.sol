@@ -302,9 +302,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
             );
         } else {
             IGovernance(governanceContract).addCollectionOnMapNum(COID);
-            IMap(IGovernance(governanceContract).mapContract())
-                .redeemCollectionInboxMT(avatarId, COID);
-
             emit AvatarJumpIn(avatarId, COID, LandId, tileCoordinate);
         }
 
@@ -315,6 +312,14 @@ contract Avatar is IAvatar, Multicall, Ownable {
             LandId,
             getAvatarBombUsed(avatarId)
         );
+
+        if (orgCoordinate == 0) {
+            IGovernance(governanceContract).redeemCollectionInboxMT(
+                msg.sender,
+                avatarId,
+                COID
+            );
+        }
 
         setAvatarCoordinate(avatarId, tileCoordinate);
     }

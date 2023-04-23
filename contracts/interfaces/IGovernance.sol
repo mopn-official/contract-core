@@ -16,6 +16,12 @@ interface IGovernance {
         address vault
     ) external;
 
+    function redeemCollectionInboxMT(
+        address to,
+        uint256 avatarId,
+        uint256 COID
+    ) external;
+
     function redeemLandHolderInboxMT(uint32 LandId) external;
 
     function getCollectionContract(

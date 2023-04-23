@@ -397,11 +397,11 @@ contract Map is Ownable, Multicall {
      * @param avatarId avatar Id
      * @param COID collection Id
      */
-    function redeemCollectionInboxMT(
+    function claimCollectionSettledInboxMT(
         uint256 avatarId,
         uint256 COID
-    ) public onlyAvatar {
-        uint256 amount = getCollectionSettledInboxMT(COID);
+    ) public onlyGovernance returns (uint256 amount) {
+        amount = getCollectionSettledInboxMT(COID);
         if (amount > 0) {
             amount =
                 amount /

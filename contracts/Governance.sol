@@ -54,6 +54,26 @@ contract Governance is Multicall, Ownable {
     }
 
     /**
+     * @notice redeem collection unclaimed minted mopn token
+     * @param avatarId avatar Id
+     * @param COID collection Id
+     */
+    function redeemCollectionInboxMT(
+        address to,
+        uint256 avatarId,
+        uint256 COID
+    ) public onlyAvatar {
+        uint256 amount = IMap(mapContract).claimCollectionSettledInboxMT(
+            avatarId,
+            COID
+        );
+        if (amount > 0) {
+            IMOPNToken(mtContract).mint(to, amount);
+            emit MTClaimed(to, amount);
+        }
+    }
+
+    /**
      * @notice redeem Land holder unclaimed minted mopn token
      * @param LandId MOPN Land Id
      */
