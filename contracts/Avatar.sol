@@ -38,7 +38,12 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
     using TileMath for uint32;
 
-    event AvatarMint(uint256 indexed avatarId, uint256 indexed COID);
+    event AvatarMint(
+        uint256 indexed avatarId,
+        uint256 indexed COID,
+        address collectionContract,
+        uint256 tokenId
+    );
 
     /**
      * @notice This event emit when an avatar jump into the map
@@ -256,7 +261,12 @@ contract Avatar is IAvatar, Multicall, Ownable {
         avatarNoumenon[currentAvatarId].tokenId = params.tokenId;
 
         tokenMap[params.collectionContract][params.tokenId] = currentAvatarId;
-        emit AvatarMint(currentAvatarId, COID);
+        emit AvatarMint(
+            currentAvatarId,
+            COID,
+            params.collectionContract,
+            params.tokenId
+        );
         return currentAvatarId;
     }
 

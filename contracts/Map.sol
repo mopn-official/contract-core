@@ -191,6 +191,12 @@ contract Map is Ownable, Multicall {
         return ABDKMath64x64.mulu(reducePower, MTProducePerSecond);
     }
 
+    function currentMTPPS() public view returns (uint256 MTPPB) {
+        uint256 reduceTimes = (block.timestamp - MTProduceStartTimestamp) /
+            MTProduceReduceInterval;
+        return currentMTPPS(reduceTimes);
+    }
+
     /**
      * @notice settle per mopn token allocation weight minted mopn token
      */
