@@ -286,13 +286,19 @@ contract Map is Ownable, Multicall {
         uint256 AvatarMTAW = getAvatarMTAW(avatarId);
         uint256 AvatarPerMTAWMinted = getAvatarPerMTAWMinted(avatarId);
         uint256 PerMTAWMinted = getPerMTAWMinted();
-        if (AvatarPerMTAWMinted < PerMTAWMinted && AvatarMTAW > 0) {
-            uint256 amount = ((((PerMTAWMinted - AvatarPerMTAWMinted) *
-                AvatarMTAW) * 90) / 100);
-            AvatarMTs[avatarId] +=
-                (amount << 192) |
-                ((PerMTAWMinted - AvatarPerMTAWMinted) << 64);
-            emit AvatarMTMinted(avatarId, amount);
+        if (AvatarPerMTAWMinted < PerMTAWMinted) {
+            if (AvatarMTAW > 0) {
+                uint256 amount = ((((PerMTAWMinted - AvatarPerMTAWMinted) *
+                    AvatarMTAW) * 90) / 100);
+                AvatarMTs[avatarId] +=
+                    (amount << 192) |
+                    ((PerMTAWMinted - AvatarPerMTAWMinted) << 64);
+                emit AvatarMTMinted(avatarId, amount);
+            } else {
+                AvatarMTs[avatarId] +=
+                    (PerMTAWMinted - AvatarPerMTAWMinted) <<
+                    64;
+            }
         }
     }
 
@@ -367,13 +373,19 @@ contract Map is Ownable, Multicall {
         uint256 CollectionMTAW = getCollectionMTAW(COID);
         uint256 PerMTAWMinted = getPerMTAWMinted();
         uint256 CollectionPerMTAWMinted = getCollectionPerMTAWMinted(COID);
-        if (CollectionPerMTAWMinted < PerMTAWMinted && CollectionMTAW > 0) {
-            uint256 amount = ((((PerMTAWMinted - CollectionPerMTAWMinted) *
-                CollectionMTAW) * 5) / 100);
-            CollectionMTs[COID] +=
-                (amount << 192) |
-                ((PerMTAWMinted - CollectionPerMTAWMinted) << 64);
-            emit CollectionMTMinted(COID, amount);
+        if (CollectionPerMTAWMinted < PerMTAWMinted) {
+            if (CollectionMTAW > 0) {
+                uint256 amount = ((((PerMTAWMinted - CollectionPerMTAWMinted) *
+                    CollectionMTAW) * 5) / 100);
+                CollectionMTs[COID] +=
+                    (amount << 192) |
+                    ((PerMTAWMinted - CollectionPerMTAWMinted) << 64);
+                emit CollectionMTMinted(COID, amount);
+            } else {
+                CollectionMTs[COID] +=
+                    (PerMTAWMinted - CollectionPerMTAWMinted) <<
+                    64;
+            }
         }
     }
 
@@ -462,13 +474,19 @@ contract Map is Ownable, Multicall {
         uint256 LandHolderMTAW = getLandHolderMTAW(LandId);
         uint256 PerMTAWMinted = getPerMTAWMinted();
         uint256 LandHolderPerMTAWMinted = getLandHolderPerMTAWMinted(LandId);
-        if (LandHolderPerMTAWMinted < PerMTAWMinted && LandHolderMTAW > 0) {
-            uint256 amount = (((PerMTAWMinted - LandHolderPerMTAWMinted) *
-                LandHolderMTAW) * 5) / 100;
-            LandHolderMTs[LandId] +=
-                (amount << 192) |
-                ((PerMTAWMinted - LandHolderPerMTAWMinted) << 64);
-            emit LandHolderMTMinted(LandId, amount);
+        if (LandHolderPerMTAWMinted < PerMTAWMinted) {
+            if (LandHolderMTAW > 0) {
+                uint256 amount = (((PerMTAWMinted - LandHolderPerMTAWMinted) *
+                    LandHolderMTAW) * 5) / 100;
+                LandHolderMTs[LandId] +=
+                    (amount << 192) |
+                    ((PerMTAWMinted - LandHolderPerMTAWMinted) << 64);
+                emit LandHolderMTMinted(LandId, amount);
+            } else {
+                LandHolderMTs[LandId] +=
+                    (PerMTAWMinted - LandHolderPerMTAWMinted) <<
+                    64;
+            }
         }
     }
 
