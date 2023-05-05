@@ -427,7 +427,7 @@ contract Map is Ownable, Multicall {
                     1);
             CollectionMTs[COID] -= amount << 192;
             CollectionMTs[COID] += amount << 128;
-            AvatarMTs[avatarId] += amount << 192;
+            AvatarMTs[avatarId] += amount << 128;
             emit AvatarMTMinted(avatarId, amount);
         }
     }

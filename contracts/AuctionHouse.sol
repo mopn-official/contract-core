@@ -38,6 +38,8 @@ contract AuctionHouse is Multicall, Ownable {
 
     event BombSold(address indexed buyer, uint256 amount, uint256 price);
 
+    event RedeemAgio(address indexed to, uint256 amount);
+
     uint256 public constant landPrice = 1000000000000000;
 
     /**
@@ -230,6 +232,7 @@ contract AuctionHouse is Multicall, Ownable {
                 to,
                 agio
             );
+            emit RedeemAgio(to, agio);
         }
     }
 

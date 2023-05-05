@@ -27,6 +27,12 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 contract Governance is Multicall, Ownable {
     event MTClaimed(address indexed to, uint256 amount);
 
+    event MTClaimedCollectionVault(
+        uint256 indexed COID,
+        address indexed to,
+        uint256 amount
+    );
+
     /**
      * @notice redeem avatar unclaimed minted mopn token
      * @param avatarId avatar Id
@@ -69,7 +75,7 @@ contract Governance is Multicall, Ownable {
         );
         if (amount > 0) {
             IMOPNToken(mtContract).mint(to, amount);
-            emit MTClaimed(to, amount);
+            emit MTClaimedCollectionVault(COID, to, amount);
         }
     }
 
