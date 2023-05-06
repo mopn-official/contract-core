@@ -38,7 +38,7 @@ contract AuctionHouse is Multicall, Ownable {
 
     event BombSold(address indexed buyer, uint256 amount, uint256 price);
 
-    event RedeemAgio(address indexed to, uint256 amount);
+    event RedeemAgio(address indexed to, uint256 roundId, uint256 amount);
 
     uint256 public constant landPrice = 1000000000000000;
 
@@ -195,14 +195,16 @@ contract AuctionHouse is Multicall, Ownable {
      * @notice get the Specified wallet's agio amount
      * @param to the wallet address who is getting the agio
      */
-    function getAgio(address to) public view returns (uint256 agio) {
+    function getAgio(
+        address to
+    ) public view returns (uint256 agio, uint64 roundId) {
         if (bombWalletData[to] == 0) {
-            return 0;
+            return (0, 0);
         }
         if (getBombWalletAgioRedeemStatus(to) == 1) {
-            return 0;
+            return (0, 0);
         }
-        uint64 roundId = getBombWalletRoundId(to);
+        roundId = getBombWalletRoundId(to);
         if (roundId != getBombRoundId()) {
             uint8 amount = getBombWalletAuctionAmount(to);
             agio =
@@ -225,14 +227,14 @@ contract AuctionHouse is Multicall, Ownable {
     }
 
     function _redeemAgio(address to) internal {
-        uint256 agio = getAgio(to);
+        (uint256 agio, uint64 roundId) = getAgio(to);
         if (agio > 0) {
             bombWalletData[to] = 0;
             IMOPNToken(IGovernance(governanceContract).mtContract()).transfer(
                 to,
                 agio
             );
-            emit RedeemAgio(to, agio);
+            emit RedeemAgio(to, roundId, agio);
         }
     }
 

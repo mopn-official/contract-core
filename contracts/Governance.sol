@@ -25,9 +25,15 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
 contract Governance is Multicall, Ownable {
-    event MTClaimed(address indexed to, uint256 amount);
+    event MTClaimed(
+        uint256 indexed avatarId,
+        uint256 indexed COID,
+        address indexed to,
+        uint256 amount
+    );
 
     event MTClaimedCollectionVault(
+        uint256 indexed avatarId,
         uint256 indexed COID,
         address indexed to,
         uint256 amount
@@ -55,7 +61,12 @@ contract Governance is Multicall, Ownable {
         uint256 amount = IMap(mapContract).claimAvatarSettledIndexMT(avatarId);
         if (amount > 0) {
             IMOPNToken(mtContract).mint(nftOwner, amount);
-            emit MTClaimed(nftOwner, amount);
+            emit MTClaimed(
+                avatarId,
+                IAvatar(avatarContract).getAvatarCOID(avatarId),
+                nftOwner,
+                amount
+            );
         }
     }
 
@@ -75,7 +86,7 @@ contract Governance is Multicall, Ownable {
         );
         if (amount > 0) {
             IMOPNToken(mtContract).mint(to, amount);
-            emit MTClaimedCollectionVault(COID, to, amount);
+            emit MTClaimedCollectionVault(COID, avatarId, to, amount);
         }
     }
 
@@ -93,7 +104,7 @@ contract Governance is Multicall, Ownable {
         );
         if (amount > 0) {
             IMOPNToken(mtContract).mint(landOwner, amount);
-            emit MTClaimed(landOwner, amount);
+            emit MTClaimed(0, 0, landOwner, amount);
         }
     }
 
