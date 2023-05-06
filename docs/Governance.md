@@ -7,7 +7,13 @@ _Governance is all other MOPN contract's owner_
 ### MTClaimed
 
 ```solidity
-event MTClaimed(address to, uint256 amount)
+event MTClaimed(uint256 avatarId, uint256 COID, address to, uint256 amount)
+```
+
+### MTClaimedCollectionVault
+
+```solidity
+event MTClaimedCollectionVault(uint256 avatarId, uint256 COID, address to, uint256 amount)
 ```
 
 ### redeemAvatarInboxMT
@@ -26,21 +32,21 @@ redeem avatar unclaimed minted mopn token
 | delegateWallet | enum IAvatar.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
 | vault | address | cold wallet address |
 
-### batchRedeemAvatarInboxMT
+### redeemCollectionInboxMT
 
 ```solidity
-function batchRedeemAvatarInboxMT(uint256[] avatarIds, enum IAvatar.DelegateWallet[] delegateWallets, address[] vaults) public
+function redeemCollectionInboxMT(address to, uint256 avatarId, uint256 COID) public
 ```
 
-batch redeem avatar unclaimed minted mopn token
+redeem collection unclaimed minted mopn token
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| avatarIds | uint256[] | avatar Ids |
-| delegateWallets | enum IAvatar.DelegateWallet[] | Delegate coldwallet to specify hotwallet protocol |
-| vaults | address[] | cold wallet address |
+| to | address |  |
+| avatarId | uint256 | avatar Id |
+| COID | uint256 | collection Id |
 
 ### redeemLandHolderInboxMT
 
@@ -292,12 +298,6 @@ function mintBomb(address to, uint256 amount) public
 
 ```solidity
 function burnBomb(address from, uint256 amount) public
-```
-
-### mintLand
-
-```solidity
-function mintLand(address to) public
 ```
 
 ### redeemAgio

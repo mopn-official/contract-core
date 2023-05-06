@@ -2,6 +2,12 @@
 
 ## MOPNLand
 
+### MAX_SUPPLY
+
+```solidity
+uint256 MAX_SUPPLY
+```
+
 ### constructor
 
 ```solidity

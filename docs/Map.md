@@ -1,17 +1,5 @@
 # Solidity API
 
-## TileHasEnemy
-
-```solidity
-error TileHasEnemy()
-```
-
-## LandIdOverflow
-
-```solidity
-error LandIdOverflow()
-```
-
 ## Map
 
 _This Contract's owner must transfer to Governance Contract once it's deployed_
@@ -22,10 +10,10 @@ _This Contract's owner must transfer to Governance Contract once it's deployed_
 mapping(uint32 => uint256) tiles
 ```
 
-### MTProducePerBlock
+### MTProducePerSecond
 
 ```solidity
-uint256 MTProducePerBlock
+uint256 MTProducePerSecond
 ```
 
 ### MTProduceReduceInterval
@@ -34,10 +22,10 @@ uint256 MTProducePerBlock
 uint256 MTProduceReduceInterval
 ```
 
-### MTProduceStartBlock
+### MTProduceStartTimestamp
 
 ```solidity
-uint256 MTProduceStartBlock
+uint256 MTProduceStartTimestamp
 ```
 
 ### MTProduceData
@@ -46,7 +34,7 @@ uint256 MTProduceStartBlock
 uint256 MTProduceData
 ```
 
-uint64 PerMTAWMinted + uint64 LastPerMTAWMintedCalcBlock + uint64 TotalMTAWs
+uint64 PerMTAWMinted + uint64 LastPerMTAWMintedCalcTimestamp + uint64 TotalMTAWs
 
 ### AvatarMTs
 
@@ -80,10 +68,16 @@ event AvatarMTMinted(uint256 avatarId, uint256 amount)
 event CollectionMTMinted(uint256 COID, uint256 amount)
 ```
 
+### LandHolderMTMinted
+
+```solidity
+event LandHolderMTMinted(uint32 LandId, uint256 amount)
+```
+
 ### constructor
 
 ```solidity
-constructor(uint256 MTProduceStartBlock_) public
+constructor(uint256 MTProduceStartTimestamp_) public
 ```
 
 ### getTileAvatar
@@ -127,20 +121,6 @@ get MOPN Land Id which a tile belongs(only have data if someone has occupied thi
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | tileCoordinate | uint32 | tile coordinate |
-
-### getTilesAvatars
-
-```solidity
-function getTilesAvatars(uint32[] tileCoordinates) public view returns (uint256[])
-```
-
-batch call for {getTileAvatar}
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| tileCoordinates | uint32[] | tile coordinate |
 
 ### governanceContract
 
@@ -199,13 +179,13 @@ function getPerMTAWMinted() public view returns (uint256)
 
 get settled Per MT Allocation Weight minted mopn token number
 
-### getLastPerMTAWMintedCalcBlock
+### getLastPerMTAWMintedCalcTimestamp
 
 ```solidity
-function getLastPerMTAWMintedCalcBlock() public view returns (uint256)
+function getLastPerMTAWMintedCalcTimestamp() public view returns (uint256)
 ```
 
-get MT last minted settlement block number
+get last per mopn token allocation weight minted settlement timestamp
 
 ### getTotalMTAWs
 
@@ -215,10 +195,24 @@ function getTotalMTAWs() public view returns (uint256)
 
 get total mopn token allocation weights
 
-### currentMTPPB
+### currentMTPPS
 
 ```solidity
-function currentMTPPB(uint256 reduceTimes) public pure returns (uint256 MTPPB)
+function currentMTPPS(uint256 reduceTimes) public pure returns (uint256 MTPPB)
+```
+
+get current mt produce per second
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| reduceTimes | uint256 | reduce times |
+
+### currentMTPPS
+
+```solidity
+function currentMTPPS() public view returns (uint256 MTPPB)
 ```
 
 ### settlePerMTAWMinted
@@ -227,7 +221,7 @@ function currentMTPPB(uint256 reduceTimes) public pure returns (uint256 MTPPB)
 function settlePerMTAWMinted() public
 ```
 
-settle per mopn token allocation weight mint mopn token
+settle per mopn token allocation weight minted mopn token
 
 ### calcPerMTAWMinted
 
@@ -393,10 +387,10 @@ get collection realtime unclaimed minted mopn token
 | ---- | ---- | ----------- |
 | COID | uint256 | collection Id |
 
-### redeemCollectionInboxMT
+### claimCollectionSettledInboxMT
 
 ```solidity
-function redeemCollectionInboxMT(uint256 avatarId, uint256 COID) public
+function claimCollectionSettledInboxMT(uint256 avatarId, uint256 COID) public returns (uint256 amount)
 ```
 
 redeem 1/collectionOnMapNFTNumber of collection unclaimed minted mopn token to a avatar
@@ -534,6 +528,12 @@ substruct on map mining mopn token allocation weight
 
 ```solidity
 modifier checkLandId(uint32 tileCoordinate, uint32 LandId)
+```
+
+### onlyGovernance
+
+```solidity
+modifier onlyGovernance()
 ```
 
 ### onlyAvatar

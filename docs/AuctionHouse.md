@@ -56,6 +56,12 @@ wallet address => uint64 total spend + uint64 roundId + uint8 auction amount + u
 event BombSold(address buyer, uint256 amount, uint256 price)
 ```
 
+### RedeemAgio
+
+```solidity
+event RedeemAgio(address to, uint256 roundId, uint256 amount)
+```
+
 ### landPrice
 
 ```solidity
@@ -203,7 +209,7 @@ a set of current round data
 ### getAgio
 
 ```solidity
-function getAgio(address to) public view returns (uint256 agio)
+function getAgio(address to) public view returns (uint256 agio, uint64 roundId)
 ```
 
 get the Specified wallet's agio amount

@@ -1,17 +1,5 @@
 # Solidity API
 
-## LandIdTilesNotOpen
-
-```solidity
-error LandIdTilesNotOpen()
-```
-
-## linkAvatarError
-
-```solidity
-error linkAvatarError()
-```
-
 ## WarmInterface
 
 ### ownerOf
@@ -44,7 +32,7 @@ struct AvatarData {
 ### AvatarMint
 
 ```solidity
-event AvatarMint(uint256 avatarId, uint256 COID)
+event AvatarMint(uint256 avatarId, uint256 COID, address collectionContract, uint256 tokenId)
 ```
 
 ### AvatarJumpIn

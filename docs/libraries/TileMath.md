@@ -11,12 +11,6 @@ struct XYCoordinate {
 }
 ```
 
-### TileCoordinateError
-
-```solidity
-error TileCoordinateError()
-```
-
 ### check
 
 ```solidity

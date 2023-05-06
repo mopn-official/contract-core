@@ -2,20 +2,10 @@
 
 ## IGovernance
 
-### DelegateWallet
-
-```solidity
-enum DelegateWallet {
-  None,
-  DelegateCash,
-  Warm
-}
-```
-
 ### redeemAvatarInboxMT
 
 ```solidity
-function redeemAvatarInboxMT(uint256 avatarId, enum IGovernance.DelegateWallet delegateWallet, address vault) external
+function redeemAvatarInboxMT(uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault) external
 ```
 
 redeem avatar unclaimed minted MOPN Tokens
@@ -25,8 +15,14 @@ redeem avatar unclaimed minted MOPN Tokens
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | avatarId | uint256 | avatar Id |
-| delegateWallet | enum IGovernance.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
+| delegateWallet | enum IAvatar.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
 | vault | address | cold wallet address |
+
+### redeemCollectionInboxMT
+
+```solidity
+function redeemCollectionInboxMT(address to, uint256 avatarId, uint256 COID) external
+```
 
 ### redeemLandHolderInboxMT
 
@@ -94,6 +90,12 @@ function getCollectionOnMapNum(uint256 COID) external view returns (uint256)
 function addCollectionAvatarNum(uint256 COID) external
 ```
 
+### getCollectionAvatarNum
+
+```solidity
+function getCollectionAvatarNum(uint256 COID) external view returns (uint256)
+```
+
 ### mintBomb
 
 ```solidity
@@ -116,6 +118,12 @@ function redeemAgio() external
 
 ```solidity
 function mintLand(address to) external
+```
+
+### auctionHouseContract
+
+```solidity
+function auctionHouseContract() external view returns (address)
 ```
 
 ### avatarContract
