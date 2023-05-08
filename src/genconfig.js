@@ -22,6 +22,10 @@ async function main() {
     contracts: {},
   };
 
+  if (network == "sepolia") {
+    config.thegraph = "https://api.studio.thegraph.com/proxy/46530/mopn-sepolia/v0.0.1/";
+  }
+
   console.log("gen config start");
   for (let i = 0; i < deployConf.contracts.length; i++) {
     contractName = deployConf.contracts[i];
