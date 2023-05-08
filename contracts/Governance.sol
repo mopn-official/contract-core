@@ -86,7 +86,7 @@ contract Governance is Multicall, Ownable {
         );
         if (amount > 0) {
             IMOPNToken(mtContract).mint(to, amount);
-            emit MTClaimedCollectionVault(COID, avatarId, to, amount);
+            emit MTClaimedCollectionVault(avatarId, COID, to, amount);
         }
     }
 
