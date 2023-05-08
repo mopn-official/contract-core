@@ -192,6 +192,9 @@ contract Map is Ownable, Multicall {
     }
 
     function currentMTPPS() public view returns (uint256 MTPPB) {
+        if (MTProduceStartTimestamp > block.timestamp) {
+            return 0;
+        }
         uint256 reduceTimes = (block.timestamp - MTProduceStartTimestamp) /
             MTProduceReduceInterval;
         return currentMTPPS(reduceTimes);
@@ -211,6 +214,9 @@ contract Map is Ownable, Multicall {
     }
 
     function calcPerMTAWMinted() public view returns (uint256) {
+        if (MTProduceStartTimestamp > block.timestamp) {
+            return 0;
+        }
         uint256 TotalMTAWs = getTotalMTAWs();
         uint256 PerMTAWMinted = getPerMTAWMinted();
         if (TotalMTAWs > 0) {
