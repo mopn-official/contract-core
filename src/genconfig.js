@@ -23,7 +23,7 @@ async function main() {
   };
 
   if (network == "sepolia") {
-    config.thegraph = "https://api.studio.thegraph.com/proxy/46530/mopn-sepolia/v0.0.1/";
+    config.thegraph = "https://api.studio.thegraph.com/proxy/46530/mopn-sepolia/v0.0.2/";
   }
 
   console.log("gen config start");
