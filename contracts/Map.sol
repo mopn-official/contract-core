@@ -221,6 +221,9 @@ contract Map is Ownable, Multicall {
         uint256 PerMTAWMinted = getPerMTAWMinted();
         if (TotalMTAWs > 0) {
             uint256 LastPerMTAWMintedCalcTimestamp = getLastPerMTAWMintedCalcTimestamp();
+            if (MTProduceStartTimestamp > LastPerMTAWMintedCalcTimestamp) {
+                LastPerMTAWMintedCalcTimestamp = MTProduceStartTimestamp;
+            }
             uint256 reduceTimes = (LastPerMTAWMintedCalcTimestamp -
                 MTProduceStartTimestamp) / MTProduceReduceInterval;
             uint256 nextReduceTimestamp = MTProduceStartTimestamp +
