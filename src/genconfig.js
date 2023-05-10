@@ -29,9 +29,12 @@ async function main() {
   console.log("gen config start");
   for (let i = 0; i < deployConf.contracts.length; i++) {
     contractName = deployConf.contracts[i];
+    if (contractName == "MOPNLandMirror") {
+      contractName = "MOPNLand";
+    }
     config.contracts[contractName] = "";
-    if (deployConf[contractName].address) {
-      config.contracts[contractName] = deployConf[contractName].address;
+    if (deployConf[deployConf.contracts[i]].address) {
+      config.contracts[contractName] = deployConf[deployConf.contracts[i]].address;
     }
   }
 
