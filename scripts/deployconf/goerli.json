@@ -11,7 +11,8 @@
         "LandMetaDataRender",
         "Map",
         "MOPNLandMirror",
-        "MOPNToken"
+        "MOPNToken",
+        "MOPNTESTNFT"
     ],
     "TileMath": {
         "address": "0xf7BC3a0dE9cC7f1a5305392C785fAfb6D80dF531",
@@ -30,7 +31,7 @@
         ]
     },
     "AuctionHouse": {
-        "address": "0xd3a5D1E54F2a8eE535A039b5C9d16653f55D75aC",
+        "address": "0x6b52a76aC7e03cc61De1450A96a8197Db0801b28",
         "verified": true,
         "constructparams": [
             1683705600,
@@ -49,7 +50,7 @@
         ]
     },
     "Avatar": {
-        "address": "0x8C971D47e01913C3b1C5101b2AC941644b90F03A",
+        "address": "0x99226881D8334dEEF5aFEB20C563b57D49851B05",
         "verified": true,
         "libraries": [
             "TileMath"
@@ -67,12 +68,12 @@
         ]
     },
     "Bomb": {
-        "address": "0x31Fb90d5D356fCE0A6feEcE93C1Ce9f73128D309",
+        "address": "0x4CF35149f5420065B1C2F1083308288fC90E6E52",
         "verified": true,
         "transOwnerTo": "Governance"
     },
     "Governance": {
-        "address": "0x0f9BbE19dA22fe4a4833b8B9950c373E229823C0",
+        "address": "0x9Ea4F6D69403EFa2C3fAeda2b23d12F28d3196D2",
         "verified": true,
         "attributesCheck": [
             {
@@ -116,7 +117,7 @@
         ]
     },
     "Map": {
-        "address": "0x1fE5De44214C92a6b9235f5814A8A5e340B1e163",
+        "address": "0x4C20f6B8D9ef14d1854599110A3C35E1572F4526",
         "verified": true,
         "libraries": [
             "TileMath"
@@ -152,8 +153,17 @@
         ]
     },
     "MOPNToken": {
-        "address": "0xc680761fc328C27177a9Fb615A1c635345AF85f1",
+        "address": "0x3f3c0Bf0D27d99132744D007524C7EfA3a7298cb",
         "verified": true,
         "transOwnerTo": "Governance"
+    },
+    "MOPNTESTNFT": {
+        "address": "0x7B8E1CF42A48767f187D3D856a4250882e5723fA",
+        "verified": true,
+        "constructparams": [
+            "MOPN Punk",
+            "MOPNPunk",
+            "https://tokenuriproxy.chainsync.network/mopntestnfts/5/"
+        ]
     }
 }

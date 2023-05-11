@@ -1,26 +1,26 @@
 const { ethers } = require("hardhat");
-const { getParsedEthersError } = require("@enzoferey/ethers-error-parser");
 
 async function main() {
-  const avatar = await ethers.getContractAt("Avatar", "0x53c9633bac2c2f54bde13e975b3a0302700a4e08");
+  const contract = "0x7f652e14b2740a2c1199964cef30cc7ea6b229c1";
+  const tokenId = ethers.BigNumber.from(695).toHexString().substring(2);
+  const contractAddressBytes = hexStringToByteArray(contract.substring(2)); // 去掉 '0x' 前缀
+  const tokenIdBytes = hexStringToByteArray(tokenId);
 
-  try {
-    await avatar.moveTo(
-      [
-        "0xf005dd97d4e96b65effad658f2a40d2e5f425d43",
-        4,
-        [],
-        0,
-        "0x0000000000000000000000000000000000000000",
-      ],
-      10130987,
-      83,
-      12
-    );
-  } catch (error) {
-    const parsederror = getParsedEthersError(error);
-    console.log(parsederror);
+  // 连接字节数组
+  const combinedBytes = contractAddressBytes.concat(tokenIdBytes);
+
+  // 计算哈希值
+  const hash = ethers.utils.keccak256(ethers.utils.arrayify(combinedBytes));
+
+  console.log(hash);
+}
+
+function hexStringToByteArray(hexString) {
+  const byteArray = [];
+  for (let i = 0; i < hexString.length; i += 2) {
+    byteArray.push(parseInt(hexString.slice(i, i + 2), 16));
   }
+  return byteArray;
 }
 
 main().catch((error) => {

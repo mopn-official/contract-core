@@ -26,6 +26,7 @@
   "homepage": "https://mopn.xyz",
   "dependencies": {
     "@enzoferey/ethers-error-parser": "^0.2.3",
+    "@graphprotocol/graph-ts": "^0.30.0",
     "@openzeppelin/contracts": "^4.8.2",
     "@openzeppelin/merkle-tree": "^1.0.4",
     "abdk-libraries-solidity": "^3.2.0",
