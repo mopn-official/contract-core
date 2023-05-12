@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract TESTNFT1 is ERC721, Ownable {
+contract TESTNFT is ERC721, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
@@ -19,7 +19,7 @@ contract TESTNFT1 is ERC721, Ownable {
         }
     }
 
-    function nextTokenId1() public view returns (uint256) {
+    function nextTokenId() public view returns (uint256) {
         return _tokenIdCounter.current();
     }
 

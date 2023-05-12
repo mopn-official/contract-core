@@ -44,7 +44,7 @@ describe("MOPN", function () {
   });
 
   it("deploy MOPNLand", async function () {
-    const MOPNLand = await ethers.getContractFactory("MOPNLand");
+    const MOPNLand = await ethers.getContractFactory("MOPNLandMirror");
     land = await MOPNLand.deploy();
     await land.deployed();
     console.log("MOPNLand ", land.address);
@@ -75,9 +75,9 @@ describe("MOPN", function () {
     console.log("LandMetaDataRender", landMetaDataRender.address);
 
     console.log("mint some land");
-    let minpasstx = await land.auctionMint(owner.address, 1);
+    let minpasstx = await land.claim(owner.address, 0);
     await minpasstx.wait();
-    minpasstx = await land.auctionMint(owner.address, 2);
+    minpasstx = await land.claim(owner.address, 100);
     await minpasstx.wait();
   });
 
@@ -96,10 +96,21 @@ describe("MOPN", function () {
   });
 
   it("deploy MOPN contracts", async function () {
+    const unixTimeStamp = Math.floor(Date.now() / 1000) - 73200;
+
     const AuctionHouse = await ethers.getContractFactory("AuctionHouse");
-    auctionHouse = await AuctionHouse.deploy(1677184081, 1677184081);
+    auctionHouse = await AuctionHouse.deploy(unixTimeStamp, unixTimeStamp);
     await auctionHouse.deployed();
     console.log("AuctionHouse", auctionHouse.address);
+
+    console.log(unixTimeStamp);
+    console.log(await auctionHouse.gettimestamp());
+
+    console.log("raw data", await auctionHouse.bombRound());
+
+    console.log("roundId", await auctionHouse.getBombRoundId());
+    console.log("round start timestamp", await auctionHouse.getBombRoundStartTimestamp());
+    console.log("round sold", await auctionHouse.getBombRoundSold());
 
     const Avatar = await ethers.getContractFactory("Avatar", {
       libraries: {
@@ -115,7 +126,7 @@ describe("MOPN", function () {
         TileMath: tileMath.address,
       },
     });
-    map = await Map.deploy(1682062000);
+    map = await Map.deploy(unixTimeStamp);
     await map.deployed();
     console.log("Map", map.address);
 
@@ -317,14 +328,16 @@ describe("MOPN", function () {
       "wallet balance",
       ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
     );
+  });
 
-    console.log("Current Bomb round", await auctionHouse.getLandRoundId());
+  it("test auction land", async function () {
+    console.log("Current Land round", await auctionHouse.getLandRoundId());
     console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
 
     const buylandtx = await auctionHouse.buyLand();
     await buylandtx.wait();
 
-    console.log("Current Bomb round", await auctionHouse.getLandRoundId());
+    console.log("Current Land round", await auctionHouse.getLandRoundId());
     console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
 
     console.log(

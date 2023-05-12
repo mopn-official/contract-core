@@ -24,7 +24,7 @@ contract MOPNLandMirror is ERC721, Ownable {
     }
 
     function auctionMint(address to, uint256 amount) public view {
-        require(true, "mirror auction mint not supported");
+        require(false, "mirror auction mint not supported");
     }
 
     function nextTokenId() public view returns (uint256) {

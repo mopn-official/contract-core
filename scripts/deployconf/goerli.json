@@ -158,11 +158,11 @@
         "transOwnerTo": "Governance"
     },
     "MOPNTESTNFT": {
-        "address": "0x7B8E1CF42A48767f187D3D856a4250882e5723fA",
+        "address": "0xdEa71568724007fFeF75fD2DC5fBc1858B5C7825",
         "verified": true,
         "constructparams": [
-            "MOPN Punk",
-            "MOPNPunk",
+            "MOPN Color Cat",
+            "MOPNMColorCat",
             "https://tokenuriproxy.chainsync.network/mopntestnfts/5/"
         ]
     }
