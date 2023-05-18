@@ -126,7 +126,7 @@ contract AuctionHouse is Multicall, Ownable {
                 _BITPOS_WALLET_TOTAL_SPEND) |
             (uint256(roundId) << _BITPOS_WALLET_ROUNDID) |
             (uint256(getBombWalletAuctionAmount(msg.sender) + amount) <<
-                _BITMASK_WALLET_AMOUNT_ENTRY);
+                _BITPOS_WALLET_AMOUNT);
 
         if (roundSold >= bombRoundProduce) {
             settleBombPreviousRound(roundId, currentPrice);
