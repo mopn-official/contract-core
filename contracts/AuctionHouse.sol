@@ -359,6 +359,16 @@ contract AuctionHouse is Multicall, Ownable {
         return block.timestamp;
     }
 
+    function testlog(uint256 amount) public pure returns (uint256) {
+        return
+            ABDKMath64x64.toUInt(
+                ABDKMath64x64.pow(
+                    ABDKMath64x64.ln(ABDKMath64x64.fromUInt(amount)),
+                    3
+                ) / 200
+            );
+    }
+
     /**
      * @notice a set of current round data
      * @return roundId round Id of current round

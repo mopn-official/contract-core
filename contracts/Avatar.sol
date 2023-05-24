@@ -129,11 +129,11 @@ contract Avatar is IAvatar, Multicall, Ownable {
      * @return bomb used number
      */
     function getAvatarBombUsed(uint256 avatarId) public view returns (uint256) {
-        return uint64(avatarNoumenon[avatarId].setData >> 192);
+        return uint64(avatarNoumenon[avatarId].setData >> 96);
     }
 
     function addAvatarBombUsed(uint256 avatarId) internal {
-        avatarNoumenon[avatarId].setData += 1 << 192;
+        avatarNoumenon[avatarId].setData += 1 << 96;
     }
 
     /**
@@ -142,10 +142,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
      * @return COID colletion id
      */
     function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
-        return
-            uint64(
-                (avatarNoumenon[avatarId].setData >> 128) & 0xFFFFFFFFFFFFFFFF
-            );
+        return uint64(avatarNoumenon[avatarId].setData >> 32);
     }
 
     /**
@@ -163,10 +160,10 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint256 avatarId,
         uint32 tileCoordinate
     ) internal {
+        uint256 mask = uint256(uint32(0xFFFFFFFF));
         avatarNoumenon[avatarId].setData =
-            (avatarNoumenon[avatarId].setData &
-                0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000) |
-            uint256(tileCoordinate);
+            (avatarNoumenon[avatarId].setData & ~mask) |
+            (uint256(tileCoordinate) & mask);
     }
 
     address public constant WARM_CONTRACT_ADDRESS =
@@ -251,13 +248,13 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 params.collectionContract,
                 params.proofs
             );
+        } else {
+            IGovernance(governanceContract).addCollectionAvatarNum(COID);
         }
-
-        IGovernance(governanceContract).addCollectionAvatarNum(COID);
 
         currentAvatarId++;
 
-        avatarNoumenon[currentAvatarId].setData = COID << 128;
+        avatarNoumenon[currentAvatarId].setData = COID << 32;
         avatarNoumenon[currentAvatarId].tokenId = params.tokenId;
 
         tokenMap[params.collectionContract][params.tokenId] = currentAvatarId;

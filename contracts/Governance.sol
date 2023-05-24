@@ -25,6 +25,18 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
 contract Governance is Multicall, Ownable {
+    // Collection Id
+    uint256 COIDCounter;
+
+    mapping(uint256 => address) public COIDMap;
+
+    /**
+     * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
+     *
+     * Collection address => uint64 COID + uint64 minted avatar num + uint64 on map nft number
+     */
+    mapping(address => uint256) public collectionMap;
+
     event MTClaimed(
         uint256 indexed avatarId,
         uint256 indexed COID,
@@ -142,18 +154,6 @@ contract Governance is Multicall, Ownable {
     function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
         whiteListRoot = whiteListRoot_;
     }
-
-    // Collection Id
-    uint256 COIDCounter;
-
-    mapping(uint256 => address) public COIDMap;
-
-    /**
-     * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
-     *
-     * Collection address => uint64 COID + uint64 minted avatar num + uint64 on map nft number
-     */
-    mapping(address => uint256) public collectionMap;
 
     /**
      * @notice use collection Id to get collection contract address

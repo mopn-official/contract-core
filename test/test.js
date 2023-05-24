@@ -348,6 +348,9 @@ describe("MOPN", function () {
 
   it("test bomb", async function () {
     await collectionInfo();
+
+    await avatarInfo();
+
     // -2 3 -1
     const bombTx = await avatar.bomb([testnft1.address, 0, testnftproofs, 0, address0], 09981003);
     await bombTx.wait();
@@ -372,6 +375,13 @@ describe("MOPN", function () {
     //   ])
     // );
 
+    const bomb2Tx = await avatar.bomb([testnft.address, 1, testnftproofs, 0, address0], 10041000);
+    await bomb2Tx.wait();
+
+    await avatarInfo();
+
+    await collectionInfo();
+
     console.log(
       "wallet balance",
       ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
@@ -379,7 +389,7 @@ describe("MOPN", function () {
   });
 
   const avatarInfo = async () => {
-    for (let i = 1; i < 10; i++) {
+    for (let i = 1; i <= 10; i++) {
       console.log(
         "avatarId",
         i,
