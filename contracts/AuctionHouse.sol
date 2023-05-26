@@ -66,20 +66,18 @@ contract AuctionHouse is Multicall, Ownable {
      * @dev last active round's start timestamp
      * @notice uint64 roundId + uint32 startTimestamp
      *  Bits Layout:
-     *  - [0..9]      `start timestamp`
-     *  - [9..72]     `round Id`
+     *  - [0..31]      `start timestamp`
+     *  - [32..95]     `round Id`
      */
     uint256 public landRound;
 
-    uint256 private constant _BITPOS_LAND_ROUNDID = 9;
+    uint256 private constant _BITPOS_LAND_ROUNDID = 32;
 
     constructor(uint256 bombStartTimestamp, uint256 landStartTimestamp) {
         bombRound =
             (uint256(1) << _BITPOS_ROUNDID) |
             (bombStartTimestamp << _BITPOS_STARTTIMESTAMP);
-        landRound =
-            (uint256(1) << _BITPOS_ROUNDID) |
-            (landStartTimestamp << _BITPOS_STARTTIMESTAMP);
+        landRound = (uint256(1) << _BITPOS_LAND_ROUNDID) | landStartTimestamp;
     }
 
     /**
@@ -333,8 +331,8 @@ contract AuctionHouse is Multicall, Ownable {
         );
 
         landRound =
-            (uint256(roundId + 1) << 192) |
-            (uint256(block.timestamp) << 160);
+            (uint256(roundId + 1) << _BITPOS_LAND_ROUNDID) |
+            block.timestamp;
     }
 
     /**
