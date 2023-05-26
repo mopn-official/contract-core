@@ -97,7 +97,7 @@ contract Map is Ownable, Multicall {
     ) public onlyAvatar {
         require(getTileAvatar(tileCoordinate) == 0, "dst Occupied");
 
-        if (getTileLandId(tileCoordinate) != LandId) {
+        if (LandId == 0 || getTileLandId(tileCoordinate) != LandId) {
             require(
                 LandId <
                     ILand(IGovernance(governanceContract).landContract())
