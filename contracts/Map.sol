@@ -21,7 +21,7 @@ contract Map is Ownable, Multicall {
 
     uint256 public constant MTProducePerSecond = 50000000000;
 
-    uint256 public constant MTProduceReduceInterval = 600000;
+    uint256 public constant MTProduceReduceInterval = 604800;
 
     uint256 public immutable MTProduceStartTimestamp;
 
