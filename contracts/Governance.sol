@@ -150,11 +150,11 @@ contract Governance is Multicall, Ownable {
         return uint64(collectionMap[getCollectionContract(COID)]);
     }
 
-    function addCollectionOnMapNum(uint256 COID) public onlyAvatar {
+    function addCollectionOnMapNum(uint256 COID) public onlyMiningData {
         collectionMap[getCollectionContract(COID)]++;
     }
 
-    function subCollectionOnMapNum(uint256 COID) public onlyAvatar {
+    function subCollectionOnMapNum(uint256 COID) public onlyMiningData {
         collectionMap[getCollectionContract(COID)]--;
     }
 

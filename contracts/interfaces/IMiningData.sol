@@ -70,4 +70,6 @@ interface IMiningData {
     function claimLandHolderSettledIndexMT(
         uint32 LandId
     ) external returns (uint256 amount);
+
+    function calcCollectionMTAW(uint256 COID) external;
 }

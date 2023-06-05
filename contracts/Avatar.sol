@@ -308,7 +308,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 tileCoordinate
             );
         } else {
-            IGovernance(governanceContract).addCollectionOnMapNum(COID);
             emit AvatarJumpIn(avatarId, COID, LandId, tileCoordinate);
         }
 
@@ -377,9 +376,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
             if (attackAvatarId > 0) {
                 setAvatarCoordinate(attackAvatarId, 0);
-                IGovernance(governanceContract).subCollectionOnMapNum(
-                    getAvatarCOID(attackAvatarId)
-                );
                 attackAvatarIds[i] = attackAvatarId;
                 victimsCoordinates[i] = tileCoordinate;
             }

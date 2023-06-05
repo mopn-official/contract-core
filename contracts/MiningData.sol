@@ -474,33 +474,10 @@ contract MiningData {
         if (onMapMTAW == 0) {
             IGovernance(governance).addCollectionOnMapNum(COID);
         }
+        calcCollectionMTAW(COID);
 
-        uint256 point = getCollectionPoint(COID);
-        uint256 collectionMTAW;
-        if (point > 0) {
-            collectionMTAW =
-                point *
-                IGovernance(governance).getCollectionOnMapNum(COID);
-        }
-        uint256 preCollectionMTAW = getCollectionMTAW(COID);
-        if (collectionMTAW != preCollectionMTAW) {
-            if (collectionMTAW > preCollectionMTAW) {
-                MTProduceData += amount + collectionMTAW - preCollectionMTAW;
-                CollectionMTs[COID] +=
-                    ((collectionMTAW - preCollectionMTAW) << 64) |
-                    amount;
-            } else {
-                MTProduceData -= preCollectionMTAW;
-                MTProduceData += amount + collectionMTAW;
-                CollectionMTs[COID] -= ((preCollectionMTAW - collectionMTAW) <<
-                    64);
-                CollectionMTs[COID] += amount;
-            }
-        } else {
-            MTProduceData += amount;
-            CollectionMTs[COID] += amount;
-        }
-
+        MTProduceData += amount;
+        CollectionMTs[COID] += amount;
         AvatarMTs[avatarId] += amount;
     }
 
@@ -512,6 +489,17 @@ contract MiningData {
      */
     function _subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) internal {
         settlePerMTAWMinted();
+        mintCollectionMT(COID);
+        uint256 amount = mintAvatarMT(avatarId, LandId);
+        IGovernance(governance).subCollectionOnMapNum(COID);
+        calcCollectionMTAW(COID);
+
+        MTProduceData -= amount;
+        CollectionMTs[COID] -= amount;
+        AvatarMTs[avatarId] -= amount;
+    }
+
+    function calcCollectionMTAW(uint256 COID) public onlyCollectionVault(COID) {
         uint256 point = getCollectionPoint(COID);
         uint256 collectionMTAW;
         if (point > 0) {
@@ -519,21 +507,27 @@ contract MiningData {
                 point *
                 IGovernance(governance).getCollectionOnMapNum(COID);
         }
-        uint256 amount = getAvatarMTAW(avatarId);
-        if (collectionMTAW > 0) {
-            MTProduceData -= getCollectionMTAW(COID) - collectionMTAW + amount;
-            mintCollectionMT(COID);
-            CollectionMTs[COID] -=
-                ((getCollectionMTAW(COID) - collectionMTAW) << 64) |
-                amount;
-        } else {
-            MTProduceData -= amount;
-            mintCollectionMT(COID);
-            CollectionMTs[COID] -= amount;
+        uint256 preCollectionMTAW = getCollectionMTAW(COID);
+        if (collectionMTAW != preCollectionMTAW) {
+            if (collectionMTAW > preCollectionMTAW) {
+                MTProduceData += collectionMTAW - preCollectionMTAW;
+                CollectionMTs[COID] += ((collectionMTAW - preCollectionMTAW) <<
+                    64);
+            } else {
+                MTProduceData -= preCollectionMTAW;
+                MTProduceData += collectionMTAW;
+                CollectionMTs[COID] -= ((preCollectionMTAW - collectionMTAW) <<
+                    64);
+            }
         }
+    }
 
-        mintAvatarMT(avatarId, LandId);
-        AvatarMTs[avatarId] -= amount;
+    modifier onlyCollectionVault(uint256 COID) {
+        require(
+            msg.sender == IGovernance(governance).getCollectionVault(COID),
+            "not allowed"
+        );
+        _;
     }
 
     modifier onlyAvatarOrMap() {
