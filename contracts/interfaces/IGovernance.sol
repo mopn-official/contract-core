@@ -62,6 +62,16 @@ interface IGovernance {
         uint256 COID
     ) external view returns (uint256);
 
+    function getCollectionMintedMT(
+        uint256 COID
+    ) external view returns (uint256);
+
+    function addCollectionMintedMT(uint256 COID, uint256 amount) external;
+
+    function getCollectionVault(uint256 COID) external view returns (address);
+
+    function mintMT(address to, uint256 amount) external;
+
     function mintBomb(address to, uint256 amount) external;
 
     function burnBomb(address from, uint256 amount) external;
@@ -81,4 +91,6 @@ interface IGovernance {
     function mapContract() external view returns (address);
 
     function landContract() external view returns (address);
+
+    function miningDataContract() external view returns (address);
 }

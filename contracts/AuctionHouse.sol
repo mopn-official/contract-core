@@ -308,7 +308,7 @@ contract AuctionHouse is Multicall, Ownable {
      */
     function buyLand() public {
         uint256 roundStartTimestamp = getLandRoundStartTimestamp();
-        require(block.timestamp > roundStartTimestamp, "auction not start");
+        require(block.timestamp >= roundStartTimestamp, "auction not start");
 
         uint64 roundId = getLandRoundId();
         uint256 price = getLandCurrentPrice();
