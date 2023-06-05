@@ -7,6 +7,7 @@ import "./interfaces/IAuctionHouse.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IBomb.sol";
 import "./interfaces/ILand.sol";
+import "./InitializedProxy.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -30,103 +31,22 @@ contract Governance is Multicall, Ownable {
 
     mapping(uint256 => address) public COIDMap;
 
+    mapping(uint256 => address) public CollectionVaultMap;
+
     /**
      * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
      *
-     * Collection address => uint64 COID + uint64 minted avatar num + uint64 on map nft number
+     * Collection address => uint64 mintedMT + uint64 COID + uint64 minted avatar num + uint64 on map nft number
      */
     mapping(address => uint256) public collectionMap;
 
-    event MTClaimed(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        address indexed to,
-        uint256 amount
-    );
-
-    event MTClaimedCollectionVault(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        address indexed to,
-        uint256 amount
-    );
-
-    /**
-     * @notice redeem avatar unclaimed minted mopn token
-     * @param avatarId avatar Id
-     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
-     * @param vault cold wallet address
-     */
-    function redeemAvatarInboxMT(
-        uint256 avatarId,
-        IAvatar.DelegateWallet delegateWallet,
-        address vault
-    ) public {
-        address nftOwner = IAvatar(avatarContract).ownerOf(
-            avatarId,
-            delegateWallet,
-            vault
-        );
-        IMap(mapContract).settlePerMTAWMinted();
-        IMap(mapContract).mintAvatarMT(avatarId);
-
-        uint256 amount = IMap(mapContract).claimAvatarSettledIndexMT(avatarId);
-        if (amount > 0) {
-            IMOPNToken(mtContract).mint(nftOwner, amount);
-            emit MTClaimed(
-                avatarId,
-                IAvatar(avatarContract).getAvatarCOID(avatarId),
-                nftOwner,
-                amount
-            );
-        }
-    }
-
-    /**
-     * @notice redeem collection unclaimed minted mopn token
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     */
-    function redeemCollectionInboxMT(
-        address to,
-        uint256 avatarId,
-        uint256 COID
-    ) public onlyAvatar {
-        uint256 amount = IMap(mapContract).claimCollectionSettledInboxMT(
-            avatarId,
-            COID
-        );
-        if (amount > 0) {
-            IMOPNToken(mtContract).mint(to, amount);
-            emit MTClaimedCollectionVault(avatarId, COID, to, amount);
-        }
-    }
-
-    /**
-     * @notice redeem Land holder unclaimed minted mopn token
-     * @param LandId MOPN Land Id
-     */
-    function redeemLandHolderInboxMT(uint32 LandId) public {
-        address landOwner = IERC721(landContract).ownerOf(LandId);
-        IMap(mapContract).settlePerMTAWMinted();
-        IMap(mapContract).mintLandHolderMT(LandId);
-
-        uint256 amount = IMap(mapContract).claimLandHolderSettledIndexMT(
-            LandId
-        );
-        if (amount > 0) {
-            IMOPNToken(mtContract).mint(landOwner, amount);
-            emit MTClaimed(0, 0, landOwner, amount);
-        }
-    }
-
     bool public whiteListRequire;
+
+    bytes32 public whiteListRoot;
 
     function setWhiteListRequire(bool whiteListRequire_) public onlyOwner {
         whiteListRequire = whiteListRequire_;
     }
-
-    bytes32 public whiteListRoot;
 
     /**
      * @notice check if this collection is in white list
@@ -252,12 +172,51 @@ contract Governance is Multicall, Ownable {
         collectionMap[getCollectionContract(COID)] += uint256(1) << 64;
     }
 
+    function getCollectionMintedMT(uint256 COID) public view returns (uint256) {
+        return uint64(collectionMap[getCollectionContract(COID)] >> 192);
+    }
+
+    function addCollectionMintedMT(
+        uint256 COID,
+        uint256 amount
+    ) public onlyMiningData {
+        collectionMap[getCollectionContract(COID)] += amount << 192;
+    }
+
+    function createCollectionVault(uint256 COID) public {
+        require(
+            CollectionVaultMap[COID] == address(0),
+            "collection vault exist"
+        );
+
+        bytes memory _initializationCalldata = abi.encodeWithSignature(
+            "initialize(uint256)",
+            COID
+        );
+        address vaultAddress = address(
+            new InitializedProxy(address(this), _initializationCalldata)
+        );
+        CollectionVaultMap[COID] = vaultAddress;
+        if (getCollectionMintedMT(COID) > 0) {
+            mintMT(vaultAddress, getCollectionMintedMT(COID));
+            collectionMap[getCollectionContract(COID)] = uint192(
+                collectionMap[getCollectionContract(COID)]
+            );
+        }
+    }
+
+    function getCollectionVault(uint256 COID) public view returns (address) {
+        return CollectionVaultMap[COID];
+    }
+
     address public auctionHouseContract;
     address public avatarContract;
     address public bombContract;
     address public mtContract;
     address public mapContract;
     address public landContract;
+    address public miningDataContract;
+    address public mopnCollectionVaultContract;
 
     function updateMOPNContracts(
         address auctionHouseContract_,
@@ -265,7 +224,9 @@ contract Governance is Multicall, Ownable {
         address bombContract_,
         address mtContract_,
         address mapContract_,
-        address landContract_
+        address landContract_,
+        address miningDataContract_,
+        address mopnCollectionVaultContract_
     ) public onlyOwner {
         auctionHouseContract = auctionHouseContract_;
         avatarContract = avatarContract_;
@@ -273,6 +234,12 @@ contract Governance is Multicall, Ownable {
         mtContract = mtContract_;
         mapContract = mapContract_;
         landContract = landContract_;
+        miningDataContract = miningDataContract_;
+        mopnCollectionVaultContract = mopnCollectionVaultContract_;
+    }
+
+    function mintMT(address to, uint256 amount) public onlyMiningData {
+        IMOPNToken(mtContract).mint(to, amount);
     }
 
     // Bomb
@@ -288,13 +255,6 @@ contract Governance is Multicall, Ownable {
         IAuctionHouse(auctionHouseContract).redeemAgioTo(msg.sender);
     }
 
-    ///todo remove before prod
-    function giveupOwnership() public onlyOwner {
-        IBomb(bombContract).transferOwnership(owner());
-        IMOPNToken(mtContract).transferOwnership(owner());
-        IMap(mapContract).transferOwnership(owner());
-    }
-
     modifier onlyAuctionHouse() {
         require(msg.sender == auctionHouseContract, "not allowed");
         _;
@@ -302,6 +262,11 @@ contract Governance is Multicall, Ownable {
 
     modifier onlyAvatar() {
         require(msg.sender == avatarContract, "not allowed");
+        _;
+    }
+
+    modifier onlyMiningData() {
+        require(msg.sender == miningDataContract, "not allowed");
         _;
     }
 

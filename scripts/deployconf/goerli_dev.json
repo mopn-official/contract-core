@@ -31,7 +31,7 @@
         ]
     },
     "AuctionHouse": {
-        "address": "0x476c30977F0f754D5b8c9eA4d1762BDAeAee3F0c",
+        "address": "0x58475C4909F8EFc83F3157336bF9bD417a27b384",
         "verified": true,
         "constructparams": [
             1684339200,
@@ -98,7 +98,7 @@
         ]
     },
     "LandMetaDataRender": {
-        "address": "0x12c627A7e2627f3998Ea11e7256f7592fb033C51",
+        "address": "0x7f1d14E5446e353B92b97fd636C778eD274B8218",
         "verified": true,
         "libraries": [
             "TileMath",
@@ -138,7 +138,7 @@
         ]
     },
     "MOPNLandMirror": {
-        "address": "0x9898EA8D280b6dF8BA2f49BFD36bccDB0941a516",
+        "address": "0x47AB1cda4662900173A7E3DC4E2538a02C059e22",
         "verified": true,
         "attributesCheck": [
             {
