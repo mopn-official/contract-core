@@ -20,6 +20,16 @@ contract Map is Ownable, Multicall {
     // Tile => uint64 avatarId + uint64 COID + uint32 MOPN Land Id
     mapping(uint32 => uint256) public tiles;
 
+    IGovernance public governance;
+
+    function getGovernanceContract() public view returns (address) {
+        return address(governance);
+    }
+
+    function setGovernanceContract(address governance_) public onlyOwner {
+        governance = IGovernance(governance_);
+    }
+
     /**
      * @notice get the avatar Id who is standing on a tile
      * @param tileCoordinate tile coordinate
@@ -46,14 +56,6 @@ contract Map is Ownable, Multicall {
         return uint32(tiles[tileCoordinate]);
     }
 
-    address public governanceContract;
-
-    function setGovernanceContract(
-        address governanceContract_
-    ) public onlyOwner {
-        governanceContract = governanceContract_;
-    }
-
     /**
      * @notice avatar id occupied a tile
      * @param avatarId avatar Id
@@ -74,9 +76,7 @@ contract Map is Ownable, Multicall {
 
         if (LandId == 0 || getTileLandId(tileCoordinate) != LandId) {
             require(
-                LandId <
-                    ILand(IGovernance(governanceContract).landContract())
-                        .MAX_SUPPLY(),
+                LandId < ILand(governance.landContract()).MAX_SUPPLY(),
                 "landId overflow"
             );
             require(
@@ -84,8 +84,7 @@ contract Map is Ownable, Multicall {
                 "LandId error"
             );
             require(
-                ILand(IGovernance(governanceContract).landContract())
-                    .nextTokenId() > LandId,
+                ILand(governance.landContract()).nextTokenId() > LandId,
                 "Land Not Open"
             );
         }
@@ -111,8 +110,12 @@ contract Map is Ownable, Multicall {
             }
         }
 
-        IMiningData(IGovernance(governanceContract).miningDataContract())
-            .addMTAW(avatarId, COID, LandId, TileMTAW);
+        IMiningData(governance.miningDataContract()).addMTAW(
+            avatarId,
+            COID,
+            LandId,
+            TileMTAW
+        );
     }
 
     /**
@@ -127,8 +130,11 @@ contract Map is Ownable, Multicall {
         avatarId = getTileAvatar(tileCoordinate);
         if (avatarId > 0 && avatarId != excludeAvatarId) {
             uint32 LandId = getTileLandId(tileCoordinate);
-            IMiningData(IGovernance(governanceContract).miningDataContract())
-                .subMTAW(avatarId, getTileCOID(tileCoordinate), LandId);
+            IMiningData(governance.miningDataContract()).subMTAW(
+                avatarId,
+                getTileCOID(tileCoordinate),
+                LandId
+            );
             tiles[tileCoordinate] = LandId;
         } else {
             avatarId = 0;
@@ -146,15 +152,12 @@ contract Map is Ownable, Multicall {
     }
 
     modifier onlyGovernance() {
-        require(msg.sender == governanceContract, "not allowed");
+        require(msg.sender == address(governance), "not allowed");
         _;
     }
 
     modifier onlyAvatar() {
-        require(
-            msg.sender == IGovernance(governanceContract).avatarContract(),
-            "not allowed"
-        );
+        require(msg.sender == governance.avatarContract(), "not allowed");
         _;
     }
 }

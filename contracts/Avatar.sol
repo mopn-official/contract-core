@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import "./interfaces/IAvatar.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IMap.sol";
+import "./interfaces/IMiningData.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
@@ -319,14 +320,6 @@ contract Avatar is IAvatar, Multicall, Ownable {
             getAvatarBombUsed(avatarId)
         );
 
-        if (orgCoordinate == 0) {
-            IGovernance(governanceContract).redeemCollectionInboxMT(
-                msg.sender,
-                avatarId,
-                COID
-            );
-        }
-
         setAvatarCoordinate(avatarId, tileCoordinate);
     }
 
@@ -354,13 +347,14 @@ contract Avatar is IAvatar, Multicall, Ownable {
         addAvatarBombUsed(avatarId);
 
         if (getAvatarCoordinate(avatarId) > 0) {
-            IMap(IGovernance(governanceContract).mapContract()).addMTAW(
-                avatarId,
-                getAvatarCOID(avatarId),
-                IMap(IGovernance(governanceContract).mapContract())
-                    .getTileLandId(getAvatarCoordinate(avatarId)),
-                1
-            );
+            IMiningData(IGovernance(governanceContract).miningDataContract())
+                .addMTAW(
+                    avatarId,
+                    getAvatarCOID(avatarId),
+                    IMap(IGovernance(governanceContract).mapContract())
+                        .getTileLandId(getAvatarCoordinate(avatarId)),
+                    1
+                );
         }
 
         IGovernance(governanceContract).burnBomb(msg.sender, 1);

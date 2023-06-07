@@ -72,4 +72,14 @@ interface IMiningData {
     ) external returns (uint256 amount);
 
     function calcCollectionMTAW(uint256 COID) external;
+
+    function changeTotalMTPledge(
+        uint256 COID,
+        bool increase,
+        uint256 amount
+    ) external;
+
+    function NFTOfferCoefficient() external view returns (uint256);
+
+    function NFTOfferAcceptNotify(uint256 price) external;
 }
