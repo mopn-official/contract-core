@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/proxy/Proxy.sol";
 
 interface IGov {
-    function mopnCollectionVaultLogic() external view returns (address);
+    function mopnCollectionVaultContract() external view returns (address);
 }
 
 /**
@@ -28,6 +28,6 @@ contract InitializedProxy is Proxy {
     }
 
     function _implementation() internal view override returns (address) {
-        return IGov(governance).mopnCollectionVaultLogic();
+        return IGov(governance).mopnCollectionVaultContract();
     }
 }

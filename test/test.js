@@ -201,7 +201,6 @@ describe("MOPN", function () {
   });
 
   it("test moveTo (first jump)", async function () {
-    console.log(await miningData.gettimestamp());
     // 0 1
     let moveToTx = await avatar.moveTo(
       [testnft.address, 0, testnftproofs, 0, address0],
@@ -286,7 +285,6 @@ describe("MOPN", function () {
     await avatarInfo();
 
     await new Promise((r) => setTimeout(r, 5000));
-    console.log(await miningData.gettimestamp());
   });
 
   it("test redeemAvatarInboxMT", async function () {
@@ -316,7 +314,6 @@ describe("MOPN", function () {
       "wallet balance",
       ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
     );
-    console.log(await miningData.gettimestamp());
   });
 
   it("test auctionHouse", async function () {
@@ -349,21 +346,21 @@ describe("MOPN", function () {
     );
   });
 
-  it("test auction land", async function () {
-    console.log("Current Land round", await auctionHouse.getLandRoundId());
-    console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
+  // it("test auction land", async function () {
+  //   console.log("Current Land round", await auctionHouse.getLandRoundId());
+  //   console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
 
-    const buylandtx = await auctionHouse.buyLand();
-    await buylandtx.wait();
+  //   const buylandtx = await auctionHouse.buyLand();
+  //   await buylandtx.wait();
 
-    console.log("Current Land round", await auctionHouse.getLandRoundId());
-    console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
+  //   console.log("Current Land round", await auctionHouse.getLandRoundId());
+  //   console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
 
-    console.log(
-      "wallet balance",
-      ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
-    );
-  });
+  //   console.log(
+  //     "wallet balance",
+  //     ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
+  //   );
+  // });
 
   it("test bomb", async function () {
     await collectionInfo();
@@ -407,6 +404,34 @@ describe("MOPN", function () {
     );
   });
 
+  it("test pledgeMT", async function () {
+    const tx1 = await governance.createCollectionVault(1);
+    await tx1.wait();
+
+    const vault1adddress = await governance.getCollectionVault(1);
+    const vault1 = await ethers.getContractAt("MOPNCollectionVault", vault1adddress);
+
+    const allowanceTx = await mt.approve(
+      vault1.address,
+      ethers.BigNumber.from("10000000000000000")
+    );
+    await allowanceTx.wait();
+
+    console.log(await miningData.getAvatarMTAW(1));
+
+    const tx2 = await mt.safeTransferFrom(
+      owner.address,
+      vault1.address,
+      ethers.BigNumber.from("500000000000"),
+      "0x"
+    );
+    await tx2.wait();
+
+    console.log(await miningData.getAvatarMTAW(1));
+
+    await collectionInfo();
+  });
+
   const avatarInfo = async () => {
     console.log("total MTAW", (await miningData.getTotalMTAWs()).toString());
     for (let i = 1; i <= 10; i++) {
@@ -438,7 +463,9 @@ describe("MOPN", function () {
         "minted avatar number",
         (await governance.getCollectionAvatarNum(i)).toString(),
         "on map avatar number",
-        (await governance.getCollectionOnMapNum(i)).toString()
+        (await governance.getCollectionOnMapNum(i)).toString(),
+        "collection points",
+        (await miningData.getCollectionPoint(i)).toString()
       );
     }
   };

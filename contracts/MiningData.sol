@@ -222,7 +222,10 @@ contract MiningData is Multicall {
      * @param avatarId avatar Id
      */
     function getAvatarMTAW(uint256 avatarId) public view returns (uint256) {
-        return uint64(AvatarMTs[avatarId]);
+        uint256 COID = IAvatar(governance.avatarContract()).getAvatarCOID(
+            avatarId
+        );
+        return uint64(AvatarMTs[avatarId]) + getCollectionPoint(COID);
     }
 
     /**
@@ -465,6 +468,7 @@ contract MiningData is Multicall {
         uint32 LandId,
         uint256 amount
     ) internal {
+        amount *= 10 ** 8;
         settlePerMTAWMinted();
         mintCollectionMT(COID);
         uint256 onMapMTAW = mintAvatarMT(avatarId, LandId);
@@ -539,10 +543,6 @@ contract MiningData is Multicall {
         } else {
             totalMTPledge -= amount;
         }
-    }
-
-    function gettimestamp() public view returns (uint256) {
-        return block.timestamp;
     }
 
     modifier onlyCollectionVault(uint256 COID) {

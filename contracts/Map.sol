@@ -62,15 +62,13 @@ contract Map is Ownable, Multicall {
      * @param COID collection Id
      * @param tileCoordinate tile coordinate
      * @param LandId MOPN Land Id
-     * @param BombUsed avatar bomb used history number
      * @dev can only called by avatar contract
      */
     function avatarSet(
         uint256 avatarId,
         uint256 COID,
         uint32 tileCoordinate,
-        uint32 LandId,
-        uint256 BombUsed
+        uint32 LandId
     ) public onlyAvatar {
         require(getTileAvatar(tileCoordinate) == 0, "dst Occupied");
 
@@ -89,7 +87,8 @@ contract Map is Ownable, Multicall {
             );
         }
 
-        uint256 TileMTAW = tileCoordinate.getTileMTAW() + BombUsed;
+        uint256 TileMTAW = tileCoordinate.getTileMTAW() +
+            IAvatar(governance.avatarContract()).getAvatarBombUsed(avatarId);
 
         tiles[tileCoordinate] =
             (avatarId << 192) |

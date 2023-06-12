@@ -1,12 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "./interfaces/IAvatar.sol";
-import "./interfaces/IMap.sol";
-import "./interfaces/IAuctionHouse.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IBomb.sol";
-import "./interfaces/ILand.sol";
 import "./InitializedProxy.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
@@ -198,7 +194,10 @@ contract Governance is Multicall, Ownable {
         );
         CollectionVaultMap[COID] = vaultAddress;
         if (getCollectionMintedMT(COID) > 0) {
-            mintMT(vaultAddress, getCollectionMintedMT(COID));
+            IMOPNToken(mtContract).mint(
+                vaultAddress,
+                getCollectionMintedMT(COID)
+            );
             collectionMap[getCollectionContract(COID)] = uint192(
                 collectionMap[getCollectionContract(COID)]
             );
@@ -249,10 +248,6 @@ contract Governance is Multicall, Ownable {
 
     function burnBomb(address from, uint256 amount) public onlyAvatar {
         IBomb(bombContract).burn(from, 1, amount);
-    }
-
-    function redeemAgio() public {
-        IAuctionHouse(auctionHouseContract).redeemAgioTo(msg.sender);
     }
 
     modifier onlyAuctionHouse() {

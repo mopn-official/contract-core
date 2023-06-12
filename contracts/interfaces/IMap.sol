@@ -6,8 +6,7 @@ interface IMap {
         uint256 avatarId,
         uint256 COID,
         uint32 tileCoordinate,
-        uint32 LandId,
-        uint256 BombUsed
+        uint32 LandId
     ) external;
 
     function avatarRemove(

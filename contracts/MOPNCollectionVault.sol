@@ -4,13 +4,13 @@ pragma solidity ^0.8.9;
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IMiningData.sol";
+import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MOPNCollectionVault is ERC20, IERC721Receiver, Ownable {
+contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
     uint256 public COID;
 
     bool public isInitialized = false;
@@ -82,21 +82,6 @@ contract MOPNCollectionVault is ERC20, IERC721Receiver, Ownable {
         }
     }
 
-    function pledgeMT(uint256 amount) public {
-        IMiningData(IGovernance(governance).miningDataContract())
-            .calcCollectionMTAW(COID);
-
-        uint256 vtokenAmount = MT2VAmount(amount);
-        IMOPNToken(IGovernance(governance).mtContract()).transferFrom(
-            msg.sender,
-            address(this),
-            amount
-        );
-        _mint(msg.sender, vtokenAmount);
-        IMiningData(IGovernance(governance).miningDataContract())
-            .changeTotalMTPledge(COID, true, amount);
-    }
-
     function withdraw(uint256 amount) public {
         IMiningData(IGovernance(governance).miningDataContract())
             .calcCollectionMTAW(COID);
@@ -136,45 +121,32 @@ contract MOPNCollectionVault is ERC20, IERC721Receiver, Ownable {
     }
 
     function acceptNFTOffer(uint256 tokenId) public {
+        require(getOfferStatus() == 0, "last offer auction not finish");
+
         IERC721(IGovernance(governance).getCollectionContract(COID))
             .safeTransferFrom(msg.sender, address(this), tokenId, "0x");
-    }
-
-    /**
-     * @notice accept auction offer
-     */
-    function acceptAuctionOffer() public {
-        uint256 startTimestamp = getAuctionStartTimestamp();
-        require(block.timestamp >= startTimestamp, "auction not start");
-
-        uint256 price = getAuctionCurrentPrice();
-
-        if (price > 0) {
-            require(
-                IMOPNToken(IGovernance(governance).mtContract()).balanceOf(
-                    msg.sender
-                ) >= price,
-                "MOPNToken not enough"
-            );
-            IMOPNToken(IGovernance(governance).mtContract()).burnFrom(
-                msg.sender,
-                (price * 2) / 10
-            );
-
-            price = (price * 8) / 10;
-        }
 
         IMiningData(IGovernance(governance).miningDataContract())
             .calcCollectionMTAW(COID);
-        uint256 offerAcceptPrice = getOfferAcceptPrice();
-        if (price > offerAcceptPrice) {
+
+        uint256 offerPrice = (IMOPNToken(IGovernance(governance).mtContract())
+            .balanceOf(address(this)) *
             IMiningData(IGovernance(governance).miningDataContract())
-                .changeTotalMTPledge(COID, true, price - offerAcceptPrice);
-        } else if (price < offerAcceptPrice) {
-            IMiningData(IGovernance(governance).miningDataContract())
-                .changeTotalMTPledge(COID, false, offerAcceptPrice - price);
-        }
-        NFTOfferData = 0;
+                .NFTOfferCoefficient()) / 10 ** 18;
+
+        IMOPNToken(IGovernance(governance).mtContract()).transfer(
+            msg.sender,
+            offerPrice
+        );
+
+        NFTOfferData =
+            (tokenId << 97) |
+            (offerPrice << 33) |
+            (block.timestamp << 1) |
+            1;
+
+        IMiningData(IGovernance(governance).miningDataContract())
+            .NFTOfferAcceptNotify(offerPrice);
     }
 
     /**
@@ -198,42 +170,64 @@ contract MOPNCollectionVault is ERC20, IERC721Receiver, Ownable {
         return ABDKMath64x64.mulu(reducePower, getOfferAcceptPrice() * 2);
     }
 
-    function onERC721Received(
-        address operator,
+    function onERC20Received(
+        address,
         address from,
-        uint256 tokenId,
-        bytes calldata
+        uint256 value,
+        bytes calldata data
     ) public returns (bytes4) {
         require(
-            msg.sender == IGovernance(governance).getCollectionContract(COID),
-            "error collection"
+            msg.sender == IGovernance(governance).mtContract(),
+            "only accept mopn token"
         );
-        require(operator == address(this), "not allowed");
 
-        require(getOfferStatus() == 0, "last offer auction not finish");
+        if (bytes32(data) == keccak256("acceptAuctionBid")) {
+            require(getOfferStatus() == 1, "auction not exist");
 
-        IMiningData(IGovernance(governance).miningDataContract())
-            .calcCollectionMTAW(COID);
+            uint256 startTimestamp = getAuctionStartTimestamp();
+            require(block.timestamp >= startTimestamp, "auction not start");
 
-        uint256 offerPrice = (IMOPNToken(IGovernance(governance).mtContract())
-            .balanceOf(address(this)) *
+            uint256 price = getAuctionCurrentPrice();
+
+            require(value >= price, "MOPNToken not enough");
+
+            if (price > 0) {
+                uint256 burnAmount = (price * 2) / 10;
+                IMOPNToken(IGovernance(governance).mtContract()).burn(
+                    burnAmount
+                );
+
+                price = price - burnAmount;
+            }
+
+            if (value > price) {
+                IMOPNToken(IGovernance(governance).mtContract()).transfer(
+                    from,
+                    value - price
+                );
+            }
+
             IMiningData(IGovernance(governance).miningDataContract())
-                .NFTOfferCoefficient()) / 10 ** 18;
+                .calcCollectionMTAW(COID);
+            uint256 offerAcceptPrice = getOfferAcceptPrice();
+            if (price > offerAcceptPrice) {
+                IMiningData(IGovernance(governance).miningDataContract())
+                    .changeTotalMTPledge(COID, true, price - offerAcceptPrice);
+            } else if (price < offerAcceptPrice) {
+                IMiningData(IGovernance(governance).miningDataContract())
+                    .changeTotalMTPledge(COID, false, offerAcceptPrice - price);
+            }
+            NFTOfferData = 0;
+        } else {
+            IMiningData(IGovernance(governance).miningDataContract())
+                .calcCollectionMTAW(COID);
 
-        IMOPNToken(IGovernance(governance).mtContract()).transfer(
-            from,
-            offerPrice
-        );
+            uint256 vtokenAmount = MT2VAmount(value);
+            _mint(from, vtokenAmount);
+            IMiningData(IGovernance(governance).miningDataContract())
+                .changeTotalMTPledge(COID, true, value);
+        }
 
-        NFTOfferData =
-            (tokenId << 97) |
-            (offerPrice << 33) |
-            (block.timestamp << 1) |
-            1;
-
-        IMiningData(IGovernance(governance).miningDataContract())
-            .NFTOfferAcceptNotify(offerPrice);
-
-        return IERC721Receiver.onERC721Received.selector;
+        return IERC20Receiver.onERC20Received.selector;
     }
 }

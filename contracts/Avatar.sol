@@ -316,8 +316,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
             avatarId,
             COID,
             tileCoordinate,
-            LandId,
-            getAvatarBombUsed(avatarId)
+            LandId
         );
 
         setAvatarCoordinate(avatarId, tileCoordinate);
