@@ -22,11 +22,7 @@ contract Map is Ownable, Multicall {
 
     IGovernance public governance;
 
-    function getGovernanceContract() public view returns (address) {
-        return address(governance);
-    }
-
-    function setGovernanceContract(address governance_) public onlyOwner {
+    constructor(address governance_) {
         governance = IGovernance(governance_);
     }
 

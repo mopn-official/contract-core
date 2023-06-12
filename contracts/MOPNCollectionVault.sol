@@ -15,7 +15,7 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
 
     bool public isInitialized = false;
 
-    address public immutable governance;
+    IGovernance public immutable governance;
 
     /**
      * @notice NFTOfferData
@@ -28,7 +28,7 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
     uint256 public NFTOfferData;
 
     constructor(address governance_) ERC20("MOPN V-Token", "MVT") {
-        governance = governance_;
+        governance = IGovernance(governance_);
     }
 
     function getOfferStatus() public view returns (uint256) {
@@ -61,9 +61,7 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /
-                IMOPNToken(IGovernance(governance).mtContract()).balanceOf(
-                    address(this)
-                );
+                IMOPNToken(governance.mtContract()).balanceOf(address(this));
         }
     }
 
@@ -71,50 +69,47 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
         uint256 VAmount
     ) public view returns (uint256 MTAmount) {
         if (VAmount == totalSupply()) {
-            MTAmount = IMOPNToken(IGovernance(governance).mtContract())
-                .balanceOf(address(this));
+            MTAmount = IMOPNToken(governance.mtContract()).balanceOf(
+                address(this)
+            );
         } else {
             MTAmount =
-                (IMOPNToken(IGovernance(governance).mtContract()).balanceOf(
-                    address(this)
-                ) * VAmount) /
+                (IMOPNToken(governance.mtContract()).balanceOf(address(this)) *
+                    VAmount) /
                 totalSupply();
         }
     }
 
     function withdraw(uint256 amount) public {
-        IMiningData(IGovernance(governance).miningDataContract())
-            .calcCollectionMTAW(COID);
+        IMiningData(governance.miningDataContract()).calcCollectionMTAW(COID);
         uint256 mtAmount = V2MTAmount(amount);
         require(mtAmount > 0, "zero to withdraw");
-        IMOPNToken(IGovernance(governance).mtContract()).transferFrom(
+        IMOPNToken(governance.mtContract()).transferFrom(
             address(this),
             msg.sender,
             mtAmount
         );
         _burn(msg.sender, amount);
-        IMiningData(IGovernance(governance).miningDataContract())
-            .changeTotalMTPledge(COID, false, mtAmount);
+        IMiningData(governance.miningDataContract()).changeTotalMTPledge(
+            COID,
+            false,
+            mtAmount
+        );
     }
 
     function getNFTOfferPrice() public view returns (uint256) {
-        uint256 amount = IMiningData(
-            IGovernance(governance).miningDataContract()
-        ).getCollectionInboxMT(COID) +
-            IMOPNToken(IGovernance(governance).mtContract()).balanceOf(
-                address(this)
-            );
+        uint256 amount = IMiningData(governance.miningDataContract())
+            .getCollectionInboxMT(COID) +
+            IMOPNToken(governance.mtContract()).balanceOf(address(this));
 
         return
             (amount *
-                IMiningData(IGovernance(governance).miningDataContract())
+                IMiningData(governance.miningDataContract())
                     .NFTOfferCoefficient()) / 10 ** 18;
     }
 
     function MTBalance() public view returns (uint256 balance) {
-        balance = IMOPNToken(IGovernance(governance).mtContract()).balanceOf(
-            address(this)
-        );
+        balance = IMOPNToken(governance.mtContract()).balanceOf(address(this));
         if (getOfferStatus() == 1) {
             balance += getOfferAcceptPrice();
         }
@@ -123,21 +118,22 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
     function acceptNFTOffer(uint256 tokenId) public {
         require(getOfferStatus() == 0, "last offer auction not finish");
 
-        IERC721(IGovernance(governance).getCollectionContract(COID))
-            .safeTransferFrom(msg.sender, address(this), tokenId, "0x");
+        IERC721(governance.getCollectionContract(COID)).safeTransferFrom(
+            msg.sender,
+            address(this),
+            tokenId,
+            "0x"
+        );
 
-        IMiningData(IGovernance(governance).miningDataContract())
-            .calcCollectionMTAW(COID);
+        IMiningData(governance.miningDataContract()).calcCollectionMTAW(COID);
 
-        uint256 offerPrice = (IMOPNToken(IGovernance(governance).mtContract())
-            .balanceOf(address(this)) *
-            IMiningData(IGovernance(governance).miningDataContract())
+        uint256 offerPrice = (IMOPNToken(governance.mtContract()).balanceOf(
+            address(this)
+        ) *
+            IMiningData(governance.miningDataContract())
                 .NFTOfferCoefficient()) / 10 ** 18;
 
-        IMOPNToken(IGovernance(governance).mtContract()).transfer(
-            msg.sender,
-            offerPrice
-        );
+        IMOPNToken(governance.mtContract()).transfer(msg.sender, offerPrice);
 
         NFTOfferData =
             (tokenId << 97) |
@@ -145,8 +141,9 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
             (block.timestamp << 1) |
             1;
 
-        IMiningData(IGovernance(governance).miningDataContract())
-            .NFTOfferAcceptNotify(offerPrice);
+        IMiningData(governance.miningDataContract()).NFTOfferAcceptNotify(
+            offerPrice
+        );
     }
 
     /**
@@ -177,7 +174,7 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
         bytes calldata data
     ) public returns (bytes4) {
         require(
-            msg.sender == IGovernance(governance).mtContract(),
+            msg.sender == governance.mtContract(),
             "only accept mopn token"
         );
 
@@ -193,39 +190,42 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
 
             if (price > 0) {
                 uint256 burnAmount = (price * 2) / 10;
-                IMOPNToken(IGovernance(governance).mtContract()).burn(
-                    burnAmount
-                );
+                IMOPNToken(governance.mtContract()).burn(burnAmount);
 
                 price = price - burnAmount;
             }
 
             if (value > price) {
-                IMOPNToken(IGovernance(governance).mtContract()).transfer(
+                IMOPNToken(governance.mtContract()).transfer(
                     from,
                     value - price
                 );
             }
 
-            IMiningData(IGovernance(governance).miningDataContract())
-                .calcCollectionMTAW(COID);
+            IMiningData(governance.miningDataContract()).calcCollectionMTAW(
+                COID
+            );
             uint256 offerAcceptPrice = getOfferAcceptPrice();
             if (price > offerAcceptPrice) {
-                IMiningData(IGovernance(governance).miningDataContract())
+                IMiningData(governance.miningDataContract())
                     .changeTotalMTPledge(COID, true, price - offerAcceptPrice);
             } else if (price < offerAcceptPrice) {
-                IMiningData(IGovernance(governance).miningDataContract())
+                IMiningData(governance.miningDataContract())
                     .changeTotalMTPledge(COID, false, offerAcceptPrice - price);
             }
             NFTOfferData = 0;
         } else {
-            IMiningData(IGovernance(governance).miningDataContract())
-                .calcCollectionMTAW(COID);
+            IMiningData(governance.miningDataContract()).calcCollectionMTAW(
+                COID
+            );
 
             uint256 vtokenAmount = MT2VAmount(value);
             _mint(from, vtokenAmount);
-            IMiningData(IGovernance(governance).miningDataContract())
-                .changeTotalMTPledge(COID, true, value);
+            IMiningData(governance.miningDataContract()).changeTotalMTPledge(
+                COID,
+                true,
+                value
+            );
         }
 
         return IERC20Receiver.onERC20Received.selector;

@@ -12,7 +12,7 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev This Contract's owner must transfer to Governance Contract once it's deployed
 contract AuctionHouse is Multicall, Ownable {
-    address public governanceContract;
+    IGovernance public governance;
 
     uint8 public immutable bombRoundProduce = 100;
 
@@ -73,22 +73,16 @@ contract AuctionHouse is Multicall, Ownable {
 
     uint256 private constant _BITPOS_LAND_ROUNDID = 32;
 
-    constructor(uint256 bombStartTimestamp, uint256 landStartTimestamp) {
+    constructor(
+        address governance_,
+        uint256 bombStartTimestamp,
+        uint256 landStartTimestamp
+    ) {
+        governance = IGovernance(governance_);
         bombRound =
             (uint256(1) << _BITPOS_ROUNDID) |
             (bombStartTimestamp << _BITPOS_STARTTIMESTAMP);
         landRound = (uint256(1) << _BITPOS_LAND_ROUNDID) | landStartTimestamp;
-    }
-
-    /**
-     * @dev set the governance contract address
-     * @dev this function also get the mopn token contract from the governances
-     * @param governanceContract_ Governance Contract Address
-     */
-    function setGovernanceContract(
-        address governanceContract_
-    ) public onlyOwner {
-        governanceContract = governanceContract_;
     }
 
     /**
@@ -109,15 +103,18 @@ contract AuctionHouse is Multicall, Ownable {
 
         if (price > 0) {
             require(
-                IMOPNToken(IGovernance(governanceContract).mtContract())
-                    .balanceOf(msg.sender) > price,
+                IMOPNToken(governance.mtContract()).balanceOf(msg.sender) >
+                    price,
                 "mopn token not enough"
             );
-            IMOPNToken(IGovernance(governanceContract).mtContract())
-                .transferFrom(msg.sender, address(this), price);
+            IMOPNToken(governance.mtContract()).transferFrom(
+                msg.sender,
+                address(this),
+                price
+            );
         }
 
-        IGovernance(governanceContract).mintBomb(msg.sender, amount);
+        governance.mintBomb(msg.sender, amount);
 
         bombWalletData[msg.sender] =
             ((getBombWalletTotalSpend(msg.sender) + price) <<
@@ -267,10 +264,7 @@ contract AuctionHouse is Multicall, Ownable {
         (uint256 agio, uint64 roundId) = getAgio(to);
         if (agio > 0) {
             bombWalletData[to] = 0;
-            IMOPNToken(IGovernance(governanceContract).mtContract()).transfer(
-                to,
-                agio
-            );
+            IMOPNToken(governance.mtContract()).transfer(to, agio);
             emit RedeemAgio(to, roundId, agio);
         }
     }
@@ -282,9 +276,7 @@ contract AuctionHouse is Multicall, Ownable {
         bombRoundData[roundId] = price;
         if (price > 0) {
             price = price * bombRoundProduce;
-            IMOPNToken(IGovernance(governanceContract).mtContract()).burn(
-                price
-            );
+            IMOPNToken(governance.mtContract()).burn(price);
         }
         bombRound =
             (uint256(roundId + 1) << _BITPOS_ROUNDID) |
@@ -315,20 +307,14 @@ contract AuctionHouse is Multicall, Ownable {
 
         if (price > 0) {
             require(
-                IMOPNToken(IGovernance(governanceContract).mtContract())
-                    .balanceOf(msg.sender) > price,
+                IMOPNToken(governance.mtContract()).balanceOf(msg.sender) >
+                    price,
                 "MOPNToken not enough"
             );
-            IMOPNToken(IGovernance(governanceContract).mtContract()).burnFrom(
-                msg.sender,
-                price
-            );
+            IMOPNToken(governance.mtContract()).burnFrom(msg.sender, price);
         }
 
-        ILand(IGovernance(governanceContract).landContract()).auctionMint(
-            msg.sender,
-            1
-        );
+        ILand(governance.landContract()).auctionMint(msg.sender, 1);
 
         landRound =
             (uint256(roundId + 1) << _BITPOS_LAND_ROUNDID) |

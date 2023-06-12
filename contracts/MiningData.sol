@@ -53,7 +53,7 @@ contract MiningData is Multicall {
 
     IGovernance public governance;
 
-    constructor(uint256 MTProduceStartTimestamp_, address governance_) {
+    constructor(address governance_, uint256 MTProduceStartTimestamp_) {
         MTProduceStartTimestamp = MTProduceStartTimestamp_;
         governance = IGovernance(governance_);
         NFTOfferCoefficient = 10 ** 18;
