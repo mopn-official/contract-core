@@ -47,16 +47,16 @@ function LandCenterTile(uint32 LandId) public pure returns (uint32 tileCoordinat
 function LandTileRange(uint32 tileCoordinate) public pure returns (uint32[], uint32[])
 ```
 
-### getLandTilesMTAW
+### getLandTilesPoint
 
 ```solidity
-function getLandTilesMTAW(uint32 LandId) public pure returns (uint256[])
+function getLandTilesPoint(uint32 LandId) public pure returns (uint256[])
 ```
 
-### getTileMTAW
+### getTilePoint
 
 ```solidity
-function getTileMTAW(uint32 tileCoordinate) public pure returns (uint256)
+function getTilePoint(uint32 tileCoordinate) public pure returns (uint256)
 ```
 
 ### coordinateIntToArr
@@ -106,4 +106,3 @@ function distance(uint32 a, uint32 b) public pure returns (uint32 d)
 ```solidity
 function coordinateToXY(uint32 tileCoordinate) public pure returns (struct TileMath.XYCoordinate xycoordinate)
 ```
-

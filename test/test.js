@@ -8,8 +8,10 @@ describe("MOPN", function () {
     governance,
     auctionHouse,
     avatar,
-    map,
     bomb,
+    map,
+    miningData,
+    collectionVault,
     mt,
     mtdecimals,
     land,
@@ -93,9 +95,15 @@ describe("MOPN", function () {
     console.log("MOPNToken", mt.address);
 
     mtdecimals = await mt.decimals();
+    console.log("mtdecimals", mtdecimals);
   });
 
   it("deploy MOPN contracts", async function () {
+    const Governance = await ethers.getContractFactory("Governance");
+    governance = await Governance.deploy();
+    await governance.deployed();
+    console.log("Governance", governance.address);
+
     const unixTimeStamp = Math.floor(Date.now() / 1000) - 73200;
 
     const AuctionHouse = await ethers.getContractFactory("AuctionHouse");
@@ -104,7 +112,6 @@ describe("MOPN", function () {
     console.log("AuctionHouse", auctionHouse.address);
 
     console.log(unixTimeStamp);
-    console.log(await auctionHouse.gettimestamp());
 
     console.log("raw data", await auctionHouse.bombRound());
 
@@ -126,14 +133,19 @@ describe("MOPN", function () {
         TileMath: tileMath.address,
       },
     });
-    map = await Map.deploy(unixTimeStamp);
+    map = await Map.deploy();
     await map.deployed();
     console.log("Map", map.address);
 
-    const Governance = await ethers.getContractFactory("Governance");
-    governance = await Governance.deploy();
-    await governance.deployed();
-    console.log("Governance", governance.address);
+    const MiningData = await ethers.getContractFactory("MiningData");
+    miningData = await MiningData.deploy(unixTimeStamp, governance.address);
+    await miningData.deployed();
+    console.log("MiningData", miningData.address);
+
+    const MOPNCollectionVault = await ethers.getContractFactory("MOPNCollectionVault");
+    collectionVault = await MOPNCollectionVault.deploy(governance.address);
+    await collectionVault.deployed();
+    console.log("MOPNCollectionVault", collectionVault.address);
   });
 
   it("transfer contract owners", async function () {
@@ -159,7 +171,9 @@ describe("MOPN", function () {
       bomb.address,
       mt.address,
       map.address,
-      land.address
+      land.address,
+      miningData.address,
+      collectionVault.address
     );
     await governancesetmopntx.wait();
 
@@ -269,6 +283,8 @@ describe("MOPN", function () {
     await moveToTx.wait();
 
     await avatarInfo();
+
+    await new Promise((r) => setTimeout(r, 5000));
   });
 
   it("test redeemAvatarInboxMT", async function () {
@@ -277,18 +293,18 @@ describe("MOPN", function () {
       ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
     );
 
-    const redeemMTTx = await governance.redeemAvatarInboxMT(1, 0, address0);
+    const redeemMTTx = await miningData.redeemAvatarInboxMT(1, 0, address0);
     await redeemMTTx.wait();
 
-    const multi10Tx = await governance.multicall([
-      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [2, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [3, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [4, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [5, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [6, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [7, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [8, 0, address0]),
-      governance.interface.encodeFunctionData("redeemAvatarInboxMT", [9, 0, address0]),
+    const multi10Tx = await miningData.multicall([
+      miningData.interface.encodeFunctionData("redeemAvatarInboxMT", [2, 0, address0]),
+      miningData.interface.encodeFunctionData("redeemAvatarInboxMT", [3, 0, address0]),
+      miningData.interface.encodeFunctionData("redeemAvatarInboxMT", [4, 0, address0]),
+      miningData.interface.encodeFunctionData("redeemAvatarInboxMT", [5, 0, address0]),
+      miningData.interface.encodeFunctionData("redeemAvatarInboxMT", [6, 0, address0]),
+      miningData.interface.encodeFunctionData("redeemAvatarInboxMT", [7, 0, address0]),
+      miningData.interface.encodeFunctionData("redeemAvatarInboxMT", [8, 0, address0]),
+      miningData.interface.encodeFunctionData("redeemAvatarInboxMT", [9, 0, address0]),
     ]);
     await multi10Tx.wait();
 
@@ -330,21 +346,21 @@ describe("MOPN", function () {
     );
   });
 
-  it("test auction land", async function () {
-    console.log("Current Land round", await auctionHouse.getLandRoundId());
-    console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
+  // it("test auction land", async function () {
+  //   console.log("Current Land round", await auctionHouse.getLandRoundId());
+  //   console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
 
-    const buylandtx = await auctionHouse.buyLand();
-    await buylandtx.wait();
+  //   const buylandtx = await auctionHouse.buyLand();
+  //   await buylandtx.wait();
 
-    console.log("Current Land round", await auctionHouse.getLandRoundId());
-    console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
+  //   console.log("Current Land round", await auctionHouse.getLandRoundId());
+  //   console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
 
-    console.log(
-      "wallet balance",
-      ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
-    );
-  });
+  //   console.log(
+  //     "wallet balance",
+  //     ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
+  //   );
+  // });
 
   it("test bomb", async function () {
     await collectionInfo();
@@ -388,7 +404,36 @@ describe("MOPN", function () {
     );
   });
 
+  it("test pledgeMT", async function () {
+    const tx1 = await governance.createCollectionVault(1);
+    await tx1.wait();
+
+    const vault1adddress = await governance.getCollectionVault(1);
+    const vault1 = await ethers.getContractAt("MOPNCollectionVault", vault1adddress);
+
+    const allowanceTx = await mt.approve(
+      vault1.address,
+      ethers.BigNumber.from("10000000000000000")
+    );
+    await allowanceTx.wait();
+
+    console.log(await miningData.getAvatarPoint(1));
+
+    const tx2 = await mt.safeTransferFrom(
+      owner.address,
+      vault1.address,
+      ethers.BigNumber.from("500000000000"),
+      "0x"
+    );
+    await tx2.wait();
+
+    console.log(await miningData.getAvatarPoint(1));
+
+    await collectionInfo();
+  });
+
   const avatarInfo = async () => {
+    console.log("total Point", (await miningData.getTotalPoints()).toString());
     for (let i = 1; i <= 10; i++) {
       console.log(
         "avatarId",
@@ -399,8 +444,10 @@ describe("MOPN", function () {
         await avatar.getAvatarCoordinate(i),
         "getAvatarBombUsed",
         (await avatar.getAvatarBombUsed(i)).toString(),
+        "getAvatarPoint",
+        (await miningData.getAvatarPoint(i)).toString(),
         "getAvatarInboxMT",
-        ethers.utils.formatUnits(await map.getAvatarInboxMT(i), mtdecimals)
+        ethers.utils.formatUnits(await miningData.getAvatarInboxMT(i), mtdecimals)
       );
     }
   };
@@ -416,7 +463,9 @@ describe("MOPN", function () {
         "minted avatar number",
         (await governance.getCollectionAvatarNum(i)).toString(),
         "on map avatar number",
-        (await governance.getCollectionOnMapNum(i)).toString()
+        (await governance.getCollectionOnMapNum(i)).toString(),
+        "collection points",
+        (await miningData.getCollectionPoint(i)).toString()
       );
     }
   };

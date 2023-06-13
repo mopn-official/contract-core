@@ -3,25 +3,26 @@ pragma solidity ^0.8.9;
 
 import "./interfaces/ILandMetaDataRender.sol";
 import "./interfaces/IMap.sol";
+import "./interfaces/IMiningData.sol";
 import "./interfaces/IGovernance.sol";
 import "./libraries/NFTMetaData.sol";
 
 contract LandMetaDataRender is ILandMetaDataRender {
-    address public governanceContract;
+    IGovernance public governance;
 
     /**
      * @dev set the governance contract address
      * @dev this function also get the Map contract from the governances
-     * @param governanceContract_ Governance Contract Address
+     * @param governance_ Governance Contract Address
      */
-    function setGovernanceContract(address governanceContract_) public {
-        governanceContract = governanceContract_;
+    constructor(address governance_) {
+        governance = IGovernance(governance_);
     }
 
     function constructTokenURI(
         uint256 LandId_
     ) public view returns (string memory) {
-        IMap map = IMap(IGovernance(governanceContract).mapContract());
+        IMap map = IMap(governance.mapContract());
 
         uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
@@ -30,7 +31,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
             tileCoordinate
         );
 
-        tileDatas[0].tileMTAW = TileMath.getTileMTAW(tileCoordinate);
+        tileDatas[0].tileNFTPoint = TileMath.getTileNFTPoint(tileCoordinate);
         uint256 COID = map.getTileCOID(tileCoordinate);
         if (COID > 0) {
             tileDatas[0].color = COID;
@@ -50,7 +51,7 @@ contract LandMetaDataRender is ILandMetaDataRender {
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
                     index = preringblocks + j * i + k + 1;
-                    tileDatas[index].tileMTAW = TileMath.getTileMTAW(
+                    tileDatas[index].tileNFTPoint = TileMath.getTileNFTPoint(
                         tileCoordinate
                     );
                     COID = map.getTileCOID(tileCoordinate);
@@ -123,12 +124,13 @@ contract LandMetaDataRender is ILandMetaDataRender {
             }
         }
 
+        IMiningData miningData = IMiningData(governance.miningDataContract());
         return
             NFTMetaData.constructTokenURI(
                 LandId,
                 tileDatas,
-                ((map.getLandHolderTotalMinted(LandId) +
-                    map.getLandHolderInboxMT(LandId)) / 10 ** 8)
+                ((miningData.getLandHolderTotalMinted(LandId) +
+                    miningData.getLandHolderInboxMT(LandId)) / 10 ** 8)
             );
     }
 }

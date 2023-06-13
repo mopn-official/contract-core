@@ -10,12 +10,6 @@ async function main() {
     return;
   }
 
-  const deployPeripheryConf = loadPeripheryConf(network);
-  if (!deployPeripheryConf) {
-    console.log("no deploy Periphery config for network " + network);
-    return;
-  }
-
   let config = {
     thegraph: thegraphbase + network,
     network: network,
@@ -35,14 +29,6 @@ async function main() {
     config.contracts[contractName] = "";
     if (deployConf[deployConf.contracts[i]].address) {
       config.contracts[contractName] = deployConf[deployConf.contracts[i]].address;
-    }
-  }
-
-  for (let i = 0; i < deployPeripheryConf.contracts.length; i++) {
-    contractName = deployPeripheryConf.contracts[i];
-    config.contracts[contractName] = "";
-    if (deployPeripheryConf[contractName].address) {
-      config.contracts[contractName] = deployPeripheryConf[contractName].address;
     }
   }
 
@@ -79,9 +65,14 @@ function loadPeripheryConf(network) {
 }
 
 function saveConfig(config, network) {
-  fs.writeFile("./configs/" + network + ".json", JSON.stringify(config), "utf8", function (err) {
-    if (err) throw err;
-  });
+  fs.writeFile(
+    "./configs/" + network + ".json",
+    JSON.stringify(config, null, 4),
+    "utf8",
+    function (err) {
+      if (err) throw err;
+    }
+  );
 }
 
 main().catch((error) => {

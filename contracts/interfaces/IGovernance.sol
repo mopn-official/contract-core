@@ -4,26 +4,6 @@ pragma solidity ^0.8.17;
 import "./IAvatar.sol";
 
 interface IGovernance {
-    /**
-     * @notice redeem avatar unclaimed minted MOPN Tokens
-     * @param avatarId avatar Id
-     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
-     * @param vault cold wallet address
-     */
-    function redeemAvatarInboxMT(
-        uint256 avatarId,
-        IAvatar.DelegateWallet delegateWallet,
-        address vault
-    ) external;
-
-    function redeemCollectionInboxMT(
-        address to,
-        uint256 avatarId,
-        uint256 COID
-    ) external;
-
-    function redeemLandHolderInboxMT(uint32 LandId) external;
-
     function getCollectionContract(
         uint256 COID
     ) external view returns (address);
@@ -68,6 +48,8 @@ interface IGovernance {
 
     function addCollectionMintedMT(uint256 COID, uint256 amount) external;
 
+    function clearCollectionMintedMT(uint256 COID) external;
+
     function getCollectionVault(uint256 COID) external view returns (address);
 
     function mintMT(address to, uint256 amount) external;
@@ -75,10 +57,6 @@ interface IGovernance {
     function mintBomb(address to, uint256 amount) external;
 
     function burnBomb(address from, uint256 amount) external;
-
-    function redeemAgio() external;
-
-    function mintLand(address to) external;
 
     function auctionHouseContract() external view returns (address);
 
