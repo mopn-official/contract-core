@@ -1,1 +1,163 @@
-{"blockScanUrl":"https://goerli.etherscan.io/","contracts":["TileMath","NFTSVG","NFTMetaData","Governance","AuctionHouse","Avatar","Bomb","LandMetaDataRender","Map","MiningData","MOPNCollectionVault","MOPNLandMirror","MOPNToken","MOPNTESTNFT"],"TileMath":{"address":"0xf7BC3a0dE9cC7f1a5305392C785fAfb6D80dF531","verified":true},"NFTSVG":{"address":"0x29e07660d43Ef4dA7114aBadfeCBe22D500414c2","verified":true},"NFTMetaData":{"address":"0x2a353bf8E4090A3Bbd3181464ea2Ab71a5D60fD4","verified":true,"libraries":["TileMath","NFTSVG"]},"Governance":{"address":"0xeeC951D7f213F081263e0721CCB8a973caC62D62","verified":true,"attributesCheck":[{"expectValue":["AuctionHouse","Avatar","Bomb","MOPNToken","Map","MOPNLandMirror","MiningData","MOPNCollectionVault"],"attributes":["auctionHouseContract","avatarContract","bombContract","mtContract","mapContract","landContract","miningDataContract","mopnCollectionVaultContract"],"updateMethod":"updateMOPNContracts"}]},"AuctionHouse":{"address":"0x7f9DA0C24512669ACdb6fd11a96a931e40C3e00b","verified":true,"constructparams":["0xeeC951D7f213F081263e0721CCB8a973caC62D62",1684339200,1684339200]},"Avatar":{"address":"0x4432860f9731F5A2029E07815ADc1839218463d7","verified":true,"libraries":["TileMath"],"constructparams":["0xeeC951D7f213F081263e0721CCB8a973caC62D62"]},"Bomb":{"address":"0xF28888a911F1b034BB10f15f5341513B852846AA","verified":true,"transOwnerTo":"Governance"},"LandMetaDataRender":{"address":"0x7f1d14E5446e353B92b97fd636C778eD274B8218","verified":true,"libraries":["TileMath","NFTMetaData"],"attributesCheck":[{"expectValue":["Governance"],"attributes":["governanceContract"],"updateMethod":"setGovernanceContract"}]},"Map":{"address":"0xaa83e0004fE51d60C689979f7CF8032A72fDCf06","verified":false,"libraries":["TileMath"],"constructparams":["0xeeC951D7f213F081263e0721CCB8a973caC62D62"]},"MiningData":{"address":"0x1E283Aa5B00595940840233220c38E968b7f8FF7","verified":true,"constructparams":["0xeeC951D7f213F081263e0721CCB8a973caC62D62",1683828189]},"MOPNCollectionVault":{"address":"0x7ced4F6a0F81C26D2bFcF92A915F95427E1781A2","verified":true,"constructparams":["0xeeC951D7f213F081263e0721CCB8a973caC62D62"]},"MOPNLandMirror":{"address":"0x47AB1cda4662900173A7E3DC4E2538a02C059e22","verified":true,"attributesCheck":[{"expectValue":["LandMetaDataRender"],"attributes":["metadataRenderAddress"],"updateMethod":"setRender"}]},"MOPNToken":{"address":"0x7975a21f34F22C942b7e08D724a854c8Fa730bE9","verified":true,"transOwnerTo":"Governance"},"MOPNTESTNFT":{"address":"0xdEa71568724007fFeF75fD2DC5fBc1858B5C7825","verified":true,"constructparams":["MOPN Color Cat","MOPNMColorCat","https://tokenuriproxy.chainsync.network/mopntestnfts/5/"]}}
+{
+    "blockScanUrl": "https://goerli.etherscan.io/",
+    "contracts": [
+        "TileMath",
+        "NFTSVG",
+        "NFTMetaData",
+        "Governance",
+        "AuctionHouse",
+        "Avatar",
+        "Bomb",
+        "LandMetaDataRender",
+        "Map",
+        "MiningData",
+        "MOPNCollectionVault",
+        "MOPNLandMirror",
+        "MOPNToken",
+        "MopnBatchHelper",
+        "MopnDataHelper",
+        "MOPNTESTNFT"
+    ],
+    "TileMath": {
+        "address": "0xf7BC3a0dE9cC7f1a5305392C785fAfb6D80dF531",
+        "verified": true
+    },
+    "NFTSVG": {
+        "address": "0x29e07660d43Ef4dA7114aBadfeCBe22D500414c2",
+        "verified": true
+    },
+    "NFTMetaData": {
+        "address": "0x2a353bf8E4090A3Bbd3181464ea2Ab71a5D60fD4",
+        "verified": true,
+        "libraries": [
+            "TileMath",
+            "NFTSVG"
+        ]
+    },
+    "Governance": {
+        "address": "0xeeC951D7f213F081263e0721CCB8a973caC62D62",
+        "verified": true,
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "AuctionHouse",
+                    "Avatar",
+                    "Bomb",
+                    "MOPNToken",
+                    "Map",
+                    "MOPNLandMirror",
+                    "MiningData",
+                    "MOPNCollectionVault"
+                ],
+                "attributes": [
+                    "auctionHouseContract",
+                    "avatarContract",
+                    "bombContract",
+                    "mtContract",
+                    "mapContract",
+                    "landContract",
+                    "miningDataContract",
+                    "mopnCollectionVaultContract"
+                ],
+                "updateMethod": "updateMOPNContracts"
+            }
+        ]
+    },
+    "AuctionHouse": {
+        "address": "0x7f9DA0C24512669ACdb6fd11a96a931e40C3e00b",
+        "verified": true,
+        "constructparams": [
+            "0xeeC951D7f213F081263e0721CCB8a973caC62D62",
+            1684339200,
+            1684339200
+        ]
+    },
+    "Avatar": {
+        "address": "0x4432860f9731F5A2029E07815ADc1839218463d7",
+        "verified": true,
+        "libraries": [
+            "TileMath"
+        ],
+        "constructparams": [
+            "0xeeC951D7f213F081263e0721CCB8a973caC62D62"
+        ]
+    },
+    "Bomb": {
+        "address": "0xF28888a911F1b034BB10f15f5341513B852846AA",
+        "verified": true,
+        "transOwnerTo": "Governance"
+    },
+    "LandMetaDataRender": {
+        "address": "0x7f1d14E5446e353B92b97fd636C778eD274B8218",
+        "verified": true,
+        "libraries": [
+            "TileMath",
+            "NFTMetaData"
+        ],
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "Governance"
+                ],
+                "attributes": [
+                    "governanceContract"
+                ],
+                "updateMethod": "setGovernanceContract"
+            }
+        ]
+    },
+    "Map": {
+        "address": "0xaa83e0004fE51d60C689979f7CF8032A72fDCf06",
+        "verified": false,
+        "libraries": [
+            "TileMath"
+        ],
+        "constructparams": [
+            "0xeeC951D7f213F081263e0721CCB8a973caC62D62"
+        ]
+    },
+    "MiningData": {
+        "address": "0x1E283Aa5B00595940840233220c38E968b7f8FF7",
+        "verified": true,
+        "constructparams": [
+            "0xeeC951D7f213F081263e0721CCB8a973caC62D62",
+            1683828189
+        ]
+    },
+    "MOPNCollectionVault": {
+        "address": "0x7ced4F6a0F81C26D2bFcF92A915F95427E1781A2",
+        "verified": true,
+        "constructparams": [
+            "0xeeC951D7f213F081263e0721CCB8a973caC62D62"
+        ]
+    },
+    "MOPNLandMirror": {
+        "address": "0x47AB1cda4662900173A7E3DC4E2538a02C059e22",
+        "verified": true,
+        "attributesCheck": [
+            {
+                "expectValue": [
+                    "LandMetaDataRender"
+                ],
+                "attributes": [
+                    "metadataRenderAddress"
+                ],
+                "updateMethod": "setRender"
+            }
+        ]
+    },
+    "MOPNToken": {
+        "address": "0x7975a21f34F22C942b7e08D724a854c8Fa730bE9",
+        "verified": true,
+        "transOwnerTo": "Governance"
+    },
+    "MOPNTESTNFT": {
+        "address": "0xdEa71568724007fFeF75fD2DC5fBc1858B5C7825",
+        "verified": true,
+        "constructparams": [
+            "MOPN Color Cat",
+            "MOPNMColorCat",
+            "https://tokenuriproxy.chainsync.network/mopntestnfts/5/"
+        ]
+    }
+}

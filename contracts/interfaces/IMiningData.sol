@@ -1,55 +1,62 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "./IAvatar.sol";
+
 interface IMiningData {
+    function getNFTOfferCoefficient() external view returns (uint256);
+
     /**
      * add on map mining mopn token allocation weight
      * @param avatarId avatar Id
      * @param COID collection Id
-     * @param LandId mopn Land Id
      * @param amount EAW amount
      */
-    function addMTAW(
+    function addNFTPoint(
         uint256 avatarId,
         uint256 COID,
-        uint32 LandId,
         uint256 amount
     ) external;
 
-    function subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) external;
+    function subNFTPoint(uint256 avatarId, uint256 COID) external;
 
-    function settlePerMTAWMinted() external;
+    function settlePerNFTPointMinted() external;
 
-    function mintAvatarMT(uint256 avatarId) external;
-
-    function claimAvatarSettledIndexMT(
-        uint256 avatarId
-    ) external returns (uint256 amount);
-
-    function getAvatarInboxMT(
-        uint256 avatarId
-    ) external view returns (uint256 inbox);
-
-    function getAvatarTotalMinted(
+    function getAvatarNFTPoint(
         uint256 avatarId
     ) external view returns (uint256);
 
-    function getAvatarMTAW(uint256 avatarId) external view returns (uint256);
-
-    function getCollectionInboxMT(
-        uint256 COID
+    function calcAvatarMT(
+        uint256 avatarId
     ) external view returns (uint256 inbox);
 
-    function getCollectionMTAW(uint256 COID) external view returns (uint256);
+    function mintAvatarMT(uint256 avatarId) external returns (uint256);
 
-    function getCollectionTotalMinted(
-        uint256 COID
-    ) external view returns (uint256);
-
-    function claimCollectionSettledInboxMT(
+    function redeemAvatarMT(
         uint256 avatarId,
+        IAvatar.DelegateWallet delegateWallet,
+        address vault
+    ) external;
+
+    function getCollectionNFTPoint(
         uint256 COID
-    ) external returns (uint256);
+    ) external view returns (uint256);
+
+    function getCollectionAvatarNFTPoint(
+        uint256 COID
+    ) external view returns (uint256);
+
+    function getCollectionPoint(uint256 COID) external view returns (uint256);
+
+    function calcCollectionMT(uint256 COID) external view returns (uint256);
+
+    function mintCollectionMT(uint256 COID) external;
+
+    function redeemCollectionMT(uint256 COID) external;
+
+    function settleCollectionMining(uint256 COID) external;
+
+    function settleCollectionNFTPoint(uint256 COID) external;
 
     /**
      * @notice get Land holder realtime unclaimed minted mopn token
@@ -63,23 +70,15 @@ interface IMiningData {
         uint32 LandId
     ) external view returns (uint256);
 
-    function getLandHolderMTAW(uint32 LandId) external view returns (uint256);
+    function redeemLandHolderMT(uint32 LandId) external;
 
-    function mintLandHolderMT(uint32 LandId) external;
+    function batchRedeemSameLandHolderMT(uint32[] memory LandIds) external;
 
-    function claimLandHolderSettledIndexMT(
-        uint32 LandId
-    ) external returns (uint256 amount);
-
-    function calcCollectionMTAW(uint256 COID) external;
-
-    function changeTotalMTPledge(
+    function changeTotalMTStaking(
         uint256 COID,
         bool increase,
         uint256 amount
     ) external;
-
-    function NFTOfferCoefficient() external view returns (uint256);
 
     function NFTOfferAcceptNotify(uint256 price) external;
 }

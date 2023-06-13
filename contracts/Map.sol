@@ -83,7 +83,7 @@ contract Map is Ownable, Multicall {
             );
         }
 
-        uint256 TileMTAW = tileCoordinate.getTileMTAW() +
+        uint256 TilePoint = tileCoordinate.getTileNFTPoint() +
             IAvatar(governance.avatarContract()).getAvatarBombUsed(avatarId);
 
         tiles[tileCoordinate] =
@@ -105,11 +105,10 @@ contract Map is Ownable, Multicall {
             }
         }
 
-        IMiningData(governance.miningDataContract()).addMTAW(
+        IMiningData(governance.miningDataContract()).addNFTPoint(
             avatarId,
             COID,
-            LandId,
-            TileMTAW
+            TilePoint
         );
     }
 
@@ -125,10 +124,9 @@ contract Map is Ownable, Multicall {
         avatarId = getTileAvatar(tileCoordinate);
         if (avatarId > 0 && avatarId != excludeAvatarId) {
             uint32 LandId = getTileLandId(tileCoordinate);
-            IMiningData(governance.miningDataContract()).subMTAW(
+            IMiningData(governance.miningDataContract()).subNFTPoint(
                 avatarId,
-                getTileCOID(tileCoordinate),
-                LandId
+                getTileCOID(tileCoordinate)
             );
             tiles[tileCoordinate] = LandId;
         } else {

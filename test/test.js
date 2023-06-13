@@ -417,7 +417,7 @@ describe("MOPN", function () {
     );
     await allowanceTx.wait();
 
-    console.log(await miningData.getAvatarMTAW(1));
+    console.log(await miningData.getAvatarPoint(1));
 
     const tx2 = await mt.safeTransferFrom(
       owner.address,
@@ -427,13 +427,13 @@ describe("MOPN", function () {
     );
     await tx2.wait();
 
-    console.log(await miningData.getAvatarMTAW(1));
+    console.log(await miningData.getAvatarPoint(1));
 
     await collectionInfo();
   });
 
   const avatarInfo = async () => {
-    console.log("total MTAW", (await miningData.getTotalMTAWs()).toString());
+    console.log("total Point", (await miningData.getTotalPoints()).toString());
     for (let i = 1; i <= 10; i++) {
       console.log(
         "avatarId",
@@ -444,8 +444,8 @@ describe("MOPN", function () {
         await avatar.getAvatarCoordinate(i),
         "getAvatarBombUsed",
         (await avatar.getAvatarBombUsed(i)).toString(),
-        "getAvatarMTAW",
-        (await miningData.getAvatarMTAW(i)).toString(),
+        "getAvatarPoint",
+        (await miningData.getAvatarPoint(i)).toString(),
         "getAvatarInboxMT",
         ethers.utils.formatUnits(await miningData.getAvatarInboxMT(i), mtdecimals)
       );

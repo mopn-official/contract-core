@@ -81,7 +81,9 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
     }
 
     function withdraw(uint256 amount) public {
-        IMiningData(governance.miningDataContract()).calcCollectionMTAW(COID);
+        IMiningData(governance.miningDataContract()).settleCollectionMining(
+            COID
+        );
         uint256 mtAmount = V2MTAmount(amount);
         require(mtAmount > 0, "zero to withdraw");
         IMOPNToken(governance.mtContract()).transferFrom(
@@ -90,7 +92,10 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
             mtAmount
         );
         _burn(msg.sender, amount);
-        IMiningData(governance.miningDataContract()).changeTotalMTPledge(
+        IMiningData(governance.miningDataContract()).settleCollectionNFTPoint(
+            COID
+        );
+        IMiningData(governance.miningDataContract()).changeTotalMTStaking(
             COID,
             false,
             mtAmount
@@ -99,13 +104,13 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
 
     function getNFTOfferPrice() public view returns (uint256) {
         uint256 amount = IMiningData(governance.miningDataContract())
-            .getCollectionInboxMT(COID) +
+            .calcCollectionMT(COID) +
             IMOPNToken(governance.mtContract()).balanceOf(address(this));
 
         return
             (amount *
                 IMiningData(governance.miningDataContract())
-                    .NFTOfferCoefficient()) / 10 ** 18;
+                    .getNFTOfferCoefficient()) / 10 ** 18;
     }
 
     function MTBalance() public view returns (uint256 balance) {
@@ -125,13 +130,15 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
             "0x"
         );
 
-        IMiningData(governance.miningDataContract()).calcCollectionMTAW(COID);
+        IMiningData(governance.miningDataContract()).settleCollectionMining(
+            COID
+        );
 
         uint256 offerPrice = (IMOPNToken(governance.mtContract()).balanceOf(
             address(this)
         ) *
             IMiningData(governance.miningDataContract())
-                .NFTOfferCoefficient()) / 10 ** 18;
+                .getNFTOfferCoefficient()) / 10 ** 18;
 
         IMOPNToken(governance.mtContract()).transfer(msg.sender, offerPrice);
 
@@ -141,6 +148,9 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
             (block.timestamp << 1) |
             1;
 
+        IMiningData(governance.miningDataContract()).settleCollectionNFTPoint(
+            COID
+        );
         IMiningData(governance.miningDataContract()).NFTOfferAcceptNotify(
             offerPrice
         );
@@ -202,26 +212,34 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
                 );
             }
 
-            IMiningData(governance.miningDataContract()).calcCollectionMTAW(
-                COID
-            );
+            IMiningData(governance.miningDataContract()).settleCollectionMining(
+                    COID
+                );
+            IMiningData(governance.miningDataContract())
+                .settleCollectionNFTPoint(COID);
             uint256 offerAcceptPrice = getOfferAcceptPrice();
             if (price > offerAcceptPrice) {
                 IMiningData(governance.miningDataContract())
-                    .changeTotalMTPledge(COID, true, price - offerAcceptPrice);
+                    .changeTotalMTStaking(COID, true, price - offerAcceptPrice);
             } else if (price < offerAcceptPrice) {
                 IMiningData(governance.miningDataContract())
-                    .changeTotalMTPledge(COID, false, offerAcceptPrice - price);
+                    .changeTotalMTStaking(
+                        COID,
+                        false,
+                        offerAcceptPrice - price
+                    );
             }
             NFTOfferData = 0;
         } else {
-            IMiningData(governance.miningDataContract()).calcCollectionMTAW(
-                COID
-            );
+            IMiningData(governance.miningDataContract()).settleCollectionMining(
+                    COID
+                );
 
             uint256 vtokenAmount = MT2VAmount(value);
             _mint(from, vtokenAmount);
-            IMiningData(governance.miningDataContract()).changeTotalMTPledge(
+            IMiningData(governance.miningDataContract())
+                .settleCollectionNFTPoint(COID);
+            IMiningData(governance.miningDataContract()).changeTotalMTStaking(
                 COID,
                 true,
                 value

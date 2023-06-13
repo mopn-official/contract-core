@@ -32,27 +32,27 @@ function getTileCOID(uint32 tileCoordinate) external view returns (uint256)
 function getTileLandId(uint32 tileCoordinate) external view returns (uint32)
 ```
 
-### addMTAW
+### addPoint
 
 ```solidity
-function addMTAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) external
+function addPoint(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) external
 ```
 
 add on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| LandId | uint32 | mopn Land Id |
-| amount | uint256 | EAW amount |
+| Name     | Type    | Description   |
+| -------- | ------- | ------------- |
+| avatarId | uint256 | avatar Id     |
+| COID     | uint256 | collection Id |
+| LandId   | uint32  | mopn Land Id  |
+| amount   | uint256 | EAW amount    |
 
-### settlePerMTAWMinted
+### settlePerPointMinted
 
 ```solidity
-function settlePerMTAWMinted() external
+function settlePerPointMinted() external
 ```
 
 ### mintAvatarMT
@@ -79,10 +79,10 @@ function getAvatarInboxMT(uint256 avatarId) external view returns (uint256 inbox
 function getAvatarTotalMinted(uint256 avatarId) external view returns (uint256)
 ```
 
-### getAvatarMTAW
+### getAvatarPoint
 
 ```solidity
-function getAvatarMTAW(uint256 avatarId) external view returns (uint256)
+function getAvatarPoint(uint256 avatarId) external view returns (uint256)
 ```
 
 ### getCollectionInboxMT
@@ -91,10 +91,10 @@ function getAvatarMTAW(uint256 avatarId) external view returns (uint256)
 function getCollectionInboxMT(uint256 COID) external view returns (uint256 inbox)
 ```
 
-### getCollectionMTAW
+### getCollectionPoint
 
 ```solidity
-function getCollectionMTAW(uint256 COID) external view returns (uint256)
+function getCollectionPoint(uint256 COID) external view returns (uint256)
 ```
 
 ### getCollectionTotalMinted
@@ -119,8 +119,8 @@ get Land holder realtime unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
 ### getLandHolderTotalMinted
@@ -129,10 +129,10 @@ get Land holder realtime unclaimed minted mopn token
 function getLandHolderTotalMinted(uint32 LandId) external view returns (uint256)
 ```
 
-### getLandHolderMTAW
+### getLandHolderPoint
 
 ```solidity
-function getLandHolderMTAW(uint32 LandId) external view returns (uint256)
+function getLandHolderPoint(uint32 LandId) external view returns (uint256)
 ```
 
 ### mintLandHolderMT
@@ -152,4 +152,3 @@ function claimLandHolderSettledIndexMT(uint32 LandId) external returns (uint256 
 ```solidity
 function transferOwnership(address newOwner) external
 ```
-

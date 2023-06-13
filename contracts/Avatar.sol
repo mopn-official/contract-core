@@ -334,12 +334,9 @@ contract Avatar is IAvatar, Multicall, Ownable {
         addAvatarBombUsed(avatarId);
 
         if (getAvatarCoordinate(avatarId) > 0) {
-            IMiningData(governance.miningDataContract()).addMTAW(
+            IMiningData(governance.miningDataContract()).addNFTPoint(
                 avatarId,
                 getAvatarCOID(avatarId),
-                IMap(governance.mapContract()).getTileLandId(
-                    getAvatarCoordinate(avatarId)
-                ),
                 1
             );
         }

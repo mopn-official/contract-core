@@ -179,6 +179,12 @@ contract Governance is Multicall, Ownable {
         collectionMap[getCollectionContract(COID)] += amount << 192;
     }
 
+    function clearCollectionMintedMT(uint256 COID) public onlyMiningData {
+        collectionMap[getCollectionContract(COID)] = uint192(
+            collectionMap[getCollectionContract(COID)]
+        );
+    }
+
     function createCollectionVault(uint256 COID) public {
         require(
             CollectionVaultMap[COID] == address(0),

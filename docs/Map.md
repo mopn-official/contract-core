@@ -34,7 +34,7 @@ uint256 MTProduceStartTimestamp
 uint256 MTProduceData
 ```
 
-uint64 PerMTAWMinted + uint64 LastPerMTAWMintedCalcTimestamp + uint64 TotalMTAWs
+uint64 PerPointMinted + uint64 LastPerPointMintedCalcTimestamp + uint64 TotalPoints
 
 ### AvatarMTs
 
@@ -42,7 +42,7 @@ uint64 PerMTAWMinted + uint64 LastPerMTAWMintedCalcTimestamp + uint64 TotalMTAWs
 mapping(uint256 => uint256) AvatarMTs
 ```
 
-uint64 MT Inbox + uint64 Total Minted MT + uint64 PerMTAWMinted + uint64 TotalMTAWs
+uint64 MT Inbox + uint64 Total Minted MT + uint64 PerPointMinted + uint64 TotalPoints
 
 ### CollectionMTs
 
@@ -90,8 +90,8 @@ get the avatar Id who is standing on a tile
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name           | Type   | Description     |
+| -------------- | ------ | --------------- |
 | tileCoordinate | uint32 | tile coordinate |
 
 ### getTileCOID
@@ -104,8 +104,8 @@ get the coid of the avatar who is standing on a tile
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name           | Type   | Description     |
+| -------------- | ------ | --------------- |
 | tileCoordinate | uint32 | tile coordinate |
 
 ### getTileLandId
@@ -118,8 +118,8 @@ get MOPN Land Id which a tile belongs(only have data if someone has occupied thi
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name           | Type   | Description     |
+| -------------- | ------ | --------------- |
 | tileCoordinate | uint32 | tile coordinate |
 
 ### governanceContract
@@ -146,13 +146,13 @@ _can only called by avatar contract_
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| tileCoordinate | uint32 | tile coordinate |
-| LandId | uint32 | MOPN Land Id |
-| BombUsed | uint256 | avatar bomb used history number |
+| Name           | Type    | Description                     |
+| -------------- | ------- | ------------------------------- |
+| avatarId       | uint256 | avatar Id                       |
+| COID           | uint256 | collection Id                   |
+| tileCoordinate | uint32  | tile coordinate                 |
+| LandId         | uint32  | MOPN Land Id                    |
+| BombUsed       | uint256 | avatar bomb used history number |
 
 ### avatarRemove
 
@@ -166,31 +166,31 @@ _can only called by avatar contract_
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| tileCoordinate | uint32 | tile coordinate |
-| excludeAvatarId | uint256 |  |
+| Name            | Type    | Description     |
+| --------------- | ------- | --------------- |
+| tileCoordinate  | uint32  | tile coordinate |
+| excludeAvatarId | uint256 |                 |
 
-### getPerMTAWMinted
+### getPerPointMinted
 
 ```solidity
-function getPerMTAWMinted() public view returns (uint256)
+function getPerPointMinted() public view returns (uint256)
 ```
 
 get settled Per MT Allocation Weight minted mopn token number
 
-### getLastPerMTAWMintedCalcTimestamp
+### getLastPerPointMintedCalcTimestamp
 
 ```solidity
-function getLastPerMTAWMintedCalcTimestamp() public view returns (uint256)
+function getLastPerPointMintedCalcTimestamp() public view returns (uint256)
 ```
 
 get last per mopn token allocation weight minted settlement timestamp
 
-### getTotalMTAWs
+### getTotalPoints
 
 ```solidity
-function getTotalMTAWs() public view returns (uint256)
+function getTotalPoints() public view returns (uint256)
 ```
 
 get total mopn token allocation weights
@@ -205,8 +205,8 @@ get current mt produce per second
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name        | Type    | Description  |
+| ----------- | ------- | ------------ |
 | reduceTimes | uint256 | reduce times |
 
 ### currentMTPPS
@@ -215,18 +215,18 @@ get current mt produce per second
 function currentMTPPS() public view returns (uint256 MTPPB)
 ```
 
-### settlePerMTAWMinted
+### settlePerPointMinted
 
 ```solidity
-function settlePerMTAWMinted() public
+function settlePerPointMinted() public
 ```
 
 settle per mopn token allocation weight minted mopn token
 
-### calcPerMTAWMinted
+### calcPerPointMinted
 
 ```solidity
-function calcPerMTAWMinted() public view returns (uint256)
+function calcPerPointMinted() public view returns (uint256)
 ```
 
 ### getAvatarSettledInboxMT
@@ -239,9 +239,9 @@ get avatar settled unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
 ### getAvatarTotalMinted
 
@@ -249,33 +249,33 @@ get avatar settled unclaimed minted mopn token
 function getAvatarTotalMinted(uint256 avatarId) public view returns (uint256)
 ```
 
-### getAvatarPerMTAWMinted
+### getAvatarPerPointMinted
 
 ```solidity
-function getAvatarPerMTAWMinted(uint256 avatarId) public view returns (uint256)
+function getAvatarPerPointMinted(uint256 avatarId) public view returns (uint256)
 ```
 
 get avatar settled per mopn token allocation weight minted mopn token number
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
-### getAvatarMTAW
+### getAvatarPoint
 
 ```solidity
-function getAvatarMTAW(uint256 avatarId) public view returns (uint256)
+function getAvatarPoint(uint256 avatarId) public view returns (uint256)
 ```
 
 get avatar on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
 ### mintAvatarMT
 
@@ -287,9 +287,9 @@ mint avatar mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
 ### claimAvatarSettledIndexMT
 
@@ -307,9 +307,9 @@ get avatar realtime unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
 ### getCollectionSettledInboxMT
 
@@ -321,8 +321,8 @@ get collection settled minted unclaimed mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### getCollectionTotalMinted
@@ -331,32 +331,32 @@ get collection settled minted unclaimed mopn token
 function getCollectionTotalMinted(uint256 COID) public view returns (uint256)
 ```
 
-### getCollectionPerMTAWMinted
+### getCollectionPerPointMinted
 
 ```solidity
-function getCollectionPerMTAWMinted(uint256 COID) public view returns (uint256)
+function getCollectionPerPointMinted(uint256 COID) public view returns (uint256)
 ```
 
 get collection settled per mopn token allocation weight minted mopn token number
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
-### getCollectionMTAW
+### getCollectionPoint
 
 ```solidity
-function getCollectionMTAW(uint256 COID) public view returns (uint256)
+function getCollectionPoint(uint256 COID) public view returns (uint256)
 ```
 
 get collection on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### mintCollectionMT
@@ -369,8 +369,8 @@ mint collection mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### getCollectionInboxMT
@@ -383,8 +383,8 @@ get collection realtime unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### claimCollectionSettledInboxMT
@@ -398,10 +398,10 @@ only avatar contract can calls
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
+| Name     | Type    | Description   |
+| -------- | ------- | ------------- |
+| avatarId | uint256 | avatar Id     |
+| COID     | uint256 | collection Id |
 
 ### getLandHolderSettledInboxMT
 
@@ -413,8 +413,8 @@ get Land holder settled minted unclaimed mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
 ### getLandHolderTotalMinted
@@ -423,32 +423,32 @@ get Land holder settled minted unclaimed mopn token
 function getLandHolderTotalMinted(uint32 LandId) public view returns (uint256)
 ```
 
-### getLandHolderPerMTAWMinted
+### getLandHolderPerPointMinted
 
 ```solidity
-function getLandHolderPerMTAWMinted(uint32 LandId) public view returns (uint256)
+function getLandHolderPerPointMinted(uint32 LandId) public view returns (uint256)
 ```
 
 get Land holder settled per mopn token allocation weight minted mopn token number
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
-### getLandHolderMTAW
+### getLandHolderPoint
 
 ```solidity
-function getLandHolderMTAW(uint32 LandId) public view returns (uint256)
+function getLandHolderPoint(uint32 LandId) public view returns (uint256)
 ```
 
 get Land holder on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
 ### mintLandHolderMT
@@ -461,8 +461,8 @@ mint Land holder mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
 ### claimLandHolderSettledIndexMT
@@ -481,48 +481,48 @@ get Land holder realtime unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
-### addMTAW
+### addPoint
 
 ```solidity
-function addMTAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) public
+function addPoint(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) public
 ```
 
-### _addMTAW
+### \_addPoint
 
 ```solidity
-function _addMTAW(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) internal
+function _addPoint(uint256 avatarId, uint256 COID, uint32 LandId, uint256 amount) internal
 ```
 
 add on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| LandId | uint32 | mopn Land Id |
-| amount | uint256 | EAW amount |
+| Name     | Type    | Description   |
+| -------- | ------- | ------------- |
+| avatarId | uint256 | avatar Id     |
+| COID     | uint256 | collection Id |
+| LandId   | uint32  | mopn Land Id  |
+| amount   | uint256 | EAW amount    |
 
-### _subMTAW
+### \_subPoint
 
 ```solidity
-function _subMTAW(uint256 avatarId, uint256 COID, uint32 LandId) internal
+function _subPoint(uint256 avatarId, uint256 COID, uint32 LandId) internal
 ```
 
 substruct on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| LandId | uint32 | mopn Land Id |
+| Name     | Type    | Description   |
+| -------- | ------- | ------------- |
+| avatarId | uint256 | avatar Id     |
+| COID     | uint256 | collection Id |
+| LandId   | uint32  | mopn Land Id  |
 
 ### checkLandId
 
@@ -541,4 +541,3 @@ modifier onlyGovernance()
 ```solidity
 modifier onlyAvatar()
 ```
-
