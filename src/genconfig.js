@@ -65,9 +65,14 @@ function loadPeripheryConf(network) {
 }
 
 function saveConfig(config, network) {
-  fs.writeFile("./configs/" + network + ".json", JSON.stringify(config), "utf8", function (err) {
-    if (err) throw err;
-  });
+  fs.writeFile(
+    "./configs/" + network + ".json",
+    JSON.stringify(config, null, 4),
+    "utf8",
+    function (err) {
+      if (err) throw err;
+    }
+  );
 }
 
 main().catch((error) => {

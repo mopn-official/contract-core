@@ -28,7 +28,7 @@ async function main() {
       }
 
       if (deployConf[contractName].constructparams) {
-        let constructparams = deployConf[contractName].constructparams;
+        let constructparams = [...deployConf[contractName].constructparams];
         for (let j = 0; j < constructparams.length; j++) {
           if (deployConf[constructparams[j]]) {
             constructparams[j] = deployConf[constructparams[j]].address;
@@ -129,10 +129,17 @@ async function main() {
         try {
           const verifyData = {
             address: deployConf[contractName].address,
-            constructorArguments: deployConf[contractName].constructparams
-              ? deployConf[contractName].constructparams
-              : [],
+            constructorArguments: [],
           };
+          if (deployConf[contractName].constructparams) {
+            let constructparams = [...deployConf[contractName].constructparams];
+            for (let j = 0; j < constructparams.length; j++) {
+              if (deployConf[constructparams[j]]) {
+                constructparams[j] = deployConf[constructparams[j]].address;
+              }
+            }
+            verifyData.constructorArguments = constructparams;
+          }
           if (deployConf[contractName].verifycontract) {
             verifyData.contract = deployConf[contractName].verifycontract;
           }
@@ -176,7 +183,7 @@ function loadConf() {
 function saveConf(deployConf) {
   fs.writeFile(
     "./scripts/deployconf/" + hre.network.name + ".json",
-    JSON.stringify(deployConf),
+    JSON.stringify(deployConf, null, 4),
     "utf8",
     function (err) {
       if (err) throw err;
