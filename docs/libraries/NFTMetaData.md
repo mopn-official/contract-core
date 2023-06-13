@@ -11,7 +11,7 @@ function constructTokenURI(uint32 LandId, struct NFTSVG.tileData[] tileDatas, ui
 ### constructAttributes
 
 ```solidity
-function constructAttributes(uint32 LandId, uint32 blockCoordinate, uint32 ringNum, uint32 totalPoint, uint256 MTMinted) public pure returns (bytes)
+function constructAttributes(uint32 LandId, uint32 blockCoordinate, uint32 ringNum, uint32 totalNFTPoint, uint256 MTMinted) public pure returns (bytes)
 ```
 
 ### constructTokenImage
@@ -38,8 +38,9 @@ function getIntAttributesArray(string trait_type, uint32[] ary) public pure retu
 function landBgColor(uint32 landId) public pure returns (bytes)
 ```
 
-### \_int2str
+### _int2str
 
 ```solidity
 function _int2str(uint32 n) internal pure returns (string)
 ```
+

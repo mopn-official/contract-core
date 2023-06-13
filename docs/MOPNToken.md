@@ -32,3 +32,9 @@ no way affects any of the arithmetic of the contract, including
 function mint(address to, uint256 amount) public
 ```
 
+### safeTransferFrom
+
+```solidity
+function safeTransferFrom(address _from, address _to, uint256 _value, bytes _data) public
+```
+

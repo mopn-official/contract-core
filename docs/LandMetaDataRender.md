@@ -2,16 +2,16 @@
 
 ## LandMetaDataRender
 
-### governanceContract
+### governance
 
 ```solidity
-address governanceContract
+contract IGovernance governance
 ```
 
-### setGovernanceContract
+### constructor
 
 ```solidity
-function setGovernanceContract(address governanceContract_) public
+constructor(address governance_) public
 ```
 
 _set the governance contract address
@@ -21,7 +21,7 @@ this function also get the Map contract from the governances_
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| governanceContract_ | address | Governance Contract Address |
+| governance_ | address | Governance Contract Address |
 
 ### constructTokenURI
 

@@ -4,63 +4,33 @@
 
 _Governance is all other MOPN contract's owner_
 
-### MTClaimed
+### COIDCounter
 
 ```solidity
-event MTClaimed(uint256 avatarId, uint256 COID, address to, uint256 amount)
+uint256 COIDCounter
 ```
 
-### MTClaimedCollectionVault
+### COIDMap
 
 ```solidity
-event MTClaimedCollectionVault(uint256 avatarId, uint256 COID, address to, uint256 amount)
+mapping(uint256 => address) COIDMap
 ```
 
-### redeemAvatarInboxMT
+### CollectionVaultMap
 
 ```solidity
-function redeemAvatarInboxMT(uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault) public
+mapping(uint256 => address) CollectionVaultMap
 ```
 
-redeem avatar unclaimed minted mopn token
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| delegateWallet | enum IAvatar.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
-| vault | address | cold wallet address |
-
-### redeemCollectionInboxMT
+### collectionMap
 
 ```solidity
-function redeemCollectionInboxMT(address to, uint256 avatarId, uint256 COID) public
+mapping(address => uint256) collectionMap
 ```
 
-redeem collection unclaimed minted mopn token
+record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
 
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| to | address |  |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-
-### redeemLandHolderInboxMT
-
-```solidity
-function redeemLandHolderInboxMT(uint32 LandId) public
-```
-
-redeem Land holder unclaimed minted mopn token
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| LandId | uint32 | MOPN Land Id |
+Collection address => uint64 mintedMT + uint64 COID + uint64 minted avatar num + uint64 on map nft number
 
 ### whiteListRequire
 
@@ -68,16 +38,16 @@ redeem Land holder unclaimed minted mopn token
 bool whiteListRequire
 ```
 
-### setWhiteListRequire
-
-```solidity
-function setWhiteListRequire(bool whiteListRequire_) public
-```
-
 ### whiteListRoot
 
 ```solidity
 bytes32 whiteListRoot
+```
+
+### setWhiteListRequire
+
+```solidity
+function setWhiteListRequire(bool whiteListRequire_) public
 ```
 
 ### isInWhiteList
@@ -108,28 +78,6 @@ update whitelist root
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | whiteListRoot_ | bytes32 | white list merkle tree root |
-
-### COIDCounter
-
-```solidity
-uint256 COIDCounter
-```
-
-### COIDMap
-
-```solidity
-mapping(uint256 => address) COIDMap
-```
-
-### collectionMap
-
-```solidity
-mapping(address => uint256) collectionMap
-```
-
-record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
-
-Collection address => uint64 COID + uint64 minted avatar num + uint64 on map nft number
 
 ### getCollectionContract
 
@@ -246,6 +194,36 @@ get NFT collection minted avatar number
 function addCollectionAvatarNum(uint256 COID) public
 ```
 
+### getCollectionMintedMT
+
+```solidity
+function getCollectionMintedMT(uint256 COID) public view returns (uint256)
+```
+
+### addCollectionMintedMT
+
+```solidity
+function addCollectionMintedMT(uint256 COID, uint256 amount) public
+```
+
+### clearCollectionMintedMT
+
+```solidity
+function clearCollectionMintedMT(uint256 COID) public
+```
+
+### createCollectionVault
+
+```solidity
+function createCollectionVault(uint256 COID) public
+```
+
+### getCollectionVault
+
+```solidity
+function getCollectionVault(uint256 COID) public view returns (address)
+```
+
 ### auctionHouseContract
 
 ```solidity
@@ -282,10 +260,28 @@ address mapContract
 address landContract
 ```
 
+### miningDataContract
+
+```solidity
+address miningDataContract
+```
+
+### mopnCollectionVaultContract
+
+```solidity
+address mopnCollectionVaultContract
+```
+
 ### updateMOPNContracts
 
 ```solidity
-function updateMOPNContracts(address auctionHouseContract_, address avatarContract_, address bombContract_, address mtContract_, address mapContract_, address landContract_) public
+function updateMOPNContracts(address auctionHouseContract_, address avatarContract_, address bombContract_, address mtContract_, address mapContract_, address landContract_, address miningDataContract_, address mopnCollectionVaultContract_) public
+```
+
+### mintMT
+
+```solidity
+function mintMT(address to, uint256 amount) public
 ```
 
 ### mintBomb
@@ -300,20 +296,6 @@ function mintBomb(address to, uint256 amount) public
 function burnBomb(address from, uint256 amount) public
 ```
 
-### redeemAgio
-
-```solidity
-function redeemAgio() public
-```
-
-### giveupOwnership
-
-```solidity
-function giveupOwnership() public
-```
-
-todo remove before prod
-
 ### onlyAuctionHouse
 
 ```solidity
@@ -324,6 +306,12 @@ modifier onlyAuctionHouse()
 
 ```solidity
 modifier onlyAvatar()
+```
+
+### onlyMiningData
+
+```solidity
+modifier onlyMiningData()
 ```
 
 ### onlyMap
