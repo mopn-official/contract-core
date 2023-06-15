@@ -3,4 +3,14 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 
-interface IMOPNCollectionVault is IERC20 {}
+interface IMOPNCollectionVault is IERC20 {
+    struct NFTAuction {
+        uint256 offerStatus;
+        uint256 startTimestamp;
+        uint256 offerAcceptPrice;
+        uint256 tokenId;
+        uint256 currentPrice;
+    }
+
+    function getAuctionInfo() external view returns (NFTAuction memory auction);
+}

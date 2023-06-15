@@ -100,7 +100,7 @@
     },
     "Map": {
         "address": "0x5815e5BFB5fA32fc0eD93406166ca4f1190eF0dd",
-        "verified": false,
+        "verified": true,
         "libraries": [
             "TileMath"
         ],
@@ -117,7 +117,7 @@
         ]
     },
     "MOPNCollectionVault": {
-        "address": "0xF1aE731389737dab10D0C1Fb8EdB9C53be632194",
+        "address": "0xB50A6Cc9f4791745A91d38b6CBf81a7143f80A38",
         "verified": true,
         "constructparams": [
             "Governance"
@@ -151,8 +151,8 @@
         ]
     },
     "MopnDataHelper": {
-        "address": "0xDE0edDEbB98c74B749caDD48C04ADA5916FCf4A3",
-        "verified": true,
+        "address": "0xCd75d4CDE25dFac2D8217Cf818CF1a8b3B2ef976",
+        "verified": false,
         "libraries": [
             "TileMath"
         ],

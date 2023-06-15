@@ -437,6 +437,14 @@ describe("MOPN", function () {
     const vault2 = await ethers.getContractAt("MOPNCollectionVault", vault2adddress);
     console.log(await vault2.balanceOf(owner.address));
 
+    console.log("nft offer price", await vault1.getNFTOfferPrice());
+
+    const tx4 = await testnft.approve(vault1.address, 1);
+    tx4.wait();
+
+    const tx5 = await vault1.acceptNFTOffer(1);
+    tx5.wait();
+
     await collectionInfo();
   });
 

@@ -1,16 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+import "./interfaces/IMOPNCollectionVault.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IMiningData.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
+contract MOPNCollectionVault is
+    IMOPNCollectionVault,
+    ERC20,
+    IERC20Receiver,
+    IERC721Receiver,
+    Ownable
+{
     uint256 public COID;
 
     bool public isInitialized = false;
@@ -27,8 +35,22 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
      */
     uint256 public NFTOfferData;
 
-    constructor(address governance_) ERC20("MOPN V-Token", "MVT") {
+    constructor(address governance_) ERC20("MOPN VToken", "MVT") {
         governance = IGovernance(governance_);
+    }
+
+    function initialize(uint256 COID_) public {
+        require(isInitialized == false, "contract initialzed");
+        COID = COID_;
+        isInitialized = true;
+    }
+
+    function name() public pure override returns (string memory) {
+        return "MOPN VToken";
+    }
+
+    function symbol() public pure override returns (string memory) {
+        return "MVT";
     }
 
     function getOfferStatus() public view returns (uint256) {
@@ -47,10 +69,33 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
         return NFTOfferData >> 97;
     }
 
-    function initialize(uint256 COID_) public {
-        require(isInitialized == false, "contract initialzed");
-        COID = COID_;
-        isInitialized = true;
+    /**
+     * @notice get the current auction price for land
+     * @return price current auction price
+     */
+    function getAuctionCurrentPrice() public view returns (uint256) {
+        if (getOfferStatus() == 0) return 0;
+
+        return
+            getAuctionPrice(
+                (block.timestamp - getAuctionStartTimestamp()) / 60
+            );
+    }
+
+    function getAuctionPrice(
+        uint256 reduceTimes
+    ) public view returns (uint256) {
+        int128 reducePercentage = ABDKMath64x64.divu(99, 100);
+        int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
+        return ABDKMath64x64.mulu(reducePower, getOfferAcceptPrice() * 2);
+    }
+
+    function getAuctionInfo() public view returns (NFTAuction memory auction) {
+        auction.offerStatus = getOfferStatus();
+        auction.startTimestamp = getAuctionStartTimestamp();
+        auction.offerAcceptPrice = getOfferAcceptPrice();
+        auction.tokenId = getAuctionTokenId();
+        auction.currentPrice = getAuctionCurrentPrice();
     }
 
     function MT2VAmount(
@@ -86,11 +131,7 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
         );
         uint256 mtAmount = V2MTAmount(amount);
         require(mtAmount > 0, "zero to withdraw");
-        IMOPNToken(governance.mtContract()).transferFrom(
-            address(this),
-            msg.sender,
-            mtAmount
-        );
+        IMOPNToken(governance.mtContract()).transfer(msg.sender, mtAmount);
         _burn(msg.sender, amount);
         IMiningData(governance.miningDataContract()).settleCollectionNFTPoint(
             COID
@@ -156,27 +197,6 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
             offerPrice,
             tokenId
         );
-    }
-
-    /**
-     * @notice get the current auction price for land
-     * @return price current auction price
-     */
-    function getAuctionCurrentPrice() public view returns (uint256) {
-        if (getOfferStatus() == 0) return 0;
-
-        return
-            getAuctionPrice(
-                (block.timestamp - getAuctionStartTimestamp()) / 60
-            );
-    }
-
-    function getAuctionPrice(
-        uint256 reduceTimes
-    ) public view returns (uint256) {
-        int128 reducePercentage = ABDKMath64x64.divu(99, 100);
-        int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, getOfferAcceptPrice() * 2);
     }
 
     function onERC20Received(
@@ -261,5 +281,14 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
         }
 
         return IERC20Receiver.onERC20Received.selector;
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) public pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }
