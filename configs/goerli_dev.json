@@ -2,21 +2,21 @@
     "thegraph": "https://api.thegraph.com/subgraphs/name/cyanface/mopn-goerli_dev",
     "network": "goerli_dev",
     "contracts": {
-        "TileMath": "0xf7BC3a0dE9cC7f1a5305392C785fAfb6D80dF531",
-        "NFTSVG": "0x29e07660d43Ef4dA7114aBadfeCBe22D500414c2",
-        "NFTMetaData": "0x2a353bf8E4090A3Bbd3181464ea2Ab71a5D60fD4",
+        "TileMath": "0x1F73aDb9c7b562B8fA0cD3e6d10Be55108975Eea",
+        "NFTSVG": "0x2cD9040787eEf71CEaaAF4b35bF76ED7D1BE0e2B",
+        "NFTMetaData": "0x9174E3DA7fc6189347674EEc74B7371FaF1c0B21",
         "Governance": "0xE44477A7f623c8dc56Df1201a2520e732F05A50e",
         "AuctionHouse": "0x897b8aBef55af86124b749d8eD7B8FA1a47e5ea3",
-        "Avatar": "0x46528Fa45070eCB458602B287fF2d9C49A7bCb6B",
+        "Avatar": "0x0e02fC5523C31724BD7644ac9197623eb4ee251e",
         "Bomb": "0xAe80976780333A11F064Fe33A98dE672d733B6f8",
-        "LandMetaDataRender": "0x7f1d14E5446e353B92b97fd636C778eD274B8218",
-        "Map": "0x4F6495a7f45f5D475A6e850678B686F38f530792",
+        "LandMetaDataRender": "0x487B0c5Ca2E3BFc81932C74BB3B149e7730570C3",
+        "Map": "0x5815e5BFB5fA32fc0eD93406166ca4f1190eF0dd",
         "MiningData": "0xa4f7cF85Ed81f55f34D19c9Ed108b0eCCE26D3fB",
         "MOPNCollectionVault": "0xF1aE731389737dab10D0C1Fb8EdB9C53be632194",
         "MOPNLand": "0x47AB1cda4662900173A7E3DC4E2538a02C059e22",
         "MOPNToken": "0xD8B104726757d04259d0B54Cfa68e79baeE36723",
         "MopnBatchHelper": "0xFCaC1ecf4E93a2F88075b167D84151344da87056",
-        "MopnDataHelper": "0xF6B62AC6AA91EC00A8f9037b44c771F740A9a8E4",
+        "MopnDataHelper": "0xDE0edDEbB98c74B749caDD48C04ADA5916FCf4A3",
         "MOPNTESTNFT": "0xdEa71568724007fFeF75fD2DC5fBc1858B5C7825"
     }
 }
