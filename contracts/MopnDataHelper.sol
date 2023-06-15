@@ -5,6 +5,7 @@ import "./interfaces/IAvatar.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IMap.sol";
 import "./interfaces/IMiningData.sol";
+import "./interfaces/IMOPNCollectionVault.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -27,8 +28,10 @@ contract MopnDataHelper is Ownable {
         uint256 OnMapNum;
         uint256 AvatarNum;
         uint256 inboxMT;
-        uint256 NFTPoint;
+        uint256 CollectionNFTPoint;
         uint256 AvatarNFTPoint;
+        address collectionVault;
+        IMOPNCollectionVault.NFTAuction NFTAuction;
     }
 
     IGovernance governance;
@@ -209,10 +212,13 @@ contract MopnDataHelper is Ownable {
         cData.AvatarNum = governance.getCollectionAvatarNum(COID);
         cData.inboxMT = IMiningData(governance.miningDataContract())
             .calcCollectionMT(COID);
-        cData.NFTPoint = IMiningData(governance.miningDataContract())
+        cData.CollectionNFTPoint = IMiningData(governance.miningDataContract())
             .getCollectionNFTPoint(COID);
         cData.AvatarNFTPoint = IMiningData(governance.miningDataContract())
             .getCollectionAvatarNFTPoint(COID);
+        cData.collectionVault = governance.getCollectionVault(COID);
+        cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
+            .getAuctionInfo();
     }
 
     function getBatchCollectionInfo(

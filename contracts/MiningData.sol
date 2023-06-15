@@ -259,7 +259,7 @@ contract MiningData is IMiningData, Multicall {
                     )
                 );
                 uint256 landamount = (amount * 5) / 100;
-                LandHolderMTs[LandId] += landamount << 128;
+                LandHolderMTs[LandId] += (landamount << 128) | landamount;
                 emit LandHolderMTMinted(LandId, landamount);
 
                 amount = (amount * 90) / 100;
@@ -466,21 +466,13 @@ contract MiningData is IMiningData, Multicall {
      * @param LandId MOPN Land Id
      */
     function getLandHolderInboxMT(uint32 LandId) public view returns (uint256) {
-        return uint64(LandHolderMTs[LandId] >> 128);
+        return uint128(LandHolderMTs[LandId] >> 128);
     }
 
     function getLandHolderTotalMinted(
         uint32 LandId
     ) public view returns (uint256) {
-        return uint64(LandHolderMTs[LandId] >> 64);
-    }
-
-    /**
-     * @notice get Land holder settled per mopn token allocation weight minted mopn token number
-     * @param LandId MOPN Land Id
-     */
-    function getOnLandMiningNFT(uint32 LandId) public view returns (uint256) {
-        return uint64(LandHolderMTs[LandId]);
+        return uint128(LandHolderMTs[LandId]);
     }
 
     function redeemLandHolderMT(uint32 LandId) public {
