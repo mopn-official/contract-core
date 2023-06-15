@@ -13,10 +13,6 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MopnBatchHelper is Multicall, Ownable {
     IGovernance governance;
-    IAuctionHouse auctionHouse;
-    IAvatar avatar;
-    IMap map;
-    IMiningData miningData;
 
     constructor(address governanceContract_) {
         _setGovernanceContract(governanceContract_);
@@ -28,10 +24,6 @@ contract MopnBatchHelper is Multicall, Ownable {
 
     function _setGovernanceContract(address governanceContract_) internal {
         governance = IGovernance(governanceContract_);
-        avatar = IAvatar(governance.avatarContract());
-        map = IMap(governance.mapContract());
-        miningData = IMiningData(governance.miningDataContract());
-        auctionHouse = IAuctionHouse(governance.auctionHouseContract());
     }
 
     /**
@@ -53,7 +45,7 @@ contract MopnBatchHelper is Multicall, Ownable {
 
         if (delegateWallets.length > 0) {
             for (uint256 i = 0; i < avatarIds.length; i++) {
-                miningData.redeemAvatarMT(
+                IMiningData(governance.miningDataContract()).redeemAvatarMT(
                     avatarIds[i],
                     delegateWallets[i],
                     vaults[i]
@@ -61,7 +53,7 @@ contract MopnBatchHelper is Multicall, Ownable {
             }
         } else {
             for (uint256 i = 0; i < avatarIds.length; i++) {
-                miningData.redeemAvatarMT(
+                IMiningData(governance.miningDataContract()).redeemAvatarMT(
                     avatarIds[i],
                     IAvatar.DelegateWallet.None,
                     address(0)
@@ -71,12 +63,16 @@ contract MopnBatchHelper is Multicall, Ownable {
     }
 
     function batchMintAvatarMT(uint256[] memory avatarIds) public {
-        miningData.settlePerNFTPointMinted();
+        IMiningData(governance.miningDataContract()).settlePerNFTPointMinted();
         uint256 COID;
         for (uint256 i = 0; i < avatarIds.length; i++) {
-            COID = avatar.getAvatarCOID(avatarIds[i]);
-            miningData.mintCollectionMT(COID);
-            miningData.mintAvatarMT(avatarIds[i]);
+            COID = IAvatar(governance.avatarContract()).getAvatarCOID(
+                avatarIds[i]
+            );
+            IMiningData(governance.miningDataContract()).mintCollectionMT(COID);
+            IMiningData(governance.miningDataContract()).mintAvatarMT(
+                avatarIds[i]
+            );
         }
     }
 
@@ -85,7 +81,7 @@ contract MopnBatchHelper is Multicall, Ownable {
         uint256[] memory avatarIds
     ) public {
         batchMintAvatarMT(avatarIds);
-        miningData.redeemLandHolderMT(LandId);
+        IMiningData(governance.miningDataContract()).redeemLandHolderMT(LandId);
     }
 
     /**
@@ -99,10 +95,13 @@ contract MopnBatchHelper is Multicall, Ownable {
         for (uint256 i = 0; i < LandIds.length; i++) {
             batchMintAvatarMT(avatarIds[i]);
         }
-        miningData.batchRedeemSameLandHolderMT(LandIds);
+        IMiningData(governance.miningDataContract())
+            .batchRedeemSameLandHolderMT(LandIds);
     }
 
     function redeemAgioTo() public {
-        auctionHouse.redeemAgioTo(msg.sender);
+        IAuctionHouse(governance.auctionHouseContract()).redeemAgioTo(
+            msg.sender
+        );
     }
 }

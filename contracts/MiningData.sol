@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "hardhat/console.sol";
+
 import "./interfaces/IAvatar.sol";
 import "./interfaces/IMap.sol";
 import "./interfaces/IGovernance.sol";
@@ -49,6 +51,14 @@ contract MiningData is IMiningData, Multicall {
     event MTClaimedCollectionVault(uint256 indexed COID, uint256 amount);
 
     event MTClaimedLandHolder(uint256 indexed landId, uint256 amount);
+
+    event NFTOfferAccept(uint256 indexed COID, uint256 tokenId, uint256 price);
+
+    event NFTAuctionAccept(
+        uint256 indexed COID,
+        uint256 tokenId,
+        uint256 price
+    );
 
     IGovernance public governance;
 
@@ -192,11 +202,10 @@ contract MiningData is IMiningData, Multicall {
      * @notice get avatar on map mining mopn token allocation weight
      * @param avatarId avatar Id
      */
-    function getAvatarNFTPoint(uint256 avatarId) public view returns (uint256) {
-        uint256 COID = IAvatar(governance.avatarContract()).getAvatarCOID(
-            avatarId
-        );
-        return uint64(AvatarMTs[avatarId]) + getCollectionPoint(COID);
+    function getAvatarNFTPoint(
+        uint256 avatarId
+    ) public view returns (uint256 point) {
+        return uint64(AvatarMTs[avatarId]);
     }
 
     /**
@@ -249,7 +258,9 @@ contract MiningData is IMiningData, Multicall {
                         avatarId
                     )
                 );
-                LandHolderMTs[LandId] += ((amount * 5) / 100) << 128;
+                uint256 landamount = (amount * 5) / 100;
+                LandHolderMTs[LandId] += landamount << 128;
+                emit LandHolderMTMinted(LandId, landamount);
 
                 amount = (amount * 90) / 100;
 
@@ -407,14 +418,21 @@ contract MiningData is IMiningData, Multicall {
 
     function redeemCollectionMT(uint256 COID) public {
         uint256 amount = governance.getCollectionMintedMT(COID);
-        governance.mintMT(governance.getCollectionVault(COID), amount);
-        governance.clearCollectionMintedMT(COID);
-        totalMTStaking += amount;
+        if (amount > 0) {
+            governance.mintMT(governance.getCollectionVault(COID), amount);
+            governance.clearCollectionMintedMT(COID);
+            totalMTStaking += amount;
+            emit MTClaimedCollectionVault(COID, amount);
+        }
     }
 
     function settleCollectionNFTPoint(
         uint256 COID
     ) public onlyCollectionVault(COID) {
+        _settleCollectionNFTPoint(COID);
+    }
+
+    function _settleCollectionNFTPoint(uint256 COID) internal {
         uint256 point = getCollectionPoint(COID);
         uint256 collectionNFTPoint;
         if (point > 0) {
@@ -471,6 +489,7 @@ contract MiningData is IMiningData, Multicall {
             address owner = ILand(governance.landContract()).ownerOf(LandId);
             governance.mintMT(owner, amount);
             LandHolderMTs[LandId] = uint128(LandHolderMTs[LandId]);
+            emit MTClaimedLandHolder(LandId, amount);
         }
     }
 
@@ -528,7 +547,7 @@ contract MiningData is IMiningData, Multicall {
         if (onMapNFTPoint == 0) {
             governance.addCollectionOnMapNum(COID);
         }
-        settleCollectionNFTPoint(COID);
+        _settleCollectionNFTPoint(COID);
 
         MTProduceData += amount;
         CollectionMTs[COID] += amount;
@@ -545,17 +564,30 @@ contract MiningData is IMiningData, Multicall {
         mintCollectionMT(COID);
         uint256 amount = mintAvatarMT(avatarId);
         governance.subCollectionOnMapNum(COID);
-        settleCollectionNFTPoint(COID);
+        _settleCollectionNFTPoint(COID);
 
         MTProduceData -= amount;
         CollectionMTs[COID] -= amount;
         AvatarMTs[avatarId] -= amount;
     }
 
-    function NFTOfferAcceptNotify(uint256 price) public {
+    function NFTOfferAcceptNotify(
+        uint256 COID,
+        uint256 price,
+        uint256 tokenId
+    ) public {
         NFTOfferCoefficient =
             ((totalMTStaking - price) * NFTOfferCoefficient) /
             totalMTStaking;
+        emit NFTOfferAccept(COID, tokenId, price);
+    }
+
+    function NFTAuctionAcceptNotify(
+        uint256 COID,
+        uint256 price,
+        uint256 tokenId
+    ) public {
+        emit NFTAuctionAccept(COID, tokenId, price);
     }
 
     function changeTotalMTStaking(
@@ -573,7 +605,7 @@ contract MiningData is IMiningData, Multicall {
     modifier onlyCollectionVault(uint256 COID) {
         require(
             msg.sender == governance.getCollectionVault(COID),
-            "not allowed"
+            "only collection vault allowed"
         );
         _;
     }
@@ -582,7 +614,7 @@ contract MiningData is IMiningData, Multicall {
         require(
             msg.sender == governance.avatarContract() ||
                 msg.sender == governance.mapContract(),
-            "not allowed"
+            "only avatar and map allowed"
         );
         _;
     }
