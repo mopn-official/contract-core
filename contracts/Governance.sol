@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "hardhat/console.sol";
+
+import "./interfaces/IMiningData.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IBomb.sol";
+import "./interfaces/IERC20Receiver.sol";
 import "./InitializedProxy.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
@@ -39,6 +43,11 @@ contract Governance is Multicall, Ownable {
     bool public whiteListRequire;
 
     bytes32 public whiteListRoot;
+
+    event CollectionVaultCreated(
+        uint256 indexed COID,
+        address indexed collectionVault
+    );
 
     function setWhiteListRequire(bool whiteListRequire_) public onlyOwner {
         whiteListRequire = whiteListRequire_;
@@ -185,7 +194,8 @@ contract Governance is Multicall, Ownable {
         );
     }
 
-    function createCollectionVault(uint256 COID) public {
+    function createCollectionVault(uint256 COID) public returns (address) {
+        require(COIDMap[COID] != address(0), "collection not exist");
         require(
             CollectionVaultMap[COID] == address(0),
             "collection vault exist"
@@ -199,15 +209,7 @@ contract Governance is Multicall, Ownable {
             new InitializedProxy(address(this), _initializationCalldata)
         );
         CollectionVaultMap[COID] = vaultAddress;
-        if (getCollectionMintedMT(COID) > 0) {
-            IMOPNToken(mtContract).mint(
-                vaultAddress,
-                getCollectionMintedMT(COID)
-            );
-            collectionMap[getCollectionContract(COID)] = uint192(
-                collectionMap[getCollectionContract(COID)]
-            );
-        }
+        return vaultAddress;
     }
 
     function getCollectionVault(uint256 COID) public view returns (address) {
@@ -271,8 +273,45 @@ contract Governance is Multicall, Ownable {
         _;
     }
 
-    modifier onlyMap() {
-        require(msg.sender == mapContract, "not allowed");
-        _;
+    function encodeaddress(address a) public pure returns (bytes memory) {
+        return abi.encode(a, a);
+    }
+
+    function onERC20Received(
+        address,
+        address from,
+        uint256 value,
+        bytes memory data
+    ) public returns (bytes4) {
+        require(msg.sender == mtContract, "only accept mopn token");
+
+        address collectionAddress;
+        assembly {
+            collectionAddress := mload(add(data, 20))
+        }
+
+        uint256 COID = getCollectionCOID(collectionAddress);
+        bytes32[] memory temp;
+        if (COID == 0) {
+            COID = generateCOID(collectionAddress, temp);
+        }
+        address collectionVault = getCollectionVault(COID);
+        if (collectionVault == address(0)) {
+            collectionVault = createCollectionVault(COID);
+        }
+
+        IMOPNToken(mtContract).safeTransferFrom(
+            address(this),
+            collectionVault,
+            value,
+            "0x"
+        );
+
+        IERC20(collectionVault).transfer(
+            from,
+            IERC20(collectionVault).balanceOf(address(this))
+        );
+
+        return IERC20Receiver.onERC20Received.selector;
     }
 }

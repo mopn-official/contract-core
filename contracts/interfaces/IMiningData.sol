@@ -80,5 +80,15 @@ interface IMiningData {
         uint256 amount
     ) external;
 
-    function NFTOfferAcceptNotify(uint256 price) external;
+    function NFTOfferAcceptNotify(
+        uint256 COID,
+        uint256 price,
+        uint256 tokenId
+    ) external;
+
+    function NFTAuctionAcceptNotify(
+        uint256 COID,
+        uint256 price,
+        uint256 tokenId
+    ) external;
 }

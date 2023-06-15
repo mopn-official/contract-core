@@ -2,34 +2,6 @@
 
 ## IGovernance
 
-### redeemAvatarInboxMT
-
-```solidity
-function redeemAvatarInboxMT(uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault) external
-```
-
-redeem avatar unclaimed minted MOPN Tokens
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| delegateWallet | enum IAvatar.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
-| vault | address | cold wallet address |
-
-### redeemCollectionInboxMT
-
-```solidity
-function redeemCollectionInboxMT(address to, uint256 avatarId, uint256 COID) external
-```
-
-### redeemLandHolderInboxMT
-
-```solidity
-function redeemLandHolderInboxMT(uint32 LandId) external
-```
-
 ### getCollectionContract
 
 ```solidity
@@ -96,6 +68,36 @@ function addCollectionAvatarNum(uint256 COID) external
 function getCollectionAvatarNum(uint256 COID) external view returns (uint256)
 ```
 
+### getCollectionMintedMT
+
+```solidity
+function getCollectionMintedMT(uint256 COID) external view returns (uint256)
+```
+
+### addCollectionMintedMT
+
+```solidity
+function addCollectionMintedMT(uint256 COID, uint256 amount) external
+```
+
+### clearCollectionMintedMT
+
+```solidity
+function clearCollectionMintedMT(uint256 COID) external
+```
+
+### getCollectionVault
+
+```solidity
+function getCollectionVault(uint256 COID) external view returns (address)
+```
+
+### mintMT
+
+```solidity
+function mintMT(address to, uint256 amount) external
+```
+
 ### mintBomb
 
 ```solidity
@@ -106,18 +108,6 @@ function mintBomb(address to, uint256 amount) external
 
 ```solidity
 function burnBomb(address from, uint256 amount) external
-```
-
-### redeemAgio
-
-```solidity
-function redeemAgio() external
-```
-
-### mintLand
-
-```solidity
-function mintLand(address to) external
 ```
 
 ### auctionHouseContract
@@ -154,5 +144,11 @@ function mapContract() external view returns (address)
 
 ```solidity
 function landContract() external view returns (address)
+```
+
+### miningDataContract
+
+```solidity
+function miningDataContract() external view returns (address)
 ```
 

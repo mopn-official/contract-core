@@ -4,10 +4,10 @@
 
 _This Contract's owner must transfer to Governance Contract once it's deployed_
 
-### governanceContract
+### governance
 
 ```solidity
-address governanceContract
+contract IGovernance governance
 ```
 
 ### bombRoundProduce
@@ -29,6 +29,10 @@ uint256 bombRound
 ```
 
 uint64 roundId + uint32 startTimestamp + uint8 round sold
+Bits Layout:
+- [0..7]      `round Sold`
+- [8..39]     `starttimestamp`
+- [40..103]    `roundId`
 
 _last active round and it's start timestamp and it's settlement status_
 
@@ -48,7 +52,13 @@ mapping(address => uint256) bombWalletData
 ```
 
 _record the last participate round auction data
-wallet address => uint64 total spend + uint64 roundId + uint8 auction amount + uint8 agio redeem status_
+wallet address => uint64 total spend + uint64 roundId + uint8 auction amount + uint8 agio redeem status
+
+Bits Layout:
+- [0]        `agio redeem status`
+- [1..8]     `auction amount`
+- [9..72]    `roundId`
+- [72..255]  `total spend`_
 
 ### BombSold
 
@@ -75,29 +85,17 @@ uint256 landRound
 ```
 
 uint64 roundId + uint32 startTimestamp
+ Bits Layout:
+ - [0..31]      `start timestamp`
+ - [32..95]     `round Id`
 
 _last active round's start timestamp_
 
 ### constructor
 
 ```solidity
-constructor(uint256 bombStartTimestamp, uint256 landStartTimestamp) public
+constructor(address governance_, uint256 bombStartTimestamp, uint256 landStartTimestamp) public
 ```
-
-### setGovernanceContract
-
-```solidity
-function setGovernanceContract(address governanceContract_) public
-```
-
-_set the governance contract address
-this function also get the mopn token contract from the governances_
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| governanceContract_ | address | Governance Contract Address |
 
 ### buyBomb
 
@@ -116,7 +114,7 @@ buy the amount of bombs at current block's price
 ### getBombRoundId
 
 ```solidity
-function getBombRoundId() public view returns (uint64)
+function getBombRoundId() public view returns (uint256)
 ```
 
 get current Round Id
@@ -125,7 +123,7 @@ get current Round Id
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| [0] | uint64 | roundId round Id |
+| [0] | uint256 | roundId round Id |
 
 ### getBombRoundStartTimestamp
 
@@ -142,7 +140,7 @@ function getBombRoundSold() public view returns (uint8)
 ### getBombWalletTotalSpend
 
 ```solidity
-function getBombWalletTotalSpend(address wallet) public view returns (uint64)
+function getBombWalletTotalSpend(address wallet) public view returns (uint256)
 ```
 
 ### getBombWalletRoundId
@@ -243,7 +241,7 @@ function _redeemAgio(address to) internal
 ### settleBombPreviousRound
 
 ```solidity
-function settleBombPreviousRound(uint64 roundId, uint256 price) internal
+function settleBombPreviousRound(uint256 roundId, uint256 price) internal
 ```
 
 make the last round settlement

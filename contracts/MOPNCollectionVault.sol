@@ -152,7 +152,9 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
             COID
         );
         IMiningData(governance.miningDataContract()).NFTOfferAcceptNotify(
-            offerPrice
+            COID,
+            offerPrice,
+            tokenId
         );
     }
 
@@ -198,18 +200,18 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
 
             require(value >= price, "MOPNToken not enough");
 
-            if (price > 0) {
-                uint256 burnAmount = (price * 2) / 10;
-                IMOPNToken(governance.mtContract()).burn(burnAmount);
-
-                price = price - burnAmount;
-            }
-
             if (value > price) {
                 IMOPNToken(governance.mtContract()).transfer(
                     from,
                     value - price
                 );
+                value = price;
+            }
+            if (price > 0) {
+                uint256 burnAmount = (price * 2) / 10;
+                IMOPNToken(governance.mtContract()).burn(burnAmount);
+
+                price = price - burnAmount;
             }
 
             IMiningData(governance.miningDataContract()).settleCollectionMining(
@@ -229,6 +231,18 @@ contract MOPNCollectionVault is ERC20, IERC20Receiver, Ownable {
                         offerAcceptPrice - price
                     );
             }
+
+            IERC721(governance.getCollectionContract(COID)).safeTransferFrom(
+                address(this),
+                from,
+                getAuctionTokenId(),
+                "0x"
+            );
+            IMiningData(governance.miningDataContract()).NFTAuctionAcceptNotify(
+                    COID,
+                    value,
+                    getAuctionTokenId()
+                );
             NFTOfferData = 0;
         } else {
             IMiningData(governance.miningDataContract()).settleCollectionMining(

@@ -108,26 +108,17 @@ mapping(address => mapping(uint256 => uint256)) tokenMap
 uint256 currentAvatarId
 ```
 
-### governanceContract
+### governance
 
 ```solidity
-address governanceContract
+contract IGovernance governance
 ```
 
-### setGovernanceContract
+### constructor
 
 ```solidity
-function setGovernanceContract(address governanceContract_) public
+constructor(address governance_) public
 ```
-
-_set the governance contract address
-this function also get the Map contract from the governances_
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| governanceContract_ | address | Governance Contract Address |
 
 ### getNFTAvatarId
 

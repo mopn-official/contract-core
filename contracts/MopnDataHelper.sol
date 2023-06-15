@@ -32,31 +32,32 @@ contract MopnDataHelper is Ownable {
     }
 
     IGovernance governance;
-    IAvatar avatar;
-    IMap map;
-    IMiningData miningData;
 
     constructor(address governanceContract_) {
         governance = IGovernance(governanceContract_);
-        avatar = IAvatar(governance.avatarContract());
-        map = IMap(governance.mapContract());
-        miningData = IMiningData(governance.miningDataContract());
     }
 
     function getAvatarByAvatarId(
         uint256 avatarId
     ) public view returns (AvatarDataOutput memory avatarData) {
-        avatarData.COID = avatar.getAvatarCOID(avatarId);
+        avatarData.COID = IAvatar(governance.avatarContract()).getAvatarCOID(
+            avatarId
+        );
         if (avatarData.COID > 0) {
-            avatarData.tokenId = avatar.getAvatarTokenId(avatarId);
+            avatarData.tokenId = IAvatar(governance.avatarContract())
+                .getAvatarTokenId(avatarId);
             avatarData.avatarId = avatarId;
             avatarData.contractAddress = governance.getCollectionContract(
                 avatarData.COID
             );
-            avatarData.BombUsed = avatar.getAvatarBombUsed(avatarId);
-            avatarData.inboxMT = miningData.calcAvatarMT(avatarId);
-            avatarData.NFTPoint = miningData.getAvatarNFTPoint(avatarId);
-            avatarData.tileCoordinate = avatar.getAvatarCoordinate(avatarId);
+            avatarData.BombUsed = IAvatar(governance.avatarContract())
+                .getAvatarBombUsed(avatarId);
+            avatarData.inboxMT = IMiningData(governance.miningDataContract())
+                .calcAvatarMT(avatarId);
+            avatarData.NFTPoint = IMiningData(governance.miningDataContract())
+                .getAvatarNFTPoint(avatarId);
+            avatarData.tileCoordinate = IAvatar(governance.avatarContract())
+                .getAvatarCoordinate(avatarId);
         }
     }
 
@@ -80,7 +81,10 @@ contract MopnDataHelper is Ownable {
         uint256 tokenId
     ) public view returns (AvatarDataOutput memory avatarData) {
         avatarData = getAvatarByAvatarId(
-            avatar.getNFTAvatarId(collection, tokenId)
+            IAvatar(governance.avatarContract()).getNFTAvatarId(
+                collection,
+                tokenId
+            )
         );
     }
 
@@ -97,7 +101,10 @@ contract MopnDataHelper is Ownable {
         avatarDatas = new AvatarDataOutput[](collections.length);
         for (uint256 i = 0; i < collections.length; i++) {
             avatarDatas[i] = getAvatarByAvatarId(
-                avatar.getNFTAvatarId(collections[i], tokenIds[i])
+                IAvatar(governance.avatarContract()).getNFTAvatarId(
+                    collections[i],
+                    tokenIds[i]
+                )
             );
         }
     }
@@ -120,7 +127,7 @@ contract MopnDataHelper is Ownable {
         for (uint256 i = 0; i < heightabs; i++) {
             for (uint256 j = 0; j < widthabs; j++) {
                 avatarDatas[i * widthabs + j] = getAvatarByAvatarId(
-                    map.getTileAvatar(coordinate)
+                    IMap(governance.mapContract()).getTileAvatar(coordinate)
                 );
                 avatarDatas[i * widthabs + j].tileCoordinate = coordinate;
                 coordinate = width > 0
@@ -174,7 +181,7 @@ contract MopnDataHelper is Ownable {
         avatarDatas = new AvatarDataOutput[](coordinates.length);
         for (uint256 i = 0; i < coordinates.length; i++) {
             avatarDatas[i] = getAvatarByAvatarId(
-                map.getTileAvatar(coordinates[i])
+                IMap(governance.mapContract()).getTileAvatar(coordinates[i])
             );
             avatarDatas[i].tileCoordinate = coordinates[i];
         }
@@ -185,7 +192,8 @@ contract MopnDataHelper is Ownable {
     ) public view returns (uint256[] memory inboxMTs) {
         inboxMTs = new uint256[](avatarIds.length);
         for (uint256 i = 0; i < avatarIds.length; i++) {
-            inboxMTs[i] = miningData.calcAvatarMT(avatarIds[i]);
+            inboxMTs[i] = IMiningData(governance.miningDataContract())
+                .calcAvatarMT(avatarIds[i]);
         }
     }
 
@@ -199,9 +207,12 @@ contract MopnDataHelper is Ownable {
         cData.COID = COID;
         cData.OnMapNum = governance.getCollectionOnMapNum(COID);
         cData.AvatarNum = governance.getCollectionAvatarNum(COID);
-        cData.inboxMT = miningData.calcCollectionMT(COID);
-        cData.NFTPoint = miningData.getCollectionNFTPoint(COID);
-        cData.AvatarNFTPoint = miningData.getCollectionAvatarNFTPoint(COID);
+        cData.inboxMT = IMiningData(governance.miningDataContract())
+            .calcCollectionMT(COID);
+        cData.NFTPoint = IMiningData(governance.miningDataContract())
+            .getCollectionNFTPoint(COID);
+        cData.AvatarNFTPoint = IMiningData(governance.miningDataContract())
+            .getCollectionAvatarNFTPoint(COID);
     }
 
     function getBatchCollectionInfo(
