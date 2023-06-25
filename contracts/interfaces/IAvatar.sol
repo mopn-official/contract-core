@@ -36,36 +36,22 @@ interface IAvatar {
 
     /**
      * @notice Avatar On Map Action Params
-     * @param tileCoordinate destination tile coordinate
      * @param collectionContract the collection contract address of a nft
      * @param tokenId the token Id of a nft
-     * @param linkedAvatarId linked same collection avatar Id if you have a collection ally on the map
-     * @param LandId the destination tile's LandId
-     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
-     * @param vault cold wallet address
+     * @param proofs nft whitelist proofs
      */
-    struct NFTParams {
+    struct WhiteListNFTParams {
         address collectionContract;
         uint256 tokenId;
         bytes32[] proofs;
-        DelegateWallet delegateWallet;
-        address vault;
     }
 
-    /**
-     * @notice Delegate Wallet Protocols
-     */
-    enum DelegateWallet {
-        None,
-        DelegateCash,
-        Warm
+    struct NFTParams {
+        address collectionContract;
+        uint256 tokenId;
     }
 
-    function ownerOf(
-        uint256 avatarId,
-        DelegateWallet delegateWallet,
-        address vault
-    ) external view returns (address);
+    function ownerOf(uint256 avatarId) external view returns (address);
 
     /**
      * @notice an on map avatar move to a new tile
@@ -83,4 +69,40 @@ interface IAvatar {
      * @param params NFTParams
      */
     function bomb(NFTParams calldata params, uint32 tileCoordinate) external;
+
+    function getCollectionAdditionalNFTPoints(
+        uint256 COID
+    ) external view returns (uint256);
+
+    function getCollectionOnMapNum(
+        uint256 COID
+    ) external view returns (uint256);
+
+    function getCollectionAvatarNum(
+        uint256 COID
+    ) external view returns (uint256);
+
+    function getCollectionMintedMT(
+        uint256 COID
+    ) external view returns (uint256);
+
+    function addCollectionMintedMT(uint256 COID, uint256 amount) external;
+
+    function clearCollectionMintedMT(uint256 COID) external;
+
+    function getCollectionContract(
+        uint256 COID
+    ) external view returns (address);
+
+    function getCollectionCOID(
+        address collectionContract
+    ) external view returns (uint256);
+
+    function getCollectionsCOIDs(
+        address[] memory collectionContracts
+    ) external view returns (uint256[] memory COIDs);
+
+    function generateCOID(
+        address collectionContract
+    ) external returns (uint256);
 }

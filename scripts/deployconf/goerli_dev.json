@@ -35,7 +35,7 @@
         ]
     },
     "Governance": {
-        "address": "0xE44477A7f623c8dc56Df1201a2520e732F05A50e",
+        "address": "0xe41161f85B6f8DE0d740189278e228bC30CDfE61",
         "verified": true,
         "attributesCheck": [
             {
@@ -64,7 +64,7 @@
         ]
     },
     "AuctionHouse": {
-        "address": "0x897b8aBef55af86124b749d8eD7B8FA1a47e5ea3",
+        "address": "0x38353f72feA94513D9F91bE2B0928AaE552B6347",
         "verified": true,
         "constructparams": [
             "Governance",
@@ -73,7 +73,7 @@
         ]
     },
     "Avatar": {
-        "address": "0x0e02fC5523C31724BD7644ac9197623eb4ee251e",
+        "address": "0xfd353f0b3cEE1A046a80Efd9818F1870807DA053",
         "verified": true,
         "libraries": [
             "TileMath"
@@ -83,7 +83,7 @@
         ]
     },
     "Bomb": {
-        "address": "0xAe80976780333A11F064Fe33A98dE672d733B6f8",
+        "address": "0x451930139ac27668F2111093C9fb747D1A4EE1B1",
         "verified": true,
         "transOwnerTo": "Governance"
     },
@@ -99,8 +99,8 @@
         ]
     },
     "Map": {
-        "address": "0x5815e5BFB5fA32fc0eD93406166ca4f1190eF0dd",
-        "verified": true,
+        "address": "0x6923A434E0A11fa56C8808EE84707B9373334Fd2",
+        "verified": false,
         "libraries": [
             "TileMath"
         ],
@@ -109,16 +109,16 @@
         ]
     },
     "MiningData": {
-        "address": "0xa4f7cF85Ed81f55f34D19c9Ed108b0eCCE26D3fB",
-        "verified": true,
+        "address": "0xd34bF161bc43662481Decf4F449FC08f5C4a7af8",
+        "verified": false,
         "constructparams": [
             "Governance",
             1683828189
         ]
     },
     "MOPNCollectionVault": {
-        "address": "0xB50A6Cc9f4791745A91d38b6CBf81a7143f80A38",
-        "verified": true,
+        "address": "0x9c2dCD9040Ba8A8Ad12AE100355199fAE93C1b34",
+        "verified": false,
         "constructparams": [
             "Governance"
         ]
@@ -139,19 +139,19 @@
         ]
     },
     "MOPNToken": {
-        "address": "0xD8B104726757d04259d0B54Cfa68e79baeE36723",
-        "verified": true,
+        "address": "0xA7F8Dc06832cFBDeEaC9F0Dd336C294F51c7f4Aa",
+        "verified": false,
         "transOwnerTo": "Governance"
     },
     "MopnBatchHelper": {
-        "address": "0xFCaC1ecf4E93a2F88075b167D84151344da87056",
-        "verified": true,
+        "address": "0x2A33474e5369870f81D88F52455b046E99AD7476",
+        "verified": false,
         "constructparams": [
             "Governance"
         ]
     },
     "MopnDataHelper": {
-        "address": "0xCd75d4CDE25dFac2D8217Cf818CF1a8b3B2ef976",
+        "address": "0x19D55AC0f2087bA3fa1EBea8377a80796Cfd514d",
         "verified": false,
         "libraries": [
             "TileMath"

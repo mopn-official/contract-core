@@ -50,9 +50,8 @@ contract MopnDataHelper is Ownable {
             avatarData.tokenId = IAvatar(governance.avatarContract())
                 .getAvatarTokenId(avatarId);
             avatarData.avatarId = avatarId;
-            avatarData.contractAddress = governance.getCollectionContract(
-                avatarData.COID
-            );
+            avatarData.contractAddress = IAvatar(governance.avatarContract())
+                .getCollectionContract(avatarData.COID);
             avatarData.BombUsed = IAvatar(governance.avatarContract())
                 .getAvatarBombUsed(avatarId);
             avatarData.inboxMT = IMiningData(governance.miningDataContract())
@@ -206,10 +205,13 @@ contract MopnDataHelper is Ownable {
     function getCollectionInfo(
         uint256 COID
     ) public view returns (CollectionDataOutput memory cData) {
-        cData.contractAddress = governance.getCollectionContract(COID);
+        cData.contractAddress = IAvatar(governance.avatarContract())
+            .getCollectionContract(COID);
         cData.COID = COID;
-        cData.OnMapNum = governance.getCollectionOnMapNum(COID);
-        cData.AvatarNum = governance.getCollectionAvatarNum(COID);
+        cData.OnMapNum = IAvatar(governance.avatarContract())
+            .getCollectionOnMapNum(COID);
+        cData.AvatarNum = IAvatar(governance.avatarContract())
+            .getCollectionAvatarNum(COID);
         cData.inboxMT = IMiningData(governance.miningDataContract())
             .calcCollectionMT(COID);
         cData.CollectionNFTPoint = IMiningData(governance.miningDataContract())

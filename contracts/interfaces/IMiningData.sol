@@ -32,11 +32,7 @@ interface IMiningData {
 
     function mintAvatarMT(uint256 avatarId) external returns (uint256);
 
-    function redeemAvatarMT(
-        uint256 avatarId,
-        IAvatar.DelegateWallet delegateWallet,
-        address vault
-    ) external;
+    function redeemAvatarMT(uint256 avatarId) external;
 
     function getCollectionNFTPoint(
         uint256 COID
@@ -91,4 +87,6 @@ interface IMiningData {
         uint256 price,
         uint256 tokenId
     ) external;
+
+    function closeWhiteList() external;
 }

@@ -14,9 +14,9 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 contract AuctionHouse is Multicall, Ownable {
     IGovernance public governance;
 
-    uint8 public immutable bombRoundProduce = 100;
+    uint8 public immutable bombRoundProduce = 10;
 
-    uint256 public immutable bombPrice = 100000000000000;
+    uint256 public immutable bombPrice = 1000000000000;
 
     /**
      * @dev last active round and it's start timestamp and it's settlement status
@@ -60,7 +60,7 @@ contract AuctionHouse is Multicall, Ownable {
 
     event RedeemAgio(address indexed to, uint256 roundId, uint256 amount);
 
-    uint256 public immutable landPrice = 1000000000000000;
+    uint256 public immutable landPrice = 1000000000000;
 
     /**
      * @dev last active round's start timestamp

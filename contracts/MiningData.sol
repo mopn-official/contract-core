@@ -13,27 +13,26 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MiningData is IMiningData, Multicall {
-    uint256 public constant MTProducePerSecond = 50000000000;
+    uint256 public constant MTOutputPerSec = 500000000;
 
     uint256 public constant MTProduceReduceInterval = 604800;
 
     uint256 public immutable MTProduceStartTimestamp;
 
-    /// @notice uint64 PerNFTPointMinted + uint64 LastPerNFTPointMintedCalcTimestamp + uint64 TotalNFTPoints
+    /// @notice uint32 LastPerNFTPointMintedCalcTimestamp + uint48 TotalWhiteListNFTPoints + uint48 WhiteListFinPerNFTPointMinted  + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
     uint256 public MTProduceData;
 
-    /// @notice uint64 MT Inbox + uint64 CollectionPerNFTMinted + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
+    /// @notice uint64 NFTOfferCoefficient + uint64 TotalMTStaking
+    uint256 public MTVaultData;
+
+    /// @notice uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
     mapping(uint256 => uint256) public AvatarMTs;
 
-    /// @notice uint64 CollectionPerNFTMinted + uint64 PerNFTPointMinted + uint64 CollectionNFTPoints + uint64 AvatarNFTPoints
+    /// @notice uint64 PerCollectionNFTMinted + uint64 PerNFTPointMinted + uint64 CollectionNFTPoints + uint32 WhiteListNFTPoints + uint32 AvatarNFTPoints
     mapping(uint256 => uint256) public CollectionMTs;
 
     /// @notice uint64 MT Inbox + uint64 totalMTMinted + uint64 OnLandMiningNFT
     mapping(uint32 => uint256) public LandHolderMTs;
-
-    uint256 public NFTOfferCoefficient;
-
-    uint256 public totalMTStaking;
 
     event AvatarMTMinted(uint256 indexed avatarId, uint256 amount);
 
@@ -65,18 +64,19 @@ contract MiningData is IMiningData, Multicall {
     constructor(address governance_, uint256 MTProduceStartTimestamp_) {
         MTProduceStartTimestamp = MTProduceStartTimestamp_;
         governance = IGovernance(governance_);
-        NFTOfferCoefficient = 10 ** 18;
+        MTVaultData = (10 ** 18) << 64;
     }
 
     function getNFTOfferCoefficient() public view returns (uint256) {
-        return NFTOfferCoefficient;
+        return uint64(MTProduceData >> 64);
     }
 
-    /**
-     * @notice get settled Per MT Allocation Weight minted mopn token number
-     */
-    function getPerNFTPointMinted() public view returns (uint256) {
-        return uint64(MTProduceData >> 128);
+    function getTotalMTStaking() public view returns (uint256) {
+        return uint64(MTProduceData);
+    }
+
+    function getTotalWhiteListNFTPoints() public view returns (uint256) {
+        return uint48(MTProduceData >> 176);
     }
 
     /**
@@ -87,6 +87,17 @@ contract MiningData is IMiningData, Multicall {
         view
         returns (uint256)
     {
+        return uint32(MTProduceData >> 224);
+    }
+
+    function getWhiteListFinPerNFTPointMinted() public view returns (uint256) {
+        return uint48(MTProduceData >> 128);
+    }
+
+    /**
+     * @notice get settled Per MT Allocation Weight minted mopn token number
+     */
+    function getPerNFTPointMinted() public view returns (uint256) {
         return uint64(MTProduceData >> 64);
     }
 
@@ -106,7 +117,7 @@ contract MiningData is IMiningData, Multicall {
     ) public pure returns (uint256 MTPPB) {
         int128 reducePercentage = ABDKMath64x64.divu(997, 1000);
         int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, MTProducePerSecond);
+        return ABDKMath64x64.mulu(reducePower, MTOutputPerSec);
     }
 
     function currentMTPPS() public view returns (uint256 MTPPB) {
@@ -123,12 +134,17 @@ contract MiningData is IMiningData, Multicall {
      */
     function settlePerNFTPointMinted() public {
         if (block.timestamp > getLastPerNFTPointMintedCalcTimestamp()) {
-            uint256 PerNFTPointMinted = calcPerNFTPointMinted();
-            MTProduceData =
-                (PerNFTPointMinted << 128) |
-                (block.timestamp << 64) |
-                getTotalNFTPoints();
+            uint256 temp = uint256(uint224(MTProduceData));
+            temp += (calcPerNFTPointMinted() - getPerNFTPointMinted()) << 64;
+
+            MTProduceData = (block.timestamp << 224) | temp;
         }
+    }
+
+    function closeWhiteList() public onlyGovernance {
+        settlePerNFTPointMinted();
+        MTProduceData += getPerNFTPointMinted() << 128;
+        MTProduceData -= getTotalWhiteListNFTPoints();
     }
 
     function calcPerNFTPointMinted() public view returns (uint256) {
@@ -219,11 +235,11 @@ contract MiningData is IMiningData, Multicall {
         uint256 AvatarNFTPoint = getAvatarNFTPoint(avatarId);
         uint256 AvatarPerNFTPointMintedDiff = calcPerNFTPointMinted() -
             getAvatarPerNFTPointMinted(avatarId);
-        uint256 AvatarCollectionPerNFTMintedDiff = getCollectionPerNFTMinted(
-            IAvatar(governance.avatarContract()).getAvatarCOID(avatarId)
-        ) - getAvatarCollectionPerNFTMinted(avatarId);
 
         if (AvatarPerNFTPointMintedDiff > 0 && AvatarNFTPoint > 0) {
+            uint256 AvatarCollectionPerNFTMintedDiff = getPerCollectionNFTMinted(
+                    IAvatar(governance.avatarContract()).getAvatarCOID(avatarId)
+                ) - getAvatarCollectionPerNFTMinted(avatarId);
             inbox +=
                 ((AvatarPerNFTPointMintedDiff * AvatarNFTPoint) * 90) /
                 100;
@@ -243,14 +259,14 @@ contract MiningData is IMiningData, Multicall {
             getAvatarPerNFTPointMinted(avatarId);
 
         if (AvatarPerNFTPointMintedDiff > 0) {
-            uint256 AvatarCollectionPerNFTMintedDiff = getCollectionPerNFTMinted(
-                    IAvatar(governance.avatarContract()).getAvatarCOID(avatarId)
-                ) - getAvatarCollectionPerNFTMinted(avatarId);
+            uint256 collectionPerNFTMintedDiff = getPerCollectionNFTMinted(
+                IAvatar(governance.avatarContract()).getAvatarCOID(avatarId)
+            ) - getAvatarCollectionPerNFTMinted(avatarId);
             if (AvatarNFTPoint > 0) {
                 uint256 amount = ((AvatarPerNFTPointMintedDiff) *
                     AvatarNFTPoint);
-                if (AvatarCollectionPerNFTMintedDiff > 0) {
-                    amount += AvatarCollectionPerNFTMintedDiff;
+                if (collectionPerNFTMintedDiff > 0) {
+                    amount += collectionPerNFTMintedDiff;
                 }
 
                 uint32 LandId = IMap(governance.mapContract()).getTileLandId(
@@ -266,12 +282,12 @@ contract MiningData is IMiningData, Multicall {
 
                 AvatarMTs[avatarId] +=
                     (amount << 192) |
-                    (AvatarCollectionPerNFTMintedDiff << 128) |
+                    (collectionPerNFTMintedDiff << 128) |
                     (AvatarPerNFTPointMintedDiff << 64);
                 emit AvatarMTMinted(avatarId, amount);
             } else {
                 AvatarMTs[avatarId] +=
-                    (AvatarCollectionPerNFTMintedDiff << 128) |
+                    (collectionPerNFTMintedDiff << 128) |
                     (AvatarPerNFTPointMintedDiff << 64);
             }
         }
@@ -281,18 +297,10 @@ contract MiningData is IMiningData, Multicall {
     /**
      * @notice redeem avatar unclaimed minted mopn token
      * @param avatarId avatar Id
-     * @param delegateWallet Delegate coldwallet to specify hotwallet protocol
-     * @param vault cold wallet address
      */
-    function redeemAvatarMT(
-        uint256 avatarId,
-        IAvatar.DelegateWallet delegateWallet,
-        address vault
-    ) public {
+    function redeemAvatarMT(uint256 avatarId) public {
         address nftOwner = IAvatar(governance.avatarContract()).ownerOf(
-            avatarId,
-            delegateWallet,
-            vault
+            avatarId
         );
 
         settlePerNFTPointMinted();
@@ -311,7 +319,7 @@ contract MiningData is IMiningData, Multicall {
         }
     }
 
-    function getCollectionPerNFTMinted(
+    function getPerCollectionNFTMinted(
         uint256 COID
     ) public view returns (uint256) {
         return uint64(CollectionMTs[COID] >> 192);
@@ -335,6 +343,12 @@ contract MiningData is IMiningData, Multicall {
         return uint64(CollectionMTs[COID] >> 64);
     }
 
+    function getCollectionWhiteListNFTPoint(
+        uint256 COID
+    ) public view returns (uint256) {
+        return uint32(CollectionMTs[COID] >> 32);
+    }
+
     /**
      * @notice get collection avatars on map mining mopn token allocation weight
      * @param COID collection Id
@@ -342,7 +356,7 @@ contract MiningData is IMiningData, Multicall {
     function getCollectionAvatarNFTPoint(
         uint256 COID
     ) public view returns (uint256) {
-        return uint64(CollectionMTs[COID]);
+        return uint32(CollectionMTs[COID]);
     }
 
     function getCollectionPoint(
@@ -353,7 +367,7 @@ contract MiningData is IMiningData, Multicall {
                 IMOPNToken(governance.mtContract()).balanceOf(
                     governance.getCollectionVault(COID)
                 ) /
-                10 ** 7;
+                10 ** 8;
         }
     }
 
@@ -364,22 +378,39 @@ contract MiningData is IMiningData, Multicall {
     function calcCollectionMT(
         uint256 COID
     ) public view returns (uint256 inbox) {
-        inbox = governance.getCollectionMintedMT(COID);
+        inbox = IAvatar(governance.avatarContract()).getCollectionMintedMT(
+            COID
+        );
         uint256 PerNFTPointMinted = calcPerNFTPointMinted();
         uint256 CollectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
             COID
         );
+        uint256 WhiteListNFTPoints = getCollectionWhiteListNFTPoint(COID);
         uint256 CollectionNFTPoint = getCollectionNFTPoint(COID);
         uint256 AvatarNFTPoint = getCollectionAvatarNFTPoint(COID);
 
         if (
             CollectionPerNFTPointMinted < PerNFTPointMinted &&
-            (CollectionNFTPoint > 0 || AvatarNFTPoint > 0)
+            AvatarNFTPoint > 0
         ) {
             inbox +=
                 (((PerNFTPointMinted - CollectionPerNFTPointMinted) *
                     (CollectionNFTPoint + AvatarNFTPoint)) * 5) /
                 100;
+            if (WhiteListNFTPoints > 0) {
+                if (getWhiteListFinPerNFTPointMinted() > 0) {
+                    inbox +=
+                        (((getWhiteListFinPerNFTPointMinted() -
+                            CollectionPerNFTPointMinted) * WhiteListNFTPoints) *
+                            5) /
+                        100;
+                } else {
+                    inbox +=
+                        (((PerNFTPointMinted - CollectionPerNFTPointMinted) *
+                            WhiteListNFTPoints) * 5) /
+                        100;
+                }
+            }
         }
     }
 
@@ -388,27 +419,68 @@ contract MiningData is IMiningData, Multicall {
      * @param COID collection Id
      */
     function mintCollectionMT(uint256 COID) public {
-        uint256 CollectionNFTPoint = getCollectionNFTPoint(COID);
-        uint256 AvatarNFTPoint = getCollectionAvatarNFTPoint(COID);
+        uint256 collectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
+            COID
+        );
         uint256 CollectionPerNFTPointMintedDiff = getPerNFTPointMinted() -
-            getCollectionPerNFTPointMinted(COID);
+            collectionPerNFTPointMinted;
         if (CollectionPerNFTPointMintedDiff > 0) {
-            if (CollectionNFTPoint > 0 || AvatarNFTPoint > 0) {
-                uint256 amount = (((CollectionPerNFTPointMintedDiff *
-                    (CollectionNFTPoint + AvatarNFTPoint)) * 5) / 100);
-                governance.addCollectionMintedMT(COID, amount);
+            uint256 AvatarNFTPoint = getCollectionAvatarNFTPoint(COID);
+            if (AvatarNFTPoint > 0) {
+                uint256 CollectionMT = CollectionMTs[COID];
+                uint256 CollectionNFTPoint = getCollectionNFTPoint(COID);
+                uint256 amount = ((CollectionPerNFTPointMintedDiff *
+                    AvatarNFTPoint) * 5) / 100;
+                CollectionMT += (CollectionPerNFTPointMintedDiff << 128);
 
                 if (CollectionNFTPoint > 0) {
-                    CollectionMTs[COID] +=
-                        (((CollectionPerNFTPointMintedDiff *
-                            CollectionNFTPoint) /
-                            governance.getCollectionOnMapNum(COID)) << 192) |
-                        (CollectionPerNFTPointMintedDiff << 128);
-                } else {
-                    CollectionMTs[COID] += (CollectionPerNFTPointMintedDiff <<
-                        128);
+                    amount = (((CollectionPerNFTPointMintedDiff *
+                        CollectionNFTPoint) * 5) / 100);
+                    CollectionMT += (((CollectionPerNFTPointMintedDiff *
+                        CollectionNFTPoint) /
+                        IAvatar(governance.avatarContract())
+                            .getCollectionOnMapNum(COID)) << 192);
                 }
 
+                uint256 WhiteListNFTPoint = getCollectionWhiteListNFTPoint(
+                    COID
+                );
+                if (WhiteListNFTPoint > 0) {
+                    uint256 whiteListFinPerNFTPointMinted = getWhiteListFinPerNFTPointMinted();
+                    if (whiteListFinPerNFTPointMinted > 0) {
+                        if (
+                            whiteListFinPerNFTPointMinted >
+                            collectionPerNFTPointMinted
+                        ) {
+                            amount = ((((whiteListFinPerNFTPointMinted -
+                                collectionPerNFTPointMinted) *
+                                WhiteListNFTPoint) * 5) / 100);
+                            CollectionMT +=
+                                (((whiteListFinPerNFTPointMinted -
+                                    collectionPerNFTPointMinted) *
+                                    WhiteListNFTPoint) /
+                                    IAvatar(governance.avatarContract())
+                                        .getCollectionOnMapNum(COID)) <<
+                                192;
+                            CollectionMT -= WhiteListNFTPoint << 32;
+                        }
+                    } else {
+                        amount = (((CollectionPerNFTPointMintedDiff *
+                            WhiteListNFTPoint) * 5) / 100);
+                        CollectionMT +=
+                            (((CollectionPerNFTPointMintedDiff) *
+                                WhiteListNFTPoint) /
+                                IAvatar(governance.avatarContract())
+                                    .getCollectionOnMapNum(COID)) <<
+                            192;
+                    }
+                }
+
+                CollectionMTs[COID] = CollectionMT;
+                IAvatar(governance.avatarContract()).addCollectionMintedMT(
+                    COID,
+                    amount
+                );
                 emit CollectionMTMinted(COID, amount);
             } else {
                 CollectionMTs[COID] += CollectionPerNFTPointMintedDiff << 128;
@@ -417,11 +489,12 @@ contract MiningData is IMiningData, Multicall {
     }
 
     function redeemCollectionMT(uint256 COID) public {
-        uint256 amount = governance.getCollectionMintedMT(COID);
+        uint256 amount = IAvatar(governance.avatarContract())
+            .getCollectionMintedMT(COID);
         if (amount > 0) {
             governance.mintMT(governance.getCollectionVault(COID), amount);
-            governance.clearCollectionMintedMT(COID);
-            totalMTStaking += amount;
+            IAvatar(governance.avatarContract()).clearCollectionMintedMT(COID);
+            MTVaultData += amount;
             emit MTClaimedCollectionVault(COID, amount);
         }
     }
@@ -436,7 +509,11 @@ contract MiningData is IMiningData, Multicall {
         uint256 point = getCollectionPoint(COID);
         uint256 collectionNFTPoint;
         if (point > 0) {
-            collectionNFTPoint = point * governance.getCollectionOnMapNum(COID);
+            collectionNFTPoint =
+                point *
+                IAvatar(governance.avatarContract()).getCollectionOnMapNum(
+                    COID
+                );
         }
         uint256 preCollectionNFTPoint = getCollectionNFTPoint(COID);
         if (collectionNFTPoint != preCollectionNFTPoint) {
@@ -532,17 +609,32 @@ contract MiningData is IMiningData, Multicall {
         uint256 COID,
         uint256 amount
     ) internal {
-        amount *= 10 ** 8;
+        amount *= 100;
         settlePerNFTPointMinted();
         mintCollectionMT(COID);
-        uint256 onMapNFTPoint = mintAvatarMT(avatarId);
-        if (onMapNFTPoint == 0) {
-            governance.addCollectionOnMapNum(COID);
-        }
+        uint256 exist = mintAvatarMT(avatarId);
         _settleCollectionNFTPoint(COID);
 
-        MTProduceData += amount;
-        CollectionMTs[COID] += amount;
+        if (exist == 0 && getWhiteListFinPerNFTPointMinted() == 0) {
+            uint256 collectionAdditionalNFTPoints = IAvatar(
+                governance.avatarContract()
+            ).getCollectionAdditionalNFTPoints(COID);
+            if (collectionAdditionalNFTPoints > 0) {
+                MTProduceData +=
+                    (collectionAdditionalNFTPoints << 176) |
+                    (amount + collectionAdditionalNFTPoints);
+                CollectionMTs[COID] +=
+                    (collectionAdditionalNFTPoints << 32) |
+                    amount;
+            } else {
+                MTProduceData += amount;
+                CollectionMTs[COID] += amount;
+            }
+        } else {
+            MTProduceData += amount;
+            CollectionMTs[COID] += amount;
+        }
+
         AvatarMTs[avatarId] += amount;
     }
 
@@ -555,11 +647,28 @@ contract MiningData is IMiningData, Multicall {
         settlePerNFTPointMinted();
         mintCollectionMT(COID);
         uint256 amount = mintAvatarMT(avatarId);
-        governance.subCollectionOnMapNum(COID);
         _settleCollectionNFTPoint(COID);
 
-        MTProduceData -= amount;
-        CollectionMTs[COID] -= amount;
+        if (getWhiteListFinPerNFTPointMinted() == 0) {
+            uint256 collectionAdditionalNFTPoints = IAvatar(
+                governance.avatarContract()
+            ).getCollectionAdditionalNFTPoints(COID);
+            if (collectionAdditionalNFTPoints > 0) {
+                MTProduceData -=
+                    (collectionAdditionalNFTPoints << 176) |
+                    (amount + collectionAdditionalNFTPoints);
+                CollectionMTs[COID] -=
+                    (collectionAdditionalNFTPoints << 32) |
+                    amount;
+            } else {
+                MTProduceData -= amount;
+                CollectionMTs[COID] -= amount;
+            }
+        } else {
+            MTProduceData -= amount;
+            CollectionMTs[COID] -= amount;
+        }
+
         AvatarMTs[avatarId] -= amount;
     }
 
@@ -568,8 +677,11 @@ contract MiningData is IMiningData, Multicall {
         uint256 price,
         uint256 tokenId
     ) public {
-        NFTOfferCoefficient =
-            ((totalMTStaking - price) * NFTOfferCoefficient) /
+        uint256 totalMTStaking = getTotalMTStaking();
+        MTVaultData =
+            ((((totalMTStaking + 10000 - price) * getNFTOfferCoefficient()) /
+                totalMTStaking +
+                10000) << 64) |
             totalMTStaking;
         emit NFTOfferAccept(COID, tokenId, price);
     }
@@ -588,9 +700,9 @@ contract MiningData is IMiningData, Multicall {
         uint256 amount
     ) public onlyCollectionVault(COID) {
         if (increase) {
-            totalMTStaking += amount;
+            MTVaultData += amount;
         } else {
-            totalMTStaking -= amount;
+            MTVaultData -= amount;
         }
     }
 
@@ -608,6 +720,11 @@ contract MiningData is IMiningData, Multicall {
                 msg.sender == governance.mapContract(),
             "only avatar and map allowed"
         );
+        _;
+    }
+
+    modifier onlyGovernance() {
+        require(msg.sender == address(governance), "only governance allowed");
         _;
     }
 }

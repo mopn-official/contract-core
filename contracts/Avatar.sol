@@ -6,19 +6,13 @@ import "./interfaces/IGovernance.sol";
 import "./interfaces/IMap.sol";
 import "./interfaces/IMiningData.sol";
 import "./libraries/TileMath.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-interface WarmInterface {
-    function ownerOf(
-        address contractAddress,
-        uint256 tokenId
-    ) external view returns (address);
-}
-
-interface DelegateCashInterface {
+interface IDelegationRegistry {
     function checkDelegateForToken(
         address delegate,
         address vault,
@@ -88,6 +82,18 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint256[] victims,
         uint32[] victimsCoordinates
     );
+
+    // Collection Id
+    uint256 COIDCounter;
+
+    mapping(uint256 => address) public COIDMap;
+
+    /**
+     * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
+     *
+     * Collection address => uint64 mintedMT + uint48 additionalNFTPoints + uint48 COID + uint48 minted avatar num + uint48 on map nft number
+     */
+    mapping(address => uint256) public collectionMap;
 
     /** 
         avatar storage map
@@ -160,72 +166,32 @@ contract Avatar is IAvatar, Multicall, Ownable {
             (uint256(tileCoordinate) & mask);
     }
 
-    address public constant WARM_CONTRACT_ADDRESS =
-        0xC3AA9bc72Bd623168860a1e5c6a4530d3D80456c;
-
-    address public constant DelegateCash_CONTRACT_ADDRESS =
-        0x00000000000076A84feF008CDAbe6409d2FE638B;
-
     /**
      * @notice get the original owner of a NFT
      * MOPN Avatar support hot wallet protocol https://delegate.cash/ and https://warm.xyz/ to verify your NFTs
      * @param collectionContract NFT collection Contract Address
      * @param tokenId NFT tokenId
-     * @param delegateWallet DelegateWallet enum to specify protocol
-     * @param vault cold wallet address
      * @return owner nft owner or nft delegate hot wallet
      */
     function ownerOf(
         address collectionContract,
-        uint256 tokenId,
-        DelegateWallet delegateWallet,
-        address vault
+        uint256 tokenId
     ) public view returns (address owner) {
-        if (delegateWallet == DelegateWallet.None) {
-            return IERC721(collectionContract).ownerOf(tokenId);
-        } else if (delegateWallet == DelegateWallet.DelegateCash) {
-            if (
-                DelegateCashInterface(DelegateCash_CONTRACT_ADDRESS)
-                    .checkDelegateForToken(
-                        msg.sender,
-                        vault,
-                        collectionContract,
-                        tokenId
-                    )
-            ) {
-                return vault;
-            } else {
-                return IERC721(collectionContract).ownerOf(tokenId);
-            }
-        } else if (delegateWallet == DelegateWallet.Warm) {
-            return
-                WarmInterface(WARM_CONTRACT_ADDRESS).ownerOf(
-                    collectionContract,
-                    tokenId
-                );
-        }
+        return IERC721(collectionContract).ownerOf(tokenId);
     }
 
     /**
      * @notice get the original owner of a avatar linked nft
      * @param avatarId avatar Id
-     * @param delegateWallet DelegateWallet enum to specify protocol
-     * @param vault cold wallet address
      * @return owner nft owner or nft delegate hot wallet
      */
-    function ownerOf(
-        uint256 avatarId,
-        DelegateWallet delegateWallet,
-        address vault
-    ) public view returns (address) {
+    function ownerOf(uint256 avatarId) public view returns (address) {
         uint256 COID = getAvatarCOID(avatarId);
         require(COID > 0, "avatar not exist");
         return
             ownerOf(
-                governance.getCollectionContract(COID),
-                avatarNoumenon[avatarId].tokenId,
-                delegateWallet,
-                vault
+                getCollectionContract(COID),
+                avatarNoumenon[avatarId].tokenId
             );
     }
 
@@ -234,14 +200,11 @@ contract Avatar is IAvatar, Multicall, Ownable {
      * @param params NFTParams
      */
     function mintAvatar(NFTParams calldata params) internal returns (uint256) {
-        uint256 COID = governance.getCollectionCOID(params.collectionContract);
+        uint256 COID = getCollectionCOID(params.collectionContract);
         if (COID == 0) {
-            COID = governance.generateCOID(
-                params.collectionContract,
-                params.proofs
-            );
+            COID = generateCOID(params.collectionContract);
         } else {
-            governance.addCollectionAvatarNum(COID);
+            addCollectionAvatarNum(COID);
         }
 
         currentAvatarId++;
@@ -271,12 +234,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
     )
         public
         tileCheck(tileCoordinate)
-        ownerCheck(
-            params.collectionContract,
-            params.tokenId,
-            params.delegateWallet,
-            params.vault
-        )
+        ownerCheck(params.collectionContract, params.tokenId)
     {
         uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
         if (avatarId == 0) {
@@ -297,6 +255,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 tileCoordinate
             );
         } else {
+            addCollectionOnMapNum(COID);
             emit AvatarJumpIn(avatarId, COID, LandId, tileCoordinate);
         }
 
@@ -320,12 +279,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
     )
         public
         tileCheck(tileCoordinate)
-        ownerCheck(
-            params.collectionContract,
-            params.tokenId,
-            params.delegateWallet,
-            params.vault
-        )
+        ownerCheck(params.collectionContract, params.tokenId)
     {
         uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
         if (avatarId == 0) {
@@ -353,6 +307,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
             if (attackAvatarId > 0) {
                 setAvatarCoordinate(attackAvatarId, 0);
+                subCollectionOnMapNum(getAvatarCOID(attackAvatarId));
                 attackAvatarIds[i] = attackAvatarId;
                 victimsCoordinates[i] = tileCoordinate;
             }
@@ -369,6 +324,153 @@ contract Avatar is IAvatar, Multicall, Ownable {
             orgTileCoordinate,
             attackAvatarIds,
             victimsCoordinates
+        );
+    }
+
+    /**
+     * @notice use collection Id to get collection contract address
+     * @param COID collection Id
+     * @return contractAddress collection contract address
+     */
+    function getCollectionContract(uint256 COID) public view returns (address) {
+        return COIDMap[COID];
+    }
+
+    /**
+     * @notice use collection contract address to get collection Id
+     * @param collectionContract collection contract address
+     * @return COID collection Id
+     */
+    function getCollectionCOID(
+        address collectionContract
+    ) public view returns (uint256) {
+        return uint48(collectionMap[collectionContract] >> 96);
+    }
+
+    /**
+     * @notice batch call for {getCollectionCOID}
+     * @param collectionContracts multi collection contracts
+     */
+    function getCollectionsCOIDs(
+        address[] memory collectionContracts
+    ) public view returns (uint256[] memory COIDs) {
+        COIDs = new uint256[](collectionContracts.length);
+        for (uint256 i = 0; i < collectionContracts.length; i++) {
+            COIDs[i] = uint64(collectionMap[collectionContracts[i]] >> 96);
+        }
+    }
+
+    /**
+     * Generate a collection id for new collection
+     * @param collectionContract collection contract adddress
+     */
+    function generateCOID(
+        address collectionContract
+    ) public returns (uint256 COID) {
+        COID = getCollectionCOID(collectionContract);
+        require(COID == 0, "COID exist");
+
+        require(
+            IERC165(collectionContract).supportsInterface(
+                type(IERC721).interfaceId
+            ),
+            "not a erc721 compatible nft"
+        );
+
+        COIDCounter++;
+        COIDMap[COIDCounter] = collectionContract;
+        collectionMap[collectionContract] =
+            (COIDCounter << 96) |
+            (uint256(1) << 48);
+        COID = COIDCounter;
+    }
+
+    /**
+     * @notice check if this collection is in white list
+     * @param collectionContract collection contract address
+     * @param additionalNFTPoints additional NFT Points
+     * @param proofs collection whitelist proofs
+     */
+    function setCollectionAdditionalNFTPoints(
+        address collectionContract,
+        uint256 additionalNFTPoints,
+        bytes32[] memory proofs
+    ) public {
+        require(
+            MerkleProof.verify(
+                proofs,
+                governance.whiteListRoot(),
+                keccak256(
+                    bytes.concat(
+                        keccak256(
+                            abi.encode(collectionContract, additionalNFTPoints)
+                        )
+                    )
+                )
+            ),
+            "collection additionalNFTPoints can't verify"
+        );
+        uint256 COID = getCollectionCOID(collectionContract);
+        if (COID == 0) {
+            COID = generateCOID(collectionContract);
+        }
+
+        collectionMap[collectionContract] =
+            (getCollectionMintedMT(COID) << 192) |
+            (additionalNFTPoints << 144) |
+            uint144(collectionMap[collectionContract]);
+    }
+
+    function getCollectionAdditionalNFTPoints(
+        uint256 COID
+    ) public view returns (uint256) {
+        return uint48(collectionMap[getCollectionContract(COID)] >> 144);
+    }
+
+    /**
+     * @notice get NFT collection On map avatar number
+     * @param COID collection Id
+     */
+    function getCollectionOnMapNum(uint256 COID) public view returns (uint256) {
+        return uint48(collectionMap[getCollectionContract(COID)]);
+    }
+
+    function addCollectionOnMapNum(uint256 COID) internal {
+        collectionMap[getCollectionContract(COID)]++;
+    }
+
+    function subCollectionOnMapNum(uint256 COID) internal {
+        collectionMap[getCollectionContract(COID)]--;
+    }
+
+    /**
+     * @notice get NFT collection minted avatar number
+     * @param COID collection Id
+     */
+    function getCollectionAvatarNum(
+        uint256 COID
+    ) public view returns (uint256) {
+        return uint64(collectionMap[getCollectionContract(COID)] >> 48);
+    }
+
+    function addCollectionAvatarNum(uint256 COID) internal {
+        collectionMap[getCollectionContract(COID)] += uint256(1) << 48;
+    }
+
+    function getCollectionMintedMT(uint256 COID) public view returns (uint256) {
+        return uint64(collectionMap[getCollectionContract(COID)] >> 192);
+    }
+
+    function addCollectionMintedMT(
+        uint256 COID,
+        uint256 amount
+    ) public onlyMiningData {
+        collectionMap[getCollectionContract(COID)] += amount << 192;
+    }
+
+    function clearCollectionMintedMT(uint256 COID) public onlyMiningData {
+        collectionMap[getCollectionContract(COID)] = uint192(
+            collectionMap[getCollectionContract(COID)]
         );
     }
 
@@ -389,7 +491,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
                 "linked avatar too far away"
             );
         } else {
-            uint256 collectionOnMapNum = governance.getCollectionOnMapNum(COID);
+            uint256 collectionOnMapNum = getCollectionOnMapNum(COID);
             require(
                 collectionOnMapNum == 0 ||
                     (getAvatarCoordinate(avatarId) > 0 &&
@@ -404,23 +506,17 @@ contract Avatar is IAvatar, Multicall, Ownable {
         _;
     }
 
-    modifier ownerCheck(
-        address collectionContract,
-        uint256 tokenId,
-        DelegateWallet delegateWallet,
-        address vault
-    ) {
+    modifier ownerCheck(address collectionContract, uint256 tokenId) {
         require(
-            ownerOf(collectionContract, tokenId, delegateWallet, vault) ==
-                msg.sender,
+            ownerOf(collectionContract, tokenId) == msg.sender,
             "not your nft"
         );
         _;
     }
 
-    modifier onlyMap() {
+    modifier onlyMiningData() {
         require(
-            msg.sender == governance.mapContract() ||
+            msg.sender == governance.miningDataContract() ||
                 msg.sender == address(this),
             "not allowed"
         );
