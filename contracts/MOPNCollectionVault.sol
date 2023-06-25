@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "./interfaces/IMOPNCollectionVault.sol";
+import "./interfaces/IAvatar.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IMiningData.sol";
@@ -164,12 +165,9 @@ contract MOPNCollectionVault is
     function acceptNFTOffer(uint256 tokenId) public {
         require(getOfferStatus() == 0, "last offer auction not finish");
 
-        IERC721(governance.getCollectionContract(COID)).safeTransferFrom(
-            msg.sender,
-            address(this),
-            tokenId,
-            "0x"
-        );
+        IERC721(
+            IAvatar(governance.avatarContract()).getCollectionContract(COID)
+        ).safeTransferFrom(msg.sender, address(this), tokenId, "0x");
 
         IMiningData(governance.miningDataContract()).settleCollectionMining(
             COID
@@ -187,7 +185,7 @@ contract MOPNCollectionVault is
             (tokenId << 97) |
             (offerPrice << 33) |
             (block.timestamp << 1) |
-            1;
+            uint256(1);
 
         IMiningData(governance.miningDataContract()).settleCollectionNFTPoint(
             COID
@@ -252,12 +250,9 @@ contract MOPNCollectionVault is
                     );
             }
 
-            IERC721(governance.getCollectionContract(COID)).safeTransferFrom(
-                address(this),
-                from,
-                getAuctionTokenId(),
-                "0x"
-            );
+            IERC721(
+                IAvatar(governance.avatarContract()).getCollectionContract(COID)
+            ).safeTransferFrom(address(this), from, getAuctionTokenId(), "0x");
             IMiningData(governance.miningDataContract()).NFTAuctionAcceptNotify(
                     COID,
                     value,

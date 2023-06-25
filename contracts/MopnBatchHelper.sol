@@ -29,36 +29,12 @@ contract MopnBatchHelper is Multicall, Ownable {
     /**
      * @notice batch redeem avatar unclaimed minted mopn token
      * @param avatarIds avatar Ids
-     * @param delegateWallets Delegate coldwallet to specify hotwallet protocol
-     * @param vaults cold wallet address
      */
-    function batchRedeemAvatarInboxMT(
-        uint256[] memory avatarIds,
-        IAvatar.DelegateWallet[] memory delegateWallets,
-        address[] memory vaults
-    ) public {
-        require(
-            delegateWallets.length == 0 ||
-                delegateWallets.length == avatarIds.length,
-            "delegateWallets incorrect"
-        );
-
-        if (delegateWallets.length > 0) {
-            for (uint256 i = 0; i < avatarIds.length; i++) {
-                IMiningData(governance.miningDataContract()).redeemAvatarMT(
-                    avatarIds[i],
-                    delegateWallets[i],
-                    vaults[i]
-                );
-            }
-        } else {
-            for (uint256 i = 0; i < avatarIds.length; i++) {
-                IMiningData(governance.miningDataContract()).redeemAvatarMT(
-                    avatarIds[i],
-                    IAvatar.DelegateWallet.None,
-                    address(0)
-                );
-            }
+    function batchRedeemAvatarInboxMT(uint256[] memory avatarIds) public {
+        for (uint256 i = 0; i < avatarIds.length; i++) {
+            IMiningData(governance.miningDataContract()).redeemAvatarMT(
+                avatarIds[i]
+            );
         }
     }
 
