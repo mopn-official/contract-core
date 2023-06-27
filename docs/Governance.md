@@ -60,10 +60,10 @@ check if this collection is in white list
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| collectionContract | address | collection contract address |
-| proofs | bytes32[] | collection whitelist proofs |
+| Name               | Type      | Description                 |
+| ------------------ | --------- | --------------------------- |
+| collectionContract | address   | collection contract address |
+| proofs             | bytes32[] | collection whitelist proofs |
 
 ### updateWhiteList
 
@@ -75,9 +75,9 @@ update whitelist root
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| whiteListRoot_ | bytes32 | white list merkle tree root |
+| Name            | Type    | Description                 |
+| --------------- | ------- | --------------------------- |
+| whiteListRoot\_ | bytes32 | white list merkle tree root |
 
 ### getCollectionContract
 
@@ -89,15 +89,15 @@ use collection Id to get collection contract address
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 #### Return Values
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | address | contractAddress collection contract address |
+| Name | Type    | Description                                 |
+| ---- | ------- | ------------------------------------------- |
+| [0]  | address | contractAddress collection contract address |
 
 ### getCollectionCOID
 
@@ -109,15 +109,15 @@ use collection contract address to get collection Id
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name               | Type    | Description                 |
+| ------------------ | ------- | --------------------------- |
 | collectionContract | address | collection contract address |
 
 #### Return Values
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | uint256 | COID collection Id |
+| Name | Type    | Description        |
+| ---- | ------- | ------------------ |
+| [0]  | uint256 | COID collection Id |
 
 ### getCollectionsCOIDs
 
@@ -129,8 +129,8 @@ batch call for {getCollectionCOID}
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name                | Type      | Description                |
+| ------------------- | --------- | -------------------------- |
 | collectionContracts | address[] | multi collection contracts |
 
 ### generateCOID
@@ -143,10 +143,10 @@ Generate a collection id for new collection
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| collectionContract | address | collection contract adddress |
-| proofs | bytes32[] | collection whitelist proofs |
+| Name               | Type      | Description                  |
+| ------------------ | --------- | ---------------------------- |
+| collectionContract | address   | collection contract adddress |
+| proofs             | bytes32[] | collection whitelist proofs  |
 
 ### getCollectionOnMapNum
 
@@ -158,8 +158,8 @@ get NFT collection On map avatar number
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### addCollectionOnMapNum
@@ -184,8 +184,8 @@ get NFT collection minted avatar number
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### addCollectionAvatarNum
@@ -230,10 +230,10 @@ function getCollectionVault(uint256 COID) public view returns (address)
 address auctionHouseContract
 ```
 
-### avatarContract
+### mopnContract
 
 ```solidity
-address avatarContract
+address mopnContract
 ```
 
 ### bombContract
@@ -275,7 +275,7 @@ address mopnCollectionVaultContract
 ### updateMOPNContracts
 
 ```solidity
-function updateMOPNContracts(address auctionHouseContract_, address avatarContract_, address bombContract_, address mtContract_, address mapContract_, address landContract_, address miningDataContract_, address mopnCollectionVaultContract_) public
+function updateMOPNContracts(address auctionHouseContract_, address mopnContract_, address bombContract_, address mtContract_, address mapContract_, address landContract_, address miningDataContract_, address mopnCollectionVaultContract_) public
 ```
 
 ### mintMT
@@ -319,4 +319,3 @@ modifier onlyMiningData()
 ```solidity
 modifier onlyMap()
 ```
-

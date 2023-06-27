@@ -87,7 +87,7 @@
                 ],
                 "attributes": [
                     "auctionHouseContract",
-                    "avatarContract",
+                    "mopnContract",
                     "bombContract",
                     "mtContract",
                     "mapContract",

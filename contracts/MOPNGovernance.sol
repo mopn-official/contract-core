@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
-
-import "./interfaces/IMiningData.sol";
+import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNMiningData.sol";
 import "./interfaces/IMOPNToken.sol";
-import "./interfaces/IBomb.sol";
+import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "./InitializedProxy.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
@@ -24,7 +23,7 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 /// @title Governance of MOPN
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
-contract Governance is Multicall, Ownable {
+contract MOPNGovernance is Multicall, Ownable {
     bytes32 public whiteListRoot;
 
     event CollectionVaultCreated(
@@ -43,7 +42,7 @@ contract Governance is Multicall, Ownable {
     }
 
     address public auctionHouseContract;
-    address public avatarContract;
+    address public mopnContract;
     address public bombContract;
     address public mtContract;
     address public mapContract;
@@ -53,7 +52,7 @@ contract Governance is Multicall, Ownable {
 
     function updateMOPNContracts(
         address auctionHouseContract_,
-        address avatarContract_,
+        address mopnContract_,
         address bombContract_,
         address mtContract_,
         address mapContract_,
@@ -62,7 +61,7 @@ contract Governance is Multicall, Ownable {
         address mopnCollectionVaultContract_
     ) public onlyOwner {
         auctionHouseContract = auctionHouseContract_;
-        avatarContract = avatarContract_;
+        mopnContract = mopnContract_;
         bombContract = bombContract_;
         mtContract = mtContract_;
         mapContract = mapContract_;
@@ -77,15 +76,15 @@ contract Governance is Multicall, Ownable {
 
     // Bomb
     function mintBomb(address to, uint256 amount) public onlyAuctionHouse {
-        IBomb(bombContract).mint(to, 1, amount);
+        IMOPNBomb(bombContract).mint(to, 1, amount);
     }
 
     function burnBomb(address from, uint256 amount) public onlyAvatar {
-        IBomb(bombContract).burn(from, 1, amount);
+        IMOPNBomb(bombContract).burn(from, 1, amount);
     }
 
     function closeWhiteList() public onlyOwner {
-        IMiningData(miningDataContract).closeWhiteList();
+        IMOPNMiningData(miningDataContract).closeWhiteList();
     }
 
     modifier onlyAuctionHouse() {
@@ -94,7 +93,7 @@ contract Governance is Multicall, Ownable {
     }
 
     modifier onlyAvatar() {
-        require(msg.sender == avatarContract, "not allowed");
+        require(msg.sender == mopnContract, "not allowed");
         _;
     }
 
@@ -105,7 +104,7 @@ contract Governance is Multicall, Ownable {
 
     function createCollectionVault(uint256 COID) public returns (address) {
         require(
-            IAvatar(avatarContract).getCollectionContract(COID) != address(0),
+            IMOPN(mopnContract).getCollectionContract(COID) != address(0),
             "collection not exist"
         );
         require(CollectionVaults[COID] == address(0), "collection vault exist");
@@ -140,11 +139,9 @@ contract Governance is Multicall, Ownable {
             collectionAddress := mload(add(data, 20))
         }
 
-        uint256 COID = IAvatar(avatarContract).getCollectionCOID(
-            collectionAddress
-        );
+        uint256 COID = IMOPN(mopnContract).getCollectionCOID(collectionAddress);
         if (COID == 0) {
-            COID = IAvatar(avatarContract).generateCOID(collectionAddress);
+            COID = IMOPN(mopnContract).generateCOID(collectionAddress);
         }
         address collectionVault = getCollectionVault(COID);
         if (collectionVault == address(0)) {

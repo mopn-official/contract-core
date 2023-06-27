@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "./IAvatar.sol";
-
-interface IMiningData {
+interface IMOPNMiningData {
     function getNFTOfferCoefficient() external view returns (uint256);
 
     /**

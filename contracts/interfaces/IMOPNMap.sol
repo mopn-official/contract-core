@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-interface IMap {
+interface IMOPNMap {
     function avatarSet(
         uint256 avatarId,
         uint256 COID,

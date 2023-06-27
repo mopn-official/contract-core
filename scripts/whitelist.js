@@ -6,20 +6,10 @@ const IPFS = require("ipfs-infura");
 const main = async () => {
   const whitelistjson = fs.readFileSync("./scripts/whitelist.json");
   console.log(JSON.parse(whitelistjson));
-  const tree = StandardMerkleTree.of(JSON.parse(whitelistjson), ["address"]);
+  const tree = StandardMerkleTree.of(JSON.parse(whitelistjson), ["address", "uint256"]);
 
-  const proof = tree.getProof(0);
+  const proof = tree.getProof(2);
 
-  const ipfs = new IPFS({
-    host: "ipfs.infura.io",
-    port: 5001,
-    protocol: "https",
-    projectId: process.env.INFURA_IPFS_PROJECTID,
-    projectSecret: process.env.INFURA_IPFS_PROJECTSECRET,
-  });
-
-  const whitelistCID = await ipfs.addJSON(whitelistjson);
-  console.log(whitelistCID);
   console.log(tree.root);
   console.log(proof);
 };

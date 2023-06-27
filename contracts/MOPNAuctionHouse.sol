@@ -2,8 +2,8 @@
 pragma solidity ^0.8.17;
 
 import "./interfaces/IMOPNToken.sol";
-import "./interfaces/IGovernance.sol";
-import "./interfaces/ILand.sol";
+import "./interfaces/IMOPNGovernance.sol";
+import "./interfaces/IMOPNLand.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
@@ -11,8 +11,8 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 /// @title Arsenal for Bomb
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev This Contract's owner must transfer to Governance Contract once it's deployed
-contract AuctionHouse is Multicall, Ownable {
-    IGovernance public governance;
+contract MOPNAuctionHouse is Multicall, Ownable {
+    IMOPNGovernance public governance;
 
     uint8 public immutable bombRoundProduce = 10;
 
@@ -78,7 +78,7 @@ contract AuctionHouse is Multicall, Ownable {
         uint256 bombStartTimestamp,
         uint256 landStartTimestamp
     ) {
-        governance = IGovernance(governance_);
+        governance = IMOPNGovernance(governance_);
         bombRound =
             (uint256(1) << _BITPOS_ROUNDID) |
             (bombStartTimestamp << _BITPOS_STARTTIMESTAMP);
@@ -314,7 +314,7 @@ contract AuctionHouse is Multicall, Ownable {
             IMOPNToken(governance.mtContract()).burnFrom(msg.sender, price);
         }
 
-        ILand(governance.landContract()).auctionMint(msg.sender, 1);
+        IMOPNLand(governance.landContract()).auctionMint(msg.sender, 1);
 
         landRound =
             (uint256(roundId + 1) << _BITPOS_LAND_ROUNDID) |

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "hardhat/console.sol";
 import "./TileMath.sol";
 import "./NFTSVG.sol";
 import "base64-sol/base64.sol";

@@ -116,10 +116,10 @@ function burnBomb(address from, uint256 amount) external
 function auctionHouseContract() external view returns (address)
 ```
 
-### avatarContract
+### mopnContract
 
 ```solidity
-function avatarContract() external view returns (address)
+function mopnContract() external view returns (address)
 ```
 
 ### bombContract
@@ -151,4 +151,3 @@ function landContract() external view returns (address)
 ```solidity
 function miningDataContract() external view returns (address)
 ```
-

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "./interfaces/IAvatar.sol";
-import "./interfaces/ILand.sol";
-import "./interfaces/IMiningData.sol";
-import "./interfaces/IGovernance.sol";
+import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNLand.sol";
+import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/IMOPNGovernance.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
@@ -14,16 +14,16 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 /// core contract for MOPN records all avatars on map
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev This Contract's owner must transfer to Governance Contract once it's deployed
-contract Map is Ownable, Multicall {
+contract MOPNMap is Ownable, Multicall {
     using TileMath for uint32;
 
     // Tile => uint64 avatarId + uint64 COID + uint32 MOPN Land Id
     mapping(uint32 => uint256) public tiles;
 
-    IGovernance public governance;
+    IMOPNGovernance public governance;
 
     constructor(address governance_) {
-        governance = IGovernance(governance_);
+        governance = IMOPNGovernance(governance_);
     }
 
     /**
@@ -70,7 +70,7 @@ contract Map is Ownable, Multicall {
 
         if (LandId == 0 || getTileLandId(tileCoordinate) != LandId) {
             require(
-                LandId < ILand(governance.landContract()).MAX_SUPPLY(),
+                LandId < IMOPNLand(governance.landContract()).MAX_SUPPLY(),
                 "landId overflow"
             );
             require(
@@ -78,13 +78,13 @@ contract Map is Ownable, Multicall {
                 "LandId error"
             );
             require(
-                ILand(governance.landContract()).nextTokenId() > LandId,
+                IMOPNLand(governance.landContract()).nextTokenId() > LandId,
                 "Land Not Open"
             );
         }
 
         uint256 TilePoint = tileCoordinate.getTileNFTPoint() +
-            IAvatar(governance.avatarContract()).getAvatarBombUsed(avatarId);
+            IMOPN(governance.mopnContract()).getAvatarBombUsed(avatarId);
 
         tiles[tileCoordinate] =
             (avatarId << 192) |
@@ -105,7 +105,7 @@ contract Map is Ownable, Multicall {
             }
         }
 
-        IMiningData(governance.miningDataContract()).addNFTPoint(
+        IMOPNMiningData(governance.miningDataContract()).addNFTPoint(
             avatarId,
             COID,
             TilePoint
@@ -124,7 +124,7 @@ contract Map is Ownable, Multicall {
         avatarId = getTileAvatar(tileCoordinate);
         if (avatarId > 0 && avatarId != excludeAvatarId) {
             uint32 LandId = getTileLandId(tileCoordinate);
-            IMiningData(governance.miningDataContract()).subNFTPoint(
+            IMOPNMiningData(governance.miningDataContract()).subNFTPoint(
                 avatarId,
                 getTileCOID(tileCoordinate)
             );
@@ -150,7 +150,7 @@ contract Map is Ownable, Multicall {
     }
 
     modifier onlyAvatar() {
-        require(msg.sender == governance.avatarContract(), "not allowed");
+        require(msg.sender == governance.mopnContract(), "not allowed");
         _;
     }
 }
