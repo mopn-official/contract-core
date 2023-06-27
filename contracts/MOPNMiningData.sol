@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
-
-import "./interfaces/IAvatar.sol";
-import "./interfaces/IMap.sol";
-import "./interfaces/IGovernance.sol";
+import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNMap.sol";
+import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNToken.sol";
-import "./interfaces/ILand.sol";
-import "./interfaces/IMiningData.sol";
+import "./interfaces/IMOPNLand.sol";
+import "./interfaces/IMOPNMiningData.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MiningData is IMiningData, Multicall {
+contract MOPNMiningData is IMOPNMiningData, Multicall {
     uint256 public constant MTOutputPerSec = 500000000;
 
     uint256 public constant MTProduceReduceInterval = 604800;
@@ -59,11 +57,13 @@ contract MiningData is IMiningData, Multicall {
         uint256 price
     );
 
-    IGovernance public governance;
+    event SettleCollectionNFTPoint(uint256 COID);
+
+    IMOPNGovernance public governance;
 
     constructor(address governance_, uint256 MTProduceStartTimestamp_) {
         MTProduceStartTimestamp = MTProduceStartTimestamp_;
-        governance = IGovernance(governance_);
+        governance = IMOPNGovernance(governance_);
         MTVaultData = (10 ** 18) << 64;
     }
 
@@ -238,7 +238,7 @@ contract MiningData is IMiningData, Multicall {
 
         if (AvatarPerNFTPointMintedDiff > 0 && AvatarNFTPoint > 0) {
             uint256 AvatarCollectionPerNFTMintedDiff = getPerCollectionNFTMinted(
-                    IAvatar(governance.avatarContract()).getAvatarCOID(avatarId)
+                    IMOPN(governance.mopnContract()).getAvatarCOID(avatarId)
                 ) - getAvatarCollectionPerNFTMinted(avatarId);
             inbox +=
                 ((AvatarPerNFTPointMintedDiff * AvatarNFTPoint) * 90) /
@@ -260,7 +260,7 @@ contract MiningData is IMiningData, Multicall {
 
         if (AvatarPerNFTPointMintedDiff > 0) {
             uint256 collectionPerNFTMintedDiff = getPerCollectionNFTMinted(
-                IAvatar(governance.avatarContract()).getAvatarCOID(avatarId)
+                IMOPN(governance.mopnContract()).getAvatarCOID(avatarId)
             ) - getAvatarCollectionPerNFTMinted(avatarId);
             if (AvatarNFTPoint > 0) {
                 uint256 amount = ((AvatarPerNFTPointMintedDiff) *
@@ -269,11 +269,12 @@ contract MiningData is IMiningData, Multicall {
                     amount += collectionPerNFTMintedDiff;
                 }
 
-                uint32 LandId = IMap(governance.mapContract()).getTileLandId(
-                    IAvatar(governance.avatarContract()).getAvatarCoordinate(
-                        avatarId
-                    )
-                );
+                uint32 LandId = IMOPNMap(governance.mapContract())
+                    .getTileLandId(
+                        IMOPN(governance.mopnContract()).getAvatarCoordinate(
+                            avatarId
+                        )
+                    );
                 uint256 landamount = (amount * 5) / 100;
                 LandHolderMTs[LandId] += (landamount << 128) | landamount;
                 emit LandHolderMTMinted(LandId, landamount);
@@ -299,15 +300,11 @@ contract MiningData is IMiningData, Multicall {
      * @param avatarId avatar Id
      */
     function redeemAvatarMT(uint256 avatarId) public {
-        address nftOwner = IAvatar(governance.avatarContract()).ownerOf(
-            avatarId
-        );
+        address nftOwner = IMOPN(governance.mopnContract()).ownerOf(avatarId);
 
         settlePerNFTPointMinted();
 
-        uint256 COID = IAvatar(governance.avatarContract()).getAvatarCOID(
-            avatarId
-        );
+        uint256 COID = IMOPN(governance.mopnContract()).getAvatarCOID(avatarId);
         mintCollectionMT(COID);
         mintAvatarMT(avatarId);
 
@@ -378,9 +375,7 @@ contract MiningData is IMiningData, Multicall {
     function calcCollectionMT(
         uint256 COID
     ) public view returns (uint256 inbox) {
-        inbox = IAvatar(governance.avatarContract()).getCollectionMintedMT(
-            COID
-        );
+        inbox = IMOPN(governance.mopnContract()).getCollectionMintedMT(COID);
         uint256 PerNFTPointMinted = calcPerNFTPointMinted();
         uint256 CollectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
             COID
@@ -438,8 +433,9 @@ contract MiningData is IMiningData, Multicall {
                         CollectionNFTPoint) * 5) / 100);
                     CollectionMT += (((CollectionPerNFTPointMintedDiff *
                         CollectionNFTPoint) /
-                        IAvatar(governance.avatarContract())
-                            .getCollectionOnMapNum(COID)) << 192);
+                        IMOPN(governance.mopnContract()).getCollectionOnMapNum(
+                            COID
+                        )) << 192);
                 }
 
                 uint256 WhiteListNFTPoint = getCollectionWhiteListNFTPoint(
@@ -459,7 +455,7 @@ contract MiningData is IMiningData, Multicall {
                                 (((whiteListFinPerNFTPointMinted -
                                     collectionPerNFTPointMinted) *
                                     WhiteListNFTPoint) /
-                                    IAvatar(governance.avatarContract())
+                                    IMOPN(governance.mopnContract())
                                         .getCollectionOnMapNum(COID)) <<
                                 192;
                             CollectionMT -= WhiteListNFTPoint << 32;
@@ -470,14 +466,14 @@ contract MiningData is IMiningData, Multicall {
                         CollectionMT +=
                             (((CollectionPerNFTPointMintedDiff) *
                                 WhiteListNFTPoint) /
-                                IAvatar(governance.avatarContract())
+                                IMOPN(governance.mopnContract())
                                     .getCollectionOnMapNum(COID)) <<
                             192;
                     }
                 }
 
                 CollectionMTs[COID] = CollectionMT;
-                IAvatar(governance.avatarContract()).addCollectionMintedMT(
+                IMOPN(governance.mopnContract()).addCollectionMintedMT(
                     COID,
                     amount
                 );
@@ -489,11 +485,12 @@ contract MiningData is IMiningData, Multicall {
     }
 
     function redeemCollectionMT(uint256 COID) public {
-        uint256 amount = IAvatar(governance.avatarContract())
-            .getCollectionMintedMT(COID);
+        uint256 amount = IMOPN(governance.mopnContract()).getCollectionMintedMT(
+            COID
+        );
         if (amount > 0) {
             governance.mintMT(governance.getCollectionVault(COID), amount);
-            IAvatar(governance.avatarContract()).clearCollectionMintedMT(COID);
+            IMOPN(governance.mopnContract()).clearCollectionMintedMT(COID);
             MTVaultData += amount;
             emit MTClaimedCollectionVault(COID, amount);
         }
@@ -501,8 +498,10 @@ contract MiningData is IMiningData, Multicall {
 
     function settleCollectionNFTPoint(
         uint256 COID
-    ) public onlyCollectionVault(COID) {
+    ) public onlyAvatarOrCollectionVault(COID) {
         _settleCollectionNFTPoint(COID);
+
+        emit SettleCollectionNFTPoint(COID);
     }
 
     function _settleCollectionNFTPoint(uint256 COID) internal {
@@ -511,9 +510,7 @@ contract MiningData is IMiningData, Multicall {
         if (point > 0) {
             collectionNFTPoint =
                 point *
-                IAvatar(governance.avatarContract()).getCollectionOnMapNum(
-                    COID
-                );
+                IMOPN(governance.mopnContract()).getCollectionOnMapNum(COID);
         }
         uint256 preCollectionNFTPoint = getCollectionNFTPoint(COID);
         if (collectionNFTPoint != preCollectionNFTPoint) {
@@ -528,11 +525,39 @@ contract MiningData is IMiningData, Multicall {
                     collectionNFTPoint) << 64);
             }
         }
+
+        uint256 additionalpoint = IMOPN(governance.mopnContract())
+            .getCollectionAdditionalNFTPoints(COID);
+        uint256 collectionAdditionalNFTPoint;
+        if (additionalpoint > 0) {
+            collectionAdditionalNFTPoint =
+                additionalpoint *
+                IMOPN(governance.mopnContract()).getCollectionOnMapNum(COID);
+        }
+        uint256 preCollectionAdditionalNFTPoint = getCollectionWhiteListNFTPoint(
+                COID
+            );
+        if (collectionAdditionalNFTPoint != preCollectionAdditionalNFTPoint) {
+            if (
+                collectionAdditionalNFTPoint > preCollectionAdditionalNFTPoint
+            ) {
+                MTProduceData +=
+                    collectionAdditionalNFTPoint -
+                    preCollectionAdditionalNFTPoint;
+                CollectionMTs[COID] += ((collectionAdditionalNFTPoint -
+                    preCollectionAdditionalNFTPoint) << 32);
+            } else {
+                MTProduceData -= preCollectionAdditionalNFTPoint;
+                MTProduceData += collectionAdditionalNFTPoint;
+                CollectionMTs[COID] -= ((preCollectionAdditionalNFTPoint -
+                    collectionAdditionalNFTPoint) << 32);
+            }
+        }
     }
 
     function settleCollectionMining(
         uint256 COID
-    ) public onlyCollectionVault(COID) {
+    ) public onlyAvatarOrCollectionVault(COID) {
         settlePerNFTPointMinted();
         mintCollectionMT(COID);
         redeemCollectionMT(COID);
@@ -555,7 +580,9 @@ contract MiningData is IMiningData, Multicall {
     function redeemLandHolderMT(uint32 LandId) public {
         uint256 amount = getLandHolderInboxMT(LandId);
         if (amount > 0) {
-            address owner = ILand(governance.landContract()).ownerOf(LandId);
+            address owner = IMOPNLand(governance.landContract()).ownerOf(
+                LandId
+            );
             governance.mintMT(owner, amount);
             LandHolderMTs[LandId] = uint128(LandHolderMTs[LandId]);
             emit MTClaimedLandHolder(LandId, amount);
@@ -567,11 +594,15 @@ contract MiningData is IMiningData, Multicall {
         address owner;
         for (uint256 i = 0; i < LandIds.length; i++) {
             if (owner == address(0)) {
-                owner = ILand(governance.landContract()).ownerOf(LandIds[i]);
+                owner = IMOPNLand(governance.landContract()).ownerOf(
+                    LandIds[i]
+                );
             } else {
                 require(
                     owner ==
-                        ILand(governance.landContract()).ownerOf(LandIds[i]),
+                        IMOPNLand(governance.landContract()).ownerOf(
+                            LandIds[i]
+                        ),
                     "not same owner"
                 );
             }
@@ -616,8 +647,8 @@ contract MiningData is IMiningData, Multicall {
         _settleCollectionNFTPoint(COID);
 
         if (exist == 0 && getWhiteListFinPerNFTPointMinted() == 0) {
-            uint256 collectionAdditionalNFTPoints = IAvatar(
-                governance.avatarContract()
+            uint256 collectionAdditionalNFTPoints = IMOPN(
+                governance.mopnContract()
             ).getCollectionAdditionalNFTPoints(COID);
             if (collectionAdditionalNFTPoints > 0) {
                 MTProduceData +=
@@ -650,8 +681,8 @@ contract MiningData is IMiningData, Multicall {
         _settleCollectionNFTPoint(COID);
 
         if (getWhiteListFinPerNFTPointMinted() == 0) {
-            uint256 collectionAdditionalNFTPoints = IAvatar(
-                governance.avatarContract()
+            uint256 collectionAdditionalNFTPoints = IMOPN(
+                governance.mopnContract()
             ).getCollectionAdditionalNFTPoints(COID);
             if (collectionAdditionalNFTPoints > 0) {
                 MTProduceData -=
@@ -698,7 +729,7 @@ contract MiningData is IMiningData, Multicall {
         uint256 COID,
         bool increase,
         uint256 amount
-    ) public onlyCollectionVault(COID) {
+    ) public onlyAvatarOrCollectionVault(COID) {
         if (increase) {
             MTVaultData += amount;
         } else {
@@ -706,9 +737,10 @@ contract MiningData is IMiningData, Multicall {
         }
     }
 
-    modifier onlyCollectionVault(uint256 COID) {
+    modifier onlyAvatarOrCollectionVault(uint256 COID) {
         require(
-            msg.sender == governance.getCollectionVault(COID),
+            msg.sender == governance.mopnContract() ||
+                msg.sender == governance.getCollectionVault(COID),
             "only collection vault allowed"
         );
         _;
@@ -716,7 +748,7 @@ contract MiningData is IMiningData, Multicall {
 
     modifier onlyAvatarOrMap() {
         require(
-            msg.sender == governance.avatarContract() ||
+            msg.sender == governance.mopnContract() ||
                 msg.sender == governance.mapContract(),
             "only avatar and map allowed"
         );

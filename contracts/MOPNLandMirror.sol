@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "./interfaces/ILandMetaDataRender.sol";
+import "./interfaces/IMOPNLandMetaDataRender.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -49,7 +49,7 @@ contract MOPNLandMirror is ERC721, Ownable {
         _requireMinted(tokenId);
 
         if (metadataRenderAddress != address(0)) {
-            ILandMetaDataRender metaDataRender = ILandMetaDataRender(
+            IMOPNLandMetaDataRender metaDataRender = IMOPNLandMetaDataRender(
                 metadataRenderAddress
             );
             tokenuri = metaDataRender.constructTokenURI(tokenId);

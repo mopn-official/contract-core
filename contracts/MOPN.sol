@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "./interfaces/IAvatar.sol";
-import "./interfaces/IGovernance.sol";
-import "./interfaces/IMap.sol";
-import "./interfaces/IMiningData.sol";
+import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNGovernance.sol";
+import "./interfaces/IMOPNMap.sol";
+import "./interfaces/IMOPNMiningData.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
@@ -12,19 +12,19 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-interface IDelegationRegistry {
-    function checkDelegateForToken(
-        address delegate,
-        address vault,
-        address contract_,
-        uint256 tokenId
-    ) external view returns (bool);
-}
+/*
+.___  ___.   ______   .______   .__   __. 
+|   \/   |  /  __  \  |   _  \  |  \ |  | 
+|  \  /  | |  |  |  | |  |_)  | |   \|  | 
+|  |\/|  | |  |  |  | |   ___/  |  . `  | 
+|  |  |  | |  `--'  | |  |      |  |\   | 
+|__|  |__|  \______/  | _|      |__| \__| 
+*/
 
 /// @title MOPN Avatar Contract
 /// @author Cyanface <cyanface@outlook.com>
 /// @dev This Contract's owner must transfer to Governance Contract once it's deployed
-contract Avatar is IAvatar, Multicall, Ownable {
+contract MOPN is IMOPN, Multicall, Ownable {
     struct AvatarData {
         uint256 tokenId;
         /// @notice uint64 avatar bomb used number + uint 64 avatar nft collection id + uint32 avatar on map coordinate
@@ -106,10 +106,10 @@ contract Avatar is IAvatar, Multicall, Ownable {
 
     uint256 public currentAvatarId;
 
-    IGovernance public governance;
+    IMOPNGovernance public governance;
 
     constructor(address governance_) {
-        governance = IGovernance(governance_);
+        governance = IMOPNGovernance(governance_);
     }
 
     function getNFTAvatarId(
@@ -245,7 +245,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint256 COID = getAvatarCOID(avatarId);
         uint32 orgCoordinate = getAvatarCoordinate(avatarId);
         if (orgCoordinate > 0) {
-            IMap(governance.mapContract()).avatarRemove(orgCoordinate, 0);
+            IMOPNMap(governance.mapContract()).avatarRemove(orgCoordinate, 0);
 
             emit AvatarMove(
                 avatarId,
@@ -259,7 +259,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
             emit AvatarJumpIn(avatarId, COID, LandId, tileCoordinate);
         }
 
-        IMap(governance.mapContract()).avatarSet(
+        IMOPNMap(governance.mapContract()).avatarSet(
             avatarId,
             COID,
             tileCoordinate,
@@ -288,7 +288,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         addAvatarBombUsed(avatarId);
 
         if (getAvatarCoordinate(avatarId) > 0) {
-            IMiningData(governance.miningDataContract()).addNFTPoint(
+            IMOPNMiningData(governance.miningDataContract()).addNFTPoint(
                 avatarId,
                 getAvatarCOID(avatarId),
                 1
@@ -302,7 +302,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
         uint32 orgTileCoordinate = tileCoordinate;
 
         for (uint256 i = 0; i < 7; i++) {
-            uint256 attackAvatarId = IMap(governance.mapContract())
+            uint256 attackAvatarId = IMOPNMap(governance.mapContract())
                 .avatarRemove(tileCoordinate, avatarId);
 
             if (attackAvatarId > 0) {
@@ -419,6 +419,9 @@ contract Avatar is IAvatar, Multicall, Ownable {
             (getCollectionMintedMT(COID) << 192) |
             (additionalNFTPoints << 144) |
             uint144(collectionMap[collectionContract]);
+
+        IMOPNMiningData(governance.miningDataContract())
+            .settleCollectionNFTPoint(COID);
     }
 
     function getCollectionAdditionalNFTPoints(
@@ -450,7 +453,7 @@ contract Avatar is IAvatar, Multicall, Ownable {
     function getCollectionAvatarNum(
         uint256 COID
     ) public view returns (uint256) {
-        return uint64(collectionMap[getCollectionContract(COID)] >> 48);
+        return uint48(collectionMap[getCollectionContract(COID)] >> 48);
     }
 
     function addCollectionAvatarNum(uint256 COID) internal {

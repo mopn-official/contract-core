@@ -4,18 +4,18 @@
         "TileMath",
         "NFTSVG",
         "NFTMetaData",
-        "Governance",
-        "AuctionHouse",
-        "Avatar",
-        "Bomb",
-        "LandMetaDataRender",
-        "Map",
-        "MiningData",
+        "MOPNGovernance",
+        "MOPNAuctionHouse",
+        "MOPN",
+        "MOPNBomb",
+        "MOPNLandMetaDataRender",
+        "MOPNMap",
+        "MOPNMiningData",
         "MOPNCollectionVault",
         "MOPNLandMirror",
         "MOPNToken",
-        "MopnBatchHelper",
-        "MopnDataHelper",
+        "MOPNBatchHelper",
+        "MOPNDataHelper",
         "MOPNTESTNFT"
     ],
     "TileMath": {
@@ -34,24 +34,24 @@
             "NFTSVG"
         ]
     },
-    "Governance": {
-        "address": "0xe41161f85B6f8DE0d740189278e228bC30CDfE61",
+    "MOPNGovernance": {
+        "address": "0x02b5357f593d937Ae2A7f0db5Dd57EA3c8687195",
         "verified": true,
         "attributesCheck": [
             {
                 "expectValue": [
-                    "AuctionHouse",
-                    "Avatar",
-                    "Bomb",
+                    "MOPNAuctionHouse",
+                    "MOPN",
+                    "MOPNBomb",
                     "MOPNToken",
-                    "Map",
+                    "MOPNMap",
                     "MOPNLandMirror",
-                    "MiningData",
+                    "MOPNMiningData",
                     "MOPNCollectionVault"
                 ],
                 "attributes": [
                     "auctionHouseContract",
-                    "avatarContract",
+                    "mopnContract",
                     "bombContract",
                     "mtContract",
                     "mapContract",
@@ -63,31 +63,31 @@
             }
         ]
     },
-    "AuctionHouse": {
-        "address": "0x38353f72feA94513D9F91bE2B0928AaE552B6347",
+    "MOPNAuctionHouse": {
+        "address": "0x272a5eaaA65F9271a43c3C5CB0D19d9585835fA4",
         "verified": true,
         "constructparams": [
-            "Governance",
+            "MOPNGovernance",
             1684339200,
             1684339200
         ]
     },
-    "Avatar": {
-        "address": "0xfd353f0b3cEE1A046a80Efd9818F1870807DA053",
+    "MOPN": {
+        "address": "0x3E6941693cAf0Bebda1f6a2BF1dD45B4b824ed90",
         "verified": true,
         "libraries": [
             "TileMath"
         ],
         "constructparams": [
-            "Governance"
+            "MOPNGovernance"
         ]
     },
-    "Bomb": {
-        "address": "0x451930139ac27668F2111093C9fb747D1A4EE1B1",
+    "MOPNBomb": {
+        "address": "0x8e56C2Ba87Be99625F5666352AeE38f778943d67",
         "verified": true,
-        "transOwnerTo": "Governance"
+        "transOwnerTo": "MOPNGovernance"
     },
-    "LandMetaDataRender": {
+    "MOPNLandMetaDataRender": {
         "address": "0x487B0c5Ca2E3BFc81932C74BB3B149e7730570C3",
         "verified": true,
         "libraries": [
@@ -95,32 +95,32 @@
             "NFTMetaData"
         ],
         "constructparams": [
-            "Governance"
+            "MOPNGovernance"
         ]
     },
-    "Map": {
-        "address": "0x6923A434E0A11fa56C8808EE84707B9373334Fd2",
-        "verified": false,
+    "MOPNMap": {
+        "address": "0xd42A43460092Dd88b48F3AaA4C466F672271645D",
+        "verified": true,
         "libraries": [
             "TileMath"
         ],
         "constructparams": [
-            "Governance"
+            "MOPNGovernance"
         ]
     },
-    "MiningData": {
-        "address": "0xd34bF161bc43662481Decf4F449FC08f5C4a7af8",
-        "verified": false,
+    "MOPNMiningData": {
+        "address": "0x583c2c775EE4f8d9fb77Ce6166A93c574e316816",
+        "verified": true,
         "constructparams": [
-            "Governance",
+            "MOPNGovernance",
             1683828189
         ]
     },
     "MOPNCollectionVault": {
-        "address": "0x9c2dCD9040Ba8A8Ad12AE100355199fAE93C1b34",
-        "verified": false,
+        "address": "0xAc93fbc547ADD98d91CA052dDf600C4772690Ff0",
+        "verified": true,
         "constructparams": [
-            "Governance"
+            "MOPNGovernance"
         ]
     },
     "MOPNLandMirror": {
@@ -129,7 +129,7 @@
         "attributesCheck": [
             {
                 "expectValue": [
-                    "LandMetaDataRender"
+                    "MOPNLandMetaDataRender"
                 ],
                 "attributes": [
                     "metadataRenderAddress"
@@ -139,25 +139,25 @@
         ]
     },
     "MOPNToken": {
-        "address": "0xA7F8Dc06832cFBDeEaC9F0Dd336C294F51c7f4Aa",
-        "verified": false,
-        "transOwnerTo": "Governance"
+        "address": "0x7a2F656980a558990AE1b0E641D6c203932E9C39",
+        "verified": true,
+        "transOwnerTo": "MOPNGovernance"
     },
-    "MopnBatchHelper": {
-        "address": "0x2A33474e5369870f81D88F52455b046E99AD7476",
-        "verified": false,
+    "MOPNBatchHelper": {
+        "address": "0x3Fd6402737ba35CfC516507BdDBD58b1068ce969",
+        "verified": true,
         "constructparams": [
-            "Governance"
+            "MOPNGovernance"
         ]
     },
-    "MopnDataHelper": {
-        "address": "0x19D55AC0f2087bA3fa1EBea8377a80796Cfd514d",
-        "verified": false,
+    "MOPNDataHelper": {
+        "address": "0x0BC5FE54fdF37009a4c17cf6BA9517fFbEcE847A",
+        "verified": true,
         "libraries": [
             "TileMath"
         ],
         "constructparams": [
-            "Governance"
+            "MOPNGovernance"
         ]
     },
     "MOPNTESTNFT": {

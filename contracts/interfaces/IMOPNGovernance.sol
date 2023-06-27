@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "./IAvatar.sol";
-
-interface IGovernance {
+interface IMOPNGovernance {
     function updateWhiteList(bytes32 whiteListRoot_) external;
 
     function mintMT(address to, uint256 amount) external;
@@ -16,7 +14,7 @@ interface IGovernance {
 
     function auctionHouseContract() external view returns (address);
 
-    function avatarContract() external view returns (address);
+    function mopnContract() external view returns (address);
 
     function bombContract() external view returns (address);
 

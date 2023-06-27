@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "./interfaces/ILandMetaDataRender.sol";
-import "./interfaces/IMap.sol";
-import "./interfaces/IMiningData.sol";
-import "./interfaces/IGovernance.sol";
+import "./interfaces/IMOPNLandMetaDataRender.sol";
+import "./interfaces/IMOPNMap.sol";
+import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/IMOPNGovernance.sol";
 import "./libraries/NFTMetaData.sol";
 
-contract LandMetaDataRender is ILandMetaDataRender {
-    IGovernance public governance;
+contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
+    IMOPNGovernance public governance;
 
     /**
      * @dev set the governance contract address
@@ -16,13 +16,13 @@ contract LandMetaDataRender is ILandMetaDataRender {
      * @param governance_ Governance Contract Address
      */
     constructor(address governance_) {
-        governance = IGovernance(governance_);
+        governance = IMOPNGovernance(governance_);
     }
 
     function constructTokenURI(
         uint256 LandId_
     ) public view returns (string memory) {
-        IMap map = IMap(governance.mapContract());
+        IMOPNMap map = IMOPNMap(governance.mapContract());
 
         uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
@@ -124,7 +124,9 @@ contract LandMetaDataRender is ILandMetaDataRender {
             }
         }
 
-        IMiningData miningData = IMiningData(governance.miningDataContract());
+        IMOPNMiningData miningData = IMOPNMiningData(
+            governance.miningDataContract()
+        );
         return
             NFTMetaData.constructTokenURI(
                 LandId,
