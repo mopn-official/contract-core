@@ -226,8 +226,10 @@ contract MOPNDataHelper is Ownable {
         cData.additionalNFTPoint = IMOPN(governance.mopnContract())
             .getCollectionAdditionalNFTPoints(COID);
         cData.collectionVault = governance.getCollectionVault(COID);
-        cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
-            .getAuctionInfo();
+        if (cData.collectionVault != address(0)) {
+            cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
+                .getAuctionInfo();
+        }
     }
 
     function getCollectionCOID(
