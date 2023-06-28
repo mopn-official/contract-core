@@ -244,6 +244,9 @@ describe("MOPN", function () {
     await avatarInfo();
 
     await new Promise((r) => setTimeout(r, 5000));
+
+    console.log(await mopndatahelper.getCollectionInfo(1));
+    console.log(await mopnminingData.calcCollectionMT(1)); getCollectionNFTPoint getCollectionAvatarNFTPoint getCollectionPoint 
   });
 
   it("test redeemAvatarInboxMT", async function () {
