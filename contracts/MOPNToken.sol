@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.19;
 
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";

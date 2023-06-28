@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
@@ -226,8 +226,10 @@ contract MOPNDataHelper is Ownable {
         cData.additionalNFTPoint = IMOPN(governance.mopnContract())
             .getCollectionAdditionalNFTPoints(COID);
         cData.collectionVault = governance.getCollectionVault(COID);
-        cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
-            .getAuctionInfo();
+        if (cData.collectionVault != address(0)) {
+            cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
+                .getAuctionInfo();
+        }
     }
 
     function getCollectionCOID(
