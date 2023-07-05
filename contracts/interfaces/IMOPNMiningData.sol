@@ -4,6 +4,8 @@ pragma solidity ^0.8.19;
 interface IMOPNMiningData {
     function getNFTOfferCoefficient() external view returns (uint256);
 
+    function getTotalNFTPoints() external view returns (uint256);
+
     /**
      * add on map mining mopn token allocation weight
      * @param avatarId avatar Id
