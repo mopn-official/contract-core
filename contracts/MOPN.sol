@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "./interfaces/IERC6551Account.sol";
+import "./interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNMap.sol";
@@ -11,6 +13,15 @@ import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+interface IDelegationRegistry {
+    function checkDelegateForToken(
+        address delegate,
+        address vault,
+        address contract_,
+        uint256 tokenId
+    ) external view returns (bool);
+}
 
 /*
 .___  ___.   ______   .______   .__   __. 
@@ -25,46 +36,39 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /// @author Cyanface <cyanface@outlook.com>
 /// @dev This Contract's owner must transfer to Governance Contract once it's deployed
 contract MOPN is IMOPN, Multicall, Ownable {
-    struct AvatarData {
-        uint256 tokenId;
-        /// @notice uint64 avatar bomb used number + uint 64 avatar nft collection id + uint32 avatar on map coordinate
-        uint256 setData;
-    }
-
     using TileMath for uint32;
 
-    event AvatarMint(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        address collectionContract,
+    event NFTJoin(
+        address indexed account,
+        address collectionAddress,
         uint256 tokenId
     );
 
     /**
      * @notice This event emit when an avatar jump into the map
-     * @param avatarId avatar Id
-     * @param COID collection Id
+     * @param account account wallet address
+     * @param collectionAddress collection contract address
      * @param LandId MOPN Land Id
      * @param tileCoordinate tile coordinate
      */
-    event AvatarJumpIn(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
+    event NFTJumpIn(
+        address indexed account,
+        address indexed collectionAddress,
         uint32 indexed LandId,
         uint32 tileCoordinate
     );
 
     /**
      * @notice This event emit when an avatar move on map
-     * @param avatarId avatar Id
-     * @param COID collection Id
+     * @param account account wallet address
+     * @param collectionAddress collection contract address
      * @param LandId MOPN Land Id
      * @param fromCoordinate tile coordinate
      * @param toCoordinate tile coordinate
      */
-    event AvatarMove(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
+    event NFTMove(
+        address indexed account,
+        address indexed collectionAddress,
         uint32 indexed LandId,
         uint32 fromCoordinate,
         uint32 toCoordinate
@@ -72,39 +76,16 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     /**
      * @notice BombUse Event emit when a Bomb is used at a coordinate by an avatar
-     * @param avatarId avatarId that has indexed
+     * @param account account wallet address
      * @param tileCoordinate the tileCoordinate
-     * @param victims thje victims that bombed out of the map
+     * @param victims the victims that bombed out of the map
      */
     event BombUse(
-        uint256 indexed avatarId,
+        address indexed account,
         uint32 tileCoordinate,
         uint256[] victims,
         uint32[] victimsCoordinates
     );
-
-    // Collection Id
-    uint256 COIDCounter;
-
-    mapping(uint256 => address) public COIDMap;
-
-    /**
-     * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
-     *
-     * Collection address => uint64 mintedMT + uint48 additionalNFTPoints + uint48 COID + uint48 minted avatar num + uint48 on map nft number
-     */
-    mapping(address => uint256) public collectionMap;
-
-    /** 
-        avatar storage map
-        avatarId => AvatarData
-    */
-    mapping(uint256 => AvatarData) public avatarNoumenon;
-
-    // token map of Collection => tokenId => avatarId
-    mapping(address => mapping(uint256 => uint256)) public tokenMap;
-
-    uint256 public currentAvatarId;
 
     IMOPNGovernance public governance;
 
@@ -112,114 +93,68 @@ contract MOPN is IMOPN, Multicall, Ownable {
         governance = IMOPNGovernance(governance_);
     }
 
-    function getNFTAvatarId(
-        address contractAddress,
-        uint256 tokenId
-    ) public view returns (uint256) {
-        return tokenMap[contractAddress][tokenId];
+    function getNFTAccount(
+        NFTParams calldata params
+    ) public view returns (address) {
+        return
+            IERC6551Registry(governance.erc6551Registry()).account(
+                governance.erc6551AccountImplementation(),
+                governance.chainId(),
+                params.collectionAddress,
+                params.tokenId,
+                1
+            );
     }
 
-    function getAvatarTokenId(uint256 avatarId) public view returns (uint256) {
-        return avatarNoumenon[avatarId].tokenId;
-    }
-
-    /**
-     * @notice get avatar bomb used number
-     * @param avatarId avatar Id
-     * @return bomb used number
-     */
-    function getAvatarBombUsed(uint256 avatarId) public view returns (uint256) {
-        return uint64(avatarNoumenon[avatarId].setData >> 96);
-    }
-
-    function addAvatarBombUsed(uint256 avatarId) internal {
-        avatarNoumenon[avatarId].setData += 1 << 96;
-    }
-
-    /**
-     * @notice get avatar collection id
-     * @param avatarId avatar Id
-     * @return COID colletion id
-     */
-    function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
-        return uint64(avatarNoumenon[avatarId].setData >> 32);
-    }
-
-    /**
-     * @notice get avatar on map coordinate
-     * @param avatarId avatar Id
-     * @return tileCoordinate tile coordinate
-     */
-    function getAvatarCoordinate(
-        uint256 avatarId
-    ) public view returns (uint32) {
-        return uint32(avatarNoumenon[avatarId].setData);
-    }
-
-    function setAvatarCoordinate(
-        uint256 avatarId,
-        uint32 tileCoordinate
-    ) internal {
-        uint256 mask = uint256(uint32(0xFFFFFFFF));
-        avatarNoumenon[avatarId].setData =
-            (avatarNoumenon[avatarId].setData & ~mask) |
-            (uint256(tileCoordinate) & mask);
+    function getNFTAccountOwner(
+        NFTParams calldata params
+    ) public view returns (address) {
+        address account = getNFTAccount(params);
+        return IERC6551Account(account).owner();
     }
 
     /**
      * @notice get the original owner of a NFT
      * MOPN Avatar support hot wallet protocol https://delegate.cash/ and https://warm.xyz/ to verify your NFTs
-     * @param collectionContract NFT collection Contract Address
-     * @param tokenId NFT tokenId
+     * @param params NFT collection Contract Address and tokenId
+     * @param operator operator
      * @return owner nft owner or nft delegate hot wallet
      */
     function ownerOf(
-        address collectionContract,
-        uint256 tokenId
+        NFTParams calldata params,
+        address operator
     ) public view returns (address owner) {
-        return IERC721(collectionContract).ownerOf(tokenId);
-    }
-
-    /**
-     * @notice get the original owner of a avatar linked nft
-     * @param avatarId avatar Id
-     * @return owner nft owner or nft delegate hot wallet
-     */
-    function ownerOf(uint256 avatarId) public view returns (address) {
-        uint256 COID = getAvatarCOID(avatarId);
-        require(COID > 0, "avatar not exist");
-        return
-            ownerOf(
-                getCollectionContract(COID),
-                avatarNoumenon[avatarId].tokenId
-            );
-    }
-
-    /**
-     * @notice mint an avatar for a NFT
-     * @param params NFTParams
-     */
-    function mintAvatar(NFTParams calldata params) internal returns (uint256) {
-        uint256 COID = getCollectionCOID(params.collectionContract);
-        if (COID == 0) {
-            COID = generateCOID(params.collectionContract);
-        } else {
-            addCollectionAvatarNum(COID);
+        address account = getNFTAccount(params);
+        if (account == operator) {
+            return operator;
         }
-
-        currentAvatarId++;
-
-        avatarNoumenon[currentAvatarId].setData = COID << 32;
-        avatarNoumenon[currentAvatarId].tokenId = params.tokenId;
-
-        tokenMap[params.collectionContract][params.tokenId] = currentAvatarId;
-        emit AvatarMint(
-            currentAvatarId,
-            COID,
-            params.collectionContract,
-            params.tokenId
-        );
-        return currentAvatarId;
+        address accountowner = IERC6551Account(account).ownerOf();
+        if (accountowner == operator) {
+            return operator;
+        }
+        if (
+            IDelegationRegistry(governance.delegateCashContract())
+                .checkDelegateForToken(
+                    operator,
+                    account,
+                    params.collectionAddress,
+                    params.tokenId
+                )
+        ) {
+            return operator;
+        }
+        if (
+            IDelegationRegistry(governance.delegateCashContract())
+                .checkDelegateForToken(
+                    operator,
+                    account,
+                    params.collectionAddress,
+                    params.tokenId
+                )
+        ) {
+            return operator;
+        }
+        return account;
     }
 
     /**
@@ -229,34 +164,41 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function moveTo(
         NFTParams calldata params,
         uint32 tileCoordinate,
-        uint256 linkedAvatarId,
+        address linkedAccount,
         uint32 LandId
     )
         public
         tileCheck(tileCoordinate)
         ownerCheck(params.collectionContract, params.tokenId)
     {
-        uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
-        if (avatarId == 0) {
-            avatarId = mintAvatar(params);
+        address account = getNFTAccount(params);
+        IMOPNMiningData memory miningData = IMOPNMiningData(
+            governance.miningDataContract()
+        );
+        if (miningData.getAccountPerNFTPointMinted(account) == 0) {
+            emit NFTJoin(account, params.collectionAddress, params.tokenId);
         }
-        linkCheck(avatarId, linkedAvatarId, tileCoordinate);
+        linkCheck(account, linkedAccount, tileCoordinate);
 
-        uint256 COID = getAvatarCOID(avatarId);
-        uint32 orgCoordinate = getAvatarCoordinate(avatarId);
+        uint32 orgCoordinate = miningData.getAccountCoordinate(account);
         if (orgCoordinate > 0) {
             IMOPNMap(governance.mapContract()).avatarRemove(orgCoordinate, 0);
 
-            emit AvatarMove(
-                avatarId,
-                COID,
+            emit NFTMove(
+                account,
+                params.contractAddress,
                 LandId,
                 orgCoordinate,
                 tileCoordinate
             );
         } else {
-            addCollectionOnMapNum(COID);
-            emit AvatarJumpIn(avatarId, COID, LandId, tileCoordinate);
+            miningData.addCollectionOnMapNum(params.collectionAddress);
+            emit NFTJumpIn(
+                account,
+                params.contractAddress,
+                LandId,
+                tileCoordinate
+            );
         }
 
         IMOPNMap(governance.mapContract()).avatarSet(
@@ -266,7 +208,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             LandId
         );
 
-        setAvatarCoordinate(avatarId, tileCoordinate);
+        miningData.setAccountCoordinate(account, tileCoordinate);
     }
 
     /**
@@ -328,71 +270,13 @@ contract MOPN is IMOPN, Multicall, Ownable {
     }
 
     /**
-     * @notice use collection Id to get collection contract address
-     * @param COID collection Id
-     * @return contractAddress collection contract address
-     */
-    function getCollectionContract(uint256 COID) public view returns (address) {
-        return COIDMap[COID];
-    }
-
-    /**
-     * @notice use collection contract address to get collection Id
-     * @param collectionContract collection contract address
-     * @return COID collection Id
-     */
-    function getCollectionCOID(
-        address collectionContract
-    ) public view returns (uint256) {
-        return uint48(collectionMap[collectionContract] >> 96);
-    }
-
-    /**
-     * @notice batch call for {getCollectionCOID}
-     * @param collectionContracts multi collection contracts
-     */
-    function getCollectionsCOIDs(
-        address[] memory collectionContracts
-    ) public view returns (uint256[] memory COIDs) {
-        COIDs = new uint256[](collectionContracts.length);
-        for (uint256 i = 0; i < collectionContracts.length; i++) {
-            COIDs[i] = uint64(collectionMap[collectionContracts[i]] >> 96);
-        }
-    }
-
-    /**
-     * Generate a collection id for new collection
-     * @param collectionContract collection contract adddress
-     */
-    function generateCOID(
-        address collectionContract
-    ) public returns (uint256 COID) {
-        COID = getCollectionCOID(collectionContract);
-        require(COID == 0, "COID exist");
-
-        require(
-            IERC165(collectionContract).supportsInterface(
-                type(IERC721).interfaceId
-            ),
-            "not a erc721 compatible nft"
-        );
-
-        COIDCounter++;
-        COIDMap[COIDCounter] = collectionContract;
-        collectionMap[collectionContract] =
-            (COIDCounter << 96) |
-            (uint256(1) << 48);
-        COID = COIDCounter;
-    }
-
-    /**
      * @notice check if this collection is in white list
-     * @param collectionContract collection contract address
+     * @param collectionAddress collection contract address
      * @param additionalNFTPoints additional NFT Points
      * @param proofs collection whitelist proofs
      */
     function setCollectionAdditionalNFTPoints(
-        address collectionContract,
+        address collectionAddress,
         uint256 additionalNFTPoints,
         bytes32[] memory proofs
     ) public {
@@ -403,101 +287,52 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 keccak256(
                     bytes.concat(
                         keccak256(
-                            abi.encode(collectionContract, additionalNFTPoints)
+                            abi.encode(collectionAddress, additionalNFTPoints)
                         )
                     )
                 )
             ),
             "collection additionalNFTPoints can't verify"
         );
-        uint256 COID = getCollectionCOID(collectionContract);
-        if (COID == 0) {
-            COID = generateCOID(collectionContract);
-        }
-
-        collectionMap[collectionContract] =
-            (getCollectionMintedMT(COID) << 192) |
-            (additionalNFTPoints << 144) |
-            uint144(collectionMap[collectionContract]);
 
         IMOPNMiningData(governance.miningDataContract())
-            .settleCollectionNFTPoint(COID);
-    }
-
-    function getCollectionAdditionalNFTPoints(
-        uint256 COID
-    ) public view returns (uint256) {
-        return uint48(collectionMap[getCollectionContract(COID)] >> 144);
-    }
-
-    /**
-     * @notice get NFT collection On map avatar number
-     * @param COID collection Id
-     */
-    function getCollectionOnMapNum(uint256 COID) public view returns (uint256) {
-        return uint48(collectionMap[getCollectionContract(COID)]);
-    }
-
-    function addCollectionOnMapNum(uint256 COID) internal {
-        collectionMap[getCollectionContract(COID)]++;
-    }
-
-    function subCollectionOnMapNum(uint256 COID) internal {
-        collectionMap[getCollectionContract(COID)]--;
-    }
-
-    /**
-     * @notice get NFT collection minted avatar number
-     * @param COID collection Id
-     */
-    function getCollectionAvatarNum(
-        uint256 COID
-    ) public view returns (uint256) {
-        return uint48(collectionMap[getCollectionContract(COID)] >> 48);
-    }
-
-    function addCollectionAvatarNum(uint256 COID) internal {
-        collectionMap[getCollectionContract(COID)] += uint256(1) << 48;
-    }
-
-    function getCollectionMintedMT(uint256 COID) public view returns (uint256) {
-        return uint64(collectionMap[getCollectionContract(COID)] >> 192);
-    }
-
-    function addCollectionMintedMT(
-        uint256 COID,
-        uint256 amount
-    ) public onlyMiningData {
-        collectionMap[getCollectionContract(COID)] += amount << 192;
-    }
-
-    function clearCollectionMintedMT(uint256 COID) public onlyMiningData {
-        collectionMap[getCollectionContract(COID)] = uint192(
-            collectionMap[getCollectionContract(COID)]
-        );
+            .setCollectionAdditionalNFTPoint(
+                collectionAddress,
+                additionalNFTPoints
+            );
     }
 
     function linkCheck(
-        uint256 avatarId,
-        uint256 linkedAvatarId,
+        address account,
+        address linkedAccount,
         uint32 tileCoordinate
     ) internal view {
-        uint256 COID = getAvatarCOID(avatarId);
-        require(COID > 0, "avatar not exist");
-
-        if (linkedAvatarId > 0) {
-            require(COID == getAvatarCOID(linkedAvatarId), "link to enemy");
-            require(linkedAvatarId != avatarId, "link to yourself");
+        IMOPNMiningData memory miningData = IMOPNMiningData(
+            governance.miningDataContract()
+        );
+        (, address accountCollection, ) = IERC6551Account(account).token();
+        if (linkedAccount != address(0)) {
+            (, address linkedAccountCollection, ) = IERC6551Account(
+                linkedAccount
+            ).token();
             require(
-                tileCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) <
-                    3,
+                accountCollection == linkedAccountCollection,
+                "link to enemy"
+            );
+            require(linkedAccount != account, "link to yourself");
+            require(
+                tileCoordinate.distance(
+                    miningData.getAccountCoordinate(linkedAccount)
+                ) < 3,
                 "linked avatar too far away"
             );
         } else {
-            uint256 collectionOnMapNum = getCollectionOnMapNum(COID);
+            uint256 collectionOnMapNum = miningData.getCollectionOnMapNum(
+                accountCollection
+            );
             require(
                 collectionOnMapNum == 0 ||
-                    (getAvatarCoordinate(avatarId) > 0 &&
+                    (miningData.getAccountCoordinate(account) > 0 &&
                         collectionOnMapNum == 1),
                 "linked avatar missing"
             );

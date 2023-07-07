@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "./interfaces/IERC6551Account.sol";
 import "./interfaces/IMOPNAuctionHouse.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
@@ -28,36 +29,30 @@ contract MOPNBatchHelper is Multicall, Ownable {
 
     /**
      * @notice batch redeem avatar unclaimed minted mopn token
-     * @param avatarIds avatar Ids
+     * @param accounts nft erc6551 accounts
      */
-    function batchRedeemAvatarInboxMT(uint256[] memory avatarIds) public {
-        for (uint256 i = 0; i < avatarIds.length; i++) {
-            IMOPNMiningData(governance.miningDataContract()).redeemAvatarMT(
-                avatarIds[i]
-            );
-        }
+    function batchTransferAccountMT(address payable[] memory accounts) public {
+        //todo batch transfer account mt
     }
 
-    function batchMintAvatarMT(uint256[] memory avatarIds) public {
-        IMOPNMiningData(governance.miningDataContract())
-            .settlePerNFTPointMinted();
-        uint256 COID;
-        for (uint256 i = 0; i < avatarIds.length; i++) {
-            COID = IMOPN(governance.mopnContract()).getAvatarCOID(avatarIds[i]);
-            IMOPNMiningData(governance.miningDataContract()).mintCollectionMT(
-                COID
-            );
-            IMOPNMiningData(governance.miningDataContract()).mintAvatarMT(
-                avatarIds[i]
-            );
+    function batchMintAccountMT(address payable[] memory accounts) public {
+        IMOPNMiningData miningData = IMOPNMiningData(
+            governance.miningDataContract()
+        );
+        miningData.settlePerNFTPointMinted();
+        for (uint256 i = 0; i < accounts.length; i++) {
+            (, address accountCollection, ) = IERC6551Account(accounts[i])
+                .token();
+            miningData.mintCollectionMT(accountCollection);
+            miningData.mintAccountMT(accounts[i]);
         }
     }
 
     function redeemRealtimeLandHolderMT(
         uint32 LandId,
-        uint256[] memory avatarIds
+        address payable[] memory accounts
     ) public {
-        batchMintAvatarMT(avatarIds);
+        batchMintAccountMT(accounts);
         IMOPNMiningData(governance.miningDataContract()).redeemLandHolderMT(
             LandId
         );
@@ -69,10 +64,10 @@ contract MOPNBatchHelper is Multicall, Ownable {
      */
     function batchRedeemRealtimeLandHolderMT(
         uint32[] memory LandIds,
-        uint256[][] memory avatarIds
+        address payable[][] memory accounts
     ) public {
         for (uint256 i = 0; i < LandIds.length; i++) {
-            batchMintAvatarMT(avatarIds[i]);
+            batchMintAccountMT(accounts[i]);
         }
         IMOPNMiningData(governance.miningDataContract())
             .batchRedeemSameLandHolderMT(LandIds);

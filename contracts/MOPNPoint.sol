@@ -30,9 +30,12 @@ contract MOPNPoint is ERC20 {
      */
     function balanceOf(
         address account
-    ) public view virtual override returns (uint256) {
-        // todo
-        return 0;
+    ) public view virtual override returns (uint256 balance) {
+        IMOPNMiningData miningData = IMOPNMiningData(
+            governance.miningDataContract()
+        );
+        balance = miningData.getAccountTotalNFTPoint(account);
+        // todo get account balance
     }
 
     function _beforeTokenTransfer(

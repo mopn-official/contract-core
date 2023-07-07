@@ -20,13 +20,27 @@ interface IMOPNGovernance {
 
     function mtContract() external view returns (address);
 
+    function pointContract() external view returns (address);
+
     function mapContract() external view returns (address);
 
     function landContract() external view returns (address);
 
+    function erc6551Registry() external view returns (address);
+
+    function erc6551AccountImplementation() external view returns (address);
+
     function miningDataContract() external view returns (address);
 
-    function createCollectionVault(uint256 COID) external returns (address);
+    function delegateCashContract() external view returns (address);
 
-    function getCollectionVault(uint256 COID) external view returns (address);
+    function createCollectionVault(
+        address collectionAddress
+    ) external returns (address);
+
+    function getCollectionVault(
+        address collectionAddress
+    ) external view returns (address);
+
+    function chainId() external view returns (uint256);
 }

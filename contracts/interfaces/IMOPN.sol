@@ -47,7 +47,7 @@ interface IMOPN {
     }
 
     struct NFTParams {
-        address collectionContract;
+        address collectionAddress;
         uint256 tokenId;
     }
 

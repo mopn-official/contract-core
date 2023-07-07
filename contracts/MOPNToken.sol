@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "./interfaces/IMOPNGovernance.sol";
+import "./interfaces/IMOPNMiningData.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -13,7 +15,11 @@ contract MOPNToken is ERC20Burnable, Ownable {
      */
     bytes4 private constant ERC20_RECEIVED = 0x4fc35859;
 
-    constructor() ERC20("MOPN Token", "MT") {}
+    IMOPNGovernance governance;
+
+    constructor(address governance_) ERC20("MOPN Token", "MT") {
+        governance = IMOPNGovernance(governance_);
+    }
 
     function decimals() public view virtual override returns (uint8) {
         return 6;
@@ -51,5 +57,21 @@ contract MOPNToken is ERC20Burnable, Ownable {
             // expected response is ERC20_RECEIVED
             require(response == ERC20_RECEIVED);
         }
+    }
+
+    function balanceOf(
+        address account
+    ) public view virtual override returns (uint256 balance) {
+        balance = super.balanceOf(account);
+        balance += IMOPNMiningData(governance.miningDataContract())
+            .calcAccountMT(payable(account));
+    }
+
+    function _beforeTokenTransfer(
+        address,
+        address,
+        uint256
+    ) internal virtual override {
+        // todo mint inbox mt
     }
 }

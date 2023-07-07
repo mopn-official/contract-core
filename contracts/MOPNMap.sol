@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "./interfaces/IERC6551Account.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNLand.sol";
 import "./interfaces/IMOPNMiningData.sol";
@@ -17,7 +18,7 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 contract MOPNMap is Ownable, Multicall {
     using TileMath for uint32;
 
-    // Tile => uint64 avatarId + uint64 COID + uint32 MOPN Land Id
+    // Tile => uint160 account + uint32 MOPN Land Id
     mapping(uint32 => uint256) public tiles;
 
     IMOPNGovernance public governance;
@@ -30,18 +31,22 @@ contract MOPNMap is Ownable, Multicall {
      * @notice get the avatar Id who is standing on a tile
      * @param tileCoordinate tile coordinate
      */
-    function getTileAvatar(
+    function getTileAccount(
         uint32 tileCoordinate
-    ) public view returns (uint256) {
-        return uint64(tiles[tileCoordinate] >> 192);
+    ) public view returns (address payable) {
+        return payable(address(uint160(tiles[tileCoordinate] >> 32)));
     }
 
     /**
      * @notice get the coid of the avatar who is standing on a tile
      * @param tileCoordinate tile coordinate
      */
-    function getTileCOID(uint32 tileCoordinate) public view returns (uint256) {
-        return uint64(tiles[tileCoordinate] >> 128);
+    function getTileCollection(
+        uint32 tileCoordinate
+    ) public view returns (address collectionAddress) {
+        (, collectionAddress, ) = IERC6551Account(
+            getTileAccount(tileCoordinate)
+        ).token();
     }
 
     /**
@@ -54,19 +59,17 @@ contract MOPNMap is Ownable, Multicall {
 
     /**
      * @notice avatar id occupied a tile
-     * @param avatarId avatar Id
-     * @param COID collection Id
+     * @param account avatar Id
      * @param tileCoordinate tile coordinate
      * @param LandId MOPN Land Id
      * @dev can only called by avatar contract
      */
-    function avatarSet(
-        uint256 avatarId,
-        uint256 COID,
+    function accountSet(
+        address account,
         uint32 tileCoordinate,
         uint32 LandId
-    ) public onlyAvatar {
-        require(getTileAvatar(tileCoordinate) == 0, "dst Occupied");
+    ) public onlyAvatar returns (uint256) {
+        require(getTileAccount(tileCoordinate) == address(0), "dst Occupied");
 
         if (LandId == 0 || getTileLandId(tileCoordinate) != LandId) {
             require(
@@ -83,18 +86,22 @@ contract MOPNMap is Ownable, Multicall {
             );
         }
 
-        uint256 TilePoint = tileCoordinate.getTileNFTPoint() +
-            IMOPN(governance.mopnContract()).getAvatarBombUsed(avatarId);
+        uint256 TilePoint = tileCoordinate.getTileNFTPoint();
 
         tiles[tileCoordinate] =
-            (avatarId << 192) |
-            (COID << 128) |
+            (uint256(uint160(account)) << 32) |
             uint256(LandId);
         tileCoordinate = tileCoordinate.neighbor(4);
 
+        (, address collectionAddress, ) = IERC6551Account(payable(account))
+            .token();
         for (uint256 i = 0; i < 18; i++) {
-            uint256 tileCOID = getTileCOID(tileCoordinate);
-            require(tileCOID == 0 || tileCOID == COID, "tile has enemy");
+            address tileCollectionAddress = getTileCollection(tileCoordinate);
+            require(
+                tileCollectionAddress == address(0) ||
+                    tileCollectionAddress == collectionAddress,
+                "tile has enemy"
+            );
 
             if (i == 5) {
                 tileCoordinate = tileCoordinate.neighbor(4).neighbor(5);
@@ -105,11 +112,7 @@ contract MOPNMap is Ownable, Multicall {
             }
         }
 
-        IMOPNMiningData(governance.miningDataContract()).addNFTPoint(
-            avatarId,
-            COID,
-            TilePoint
-        );
+        return TilePoint;
     }
 
     /**
@@ -117,36 +120,17 @@ contract MOPNMap is Ownable, Multicall {
      * @param tileCoordinate tile coordinate
      * @dev can only called by avatar contract
      */
-    function avatarRemove(
+    function accountRemove(
         uint32 tileCoordinate,
-        uint256 excludeAvatarId
-    ) public onlyAvatar returns (uint256 avatarId) {
-        avatarId = getTileAvatar(tileCoordinate);
-        if (avatarId > 0 && avatarId != excludeAvatarId) {
+        address excludeAccount
+    ) public onlyAvatar returns (address account) {
+        account = getTileAccount(tileCoordinate);
+        if (account != address(0) && account != excludeAccount) {
             uint32 LandId = getTileLandId(tileCoordinate);
-            IMOPNMiningData(governance.miningDataContract()).subNFTPoint(
-                avatarId,
-                getTileCOID(tileCoordinate)
-            );
             tiles[tileCoordinate] = LandId;
         } else {
-            avatarId = 0;
+            account = address(0);
         }
-    }
-
-    modifier checkLandId(uint32 tileCoordinate, uint32 LandId) {
-        if (getTileLandId(tileCoordinate) != LandId) {
-            require(
-                tileCoordinate.distance(LandId.LandCenterTile()) < 6,
-                "LandId error"
-            );
-        }
-        _;
-    }
-
-    modifier onlyGovernance() {
-        require(msg.sender == address(governance), "not allowed");
-        _;
     }
 
     modifier onlyAvatar() {

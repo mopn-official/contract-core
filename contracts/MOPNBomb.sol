@@ -18,4 +18,15 @@ contract MOPNBomb is ERC1155, Ownable {
     function burn(address from, uint256 id, uint256 amount) public onlyOwner {
         _burn(from, id, amount);
     }
+
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        //todo change account points
+    }
 }

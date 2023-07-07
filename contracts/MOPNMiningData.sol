@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "./interfaces/IERC6551Account.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNMap.sol";
 import "./interfaces/IMOPNGovernance.sol";
@@ -17,66 +18,65 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
 
     uint256 public immutable MTProduceStartTimestamp;
 
-    /// @notice uint32 LastPerNFTPointMintedCalcTimestamp + uint48 TotalWhiteListNFTPoints + uint48 WhiteListFinPerNFTPointMinted  + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
-    uint256 public MTProduceData;
+    /// @notice uint32 LastPerNFTPointMintedCalcTimestamp + uint64 PerNFTPointMinted + uint64 TotalWhiteListNFTPoints + uint64 TotalNFTPoints
+    uint256 public MiningData1;
 
-    /// @notice uint64 NFTOfferCoefficient + uint64 TotalMTStaking
-    uint256 public MTVaultData;
+    /// @notice uint64 WhiteListFinPerNFTPointMinted + uint64 NFTOfferCoefficient + uint64 TotalMTStaking
+    uint256 public MiningData2;
 
-    /// @notice uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
-    mapping(uint256 => uint256) public AvatarMTs;
+    /// @notice  uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerNFTPointMinted + uint32 TotalNFTPoints + uint32 coordinate
+    mapping(address => uint256) public AccountsData;
 
     /// @notice uint64 PerCollectionNFTMinted + uint64 PerNFTPointMinted + uint64 CollectionNFTPoints + uint32 WhiteListNFTPoints + uint32 AvatarNFTPoints
-    mapping(uint256 => uint256) public CollectionMTs;
+    mapping(address => uint256) public CollectionsData1;
 
-    /// @notice uint64 MT Inbox + uint64 totalMTMinted + uint64 OnLandMiningNFT
+    /**
+     * @notice record the collection's states info
+     * Collection address => uint32 additionalNFTPoints + uint64 mintedMT + uint32 registered account num + uint32 on map nft number
+     */
+    mapping(address => uint256) public CollectionsData2;
+
+    /// @notice uint64 settled MT + uint64 totalMTMinted + uint64 OnLandMiningNFT
     mapping(uint32 => uint256) public LandHolderMTs;
 
-    event AvatarMTMinted(uint256 indexed avatarId, uint256 amount);
+    event AccountMTMinted(address indexed account, uint256 amount);
 
-    event CollectionMTMinted(uint256 indexed COID, uint256 amount);
+    event CollectionMTMinted(address indexed collectionAddress, uint256 amount);
 
     event LandHolderMTMinted(uint32 indexed LandId, uint256 amount);
 
-    event MTClaimed(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        address indexed to,
-        uint256 amount
-    );
-
-    event MTClaimedCollectionVault(uint256 indexed COID, uint256 amount);
-
-    event MTClaimedLandHolder(uint256 indexed landId, uint256 amount);
-
-    event NFTOfferAccept(uint256 indexed COID, uint256 tokenId, uint256 price);
-
-    event NFTAuctionAccept(
-        uint256 indexed COID,
+    event NFTOfferAccept(
+        address indexed collectionAddress,
         uint256 tokenId,
         uint256 price
     );
 
-    event SettleCollectionNFTPoint(uint256 COID);
+    event NFTAuctionAccept(
+        address indexed collectionAddress,
+        uint256 tokenId,
+        uint256 price
+    );
+
+    event SettleCollectionNFTPoint(address collectionAddress);
 
     IMOPNGovernance public governance;
 
     constructor(address governance_, uint256 MTProduceStartTimestamp_) {
         MTProduceStartTimestamp = MTProduceStartTimestamp_;
         governance = IMOPNGovernance(governance_);
-        MTVaultData = (10 ** 18) << 64;
+        MiningData2 = (10 ** 18) << 64;
+    }
+
+    function getWhiteListFinPerNFTPointMinted() public view returns (uint256) {
+        return uint48(MiningData2 >> 128);
     }
 
     function getNFTOfferCoefficient() public view returns (uint256) {
-        return uint64(MTProduceData >> 64);
+        return uint64(MiningData2 >> 64);
     }
 
     function getTotalMTStaking() public view returns (uint256) {
-        return uint64(MTProduceData);
-    }
-
-    function getTotalWhiteListNFTPoints() public view returns (uint256) {
-        return uint48(MTProduceData >> 176);
+        return uint64(MiningData2);
     }
 
     /**
@@ -87,25 +87,25 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
         view
         returns (uint256)
     {
-        return uint32(MTProduceData >> 224);
-    }
-
-    function getWhiteListFinPerNFTPointMinted() public view returns (uint256) {
-        return uint48(MTProduceData >> 128);
+        return uint32(MiningData1 >> 192);
     }
 
     /**
      * @notice get settled Per MT Allocation Weight minted mopn token number
      */
     function getPerNFTPointMinted() public view returns (uint256) {
-        return uint64(MTProduceData >> 64);
+        return uint64(MiningData1 >> 128);
+    }
+
+    function getTotalWhiteListNFTPoints() public view returns (uint256) {
+        return uint64(MiningData1 >> 64);
     }
 
     /**
      * @notice get total mopn token allocation weights
      */
     function getTotalNFTPoints() public view returns (uint256) {
-        return uint64(MTProduceData);
+        return uint64(MiningData1);
     }
 
     /**
@@ -134,17 +134,17 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
      */
     function settlePerNFTPointMinted() public {
         if (block.timestamp > getLastPerNFTPointMintedCalcTimestamp()) {
-            uint256 temp = uint256(uint224(MTProduceData));
-            temp += (calcPerNFTPointMinted() - getPerNFTPointMinted()) << 64;
+            uint256 temp = uint256(uint192(MiningData1));
+            temp += (calcPerNFTPointMinted() - getPerNFTPointMinted()) << 128;
 
-            MTProduceData = (block.timestamp << 224) | temp;
+            MiningData1 = (block.timestamp << 192) | temp;
         }
     }
 
     function closeWhiteList() public onlyGovernance {
         settlePerNFTPointMinted();
-        MTProduceData += getPerNFTPointMinted() << 128;
-        MTProduceData -= getTotalWhiteListNFTPoints();
+        MiningData2 += getPerNFTPointMinted() << 128;
+        MiningData1 -= getTotalWhiteListNFTPoints();
     }
 
     function calcPerNFTPointMinted() public view returns (uint256) {
@@ -190,179 +190,224 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
 
     /**
      * @notice get avatar settled unclaimed minted mopn token
-     * @param avatarId avatar Id
+     * @param account account wallet address
      */
-    function getAvatarSettledMT(
-        uint256 avatarId
+    function getAccountSettledMT(
+        address payable account
     ) public view returns (uint256) {
-        return uint64(AvatarMTs[avatarId] >> 192);
+        return uint64(AccountsData[account] >> 192);
     }
 
-    function getAvatarCollectionPerNFTMinted(
-        uint256 avatarId
+    function getAccountPerCollectionNFTMinted(
+        address payable account
     ) public view returns (uint256) {
-        return uint64(AvatarMTs[avatarId] >> 128);
+        return uint64(AccountsData[account] >> 128);
     }
 
     /**
      * @notice get avatar settled per mopn token allocation weight minted mopn token number
-     * @param avatarId avatar Id
+     * @param account account wallet address
      */
-    function getAvatarPerNFTPointMinted(
-        uint256 avatarId
+    function getAccountPerNFTPointMinted(
+        address payable account
     ) public view returns (uint256) {
-        return uint64(AvatarMTs[avatarId] >> 64);
+        return uint64(AccountsData[account] >> 64);
     }
 
     /**
      * @notice get avatar on map mining mopn token allocation weight
-     * @param avatarId avatar Id
+     * @param account account wallet address
      */
-    function getAvatarNFTPoint(
-        uint256 avatarId
-    ) public view returns (uint256 point) {
-        return uint64(AvatarMTs[avatarId]);
+    function getAccountTotalNFTPoint(
+        address account
+    ) public view returns (uint256) {
+        return uint32(AccountsData[account] >> 32);
+    }
+
+    function getAccountCoordinate(
+        address payable account
+    ) public view returns (uint32) {
+        return uint32(AccountsData[account]);
     }
 
     /**
      * @notice get avatar realtime unclaimed minted mopn token
-     * @param avatarId avatar Id
+     * @param account account wallet address
      */
-    function calcAvatarMT(
-        uint256 avatarId
+    function calcAccountMT(
+        address payable account
     ) public view returns (uint256 inbox) {
-        inbox = getAvatarSettledMT(avatarId);
-        uint256 AvatarNFTPoint = getAvatarNFTPoint(avatarId);
-        uint256 AvatarPerNFTPointMintedDiff = calcPerNFTPointMinted() -
-            getAvatarPerNFTPointMinted(avatarId);
+        inbox = getAccountSettledMT(account);
+        uint256 AccountTotalNFTPoint = getAccountTotalNFTPoint(account);
+        uint256 AccountPerNFTPointMintedDiff = calcPerNFTPointMinted() -
+            getAccountPerNFTPointMinted(account);
 
-        if (AvatarPerNFTPointMintedDiff > 0 && AvatarNFTPoint > 0) {
-            uint256 AvatarCollectionPerNFTMintedDiff = getPerCollectionNFTMinted(
-                    IMOPN(governance.mopnContract()).getAvatarCOID(avatarId)
-                ) - getAvatarCollectionPerNFTMinted(avatarId);
+        if (AccountPerNFTPointMintedDiff > 0 && AccountTotalNFTPoint > 0) {
+            (, address collectionAddress, ) = IERC6551Account(account).token();
+            uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
+                    collectionAddress
+                ) - getAccountPerCollectionNFTMinted(account);
             inbox +=
-                ((AvatarPerNFTPointMintedDiff * AvatarNFTPoint) * 90) /
+                ((AccountPerNFTPointMintedDiff * AccountTotalNFTPoint) * 90) /
                 100;
-            if (AvatarCollectionPerNFTMintedDiff > 0) {
-                inbox += (AvatarCollectionPerNFTMintedDiff * 90) / 100;
+            if (AccountPerCollectionNFTMintedDiff > 0) {
+                inbox += (AccountPerCollectionNFTMintedDiff * 90) / 100;
             }
         }
     }
 
     /**
      * @notice mint avatar mopn token
-     * @param avatarId avatar Id
+     * @param account account wallet address
      */
-    function mintAvatarMT(uint256 avatarId) public returns (uint256) {
-        uint256 AvatarNFTPoint = getAvatarNFTPoint(avatarId);
-        uint256 AvatarPerNFTPointMintedDiff = getPerNFTPointMinted() -
-            getAvatarPerNFTPointMinted(avatarId);
+    function mintAccountMT(address payable account) public returns (uint256) {
+        uint256 AccountTotalNFTPoint = getAccountTotalNFTPoint(account);
+        uint256 AccountPerNFTPointMintedDiff = getPerNFTPointMinted() -
+            getAccountPerNFTPointMinted(account);
 
-        if (AvatarPerNFTPointMintedDiff > 0) {
-            uint256 collectionPerNFTMintedDiff = getPerCollectionNFTMinted(
-                IMOPN(governance.mopnContract()).getAvatarCOID(avatarId)
-            ) - getAvatarCollectionPerNFTMinted(avatarId);
-            if (AvatarNFTPoint > 0) {
-                uint256 amount = ((AvatarPerNFTPointMintedDiff) *
-                    AvatarNFTPoint);
-                if (collectionPerNFTMintedDiff > 0) {
-                    amount += collectionPerNFTMintedDiff;
+        if (AccountPerNFTPointMintedDiff > 0) {
+            (, address collectionAddress, ) = IERC6551Account(account).token();
+            uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
+                    collectionAddress
+                ) - getAccountPerCollectionNFTMinted(account);
+            if (AccountTotalNFTPoint > 0) {
+                uint256 amount = ((AccountPerNFTPointMintedDiff) *
+                    AccountTotalNFTPoint);
+                if (AccountPerCollectionNFTMintedDiff > 0) {
+                    amount += AccountPerCollectionNFTMintedDiff;
                 }
 
                 uint32 LandId = IMOPNMap(governance.mapContract())
-                    .getTileLandId(
-                        IMOPN(governance.mopnContract()).getAvatarCoordinate(
-                            avatarId
-                        )
-                    );
+                    .getTileLandId(getAccountCoordinate(account));
                 uint256 landamount = (amount * 5) / 100;
                 LandHolderMTs[LandId] += (landamount << 128) | landamount;
                 emit LandHolderMTMinted(LandId, landamount);
 
                 amount = (amount * 90) / 100;
 
-                AvatarMTs[avatarId] +=
+                AccountsData[account] +=
                     (amount << 192) |
-                    (collectionPerNFTMintedDiff << 128) |
-                    (AvatarPerNFTPointMintedDiff << 64);
-                emit AvatarMTMinted(avatarId, amount);
+                    (AccountPerCollectionNFTMintedDiff << 128) |
+                    (AccountPerNFTPointMintedDiff << 64);
+                emit AccountMTMinted(account, amount);
             } else {
-                AvatarMTs[avatarId] +=
-                    (collectionPerNFTMintedDiff << 128) |
-                    (AvatarPerNFTPointMintedDiff << 64);
+                AccountsData[account] +=
+                    (AccountPerCollectionNFTMintedDiff << 128) |
+                    (AccountPerNFTPointMintedDiff << 64);
             }
         }
-        return AvatarNFTPoint;
+        return AccountTotalNFTPoint;
     }
 
     /**
-     * @notice redeem avatar unclaimed minted mopn token
-     * @param avatarId avatar Id
+     * @notice redeem account unclaimed minted mopn token
+     * @param account account wallet address
+     * @param to redeem mt to address
      */
-    function redeemAvatarMT(uint256 avatarId) public {
-        address nftOwner = IMOPN(governance.mopnContract()).ownerOf(avatarId);
-
+    function claimAccountMT(address payable account, address to) public onlyMT {
         settlePerNFTPointMinted();
+        (, address collectionAddress, ) = IERC6551Account(account).token();
+        mintCollectionMT(collectionAddress);
+        mintAccountMT(account);
 
-        uint256 COID = IMOPN(governance.mopnContract()).getAvatarCOID(avatarId);
-        mintCollectionMT(COID);
-        mintAvatarMT(avatarId);
-
-        uint256 amount = getAvatarSettledMT(avatarId);
+        uint256 amount = getAccountSettledMT(account);
         if (amount > 0) {
-            AvatarMTs[avatarId] -= amount << 192;
-            governance.mintMT(nftOwner, amount);
-            emit MTClaimed(avatarId, COID, nftOwner, amount);
+            AccountsData[account] -= amount << 192;
+            governance.mintMT(to, amount);
         }
     }
 
     function getPerCollectionNFTMinted(
-        uint256 COID
+        address collectionAddress
     ) public view returns (uint256) {
-        return uint64(CollectionMTs[COID] >> 192);
+        return uint64(CollectionsData1[collectionAddress] >> 192);
     }
 
     /**
      * @notice get collection settled per mopn token allocation weight minted mopn token number
-     * @param COID collection Id
+     * @param collectionAddress collection contract address
      */
     function getCollectionPerNFTPointMinted(
-        uint256 COID
+        address collectionAddress
     ) public view returns (uint256) {
-        return uint64(CollectionMTs[COID] >> 128);
+        return uint64(CollectionsData1[collectionAddress] >> 128);
     }
 
     /**
      * @notice get collection on map mining mopn token allocation weight
-     * @param COID collection Id
+     * @param collectionAddress collection contract adddress
      */
-    function getCollectionNFTPoint(uint256 COID) public view returns (uint256) {
-        return uint64(CollectionMTs[COID] >> 64);
+    function getCollectionNFTPoints(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint64(CollectionsData1[collectionAddress] >> 64);
     }
 
-    function getCollectionWhiteListNFTPoint(
-        uint256 COID
+    function getCollectionWhiteListNFTPoints(
+        address collectionAddress
     ) public view returns (uint256) {
-        return uint32(CollectionMTs[COID] >> 32);
+        return uint32(CollectionsData1[collectionAddress] >> 32);
+    }
+
+    function getCollectionAvatarNFTPoints(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint32(CollectionsData1[collectionAddress]);
+    }
+
+    function getCollectionAdditionalNFTPoints(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint32(CollectionsData2[collectionAddress] >> 128);
+    }
+
+    function getCollectionSettledMT(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint64(CollectionsData2[collectionAddress] >> 64);
     }
 
     /**
-     * @notice get collection avatars on map mining mopn token allocation weight
-     * @param COID collection Id
+     * @notice get NFT collection minted avatar number
+     * @param collectionAddress collection contract address
      */
-    function getCollectionAvatarNFTPoint(
-        uint256 COID
+    function getCollectionAvatarNum(
+        address collectionAddress
     ) public view returns (uint256) {
-        return uint32(CollectionMTs[COID]);
+        return uint32(CollectionsData2[collectionAddress] >> 32);
+    }
+
+    function addCollectionAvatarNum(
+        address collectionAddress
+    ) public onlyAvatarOrMap {
+        CollectionsData2[collectionAddress] += uint256(1) << 32;
+    }
+
+    /**
+     * @notice get NFT collection On map avatar number
+     * @param collectionAddress collection contract address
+     */
+    function getCollectionOnMapNum(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint32(CollectionsData2[collectionAddress]);
+    }
+
+    function addCollectionOnMapNum(address collectionAddress) internal {
+        CollectionsData2[collectionAddress]++;
+    }
+
+    function subCollectionOnMapNum(address collectionAddress) internal {
+        CollectionsData2[collectionAddress]--;
     }
 
     function getCollectionPoint(
-        uint256 COID
+        address collectionAddress
     ) public view returns (uint256 point) {
-        if (governance.getCollectionVault(COID) != address(0)) {
+        if (governance.getCollectionVault(collectionAddress) != address(0)) {
             point =
                 IMOPNToken(governance.mtContract()).balanceOf(
-                    governance.getCollectionVault(COID)
+                    governance.getCollectionVault(collectionAddress)
                 ) /
                 10 ** 8;
         }
@@ -370,27 +415,31 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
 
     /**
      * @notice get collection realtime unclaimed minted mopn token
-     * @param COID collection Id
+     * @param collectionAddress collection contract address
      */
     function calcCollectionMT(
-        uint256 COID
+        address collectionAddress
     ) public view returns (uint256 inbox) {
-        inbox = IMOPN(governance.mopnContract()).getCollectionMintedMT(COID);
+        inbox = getCollectionSettledMT(collectionAddress);
         uint256 PerNFTPointMinted = calcPerNFTPointMinted();
         uint256 CollectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
-            COID
+            collectionAddress
         );
-        uint256 WhiteListNFTPoints = getCollectionWhiteListNFTPoint(COID);
-        uint256 CollectionNFTPoint = getCollectionNFTPoint(COID);
-        uint256 AvatarNFTPoint = getCollectionAvatarNFTPoint(COID);
+        uint256 WhiteListNFTPoints = getCollectionWhiteListNFTPoints(
+            collectionAddress
+        );
+        uint256 CollectionNFTPoints = getCollectionNFTPoints(collectionAddress);
+        uint256 AvatarNFTPoints = getCollectionAvatarNFTPoints(
+            collectionAddress
+        );
 
         if (
             CollectionPerNFTPointMinted < PerNFTPointMinted &&
-            AvatarNFTPoint > 0
+            AvatarNFTPoints > 0
         ) {
             inbox +=
                 (((PerNFTPointMinted - CollectionPerNFTPointMinted) *
-                    (CollectionNFTPoint + AvatarNFTPoint)) * 5) /
+                    (CollectionNFTPoints + AvatarNFTPoints)) * 5) /
                 100;
             if (WhiteListNFTPoints > 0) {
                 if (getWhiteListFinPerNFTPointMinted() > 0) {
@@ -411,156 +460,170 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
 
     /**
      * @notice mint collection mopn token
-     * @param COID collection Id
+     * @param collectionAddress collection contract address
      */
-    function mintCollectionMT(uint256 COID) public {
-        uint256 collectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
-            COID
+    function mintCollectionMT(address collectionAddress) public {
+        uint256 CollectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
+            collectionAddress
         );
         uint256 CollectionPerNFTPointMintedDiff = getPerNFTPointMinted() -
-            collectionPerNFTPointMinted;
+            CollectionPerNFTPointMinted;
         if (CollectionPerNFTPointMintedDiff > 0) {
-            uint256 AvatarNFTPoint = getCollectionAvatarNFTPoint(COID);
-            if (AvatarNFTPoint > 0) {
-                uint256 CollectionMT = CollectionMTs[COID];
-                uint256 CollectionNFTPoint = getCollectionNFTPoint(COID);
-                uint256 amount = ((CollectionPerNFTPointMintedDiff *
-                    AvatarNFTPoint) * 5) / 100;
-                CollectionMT += (CollectionPerNFTPointMintedDiff << 128);
+            uint256 AvatarNFTPoints = getCollectionAvatarNFTPoints(
+                collectionAddress
+            );
+            if (AvatarNFTPoints > 0) {
+                uint256 CollectionData1 = CollectionsData1[collectionAddress];
 
-                if (CollectionNFTPoint > 0) {
-                    amount = (((CollectionPerNFTPointMintedDiff *
-                        CollectionNFTPoint) * 5) / 100);
-                    CollectionMT += (((CollectionPerNFTPointMintedDiff *
-                        CollectionNFTPoint) /
-                        IMOPN(governance.mopnContract()).getCollectionOnMapNum(
-                            COID
-                        )) << 192);
+                uint256 amount = ((CollectionPerNFTPointMintedDiff *
+                    AvatarNFTPoints) * 5) / 100;
+                CollectionData1 += CollectionPerNFTPointMintedDiff << 128;
+
+                uint256 CollectionNFTPoints = getCollectionNFTPoints(
+                    collectionAddress
+                );
+                if (CollectionNFTPoints > 0) {
+                    amount +=
+                        ((CollectionPerNFTPointMintedDiff *
+                            CollectionNFTPoints) * 5) /
+                        100;
+                    CollectionData1 +=
+                        ((CollectionPerNFTPointMintedDiff *
+                            CollectionNFTPoints) /
+                            getCollectionOnMapNum(collectionAddress)) <<
+                        192;
                 }
 
-                uint256 WhiteListNFTPoint = getCollectionWhiteListNFTPoint(
-                    COID
+                uint256 WhiteListNFTPoints = getCollectionWhiteListNFTPoints(
+                    collectionAddress
                 );
-                if (WhiteListNFTPoint > 0) {
+                if (WhiteListNFTPoints > 0) {
                     uint256 whiteListFinPerNFTPointMinted = getWhiteListFinPerNFTPointMinted();
                     if (whiteListFinPerNFTPointMinted > 0) {
                         if (
                             whiteListFinPerNFTPointMinted >
-                            collectionPerNFTPointMinted
+                            CollectionPerNFTPointMinted
                         ) {
                             amount = ((((whiteListFinPerNFTPointMinted -
-                                collectionPerNFTPointMinted) *
-                                WhiteListNFTPoint) * 5) / 100);
-                            CollectionMT +=
+                                CollectionPerNFTPointMinted) *
+                                WhiteListNFTPoints) * 5) / 100);
+                            CollectionData1 +=
                                 (((whiteListFinPerNFTPointMinted -
-                                    collectionPerNFTPointMinted) *
-                                    WhiteListNFTPoint) /
-                                    IMOPN(governance.mopnContract())
-                                        .getCollectionOnMapNum(COID)) <<
+                                    CollectionPerNFTPointMinted) *
+                                    WhiteListNFTPoints) /
+                                    getCollectionOnMapNum(collectionAddress)) <<
                                 192;
-                            CollectionMT -= WhiteListNFTPoint << 32;
+                            CollectionData1 -= WhiteListNFTPoints << 32;
                         }
                     } else {
-                        amount = (((CollectionPerNFTPointMintedDiff *
-                            WhiteListNFTPoint) * 5) / 100);
-                        CollectionMT +=
+                        amount += (((CollectionPerNFTPointMintedDiff *
+                            WhiteListNFTPoints) * 5) / 100);
+                        CollectionData1 +=
                             (((CollectionPerNFTPointMintedDiff) *
-                                WhiteListNFTPoint) /
-                                IMOPN(governance.mopnContract())
-                                    .getCollectionOnMapNum(COID)) <<
+                                WhiteListNFTPoints) /
+                                getCollectionOnMapNum(collectionAddress)) <<
                             192;
                     }
                 }
 
-                CollectionMTs[COID] = CollectionMT;
-                IMOPN(governance.mopnContract()).addCollectionMintedMT(
-                    COID,
-                    amount
-                );
-                emit CollectionMTMinted(COID, amount);
+                CollectionsData1[collectionAddress] = CollectionData1;
+                CollectionsData2[collectionAddress] += amount << 64;
+                emit CollectionMTMinted(collectionAddress, amount);
             } else {
-                CollectionMTs[COID] += CollectionPerNFTPointMintedDiff << 128;
+                CollectionsData1[collectionAddress] +=
+                    CollectionPerNFTPointMintedDiff <<
+                    128;
             }
         }
     }
 
-    function redeemCollectionMT(uint256 COID) public {
-        uint256 amount = IMOPN(governance.mopnContract()).getCollectionMintedMT(
-            COID
-        );
+    function claimCollectionMT(address collectionAddress) public {
+        uint256 amount = getCollectionSettledMT(collectionAddress);
         if (amount > 0) {
-            governance.mintMT(governance.getCollectionVault(COID), amount);
-            IMOPN(governance.mopnContract()).clearCollectionMintedMT(COID);
-            MTVaultData += amount;
-            emit MTClaimedCollectionVault(COID, amount);
+            address collectionVault = governance.getCollectionVault(
+                collectionAddress
+            );
+            if (collectionVault == address(0)) {
+                collectionVault = governance.createCollectionVault(
+                    collectionAddress
+                );
+            }
+            governance.mintMT(collectionVault, amount);
+            CollectionsData2[collectionAddress] -= amount << 64;
+            MiningData2 += amount;
         }
     }
 
     function settleCollectionNFTPoint(
-        uint256 COID
-    ) public onlyAvatarOrCollectionVault(COID) {
-        _settleCollectionNFTPoint(COID);
+        address collectionAddress
+    ) public onlyAvatarOrCollectionVault(collectionAddress) {
+        _settleCollectionNFTPoint(collectionAddress);
 
-        emit SettleCollectionNFTPoint(COID);
+        emit SettleCollectionNFTPoint(collectionAddress);
     }
 
-    function _settleCollectionNFTPoint(uint256 COID) internal {
-        uint256 point = getCollectionPoint(COID);
+    function _settleCollectionNFTPoint(address collectionAddress) internal {
+        uint256 point = getCollectionPoint(collectionAddress);
         uint256 collectionNFTPoint;
         if (point > 0) {
             collectionNFTPoint =
                 point *
-                IMOPN(governance.mopnContract()).getCollectionOnMapNum(COID);
+                getCollectionOnMapNum(collectionAddress);
         }
-        uint256 preCollectionNFTPoint = getCollectionNFTPoint(COID);
-        if (collectionNFTPoint != preCollectionNFTPoint) {
-            if (collectionNFTPoint > preCollectionNFTPoint) {
-                MTProduceData += collectionNFTPoint - preCollectionNFTPoint;
-                CollectionMTs[COID] += ((collectionNFTPoint -
-                    preCollectionNFTPoint) << 64);
-            } else {
-                MTProduceData -= preCollectionNFTPoint;
-                MTProduceData += collectionNFTPoint;
-                CollectionMTs[COID] -= ((preCollectionNFTPoint -
-                    collectionNFTPoint) << 64);
-            }
+        uint256 preCollectionNFTPoint = getCollectionNFTPoints(
+            collectionAddress
+        );
+
+        if (collectionNFTPoint > preCollectionNFTPoint) {
+            MiningData1 += collectionNFTPoint - preCollectionNFTPoint;
+            CollectionsData1[collectionAddress] += ((collectionNFTPoint -
+                preCollectionNFTPoint) << 64);
+        } else if (collectionNFTPoint < preCollectionNFTPoint) {
+            MiningData1 -= preCollectionNFTPoint - collectionNFTPoint;
+            CollectionsData1[collectionAddress] -= ((preCollectionNFTPoint -
+                collectionNFTPoint) << 64);
         }
 
-        uint256 additionalpoint = IMOPN(governance.mopnContract())
-            .getCollectionAdditionalNFTPoints(COID);
+        uint256 additionalpoint = getCollectionAdditionalNFTPoints(
+            collectionAddress
+        );
         uint256 collectionAdditionalNFTPoint;
         if (additionalpoint > 0) {
             collectionAdditionalNFTPoint =
                 additionalpoint *
-                IMOPN(governance.mopnContract()).getCollectionOnMapNum(COID);
+                getCollectionOnMapNum(collectionAddress);
         }
-        uint256 preCollectionAdditionalNFTPoint = getCollectionWhiteListNFTPoint(
-                COID
+        uint256 preCollectionAdditionalNFTPoint = getCollectionWhiteListNFTPoints(
+                collectionAddress
             );
-        if (collectionAdditionalNFTPoint != preCollectionAdditionalNFTPoint) {
-            if (
-                collectionAdditionalNFTPoint > preCollectionAdditionalNFTPoint
-            ) {
-                MTProduceData +=
-                    collectionAdditionalNFTPoint -
-                    preCollectionAdditionalNFTPoint;
-                CollectionMTs[COID] += ((collectionAdditionalNFTPoint -
-                    preCollectionAdditionalNFTPoint) << 32);
-            } else {
-                MTProduceData -= preCollectionAdditionalNFTPoint;
-                MTProduceData += collectionAdditionalNFTPoint;
-                CollectionMTs[COID] -= ((preCollectionAdditionalNFTPoint -
-                    collectionAdditionalNFTPoint) << 32);
-            }
+
+        if (collectionAdditionalNFTPoint > preCollectionAdditionalNFTPoint) {
+            MiningData1 +=
+                collectionAdditionalNFTPoint -
+                preCollectionAdditionalNFTPoint;
+            CollectionsData1[
+                collectionAddress
+            ] += ((collectionAdditionalNFTPoint -
+                preCollectionAdditionalNFTPoint) << 32);
+        } else if (
+            collectionAdditionalNFTPoint < preCollectionAdditionalNFTPoint
+        ) {
+            MiningData1 -=
+                preCollectionAdditionalNFTPoint -
+                collectionAdditionalNFTPoint;
+            CollectionsData1[
+                collectionAddress
+            ] -= ((preCollectionAdditionalNFTPoint -
+                collectionAdditionalNFTPoint) << 32);
         }
     }
 
     function settleCollectionMining(
-        uint256 COID
-    ) public onlyAvatarOrCollectionVault(COID) {
+        address collectionAddress
+    ) public onlyAvatarOrCollectionVault(collectionAddress) {
         settlePerNFTPointMinted();
-        mintCollectionMT(COID);
-        redeemCollectionMT(COID);
+        mintCollectionMT(collectionAddress);
+        claimCollectionMT(collectionAddress);
     }
 
     /**
@@ -585,7 +648,6 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
             );
             governance.mintMT(owner, amount);
             LandHolderMTs[LandId] = uint128(LandHolderMTs[LandId]);
-            emit MTClaimedLandHolder(LandId, amount);
         }
     }
 
@@ -615,132 +677,94 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
     }
 
     function addNFTPoint(
-        uint256 avatarId,
-        uint256 COID,
+        address payable account,
         uint256 amount
-    ) public onlyAvatarOrMap {
-        _addNFTPoint(avatarId, COID, amount);
+    ) public onlyBombOrMap {
+        _addNFTPoint(account, amount);
     }
 
-    function subNFTPoint(
-        uint256 avatarId,
-        uint256 COID
-    ) public onlyAvatarOrMap {
-        _subNFTPoint(avatarId, COID);
+    function subNFTPoint(address payable account) public onlyBombOrMap {
+        _subNFTPoint(account);
     }
 
     /**
      * add on map mining mopn token allocation weight
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     * @param amount EAW amount
+     * @param account account wallet address
+     * @param amount Points amount
      */
-    function _addNFTPoint(
-        uint256 avatarId,
-        uint256 COID,
-        uint256 amount
-    ) internal {
+    function _addNFTPoint(address payable account, uint256 amount) internal {
         amount *= 100;
         settlePerNFTPointMinted();
-        mintCollectionMT(COID);
-        uint256 exist = mintAvatarMT(avatarId);
-        _settleCollectionNFTPoint(COID);
-
-        if (exist == 0 && getWhiteListFinPerNFTPointMinted() == 0) {
-            uint256 collectionAdditionalNFTPoints = IMOPN(
-                governance.mopnContract()
-            ).getCollectionAdditionalNFTPoints(COID);
-            if (collectionAdditionalNFTPoints > 0) {
-                MTProduceData +=
-                    (collectionAdditionalNFTPoints << 176) |
-                    (amount + collectionAdditionalNFTPoints);
-                CollectionMTs[COID] +=
-                    (collectionAdditionalNFTPoints << 32) |
-                    amount;
-            } else {
-                MTProduceData += amount;
-                CollectionMTs[COID] += amount;
-            }
-        } else {
-            MTProduceData += amount;
-            CollectionMTs[COID] += amount;
+        (, address collectionAddress, ) = IERC6551Account(account).token();
+        mintCollectionMT(collectionAddress);
+        uint256 exist = mintAccountMT(account);
+        if (exist == 0) {
+            addCollectionOnMapNum(collectionAddress);
         }
 
-        AvatarMTs[avatarId] += amount;
+        _settleCollectionNFTPoint(collectionAddress);
+
+        MiningData1 += amount;
+        CollectionsData1[collectionAddress] += amount;
+        AccountsData[account] += amount;
     }
 
     /**
      * substruct on map mining mopn token allocation weight
-     * @param avatarId avatar Id
-     * @param COID collection Id
+     * @param account account wallet address
      */
-    function _subNFTPoint(uint256 avatarId, uint256 COID) internal {
+    function _subNFTPoint(address payable account) internal {
         settlePerNFTPointMinted();
-        mintCollectionMT(COID);
-        uint256 amount = mintAvatarMT(avatarId);
-        _settleCollectionNFTPoint(COID);
+        (, address collectionAddress, ) = IERC6551Account(account).token();
+        mintCollectionMT(collectionAddress);
+        uint256 amount = mintAccountMT(account);
+        subCollectionOnMapNum(collectionAddress);
+        _settleCollectionNFTPoint(collectionAddress);
 
-        if (getWhiteListFinPerNFTPointMinted() == 0) {
-            uint256 collectionAdditionalNFTPoints = IMOPN(
-                governance.mopnContract()
-            ).getCollectionAdditionalNFTPoints(COID);
-            if (collectionAdditionalNFTPoints > 0) {
-                MTProduceData -=
-                    (collectionAdditionalNFTPoints << 176) |
-                    (amount + collectionAdditionalNFTPoints);
-                CollectionMTs[COID] -=
-                    (collectionAdditionalNFTPoints << 32) |
-                    amount;
-            } else {
-                MTProduceData -= amount;
-                CollectionMTs[COID] -= amount;
-            }
-        } else {
-            MTProduceData -= amount;
-            CollectionMTs[COID] -= amount;
-        }
-
-        AvatarMTs[avatarId] -= amount;
+        MiningData1 -= amount;
+        CollectionsData1[collectionAddress] -= amount;
+        AccountsData[account] -= amount;
     }
 
     function NFTOfferAcceptNotify(
-        uint256 COID,
+        address collectionAddress,
         uint256 price,
         uint256 tokenId
     ) public {
         uint256 totalMTStaking = getTotalMTStaking();
-        MTVaultData =
+        MiningData2 =
+            (getWhiteListFinPerNFTPointMinted() << 128) |
             ((((totalMTStaking + 10000 - price) * getNFTOfferCoefficient()) /
                 totalMTStaking +
                 10000) << 64) |
             totalMTStaking;
-        emit NFTOfferAccept(COID, tokenId, price);
+        emit NFTOfferAccept(collectionAddress, tokenId, price);
     }
 
     function NFTAuctionAcceptNotify(
-        uint256 COID,
+        address collectionAddress,
         uint256 price,
         uint256 tokenId
     ) public {
-        emit NFTAuctionAccept(COID, tokenId, price);
+        emit NFTAuctionAccept(collectionAddress, tokenId, price);
     }
 
     function changeTotalMTStaking(
-        uint256 COID,
+        address collectionAddress,
         bool increase,
         uint256 amount
-    ) public onlyAvatarOrCollectionVault(COID) {
+    ) public onlyAvatarOrCollectionVault(collectionAddress) {
         if (increase) {
-            MTVaultData += amount;
+            MiningData2 += amount;
         } else {
-            MTVaultData -= amount;
+            MiningData2 -= amount;
         }
     }
 
-    modifier onlyAvatarOrCollectionVault(uint256 COID) {
+    modifier onlyAvatarOrCollectionVault(address collectionAddress) {
         require(
             msg.sender == governance.mopnContract() ||
-                msg.sender == governance.getCollectionVault(COID),
+                msg.sender == governance.getCollectionVault(collectionAddress),
             "only collection vault allowed"
         );
         _;
@@ -755,8 +779,25 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
         _;
     }
 
+    modifier onlyBombOrMap() {
+        require(
+            msg.sender == governance.bombContract() ||
+                msg.sender == governance.mapContract(),
+            "only avatar and map allowed"
+        );
+        _;
+    }
+
     modifier onlyGovernance() {
         require(msg.sender == address(governance), "only governance allowed");
+        _;
+    }
+
+    modifier onlyMT() {
+        require(
+            msg.sender == governance.mtContract(),
+            "only mopn token allowed"
+        );
         _;
     }
 }

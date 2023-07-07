@@ -20,7 +20,7 @@ contract MOPNCollectionVault is
     IERC721Receiver,
     Ownable
 {
-    uint256 public COID;
+    address public collectionAddress;
 
     bool public isInitialized = false;
 
@@ -29,10 +29,10 @@ contract MOPNCollectionVault is
     /**
      * @notice NFTOfferData
      * Bits Layouts:
-     *  - [0..0] OfferStatus 0 offering 1 auctioning
-     *  - [1..32] Auction Start Timestamp
-     *  - [33..96] Offer Accept Price
-     *  - [97..255] Auction tokenId
+     *  - [0..7] OfferStatus 0 offering 1 auctioning
+     *  - [8..39] Auction Start Timestamp
+     *  - [40..103] Offer Accept Price
+     *  - [104..255] Auction tokenId
      */
     uint256 public NFTOfferData;
 
@@ -40,9 +40,9 @@ contract MOPNCollectionVault is
         governance = IMOPNGovernance(governance_);
     }
 
-    function initialize(uint256 COID_) public {
+    function initialize(address collectionAddress_) public {
         require(isInitialized == false, "contract initialzed");
-        COID = COID_;
+        collectionAddress = collectionAddress_;
         isInitialized = true;
     }
 
@@ -55,19 +55,19 @@ contract MOPNCollectionVault is
     }
 
     function getOfferStatus() public view returns (uint256) {
-        return NFTOfferData & 0xF;
+        return uint8(NFTOfferData);
     }
 
     function getAuctionStartTimestamp() public view returns (uint256) {
-        return uint32(NFTOfferData >> 1);
+        return uint32(NFTOfferData >> 8);
     }
 
     function getOfferAcceptPrice() public view returns (uint256) {
-        return uint64(NFTOfferData >> 33);
+        return uint64(NFTOfferData >> 40);
     }
 
     function getAuctionTokenId() public view returns (uint256) {
-        return NFTOfferData >> 97;
+        return NFTOfferData >> 104;
     }
 
     /**
@@ -128,16 +128,16 @@ contract MOPNCollectionVault is
 
     function withdraw(uint256 amount) public {
         IMOPNMiningData(governance.miningDataContract()).settleCollectionMining(
-                COID
+                collectionAddress
             );
         uint256 mtAmount = V2MTAmount(amount);
         require(mtAmount > 0, "zero to withdraw");
         IMOPNToken(governance.mtContract()).transfer(msg.sender, mtAmount);
         _burn(msg.sender, amount);
         IMOPNMiningData(governance.miningDataContract())
-            .settleCollectionNFTPoint(COID);
+            .settleCollectionNFTPoint(collectionAddress);
         IMOPNMiningData(governance.miningDataContract()).changeTotalMTStaking(
-            COID,
+            collectionAddress,
             false,
             mtAmount
         );
@@ -145,7 +145,7 @@ contract MOPNCollectionVault is
 
     function getNFTOfferPrice() public view returns (uint256) {
         uint256 amount = IMOPNMiningData(governance.miningDataContract())
-            .calcCollectionMT(COID) +
+            .calcCollectionMT(collectionAddress) +
             IMOPNToken(governance.mtContract()).balanceOf(address(this));
 
         return
@@ -164,11 +164,15 @@ contract MOPNCollectionVault is
     function acceptNFTOffer(uint256 tokenId) public {
         require(getOfferStatus() == 0, "last offer auction not finish");
 
-        IERC721(IMOPN(governance.mopnContract()).getCollectionContract(COID))
-            .safeTransferFrom(msg.sender, address(this), tokenId, "0x");
+        IERC721(collectionAddress).safeTransferFrom(
+            msg.sender,
+            address(this),
+            tokenId,
+            "0x"
+        );
 
         IMOPNMiningData(governance.miningDataContract()).settleCollectionMining(
-                COID
+                collectionAddress
             );
 
         uint256 offerPrice = (IMOPNToken(governance.mtContract()).balanceOf(
@@ -186,9 +190,9 @@ contract MOPNCollectionVault is
             uint256(1);
 
         IMOPNMiningData(governance.miningDataContract())
-            .settleCollectionNFTPoint(COID);
+            .settleCollectionNFTPoint(collectionAddress);
         IMOPNMiningData(governance.miningDataContract()).NFTOfferAcceptNotify(
-            COID,
+            collectionAddress,
             offerPrice,
             tokenId
         );
@@ -230,38 +234,49 @@ contract MOPNCollectionVault is
             }
 
             IMOPNMiningData(governance.miningDataContract())
-                .settleCollectionMining(COID);
+                .settleCollectionMining(collectionAddress);
             IMOPNMiningData(governance.miningDataContract())
-                .settleCollectionNFTPoint(COID);
+                .settleCollectionNFTPoint(collectionAddress);
             uint256 offerAcceptPrice = getOfferAcceptPrice();
             if (price > offerAcceptPrice) {
                 IMOPNMiningData(governance.miningDataContract())
-                    .changeTotalMTStaking(COID, true, price - offerAcceptPrice);
+                    .changeTotalMTStaking(
+                        collectionAddress,
+                        true,
+                        price - offerAcceptPrice
+                    );
             } else if (price < offerAcceptPrice) {
                 IMOPNMiningData(governance.miningDataContract())
                     .changeTotalMTStaking(
-                        COID,
+                        collectionAddress,
                         false,
                         offerAcceptPrice - price
                     );
             }
 
-            IERC721(
-                IMOPN(governance.mopnContract()).getCollectionContract(COID)
-            ).safeTransferFrom(address(this), from, getAuctionTokenId(), "0x");
+            IERC721(collectionAddress).safeTransferFrom(
+                address(this),
+                from,
+                getAuctionTokenId(),
+                "0x"
+            );
             IMOPNMiningData(governance.miningDataContract())
-                .NFTAuctionAcceptNotify(COID, value, getAuctionTokenId());
+                .NFTAuctionAcceptNotify(
+                    collectionAddress,
+                    value,
+                    getAuctionTokenId()
+                );
             NFTOfferData = 0;
         } else {
             IMOPNMiningData(governance.miningDataContract())
-                .settleCollectionMining(COID);
+                .settleCollectionMining(collectionAddress);
 
             uint256 vtokenAmount = MT2VAmount(value);
             _mint(from, vtokenAmount);
             IMOPNMiningData(governance.miningDataContract())
-                .settleCollectionNFTPoint(COID);
+                .settleCollectionNFTPoint(collectionAddress);
             IMOPNMiningData(governance.miningDataContract())
-                .changeTotalMTStaking(COID, true, value);
+                .changeTotalMTStaking(collectionAddress, true, value);
         }
 
         return IERC20Receiver.onERC20Received.selector;

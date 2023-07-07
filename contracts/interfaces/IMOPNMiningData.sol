@@ -6,53 +6,51 @@ interface IMOPNMiningData {
 
     function getTotalNFTPoints() external view returns (uint256);
 
-    /**
-     * add on map mining mopn token allocation weight
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     * @param amount EAW amount
-     */
-    function addNFTPoint(
-        uint256 avatarId,
-        uint256 COID,
-        uint256 amount
-    ) external;
+    function addNFTPoint(address payable account, uint256 amount) external;
 
-    function subNFTPoint(uint256 avatarId, uint256 COID) external;
+    function subNFTPoint(address payable account) external;
 
     function settlePerNFTPointMinted() external;
 
-    function getAvatarNFTPoint(
-        uint256 avatarId
+    function getAccountTotalNFTPoint(
+        address account
     ) external view returns (uint256);
 
-    function calcAvatarMT(
-        uint256 avatarId
+    function calcAccountMT(
+        address payable account
     ) external view returns (uint256 inbox);
 
-    function mintAvatarMT(uint256 avatarId) external returns (uint256);
+    function mintAccountMT(address payable account) external returns (uint256);
 
-    function redeemAvatarMT(uint256 avatarId) external;
+    function claimAccountMT(address payable account, address to) external;
 
-    function getCollectionNFTPoint(
-        uint256 COID
+    function getCollectionNFTPoints(
+        address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAvatarNFTPoint(
-        uint256 COID
+    function getCollectionWhiteListNFTPoints(
+        address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionPoint(uint256 COID) external view returns (uint256);
+    function getCollectionAvatarNFTPoints(
+        address collectionAddress
+    ) external view returns (uint256);
 
-    function calcCollectionMT(uint256 COID) external view returns (uint256);
+    function getCollectionPoint(
+        address collectionAddress
+    ) external view returns (uint256);
 
-    function mintCollectionMT(uint256 COID) external;
+    function calcCollectionMT(
+        address collectionAddress
+    ) external view returns (uint256);
 
-    function redeemCollectionMT(uint256 COID) external;
+    function mintCollectionMT(address collectionAddress) external;
 
-    function settleCollectionMining(uint256 COID) external;
+    function claimCollectionMT(address collectionAddressD) external;
 
-    function settleCollectionNFTPoint(uint256 COID) external;
+    function settleCollectionMining(address collectionAddress) external;
+
+    function settleCollectionNFTPoint(address collectionAddress) external;
 
     /**
      * @notice get Land holder realtime unclaimed minted mopn token
@@ -71,19 +69,19 @@ interface IMOPNMiningData {
     function batchRedeemSameLandHolderMT(uint32[] memory LandIds) external;
 
     function changeTotalMTStaking(
-        uint256 COID,
+        address collectionAddress,
         bool increase,
         uint256 amount
     ) external;
 
     function NFTOfferAcceptNotify(
-        uint256 COID,
+        address collectionAddress,
         uint256 price,
         uint256 tokenId
     ) external;
 
     function NFTAuctionAcceptNotify(
-        uint256 COID,
+        address collectionAddress,
         uint256 price,
         uint256 tokenId
     ) external;

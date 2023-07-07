@@ -24,14 +24,20 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
 contract MOPNGovernance is Multicall, Ownable {
+    uint256 chainId;
+
     bytes32 public whiteListRoot;
 
     event CollectionVaultCreated(
-        uint256 indexed COID,
+        address indexed collectionAddress,
         address indexed collectionVault
     );
 
-    mapping(uint256 => address) public CollectionVaults;
+    mapping(address => address) public CollectionVaults;
+
+    constructor(uint256 chainId_) {
+        chainId = chainId_;
+    }
 
     /**
      * @notice update whitelist root
@@ -41,10 +47,30 @@ contract MOPNGovernance is Multicall, Ownable {
         whiteListRoot = whiteListRoot_;
     }
 
+    address public erc6551Registry;
+    address public erc6551AccountImplementation;
+
+    function updateERC6551Contract(
+        address erc6551Registry_,
+        address erc6551AccountImplementation_
+    ) public onlyOwner {
+        erc6551Registry = erc6551Registry_;
+        erc6551AccountImplementation = erc6551AccountImplementation_;
+    }
+
+    address public delegateCashContract;
+
+    function updateDelegateCashContract(
+        address delegateCashContract_
+    ) public onlyOwner {
+        delegateCashContract = delegateCashContract_;
+    }
+
     address public auctionHouseContract;
     address public mopnContract;
     address public bombContract;
     address public mtContract;
+    address public pointContract;
     address public mapContract;
     address public landContract;
     address public miningDataContract;
@@ -55,6 +81,7 @@ contract MOPNGovernance is Multicall, Ownable {
         address mopnContract_,
         address bombContract_,
         address mtContract_,
+        address pointContract_,
         address mapContract_,
         address landContract_,
         address miningDataContract_,
@@ -64,6 +91,7 @@ contract MOPNGovernance is Multicall, Ownable {
         mopnContract = mopnContract_;
         bombContract = bombContract_;
         mtContract = mtContract_;
+        pointContract = pointContract_;
         mapContract = mapContract_;
         landContract = landContract_;
         miningDataContract = miningDataContract_;
@@ -81,6 +109,7 @@ contract MOPNGovernance is Multicall, Ownable {
 
     function burnBomb(address from, uint256 amount) public onlyAvatar {
         IMOPNBomb(bombContract).burn(from, 1, amount);
+        IMOPNBomb(bombContract).mint(from, 2, amount);
     }
 
     function closeWhiteList() public onlyOwner {
@@ -102,28 +131,31 @@ contract MOPNGovernance is Multicall, Ownable {
         _;
     }
 
-    function createCollectionVault(uint256 COID) public returns (address) {
+    function createCollectionVault(
+        address collectionAddress
+    ) public returns (address) {
         require(
-            IMOPN(mopnContract).getCollectionContract(COID) != address(0),
-            "collection not exist"
+            CollectionVaults[collectionAddress] == address(0),
+            "collection vault exist"
         );
-        require(CollectionVaults[COID] == address(0), "collection vault exist");
 
         bytes memory _initializationCalldata = abi.encodeWithSignature(
             "initialize(uint256)",
-            COID
+            collectionAddress
         );
         address vaultAddress = address(
             new InitializedProxy(address(this), _initializationCalldata)
         );
-        CollectionVaults[COID] = vaultAddress;
-        emit CollectionVaultCreated(COID, vaultAddress);
+        CollectionVaults[collectionAddress] = vaultAddress;
+        emit CollectionVaultCreated(collectionAddress, vaultAddress);
 
         return vaultAddress;
     }
 
-    function getCollectionVault(uint256 COID) public view returns (address) {
-        return CollectionVaults[COID];
+    function getCollectionVault(
+        address collectionAddress
+    ) public view returns (address) {
+        return CollectionVaults[collectionAddress];
     }
 
     function onERC20Received(
@@ -139,13 +171,9 @@ contract MOPNGovernance is Multicall, Ownable {
             collectionAddress := mload(add(data, 20))
         }
 
-        uint256 COID = IMOPN(mopnContract).getCollectionCOID(collectionAddress);
-        if (COID == 0) {
-            COID = IMOPN(mopnContract).generateCOID(collectionAddress);
-        }
-        address collectionVault = getCollectionVault(COID);
+        address collectionVault = getCollectionVault(collectionAddress);
         if (collectionVault == address(0)) {
-            collectionVault = createCollectionVault(COID);
+            collectionVault = createCollectionVault(collectionAddress);
         }
 
         IMOPNToken(mtContract).safeTransferFrom(
