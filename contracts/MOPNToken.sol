@@ -59,6 +59,10 @@ contract MOPNToken is ERC20Burnable, Ownable {
         }
     }
 
+    function totalSupply() public view override returns (uint256) {
+        //todo
+    }
+
     function balanceOf(
         address account
     ) public view virtual override returns (uint256 balance) {

@@ -123,13 +123,13 @@ contract MOPNMap is Ownable, Multicall {
     function accountRemove(
         uint32 tileCoordinate,
         address excludeAccount
-    ) public onlyAvatar returns (address account) {
+    ) public onlyAvatar returns (address payable account) {
         account = getTileAccount(tileCoordinate);
         if (account != address(0) && account != excludeAccount) {
             uint32 LandId = getTileLandId(tileCoordinate);
             tiles[tileCoordinate] = LandId;
         } else {
-            account = address(0);
+            account = payable(address(0));
         }
     }
 

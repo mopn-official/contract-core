@@ -32,60 +32,11 @@ interface IDelegationRegistry {
 |__|  |__|  \______/  | _|      |__| \__| 
 */
 
-/// @title MOPN Avatar Contract
+/// @title MOPN Contract
 /// @author Cyanface <cyanface@outlook.com>
 /// @dev This Contract's owner must transfer to Governance Contract once it's deployed
 contract MOPN is IMOPN, Multicall, Ownable {
     using TileMath for uint32;
-
-    event NFTJoin(
-        address indexed account,
-        address collectionAddress,
-        uint256 tokenId
-    );
-
-    /**
-     * @notice This event emit when an avatar jump into the map
-     * @param account account wallet address
-     * @param collectionAddress collection contract address
-     * @param LandId MOPN Land Id
-     * @param tileCoordinate tile coordinate
-     */
-    event NFTJumpIn(
-        address indexed account,
-        address indexed collectionAddress,
-        uint32 indexed LandId,
-        uint32 tileCoordinate
-    );
-
-    /**
-     * @notice This event emit when an avatar move on map
-     * @param account account wallet address
-     * @param collectionAddress collection contract address
-     * @param LandId MOPN Land Id
-     * @param fromCoordinate tile coordinate
-     * @param toCoordinate tile coordinate
-     */
-    event NFTMove(
-        address indexed account,
-        address indexed collectionAddress,
-        uint32 indexed LandId,
-        uint32 fromCoordinate,
-        uint32 toCoordinate
-    );
-
-    /**
-     * @notice BombUse Event emit when a Bomb is used at a coordinate by an avatar
-     * @param account account wallet address
-     * @param tileCoordinate the tileCoordinate
-     * @param victims the victims that bombed out of the map
-     */
-    event BombUse(
-        address indexed account,
-        uint32 tileCoordinate,
-        uint256[] victims,
-        uint32[] victimsCoordinates
-    );
 
     IMOPNGovernance public governance;
 
@@ -95,21 +46,23 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     function getNFTAccount(
         NFTParams calldata params
-    ) public view returns (address) {
+    ) public view returns (address payable) {
         return
-            IERC6551Registry(governance.erc6551Registry()).account(
-                governance.erc6551AccountImplementation(),
-                governance.chainId(),
-                params.collectionAddress,
-                params.tokenId,
-                1
+            payable(
+                IERC6551Registry(governance.erc6551Registry()).account(
+                    governance.erc6551AccountImplementation(),
+                    governance.chainId(),
+                    params.collectionAddress,
+                    params.tokenId,
+                    1
+                )
             );
     }
 
     function getNFTAccountOwner(
         NFTParams calldata params
     ) public view returns (address) {
-        address account = getNFTAccount(params);
+        address payable account = getNFTAccount(params);
         return IERC6551Account(account).owner();
     }
 
@@ -124,11 +77,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
         NFTParams calldata params,
         address operator
     ) public view returns (address owner) {
-        address account = getNFTAccount(params);
+        address payable account = getNFTAccount(params);
         if (account == operator) {
             return operator;
         }
-        address accountowner = IERC6551Account(account).ownerOf();
+        address accountowner = IERC6551Account(account).owner();
         if (accountowner == operator) {
             return operator;
         }
@@ -164,15 +117,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function moveTo(
         NFTParams calldata params,
         uint32 tileCoordinate,
-        address linkedAccount,
+        address payable linkedAccount,
         uint32 LandId
-    )
-        public
-        tileCheck(tileCoordinate)
-        ownerCheck(params.collectionContract, params.tokenId)
-    {
-        address account = getNFTAccount(params);
-        IMOPNMiningData memory miningData = IMOPNMiningData(
+    ) public tileCheck(tileCoordinate) ownerCheck(params) {
+        address payable account = getNFTAccount(params);
+        IMOPNMiningData miningData = IMOPNMiningData(
             governance.miningDataContract()
         );
         if (miningData.getAccountPerNFTPointMinted(account) == 0) {
@@ -182,28 +131,18 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
         uint32 orgCoordinate = miningData.getAccountCoordinate(account);
         if (orgCoordinate > 0) {
-            IMOPNMap(governance.mapContract()).avatarRemove(orgCoordinate, 0);
-
-            emit NFTMove(
-                account,
-                params.contractAddress,
-                LandId,
+            IMOPNMap(governance.mapContract()).accountRemove(
                 orgCoordinate,
-                tileCoordinate
+                address(0)
             );
+
+            emit NFTMove(account, LandId, orgCoordinate, tileCoordinate);
         } else {
-            miningData.addCollectionOnMapNum(params.collectionAddress);
-            emit NFTJumpIn(
-                account,
-                params.contractAddress,
-                LandId,
-                tileCoordinate
-            );
+            emit NFTJumpIn(account, LandId, tileCoordinate);
         }
 
-        IMOPNMap(governance.mapContract()).avatarSet(
-            avatarId,
-            COID,
+        IMOPNMap(governance.mapContract()).accountSet(
+            account,
             tileCoordinate,
             LandId
         );
@@ -218,39 +157,35 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function bomb(
         NFTParams calldata params,
         uint32 tileCoordinate
-    )
-        public
-        tileCheck(tileCoordinate)
-        ownerCheck(params.collectionContract, params.tokenId)
-    {
-        uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
-        if (avatarId == 0) {
-            avatarId = mintAvatar(params);
+    ) public tileCheck(tileCoordinate) ownerCheck(params) {
+        address payable account = getNFTAccount(params);
+        IMOPNMiningData miningData = IMOPNMiningData(
+            governance.miningDataContract()
+        );
+        if (miningData.getAccountPerNFTPointMinted(account) == 0) {
+            emit NFTJoin(account, params.collectionAddress, params.tokenId);
         }
-        addAvatarBombUsed(avatarId);
 
-        if (getAvatarCoordinate(avatarId) > 0) {
+        if (miningData.getAccountCoordinate(account) > 0) {
             IMOPNMiningData(governance.miningDataContract()).addNFTPoint(
-                avatarId,
-                getAvatarCOID(avatarId),
+                account,
                 1
             );
         }
 
         governance.burnBomb(msg.sender, 1);
 
-        uint256[] memory attackAvatarIds = new uint256[](7);
+        address[] memory attackAccounts = new address[](7);
         uint32[] memory victimsCoordinates = new uint32[](7);
         uint32 orgTileCoordinate = tileCoordinate;
 
         for (uint256 i = 0; i < 7; i++) {
-            uint256 attackAvatarId = IMOPNMap(governance.mapContract())
-                .avatarRemove(tileCoordinate, avatarId);
+            address payable attackAccount = IMOPNMap(governance.mapContract())
+                .accountRemove(tileCoordinate, account);
 
-            if (attackAvatarId > 0) {
-                setAvatarCoordinate(attackAvatarId, 0);
-                subCollectionOnMapNum(getAvatarCOID(attackAvatarId));
-                attackAvatarIds[i] = attackAvatarId;
+            if (attackAccount != address(0)) {
+                miningData.setAccountCoordinate(attackAccount, 0);
+                attackAccounts[i] = attackAccount;
                 victimsCoordinates[i] = tileCoordinate;
             }
 
@@ -262,9 +197,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
 
         emit BombUse(
-            avatarId,
+            account,
             orgTileCoordinate,
-            attackAvatarIds,
+            attackAccounts,
             victimsCoordinates
         );
     }
@@ -303,11 +238,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
     }
 
     function linkCheck(
-        address account,
-        address linkedAccount,
+        address payable account,
+        address payable linkedAccount,
         uint32 tileCoordinate
     ) internal view {
-        IMOPNMiningData memory miningData = IMOPNMiningData(
+        IMOPNMiningData miningData = IMOPNMiningData(
             governance.miningDataContract()
         );
         (, address accountCollection, ) = IERC6551Account(account).token();
@@ -344,11 +279,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         _;
     }
 
-    modifier ownerCheck(address collectionContract, uint256 tokenId) {
-        require(
-            ownerOf(collectionContract, tokenId) == msg.sender,
-            "not your nft"
-        );
+    modifier ownerCheck(NFTParams calldata params) {
+        require(ownerOf(params, msg.sender) == msg.sender, "not your nft");
         _;
     }
 

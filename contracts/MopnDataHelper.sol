@@ -71,7 +71,7 @@ contract MOPNDataHelper is Ownable {
     }
 
     function getAccounts(
-        address[] memory accounts
+        address payable[] memory accounts
     ) public view returns (AccountDataOutput[] memory accountDatas) {
         accountDatas = new AccountDataOutput[](accounts.length);
         for (uint256 i = 0; i < accounts.length; i++) {
@@ -191,39 +191,59 @@ contract MOPNDataHelper is Ownable {
     }
 
     function getBatchAccountMTBalance(
-        address[] memory accounts
+        address payable[] memory accounts
     ) public view returns (uint256[] memory MTBalances) {
         MTBalances = new uint256[](accounts.length);
         for (uint256 i = 0; i < accounts.length; i++) {
-            MTBalances[i] = IMOPNToken(accounts[i]);
+            MTBalances[i] = IMOPNToken(governance.mtContract()).balanceOf(
+                accounts[i]
+            );
         }
     }
 
     /**
      * get collection contract, on map num, avatar num etc from IGovernance.
+     * struct CollectionDataOutput {
+        address contractAddress;
+        uint256 OnMapNum;
+        uint256 AvatarNum;
+        uint256 MTBalance;
+        uint256 AdditionalNFTPoint;
+        uint256 CollectionNFTPoint;
+        uint256 AvatarNFTPoint;
+        uint256 CollectionPoint;
+        uint256 additionalPoint;
+        address collectionVault;
+        IMOPNCollectionVault.NFTAuction NFTAuction;
+    }
      */
     function getCollectionInfo(
         address collectionAddress
     ) public view returns (CollectionDataOutput memory cData) {
-        cData.contractAddress = IMOPN(governance.mopnContract())
-            .getCollectionContract(collectionAddress);
-        cData.collectionAddress = collectionAddress;
-        cData.OnMapNum = IMOPN(governance.mopnContract()).getCollectionOnMapNum(
+        IMOPNMiningData miningData = IMOPNMiningData(
+            governance.miningDataContract()
+        );
+        cData.contractAddress = collectionAddress;
+        cData.OnMapNum = miningData.getCollectionOnMapNum(collectionAddress);
+        cData.AvatarNum = miningData.getCollectionAvatarNum(collectionAddress);
+        cData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
+            governance.getCollectionVault(collectionAddress)
+        );
+        cData.AdditionalNFTPoint = miningData.getCollectionAdditionalNFTPoints(
             collectionAddress
         );
-        cData.AvatarNum = IMOPN(governance.mopnContract())
-            .getCollectionAvatarNum(collectionAddress);
-        cData.inboxMT = IMOPNMiningData(governance.miningDataContract())
-            .calcCollectionMT(collectionAddress);
-        cData.CollectionNFTPoint = IMOPNMiningData(
-            governance.miningDataContract()
-        ).getCollectionNFTPoint(collectionAddress);
-        cData.AvatarNFTPoint = IMOPNMiningData(governance.miningDataContract())
-            .getCollectionAvatarNFTPoint(collectionAddress);
-        cData.CollectionPoint = IMOPNMiningData(governance.miningDataContract())
-            .getCollectionPoint(collectionAddress);
-        cData.additionalNFTPoint = IMOPN(governance.mopnContract())
-            .getCollectionAdditionalNFTPoints(collectionAddress);
+        cData.CollectionNFTPoint = miningData.getCollectionNFTPoints(
+            collectionAddress
+        );
+        cData.AvatarNFTPoint = miningData.getCollectionAvatarNFTPoints(
+            collectionAddress
+        );
+        cData.CollectionPoint = miningData.getCollectionPoint(
+            collectionAddress
+        );
+        cData.additionalPoint = miningData.getCollectionAdditionalNFTPoint(
+            collectionAddress
+        );
         cData.collectionVault = governance.getCollectionVault(
             collectionAddress
         );

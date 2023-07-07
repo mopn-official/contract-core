@@ -2,23 +2,24 @@
 pragma solidity ^0.8.19;
 
 interface IMOPNMap {
-    function avatarSet(
-        uint256 avatarId,
-        uint256 COID,
+    function accountSet(
+        address account,
         uint32 tileCoordinate,
         uint32 LandId
     ) external;
 
-    function avatarRemove(
+    function accountRemove(
         uint32 tileCoordinate,
-        uint256 excludeAvatarId
-    ) external returns (uint256);
+        address excludeAccount
+    ) external returns (address payable);
 
-    function getTileAvatar(
+    function getTileAccount(
         uint32 tileCoordinate
-    ) external view returns (uint256);
+    ) external view returns (address payable);
 
-    function getTileCOID(uint32 tileCoordinate) external view returns (uint256);
+    function getTileCollection(
+        uint32 tileCoordinate
+    ) external view returns (address);
 
     function getTileLandId(
         uint32 tileCoordinate

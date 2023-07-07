@@ -16,6 +16,19 @@ interface IMOPNMiningData {
         address account
     ) external view returns (uint256);
 
+    function getAccountPerNFTPointMinted(
+        address payable account
+    ) external view returns (uint256);
+
+    function getAccountCoordinate(
+        address payable account
+    ) external view returns (uint32);
+
+    function setAccountCoordinate(
+        address payable account,
+        uint32 coordinate
+    ) external;
+
     function calcAccountMT(
         address payable account
     ) external view returns (uint256 inbox);
@@ -28,11 +41,28 @@ interface IMOPNMiningData {
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionWhiteListNFTPoints(
+    function getCollectionAdditionalNFTPoints(
         address collectionAddress
     ) external view returns (uint256);
 
     function getCollectionAvatarNFTPoints(
+        address collectionAddress
+    ) external view returns (uint256);
+
+    function getCollectionAdditionalNFTPoint(
+        address collectionAddress
+    ) external view returns (uint256);
+
+    function setCollectionAdditionalNFTPoint(
+        address collectionAddress,
+        uint256 additionalNFTPoint
+    ) external;
+
+    function getCollectionOnMapNum(
+        address collectionAddress
+    ) external view returns (uint256);
+
+    function getCollectionAvatarNum(
         address collectionAddress
     ) external view returns (uint256);
 
