@@ -6,7 +6,7 @@ import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNMap.sol";
-import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNCollectionVault.sol";
 import "./libraries/TileMath.sol";
@@ -45,14 +45,12 @@ contract MOPNDataHelper is Ownable {
     }
 
     function getAccount(
-        address payable account
+        address account
     ) public view returns (AccountDataOutput memory accountData) {
-        IMOPNMiningData miningData = IMOPNMiningData(
-            governance.miningDataContract()
-        );
+        IMOPNData miningData = IMOPNData(governance.miningDataContract());
         accountData.account = account;
         (, address collectionAddress, uint256 tokenId) = IERC6551Account(
-            account
+            payable(account)
         ).token();
 
         accountData.tokenId = tokenId;
@@ -71,7 +69,7 @@ contract MOPNDataHelper is Ownable {
     }
 
     function getAccounts(
-        address payable[] memory accounts
+        address[] memory accounts
     ) public view returns (AccountDataOutput[] memory accountDatas) {
         accountDatas = new AccountDataOutput[](accounts.length);
         for (uint256 i = 0; i < accounts.length; i++) {
@@ -191,7 +189,7 @@ contract MOPNDataHelper is Ownable {
     }
 
     function getBatchAccountMTBalance(
-        address payable[] memory accounts
+        address[] memory accounts
     ) public view returns (uint256[] memory MTBalances) {
         MTBalances = new uint256[](accounts.length);
         for (uint256 i = 0; i < accounts.length; i++) {
@@ -220,9 +218,7 @@ contract MOPNDataHelper is Ownable {
     function getCollectionInfo(
         address collectionAddress
     ) public view returns (CollectionDataOutput memory cData) {
-        IMOPNMiningData miningData = IMOPNMiningData(
-            governance.miningDataContract()
-        );
+        IMOPNData miningData = IMOPNData(governance.miningDataContract());
         cData.contractAddress = collectionAddress;
         cData.OnMapNum = miningData.getCollectionOnMapNum(collectionAddress);
         cData.AvatarNum = miningData.getCollectionAvatarNum(collectionAddress);
