@@ -1,27 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "./interfaces/IERC6551Account.sol";
+import "./libraries/TileMath.sol";
+import "./erc6551/interfaces/IERC6551Account.sol";
 import "./interfaces/IMOPN.sol";
-import "./interfaces/IMOPNMap.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNLand.sol";
-import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/IMOPNData.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MOPNMiningData is IMOPNMiningData, Multicall {
+contract MOPNData is IMOPNData, Multicall {
     uint256 public constant MTOutputPerSec = 500000000;
 
     uint256 public constant MTProduceReduceInterval = 604800;
 
     uint256 public immutable MTProduceStartTimestamp;
 
-    /// @notice uint32 LastPerNFTPointMintedCalcTimestamp + uint64 PerNFTPointMinted + uint64 TotalWhiteListNFTPoints + uint64 TotalNFTPoints
+    /// @notice uint96 MTTotalMinted + uint32 LastPerNFTPointMintedCalcTimestamp + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
     uint256 public MiningData1;
 
-    /// @notice uint64 WhiteListFinPerNFTPointMinted + uint64 NFTOfferCoefficient + uint64 TotalMTStaking
+    /// @notice uint64 WhiteListFinPerNFTPointMinted + uint64 TotalWhiteListNFTPoints + uint64 NFTOfferCoefficient + uint64 TotalMTStaking
     uint256 public MiningData2;
 
     /// @notice  uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerNFTPointMinted + uint32 TotalNFTPoints + uint32 coordinate
@@ -38,26 +38,6 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
 
     /// @notice uint64 settled MT + uint64 totalMTMinted + uint64 OnLandMiningNFT
     mapping(uint32 => uint256) public LandHolderMTs;
-
-    event AccountMTMinted(address indexed account, uint256 amount);
-
-    event CollectionMTMinted(address indexed collectionAddress, uint256 amount);
-
-    event LandHolderMTMinted(uint32 indexed LandId, uint256 amount);
-
-    event NFTOfferAccept(
-        address indexed collectionAddress,
-        uint256 tokenId,
-        uint256 price
-    );
-
-    event NFTAuctionAccept(
-        address indexed collectionAddress,
-        uint256 tokenId,
-        uint256 price
-    );
-
-    event SettleCollectionNFTPoint(address collectionAddress);
 
     IMOPNGovernance public governance;
 
@@ -188,18 +168,34 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
         return PerNFTPointMinted;
     }
 
+    function getAccountCollection(
+        address account
+    ) public view returns (address collectionAddress) {
+        (, collectionAddress, ) = IERC6551Account(payable(account)).token();
+    }
+
+    function checkNFTAccount(address account) public view returns (bool exist) {
+        exist = AccountsData[account] > 0;
+    }
+
+    function initNFTAccount(address account) public onlyMOPNOrBomb {
+        if (AccountsData[account] == 0) {
+            AccountsData[account] = uint256(1) << 64;
+        }
+    }
+
     /**
      * @notice get avatar settled unclaimed minted mopn token
      * @param account account wallet address
      */
     function getAccountSettledMT(
-        address payable account
+        address account
     ) public view returns (uint256) {
         return uint64(AccountsData[account] >> 192);
     }
 
     function getAccountPerCollectionNFTMinted(
-        address payable account
+        address account
     ) public view returns (uint256) {
         return uint64(AccountsData[account] >> 128);
     }
@@ -209,7 +205,7 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
      * @param account account wallet address
      */
     function getAccountPerNFTPointMinted(
-        address payable account
+        address account
     ) public view returns (uint256) {
         return uint64(AccountsData[account] >> 64);
     }
@@ -225,13 +221,13 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
     }
 
     function getAccountCoordinate(
-        address payable account
+        address account
     ) public view returns (uint32) {
         return uint32(AccountsData[account]);
     }
 
     function setAccountCoordinate(
-        address payable account,
+        address account,
         uint32 coordinate
     ) public onlyMOPNOrBomb {
         AccountsData[account] =
@@ -245,7 +241,7 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
      * @param account account wallet address
      */
     function calcAccountMT(
-        address payable account
+        address account
     ) public view returns (uint256 inbox) {
         inbox = getAccountSettledMT(account);
         uint256 AccountTotalNFTPoint = getAccountTotalNFTPoint(account);
@@ -253,7 +249,7 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
             getAccountPerNFTPointMinted(account);
 
         if (AccountPerNFTPointMintedDiff > 0 && AccountTotalNFTPoint > 0) {
-            (, address collectionAddress, ) = IERC6551Account(account).token();
+            address collectionAddress = getAccountCollection(account);
             uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
                     collectionAddress
                 ) - getAccountPerCollectionNFTMinted(account);
@@ -270,42 +266,45 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
      * @notice mint avatar mopn token
      * @param account account wallet address
      */
-    function mintAccountMT(address payable account) public returns (uint256) {
+    function mintAccountMT(address account) public returns (uint256) {
         uint256 AccountTotalNFTPoint = getAccountTotalNFTPoint(account);
         uint256 AccountPerNFTPointMintedDiff = getPerNFTPointMinted() -
             getAccountPerNFTPointMinted(account);
-
-        if (AccountPerNFTPointMintedDiff > 0) {
-            (, address collectionAddress, ) = IERC6551Account(account).token();
-            uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
-                    collectionAddress
-                ) - getAccountPerCollectionNFTMinted(account);
-            if (AccountTotalNFTPoint > 0) {
-                uint256 amount = ((AccountPerNFTPointMintedDiff) *
-                    AccountTotalNFTPoint);
-                if (AccountPerCollectionNFTMintedDiff > 0) {
-                    amount += AccountPerCollectionNFTMintedDiff;
-                }
-
-                uint32 LandId = IMOPNMap(governance.mapContract())
-                    .getTileLandId(getAccountCoordinate(account));
-                uint256 landamount = (amount * 5) / 100;
-                LandHolderMTs[LandId] += (landamount << 128) | landamount;
-                emit LandHolderMTMinted(LandId, landamount);
-
-                amount = (amount * 90) / 100;
-
-                AccountsData[account] +=
-                    (amount << 192) |
-                    (AccountPerCollectionNFTMintedDiff << 128) |
-                    (AccountPerNFTPointMintedDiff << 64);
-                emit AccountMTMinted(account, amount);
-            } else {
-                AccountsData[account] +=
-                    (AccountPerCollectionNFTMintedDiff << 128) |
-                    (AccountPerNFTPointMintedDiff << 64);
-            }
+        if (AccountPerNFTPointMintedDiff <= 0) {
+            return AccountTotalNFTPoint;
         }
+
+        uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
+            getAccountCollection(account)
+        ) - getAccountPerCollectionNFTMinted(account);
+
+        uint256 amount;
+        if (AccountTotalNFTPoint > 0) {
+            amount =
+                AccountPerNFTPointMintedDiff *
+                AccountTotalNFTPoint +
+                (
+                    AccountPerCollectionNFTMintedDiff > 0
+                        ? AccountPerCollectionNFTMintedDiff
+                        : 0
+                );
+
+            uint32 LandId = IMOPN(governance.mopnContract()).getTileLandId(
+                getAccountCoordinate(account)
+            );
+            uint256 landamount = (amount * 5) / 100;
+            LandHolderMTs[LandId] += (landamount << 128) | (landamount << 64);
+            emit LandHolderMTMinted(LandId, landamount);
+
+            amount = (amount * 90) / 100;
+
+            AccountsData[account] += amount << 192;
+            emit AccountMTMinted(account, amount);
+        }
+        AccountsData[account] +=
+            (AccountPerCollectionNFTMintedDiff << 128) |
+            (AccountPerNFTPointMintedDiff << 64);
+
         return AccountTotalNFTPoint;
     }
 
@@ -314,9 +313,9 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
      * @param account account wallet address
      * @param to redeem mt to address
      */
-    function claimAccountMT(address payable account, address to) public onlyMT {
+    function claimAccountMT(address account, address to) public onlyMT {
         settlePerNFTPointMinted();
-        (, address collectionAddress, ) = IERC6551Account(account).token();
+        address collectionAddress = getAccountCollection(account);
         mintCollectionMT(collectionAddress);
         mintAccountMT(account);
 
@@ -696,14 +695,17 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
     }
 
     function addNFTPoint(
-        address payable account,
+        address account,
         uint256 amount
     ) public onlyMOPNOrBomb {
         _addNFTPoint(account, amount);
     }
 
-    function subNFTPoint(address payable account) public onlyMOPNOrBomb {
-        _subNFTPoint(account);
+    function subNFTPoint(
+        address account,
+        uint256 amount
+    ) public onlyMOPNOrBomb {
+        _subNFTPoint(account, amount);
     }
 
     /**
@@ -711,10 +713,10 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
      * @param account account wallet address
      * @param amount Points amount
      */
-    function _addNFTPoint(address payable account, uint256 amount) internal {
+    function _addNFTPoint(address account, uint256 amount) internal {
         amount *= 100;
         settlePerNFTPointMinted();
-        (, address collectionAddress, ) = IERC6551Account(account).token();
+        address collectionAddress = getAccountCollection(account);
         mintCollectionMT(collectionAddress);
         uint256 exist = mintAccountMT(account);
         if (exist == 0) {
@@ -732,12 +734,17 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
      * substruct on map mining mopn token allocation weight
      * @param account account wallet address
      */
-    function _subNFTPoint(address payable account) internal {
+    function _subNFTPoint(address account, uint256 amount) internal {
         settlePerNFTPointMinted();
-        (, address collectionAddress, ) = IERC6551Account(account).token();
+        address collectionAddress = getAccountCollection(account);
         mintCollectionMT(collectionAddress);
-        uint256 amount = mintAccountMT(account);
-        subCollectionOnMapNum(collectionAddress);
+        if (amount == 0) {
+            amount = mintAccountMT(account);
+            subCollectionOnMapNum(collectionAddress);
+        } else {
+            mintAccountMT(account);
+        }
+
         _settleCollectionNFTPoint(collectionAddress);
 
         MiningData1 -= amount;
@@ -749,7 +756,7 @@ contract MOPNMiningData is IMOPNMiningData, Multicall {
         address collectionAddress,
         uint256 price,
         uint256 tokenId
-    ) public {
+    ) public onlyCollectionVault(collectionAddress) {
         uint256 totalMTStaking = getTotalMTStaking();
         MiningData2 =
             (getWhiteListFinPerNFTPointMinted() << 128) |

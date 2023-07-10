@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNMiningData.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -34,8 +35,16 @@ contract MOPNPoint is ERC20 {
         IMOPNMiningData miningData = IMOPNMiningData(
             governance.miningDataContract()
         );
-        balance = miningData.getAccountTotalNFTPoint(account);
-        // todo get account balance
+        balance = IMOPNBomb(governance.bombContract()).balanceOf(account, 2);
+        if (miningData.getAccountCoordinate(account) > 0) {
+            balance += miningData.getAccountTotalNFTPoint(account);
+            balance += miningData.getCollectionPoint(
+                miningData.getAccountCollection(account)
+            );
+            balance += miningData.getCollectionAdditionalNFTPoint(
+                miningData.getAccountCollection(account)
+            );
+        }
     }
 
     function _beforeTokenTransfer(

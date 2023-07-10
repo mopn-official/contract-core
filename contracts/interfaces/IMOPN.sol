@@ -54,16 +54,7 @@ interface IMOPN {
 
     function getNFTAccount(
         NFTParams calldata params
-    ) external view returns (address payable);
-
-    function getNFTAccountOwner(
-        NFTParams calldata params
     ) external view returns (address);
-
-    function ownerOf(
-        NFTParams calldata params,
-        address operator
-    ) external view returns (address owner);
 
     /**
      * @notice an on map avatar move to a new tile
@@ -72,7 +63,6 @@ interface IMOPN {
     function moveTo(
         NFTParams calldata params,
         uint32 tileCoordinate,
-        address payable linkedAccount,
         uint32 LandId
     ) external;
 
@@ -81,4 +71,12 @@ interface IMOPN {
      * @param params NFTParams
      */
     function bomb(NFTParams calldata params, uint32 tileCoordinate) external;
+
+    function getTileAccount(
+        uint32 tileCoordinate
+    ) external view returns (address);
+
+    function getTileLandId(
+        uint32 tileCoordinate
+    ) external view returns (uint32);
 }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "./interfaces/IERC6551Account.sol";
+import "./erc6551/interfaces/IERC6551Account.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNGovernance.sol";
