@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -16,6 +16,8 @@ contract MOPNToken is ERC20Burnable, Ownable {
     bytes4 private constant ERC20_RECEIVED = 0x4fc35859;
 
     IMOPNGovernance governance;
+
+    uint256 totalBurned;
 
     constructor(address governance_) ERC20("MOPN Token", "MT") {
         governance = IMOPNGovernance(governance_);
@@ -60,22 +62,39 @@ contract MOPNToken is ERC20Burnable, Ownable {
     }
 
     function totalSupply() public view override returns (uint256) {
-        //todo
+        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+        return
+            mopnData.MTTotalMinted() +
+            (mopnData.calcPerNFTPointMinted() - mopnData.PerNFTPointMinted()) *
+            mopnData.TotalNFTPoints();
     }
 
     function balanceOf(
         address account
     ) public view virtual override returns (uint256 balance) {
         balance = super.balanceOf(account);
-        balance += IMOPNMiningData(governance.miningDataContract())
-            .calcAccountMT(payable(account));
+        if (
+            IMOPNData(governance.miningDataContract())
+                .getAccountPerNFTPointMinted(account) > 0
+        ) {
+            balance += IMOPNData(governance.miningDataContract()).calcAccountMT(
+                    account
+                );
+        }
     }
 
     function _beforeTokenTransfer(
+        address from,
         address,
-        address,
-        uint256
+        uint256 amount
     ) internal virtual override {
-        // todo mint inbox mt
+        uint256 realbalance = super.balanceOf(from);
+        if (realbalance < amount) {
+            uint256 claimed = IMOPNData(governance.miningDataContract())
+                .claimAccountMT(from);
+            if (claimed > 0) {
+                _mint(from, claimed);
+            }
+        }
     }
 }

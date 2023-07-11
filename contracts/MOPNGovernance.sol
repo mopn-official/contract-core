@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPN.sol";
-import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IERC20Receiver.sol";
@@ -113,7 +113,7 @@ contract MOPNGovernance is Multicall, Ownable {
     }
 
     function closeWhiteList() public onlyOwner {
-        IMOPNMiningData(miningDataContract).closeWhiteList();
+        IMOPNData(miningDataContract).closeWhiteList();
     }
 
     modifier onlyAuctionHouse() {

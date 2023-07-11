@@ -52,25 +52,15 @@ interface IMOPN {
         uint32[] victimsCoordinates
     );
 
-    function getNFTAccount(
-        NFTParams calldata params
-    ) external view returns (address);
-
     /**
      * @notice an on map avatar move to a new tile
-     * @param params NFTParams
      */
-    function moveTo(
-        NFTParams calldata params,
-        uint32 tileCoordinate,
-        uint32 LandId
-    ) external;
+    function moveTo(uint32 tileCoordinate, uint32 LandId) external;
 
     /**
      * @notice throw a bomb to a tile
-     * @param params NFTParams
      */
-    function bomb(NFTParams calldata params, uint32 tileCoordinate) external;
+    function bomb(uint32 tileCoordinate) external;
 
     function getTileAccount(
         uint32 tileCoordinate

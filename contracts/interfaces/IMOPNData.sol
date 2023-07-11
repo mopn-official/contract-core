@@ -22,25 +22,21 @@ interface IMOPNData {
 
     event SettleCollectionNFTPoint(address collectionAddress);
 
-    function getNFTOfferCoefficient() external view returns (uint256);
+    function MTTotalMinted() external view returns (uint256);
 
-    function getTotalNFTPoints() external view returns (uint256);
+    function PerNFTPointMinted() external view returns (uint256);
 
-    function addNFTPoint(address account, uint256 amount) external;
+    function TotalNFTPoints() external view returns (uint256);
 
-    function subNFTPoint(address account, uint256 amount) external;
+    function NFTOfferCoefficient() external view returns (uint256);
+
+    function calcPerNFTPointMinted() external view returns (uint256);
 
     function settlePerNFTPointMinted() external;
 
     function getAccountCollection(
         address account
     ) external view returns (address collectionAddress);
-
-    function checkNFTAccount(
-        address account
-    ) external view returns (bool exist);
-
-    function initNFTAccount(address account) external;
 
     function getAccountTotalNFTPoint(
         address account
@@ -62,7 +58,7 @@ interface IMOPNData {
 
     function mintAccountMT(address account) external returns (uint256);
 
-    function claimAccountMT(address account, address to) external;
+    function claimAccountMT(address account) external returns (uint256);
 
     function getCollectionNFTPoints(
         address collectionAddress
@@ -144,4 +140,8 @@ interface IMOPNData {
     ) external;
 
     function closeWhiteList() external;
+
+    function addNFTPoint(address account, uint256 amount) external;
+
+    function subNFTPoint(address account, uint256 amount) external;
 }

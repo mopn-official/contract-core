@@ -18,10 +18,10 @@ contract MOPNData is IMOPNData, Multicall {
 
     uint256 public immutable MTProduceStartTimestamp;
 
-    /// @notice uint96 MTTotalMinted + uint32 LastPerNFTPointMintedCalcTimestamp + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
+    /// @notice uint96 MTTotalMinted + uint32 LastTickTimestamp + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
     uint256 public MiningData1;
 
-    /// @notice uint64 WhiteListFinPerNFTPointMinted + uint64 TotalWhiteListNFTPoints + uint64 NFTOfferCoefficient + uint64 TotalMTStaking
+    /// @notice uint64 AdditionalFinishSnapshot + uint64 TotalAdditionalNFTPoints + uint64 NFTOfferCoefficient + uint64 TotalMTStaking
     uint256 public MiningData2;
 
     /// @notice  uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerNFTPointMinted + uint32 TotalNFTPoints + uint32 coordinate
@@ -47,45 +47,45 @@ contract MOPNData is IMOPNData, Multicall {
         MiningData2 = (10 ** 18) << 64;
     }
 
-    function getWhiteListFinPerNFTPointMinted() public view returns (uint256) {
-        return uint48(MiningData2 >> 128);
-    }
-
-    function getNFTOfferCoefficient() public view returns (uint256) {
-        return uint64(MiningData2 >> 64);
-    }
-
-    function getTotalMTStaking() public view returns (uint256) {
-        return uint64(MiningData2);
+    function MTTotalMinted() public view returns (uint256) {
+        return uint96(MiningData1 >> 160);
     }
 
     /**
      * @notice get last per mopn token allocation weight minted settlement timestamp
      */
-    function getLastPerNFTPointMintedCalcTimestamp()
-        public
-        view
-        returns (uint256)
-    {
-        return uint32(MiningData1 >> 192);
+    function LastTickTimestamp() public view returns (uint256) {
+        return uint32(MiningData1 >> 128);
     }
 
     /**
      * @notice get settled Per MT Allocation Weight minted mopn token number
      */
-    function getPerNFTPointMinted() public view returns (uint256) {
-        return uint64(MiningData1 >> 128);
-    }
-
-    function getTotalWhiteListNFTPoints() public view returns (uint256) {
+    function PerNFTPointMinted() public view returns (uint256) {
         return uint64(MiningData1 >> 64);
     }
 
     /**
      * @notice get total mopn token allocation weights
      */
-    function getTotalNFTPoints() public view returns (uint256) {
+    function TotalNFTPoints() public view returns (uint256) {
         return uint64(MiningData1);
+    }
+
+    function AdditionalFinishSnapshot() public view returns (uint256) {
+        return uint48(MiningData2 >> 192);
+    }
+
+    function TotalAdditionalNFTPoints() public view returns (uint256) {
+        return uint64(MiningData2 >> 128);
+    }
+
+    function NFTOfferCoefficient() public view returns (uint256) {
+        return uint64(MiningData2 >> 64);
+    }
+
+    function TotalMTStaking() public view returns (uint256) {
+        return uint64(MiningData2);
     }
 
     /**
@@ -113,32 +113,34 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice settle per mopn token allocation weight minted mopn token
      */
     function settlePerNFTPointMinted() public {
-        if (block.timestamp > getLastPerNFTPointMintedCalcTimestamp()) {
-            uint256 temp = uint256(uint192(MiningData1));
-            temp += (calcPerNFTPointMinted() - getPerNFTPointMinted()) << 128;
-
-            MiningData1 = (block.timestamp << 192) | temp;
+        if (block.timestamp > LastTickTimestamp()) {
+            uint256 PerNFTPointMintDiff = calcPerNFTPointMinted() -
+                PerNFTPointMinted();
+            MiningData1 +=
+                ((PerNFTPointMintDiff * TotalNFTPoints()) << 160) |
+                ((block.timestamp - LastTickTimestamp()) << 128) |
+                ((PerNFTPointMintDiff) << 64);
         }
     }
 
     function closeWhiteList() public onlyGovernance {
         settlePerNFTPointMinted();
-        MiningData2 += getPerNFTPointMinted() << 128;
-        MiningData1 -= getTotalWhiteListNFTPoints();
+        MiningData2 += PerNFTPointMinted() << 192;
+        MiningData1 -= TotalAdditionalNFTPoints();
     }
 
     function calcPerNFTPointMinted() public view returns (uint256) {
         if (MTProduceStartTimestamp > block.timestamp) {
             return 0;
         }
-        uint256 TotalNFTPoints = getTotalNFTPoints();
-        uint256 PerNFTPointMinted = getPerNFTPointMinted();
-        if (TotalNFTPoints > 0) {
-            uint256 LastPerNFTPointMintedCalcTimestamp = getLastPerNFTPointMintedCalcTimestamp();
-            if (MTProduceStartTimestamp > LastPerNFTPointMintedCalcTimestamp) {
-                LastPerNFTPointMintedCalcTimestamp = MTProduceStartTimestamp;
+        uint256 totalNFTPoints = TotalNFTPoints();
+        uint256 perNFTPointMinted = PerNFTPointMinted();
+        if (totalNFTPoints > 0) {
+            uint256 lastTickTimestamp = LastTickTimestamp();
+            if (MTProduceStartTimestamp > lastTickTimestamp) {
+                lastTickTimestamp = MTProduceStartTimestamp;
             }
-            uint256 reduceTimes = (LastPerNFTPointMintedCalcTimestamp -
+            uint256 reduceTimes = (lastTickTimestamp -
                 MTProduceStartTimestamp) / MTProduceReduceInterval;
             uint256 nextReduceTimestamp = MTProduceStartTimestamp +
                 MTProduceReduceInterval +
@@ -147,41 +149,29 @@ contract MOPNData is IMOPNData, Multicall {
 
             while (true) {
                 if (block.timestamp > nextReduceTimestamp) {
-                    PerNFTPointMinted +=
-                        ((nextReduceTimestamp -
-                            LastPerNFTPointMintedCalcTimestamp) *
+                    perNFTPointMinted +=
+                        ((nextReduceTimestamp - lastTickTimestamp) *
                             currentMTPPS(reduceTimes)) /
-                        TotalNFTPoints;
-                    LastPerNFTPointMintedCalcTimestamp = nextReduceTimestamp;
+                        totalNFTPoints;
+                    lastTickTimestamp = nextReduceTimestamp;
                     reduceTimes++;
                     nextReduceTimestamp += MTProduceReduceInterval;
                 } else {
-                    PerNFTPointMinted +=
-                        ((block.timestamp -
-                            LastPerNFTPointMintedCalcTimestamp) *
+                    perNFTPointMinted +=
+                        ((block.timestamp - lastTickTimestamp) *
                             currentMTPPS(reduceTimes)) /
-                        TotalNFTPoints;
+                        totalNFTPoints;
                     break;
                 }
             }
         }
-        return PerNFTPointMinted;
+        return perNFTPointMinted;
     }
 
     function getAccountCollection(
         address account
     ) public view returns (address collectionAddress) {
         (, collectionAddress, ) = IERC6551Account(payable(account)).token();
-    }
-
-    function checkNFTAccount(address account) public view returns (bool exist) {
-        exist = AccountsData[account] > 0;
-    }
-
-    function initNFTAccount(address account) public onlyMOPNOrBomb {
-        if (AccountsData[account] == 0) {
-            AccountsData[account] = uint256(1) << 64;
-        }
     }
 
     /**
@@ -268,7 +258,7 @@ contract MOPNData is IMOPNData, Multicall {
      */
     function mintAccountMT(address account) public returns (uint256) {
         uint256 AccountTotalNFTPoint = getAccountTotalNFTPoint(account);
-        uint256 AccountPerNFTPointMintedDiff = getPerNFTPointMinted() -
+        uint256 AccountPerNFTPointMintedDiff = PerNFTPointMinted() -
             getAccountPerNFTPointMinted(account);
         if (AccountPerNFTPointMintedDiff <= 0) {
             return AccountTotalNFTPoint;
@@ -311,18 +301,17 @@ contract MOPNData is IMOPNData, Multicall {
     /**
      * @notice redeem account unclaimed minted mopn token
      * @param account account wallet address
-     * @param to redeem mt to address
      */
-    function claimAccountMT(address account, address to) public onlyMT {
+    function claimAccountMT(
+        address account
+    ) public onlyMT returns (uint256 amount) {
         settlePerNFTPointMinted();
-        address collectionAddress = getAccountCollection(account);
-        mintCollectionMT(collectionAddress);
+        mintCollectionMT(getAccountCollection(account));
         mintAccountMT(account);
 
-        uint256 amount = getAccountSettledMT(account);
+        amount = getAccountSettledMT(account);
         if (amount > 0) {
             AccountsData[account] -= amount << 192;
-            governance.mintMT(to, amount);
         }
     }
 
@@ -439,7 +428,7 @@ contract MOPNData is IMOPNData, Multicall {
         address collectionAddress
     ) public view returns (uint256 inbox) {
         inbox = getCollectionSettledMT(collectionAddress);
-        uint256 PerNFTPointMinted = calcPerNFTPointMinted();
+        uint256 perNFTPointMinted = calcPerNFTPointMinted();
         uint256 CollectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
             collectionAddress
         );
@@ -452,23 +441,23 @@ contract MOPNData is IMOPNData, Multicall {
         );
 
         if (
-            CollectionPerNFTPointMinted < PerNFTPointMinted &&
+            CollectionPerNFTPointMinted < perNFTPointMinted &&
             AvatarNFTPoints > 0
         ) {
             inbox +=
-                (((PerNFTPointMinted - CollectionPerNFTPointMinted) *
+                (((perNFTPointMinted - CollectionPerNFTPointMinted) *
                     (CollectionNFTPoints + AvatarNFTPoints)) * 5) /
                 100;
             if (WhiteListNFTPoints > 0) {
-                if (getWhiteListFinPerNFTPointMinted() > 0) {
+                if (AdditionalFinishSnapshot() > 0) {
                     inbox +=
-                        (((getWhiteListFinPerNFTPointMinted() -
+                        (((AdditionalFinishSnapshot() -
                             CollectionPerNFTPointMinted) * WhiteListNFTPoints) *
                             5) /
                         100;
                 } else {
                     inbox +=
-                        (((PerNFTPointMinted - CollectionPerNFTPointMinted) *
+                        (((perNFTPointMinted - CollectionPerNFTPointMinted) *
                             WhiteListNFTPoints) * 5) /
                         100;
                 }
@@ -484,7 +473,7 @@ contract MOPNData is IMOPNData, Multicall {
         uint256 CollectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
             collectionAddress
         );
-        uint256 CollectionPerNFTPointMintedDiff = getPerNFTPointMinted() -
+        uint256 CollectionPerNFTPointMintedDiff = PerNFTPointMinted() -
             CollectionPerNFTPointMinted;
         if (CollectionPerNFTPointMintedDiff > 0) {
             uint256 AvatarNFTPoints = getCollectionAvatarNFTPoints(
@@ -516,7 +505,7 @@ contract MOPNData is IMOPNData, Multicall {
                     collectionAddress
                 );
                 if (WhiteListNFTPoints > 0) {
-                    uint256 whiteListFinPerNFTPointMinted = getWhiteListFinPerNFTPointMinted();
+                    uint256 whiteListFinPerNFTPointMinted = AdditionalFinishSnapshot();
                     if (whiteListFinPerNFTPointMinted > 0) {
                         if (
                             whiteListFinPerNFTPointMinted >
@@ -757,10 +746,10 @@ contract MOPNData is IMOPNData, Multicall {
         uint256 price,
         uint256 tokenId
     ) public onlyCollectionVault(collectionAddress) {
-        uint256 totalMTStaking = getTotalMTStaking();
+        uint256 totalMTStaking = TotalMTStaking();
         MiningData2 =
-            (getWhiteListFinPerNFTPointMinted() << 128) |
-            ((((totalMTStaking + 10000 - price) * getNFTOfferCoefficient()) /
+            (AdditionalFinishSnapshot() << 192) |
+            ((((totalMTStaking + 10000 - price) * NFTOfferCoefficient()) /
                 totalMTStaking +
                 10000) << 64) |
             totalMTStaking;

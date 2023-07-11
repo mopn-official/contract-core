@@ -10,6 +10,7 @@ import "./interfaces/IMOPNLand.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
+import "@openzeppelin/contracts/interfaces/IERC165.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -47,45 +48,46 @@ contract MOPN is IMOPN, Multicall, Ownable {
         governance = IMOPNGovernance(governance_);
     }
 
-    function getNFTAccount(
-        NFTParams calldata params
-    ) public view returns (address) {
-        return
-            IERC6551Registry(governance.erc6551Registry()).account(
-                governance.erc6551AccountImplementation(),
-                governance.chainId(),
-                params.collectionAddress,
-                params.tokenId,
-                1
-            );
-    }
-
-    function createNFTAccount(
-        NFTParams calldata params
-    ) public returns (address account) {
-        account = IERC6551Registry(governance.erc6551Registry()).createAccount(
-            governance.erc6551AccountImplementation(),
-            governance.chainId(),
-            params.collectionAddress,
-            params.tokenId,
-            1,
-            "0x"
+    function getAccountNFT(
+        address account
+    ) public view returns (address collectionAddress, uint256 tokenId) {
+        require(
+            IERC165(payable(account)).supportsInterface(
+                type(IERC6551Account).interfaceId
+            ),
+            "not erc6551 account"
         );
-        emit NFTJoin(account, params.collectionAddress, params.tokenId);
+
+        uint256 chainId;
+        (chainId, collectionAddress, tokenId) = IERC6551Account(
+            payable(account)
+        ).token();
+        require(
+            chainId != governance.chainId(),
+            "not support cross chain account"
+        );
+        require(
+            account ==
+                IERC6551Registry(governance.erc6551Registry()).account(
+                    governance.erc6551AccountImplementation(),
+                    governance.chainId(),
+                    collectionAddress,
+                    tokenId,
+                    1
+                ),
+            "not a mopn Account Implementation"
+        );
     }
 
     /**
      * @notice an on map avatar move to a new tile
-     * @param params NFTParams
+     * @param tileCoordinate NFT move To coordinate
      */
-    function moveTo(
-        NFTParams calldata params,
-        uint32 tileCoordinate,
-        uint32 LandId
-    ) public {
+    function moveTo(uint32 tileCoordinate, uint32 LandId) public {
         tileCoordinate.check();
-        address account = getNFTAccount(params);
-        require(account == msg.sender, "not allowed");
+        (address collectionAddress, uint256 tokenId) = getAccountNFT(
+            msg.sender
+        );
 
         require(getTileAccount(tileCoordinate) == address(0), "dst Occupied");
 
@@ -105,45 +107,47 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
 
         IMOPNData mopnData = IMOPNData(governance.miningDataContract());
-        if (mopnData.getAccountPerNFTPointMinted(account) == 0) {
-            emit NFTJoin(account, params.collectionAddress, params.tokenId);
+        if (mopnData.getAccountPerNFTPointMinted(msg.sender) == 0) {
+            emit NFTJoin(msg.sender, collectionAddress, tokenId);
         }
 
-        uint32 orgCoordinate = mopnData.getAccountCoordinate(account);
+        uint32 orgCoordinate = mopnData.getAccountCoordinate(msg.sender);
         uint256 orgNFTPoint;
         if (orgCoordinate > 0) {
             accountRemove(orgCoordinate);
             orgNFTPoint = orgCoordinate.getTileNFTPoint();
 
-            emit NFTMove(account, LandId, orgCoordinate, tileCoordinate);
+            emit NFTMove(msg.sender, LandId, orgCoordinate, tileCoordinate);
         } else {
-            emit NFTJumpIn(account, LandId, tileCoordinate);
+            emit NFTJumpIn(msg.sender, LandId, tileCoordinate);
         }
 
         uint256 tileNFTPoint = tileCoordinate.getTileNFTPoint();
-        accountSet(account, tileCoordinate, LandId);
+        accountSet(msg.sender, tileCoordinate, LandId);
 
-        mopnData.setAccountCoordinate(account, tileCoordinate);
+        mopnData.setAccountCoordinate(msg.sender, tileCoordinate);
         if (tileNFTPoint > orgNFTPoint) {
-            mopnData.addNFTPoint(account, tileNFTPoint - orgNFTPoint);
+            mopnData.addNFTPoint(msg.sender, tileNFTPoint - orgNFTPoint);
         } else if (orgNFTPoint < tileNFTPoint) {
-            mopnData.subNFTPoint(account, orgNFTPoint - tileNFTPoint);
+            mopnData.subNFTPoint(msg.sender, orgNFTPoint - tileNFTPoint);
         }
     }
 
     /**
      * @notice throw a bomb to a tile
-     * @param params NFTParams
+     * @param tileCoordinate bomb to tile coordinate
      */
-    function bomb(NFTParams calldata params, uint32 tileCoordinate) public {
+    function bomb(uint32 tileCoordinate) public {
         tileCoordinate.check();
-        address account = getNFTAccount(params);
-        require(account == msg.sender, "not allowed");
+        (address collectionAddress, uint256 tokenId) = getAccountNFT(
+            msg.sender
+        );
 
         IMOPNData mopnData = IMOPNData(governance.miningDataContract());
-        if (mopnData.getAccountPerNFTPointMinted(account) == 0) {
-            emit NFTJoin(account, params.collectionAddress, params.tokenId);
-        }
+        require(
+            mopnData.getAccountCoordinate(msg.sender) > 0,
+            "NFT not on the map"
+        );
 
         governance.burnBomb(msg.sender, 1);
 
@@ -153,7 +157,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
         for (uint256 i = 0; i < 7; i++) {
             address attackAccount = getTileAccount(tileCoordinate);
-            if (attackAccount != address(0) && attackAccount != account) {
+            if (attackAccount != address(0) && attackAccount != msg.sender) {
                 accountRemove(tileCoordinate);
                 mopnData.setAccountCoordinate(attackAccount, 0);
                 attackAccounts[i] = attackAccount;
@@ -169,7 +173,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
 
         emit BombUse(
-            account,
+            msg.sender,
             orgTileCoordinate,
             attackAccounts,
             victimsCoordinates

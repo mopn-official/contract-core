@@ -2,8 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPNLandMetaDataRender.sol";
-import "./interfaces/IMOPNMap.sol";
-import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./libraries/NFTMetaData.sol";
 
@@ -124,15 +123,13 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
             }
         }
 
-        IMOPNMiningData miningData = IMOPNMiningData(
-            governance.miningDataContract()
-        );
+        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
         return
             NFTMetaData.constructTokenURI(
                 LandId,
                 tileDatas,
-                ((miningData.getLandHolderTotalMinted(LandId) +
-                    miningData.getLandHolderInboxMT(LandId)) / 10 ** 8)
+                ((mopnData.getLandHolderTotalMinted(LandId) +
+                    mopnData.getLandHolderInboxMT(LandId)) / 10 ** 8)
             );
     }
 }

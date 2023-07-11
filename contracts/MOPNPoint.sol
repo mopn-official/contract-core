@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/IMOPNData.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MOPNPoint is ERC20 {
@@ -21,9 +21,7 @@ contract MOPNPoint is ERC20 {
      * @dev See {IERC20-totalSupply}.
      */
     function totalSupply() public view virtual override returns (uint256) {
-        return
-            IMOPNMiningData(governance.miningDataContract())
-                .getTotalNFTPoints();
+        return IMOPNData(governance.miningDataContract()).getTotalNFTPoints();
     }
 
     /**
@@ -32,17 +30,15 @@ contract MOPNPoint is ERC20 {
     function balanceOf(
         address account
     ) public view virtual override returns (uint256 balance) {
-        IMOPNMiningData miningData = IMOPNMiningData(
-            governance.miningDataContract()
-        );
+        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
         balance = IMOPNBomb(governance.bombContract()).balanceOf(account, 2);
-        if (miningData.getAccountCoordinate(account) > 0) {
-            balance += miningData.getAccountTotalNFTPoint(account);
-            balance += miningData.getCollectionPoint(
-                miningData.getAccountCollection(account)
+        if (mopnData.getAccountCoordinate(account) > 0) {
+            balance += mopnData.getAccountTotalNFTPoint(account);
+            balance += mopnData.getCollectionPoint(
+                mopnData.getAccountCollection(account)
             );
-            balance += miningData.getCollectionAdditionalNFTPoint(
-                miningData.getAccountCollection(account)
+            balance += mopnData.getCollectionAdditionalNFTPoint(
+                mopnData.getAccountCollection(account)
             );
         }
     }

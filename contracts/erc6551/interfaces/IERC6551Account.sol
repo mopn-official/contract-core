@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IERC6551AccountProxy {
-    function implementation() external view returns (address);
-}
-
 /// @dev the ERC-165 identifier for this interface is `0xeff4d378`
 interface IERC6551Account {
     event TransactionExecuted(
