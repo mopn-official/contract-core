@@ -146,8 +146,8 @@ function mapContract() external view returns (address)
 function landContract() external view returns (address)
 ```
 
-### miningDataContract
+### mopnDataContract
 
 ```solidity
-function miningDataContract() external view returns (address)
+function mopnDataContract() external view returns (address)
 ```

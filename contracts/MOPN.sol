@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "hardhat/console.sol";
+
 import "./erc6551/interfaces/IERC6551Account.sol";
 import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
@@ -50,7 +52,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     function getAccountNFT(
         address account
-    ) public view returns (address collectionAddress, uint256 tokenId) {
+    ) public view returns (address, uint256) {
         require(
             IERC165(payable(account)).supportsInterface(
                 type(IERC6551Account).interfaceId
@@ -58,14 +60,17 @@ contract MOPN is IMOPN, Multicall, Ownable {
             "not erc6551 account"
         );
 
-        uint256 chainId;
-        (chainId, collectionAddress, tokenId) = IERC6551Account(
-            payable(account)
-        ).token();
+        (
+            uint256 chainId,
+            address collectionAddress,
+            uint256 tokenId
+        ) = IERC6551Account(payable(account)).token();
+
         require(
-            chainId != governance.chainId(),
+            chainId == governance.chainId(),
             "not support cross chain account"
         );
+
         require(
             account ==
                 IERC6551Registry(governance.erc6551Registry()).account(
@@ -73,10 +78,12 @@ contract MOPN is IMOPN, Multicall, Ownable {
                     governance.chainId(),
                     collectionAddress,
                     tokenId,
-                    1
+                    0
                 ),
             "not a mopn Account Implementation"
         );
+
+        return (collectionAddress, tokenId);
     }
 
     /**
@@ -106,7 +113,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             );
         }
 
-        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
         if (mopnData.getAccountPerNFTPointMinted(msg.sender) == 0) {
             emit NFTJoin(msg.sender, collectionAddress, tokenId);
         }
@@ -126,6 +133,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         accountSet(msg.sender, tileCoordinate, LandId);
 
         mopnData.setAccountCoordinate(msg.sender, tileCoordinate);
+        console.log(msg.sender, tileNFTPoint, orgNFTPoint);
         if (tileNFTPoint > orgNFTPoint) {
             mopnData.addNFTPoint(msg.sender, tileNFTPoint - orgNFTPoint);
         } else if (orgNFTPoint < tileNFTPoint) {
@@ -139,11 +147,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
      */
     function bomb(uint32 tileCoordinate) public {
         tileCoordinate.check();
-        (address collectionAddress, uint256 tokenId) = getAccountNFT(
-            msg.sender
-        );
+        getAccountNFT(msg.sender);
 
-        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
         require(
             mopnData.getAccountCoordinate(msg.sender) > 0,
             "NFT not on the map"
@@ -206,7 +212,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             "collection additionalNFTPoints can't verify"
         );
 
-        IMOPNData(governance.miningDataContract())
+        IMOPNData(governance.mopnDataContract())
             .setCollectionAdditionalNFTPoint(
                 collectionAddress,
                 additionalNFTPoints
@@ -283,7 +289,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
 
         if (collectionLinked == false) {
-            IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+            IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
             uint256 collectionOnMapNum = mopnData.getCollectionOnMapNum(
                 collectionAddress
             );

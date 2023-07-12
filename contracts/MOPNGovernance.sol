@@ -24,7 +24,7 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
 contract MOPNGovernance is Multicall, Ownable {
-    uint256 chainId;
+    uint256 public chainId;
 
     bytes32 public whiteListRoot;
 
@@ -58,22 +58,13 @@ contract MOPNGovernance is Multicall, Ownable {
         erc6551AccountImplementation = erc6551AccountImplementation_;
     }
 
-    address public delegateCashContract;
-
-    function updateDelegateCashContract(
-        address delegateCashContract_
-    ) public onlyOwner {
-        delegateCashContract = delegateCashContract_;
-    }
-
     address public auctionHouseContract;
     address public mopnContract;
     address public bombContract;
     address public mtContract;
     address public pointContract;
-    address public mapContract;
     address public landContract;
-    address public miningDataContract;
+    address public mopnDataContract;
     address public mopnCollectionVaultContract;
 
     function updateMOPNContracts(
@@ -82,9 +73,8 @@ contract MOPNGovernance is Multicall, Ownable {
         address bombContract_,
         address mtContract_,
         address pointContract_,
-        address mapContract_,
         address landContract_,
-        address miningDataContract_,
+        address mopnDataContract_,
         address mopnCollectionVaultContract_
     ) public onlyOwner {
         auctionHouseContract = auctionHouseContract_;
@@ -92,9 +82,8 @@ contract MOPNGovernance is Multicall, Ownable {
         bombContract = bombContract_;
         mtContract = mtContract_;
         pointContract = pointContract_;
-        mapContract = mapContract_;
         landContract = landContract_;
-        miningDataContract = miningDataContract_;
+        mopnDataContract = mopnDataContract_;
         mopnCollectionVaultContract = mopnCollectionVaultContract_;
     }
 
@@ -113,7 +102,7 @@ contract MOPNGovernance is Multicall, Ownable {
     }
 
     function closeWhiteList() public onlyOwner {
-        IMOPNData(miningDataContract).closeWhiteList();
+        IMOPNData(mopnDataContract).closeWhiteList();
     }
 
     modifier onlyAuctionHouse() {
@@ -127,7 +116,7 @@ contract MOPNGovernance is Multicall, Ownable {
     }
 
     modifier onlyMiningData() {
-        require(msg.sender == miningDataContract, "not allowed");
+        require(msg.sender == mopnDataContract, "not allowed");
         _;
     }
 

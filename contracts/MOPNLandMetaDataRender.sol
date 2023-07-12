@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPNLandMetaDataRender.sol";
+import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./libraries/NFTMetaData.sol";
@@ -21,7 +22,7 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
     function constructTokenURI(
         uint256 LandId_
     ) public view returns (string memory) {
-        IMOPNMap map = IMOPNMap(governance.mapContract());
+        IMOPN mopn = IMOPN(governance.mopnContract());
 
         uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
@@ -30,8 +31,18 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
             tileCoordinate
         );
 
+        address[] memory collections = new address[](30);
+        address collection;
+        uint256 COID;
         tileDatas[0].tileNFTPoint = TileMath.getTileNFTPoint(tileCoordinate);
-        uint256 COID = map.getTileCOID(tileCoordinate);
+
+        address tileAccount = mopn.getTileAccount(tileCoordinate);
+        if (tileAccount != address(0)) {
+            (collection, ) = mopn.getAccountNFT(tileAccount);
+            COID++;
+            collections[COID] = collection;
+        }
+
         if (COID > 0) {
             tileDatas[0].color = COID;
             tileDatas[1].color = COID;
@@ -53,7 +64,17 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
                     tileDatas[index].tileNFTPoint = TileMath.getTileNFTPoint(
                         tileCoordinate
                     );
-                    COID = map.getTileCOID(tileCoordinate);
+
+                    tileAccount = mopn.getTileAccount(tileCoordinate);
+                    if (tileAccount != address(0)) {
+                        (collection, ) = mopn.getAccountNFT(tileAccount);
+                        COID = exists(collections, collection);
+                        if (COID == 0) {
+                            COID++;
+                            collections[COID] = collection;
+                        }
+                    }
+
                     if (COID > 0) {
                         uint32[3] memory tileCoordinateArr = TileMath
                             .coordinateIntToArr(tileCoordinate);
@@ -123,13 +144,30 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
             }
         }
 
-        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
         return
             NFTMetaData.constructTokenURI(
                 LandId,
                 tileDatas,
-                ((mopnData.getLandHolderTotalMinted(LandId) +
-                    mopnData.getLandHolderInboxMT(LandId)) / 10 ** 8)
+                getMintedMT(LandId)
             );
+    }
+
+    function getMintedMT(uint32 LandId) private view returns (uint256) {
+        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
+        return ((mopnData.getLandHolderTotalMinted(LandId) +
+            mopnData.getLandHolderInboxMT(LandId)) / 10 ** 8);
+    }
+
+    function exists(
+        address[] memory arr,
+        address item
+    ) public pure returns (uint256) {
+        for (uint i = 1; i < arr.length; i++) {
+            if (arr[i] == item) {
+                return i;
+            }
+        }
+
+        return 0;
     }
 }

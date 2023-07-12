@@ -62,7 +62,7 @@ contract MOPNToken is ERC20Burnable, Ownable {
     }
 
     function totalSupply() public view override returns (uint256) {
-        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
         return
             mopnData.MTTotalMinted() +
             (mopnData.calcPerNFTPointMinted() - mopnData.PerNFTPointMinted()) *
@@ -74,12 +74,13 @@ contract MOPNToken is ERC20Burnable, Ownable {
     ) public view virtual override returns (uint256 balance) {
         balance = super.balanceOf(account);
         if (
-            IMOPNData(governance.miningDataContract())
-                .getAccountPerNFTPointMinted(account) > 0
+            IMOPNData(governance.mopnDataContract()).accountClaimAvailable(
+                account
+            )
         ) {
-            balance += IMOPNData(governance.miningDataContract()).calcAccountMT(
-                    account
-                );
+            balance += IMOPNData(governance.mopnDataContract()).calcAccountMT(
+                account
+            );
         }
     }
 
@@ -90,7 +91,7 @@ contract MOPNToken is ERC20Burnable, Ownable {
     ) internal virtual override {
         uint256 realbalance = super.balanceOf(from);
         if (realbalance < amount) {
-            uint256 claimed = IMOPNData(governance.miningDataContract())
+            uint256 claimed = IMOPNData(governance.mopnDataContract())
                 .claimAccountMT(from);
             if (claimed > 0) {
                 _mint(from, claimed);

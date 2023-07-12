@@ -34,6 +34,10 @@ interface IMOPNData {
 
     function settlePerNFTPointMinted() external;
 
+    function accountClaimAvailable(
+        address account
+    ) external view returns (bool);
+
     function getAccountCollection(
         address account
     ) external view returns (address collectionAddress);
@@ -68,7 +72,7 @@ interface IMOPNData {
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAvatarNFTPoints(
+    function getCollectionAccountNFTPoints(
         address collectionAddress
     ) external view returns (uint256);
 
@@ -85,7 +89,7 @@ interface IMOPNData {
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAvatarNum(
+    function getCollectionAccountNum(
         address collectionAddress
     ) external view returns (uint256);
 

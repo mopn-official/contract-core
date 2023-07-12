@@ -2,10 +2,10 @@
 pragma solidity ^0.8.19;
 
 import "./erc6551/interfaces/IERC6551Account.sol";
+import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNMap.sol";
 import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNCollectionVault.sol";
@@ -14,6 +14,11 @@ import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MOPNDataHelper is Ownable {
+    struct NFTParams {
+        address collectionAddress;
+        uint256 tokenId;
+    }
+
     struct AccountDataOutput {
         address account;
         address contractAddress;
@@ -44,10 +49,10 @@ contract MOPNDataHelper is Ownable {
         governance = IMOPNGovernance(governanceContract_);
     }
 
-    function getAccount(
+    function getAccountData(
         address account
     ) public view returns (AccountDataOutput memory accountData) {
-        IMOPNData miningData = IMOPNData(governance.miningDataContract());
+        IMOPNData miningData = IMOPNData(governance.mopnDataContract());
         accountData.account = account;
         (, address collectionAddress, uint256 tokenId) = IERC6551Account(
             payable(account)
@@ -68,13 +73,26 @@ contract MOPNDataHelper is Ownable {
         accountData.tileCoordinate = miningData.getAccountCoordinate(account);
     }
 
-    function getAccounts(
+    function getAccountsData(
         address[] memory accounts
     ) public view returns (AccountDataOutput[] memory accountDatas) {
         accountDatas = new AccountDataOutput[](accounts.length);
         for (uint256 i = 0; i < accounts.length; i++) {
-            accountDatas[i] = getAccount(accounts[i]);
+            accountDatas[i] = getAccountData(accounts[i]);
         }
+    }
+
+    function getAccountByNFT(
+        NFTParams calldata params
+    ) public view returns (address) {
+        return
+            IERC6551Registry(governance.erc6551Registry()).account(
+                governance.erc6551AccountImplementation(),
+                governance.chainId(),
+                params.collectionAddress,
+                params.tokenId,
+                0
+            );
     }
 
     /**
@@ -82,12 +100,10 @@ contract MOPNDataHelper is Ownable {
      * @param params  collection contract address and tokenId
      * @return accountData avatar data format struct AvatarDataOutput
      */
-    function getAccountByNFT(
-        IMOPN.NFTParams calldata params
+    function getAccountDataByNFT(
+        NFTParams calldata params
     ) public view returns (AccountDataOutput memory accountData) {
-        accountData = getAccount(
-            IMOPN(governance.mopnContract()).getNFTAccount(params)
-        );
+        accountData = getAccountData(getAccountByNFT(params));
     }
 
     /**
@@ -95,78 +111,13 @@ contract MOPNDataHelper is Ownable {
      * @param params array of collection contract address and token ids
      * @return accountDatas avatar datas format struct AvatarDataOutput
      */
-    function getAccountsByNFTs(
-        IMOPN.NFTParams[] calldata params
+    function getAccountsDataByNFTs(
+        NFTParams[] calldata params
     ) public view returns (AccountDataOutput[] memory accountDatas) {
         accountDatas = new AccountDataOutput[](params.length);
         for (uint256 i = 0; i < params.length; i++) {
-            accountDatas[i] = getAccount(
-                IMOPN(governance.mopnContract()).getNFTAccount(params[i])
-            );
+            accountDatas[i] = getAccountData(getAccountByNFT(params[i]));
         }
-    }
-
-    /**
-     * @notice get avatar infos by tile sets start by start coordinate and range by width and height
-     * @param startCoordinate start tile coordinate
-     * @param width range width
-     * @param height range height
-     */
-    function getAccountsByCoordinateRange(
-        uint32 startCoordinate,
-        int32 width,
-        int32 height
-    ) public view returns (AccountDataOutput[] memory accountDatas) {
-        uint32 coordinate = startCoordinate;
-        uint256 widthabs = SignedMath.abs(width);
-        uint256 heightabs = SignedMath.abs(height);
-        accountDatas = new AccountDataOutput[](widthabs * heightabs);
-        for (uint256 i = 0; i < heightabs; i++) {
-            for (uint256 j = 0; j < widthabs; j++) {
-                accountDatas[i * widthabs + j] = getAccount(
-                    IMOPNMap(governance.mapContract()).getTileAccount(
-                        coordinate
-                    )
-                );
-                accountDatas[i * widthabs + j].tileCoordinate = coordinate;
-                coordinate = width > 0
-                    ? TileMath.neighbor(coordinate, (j % 2 == 0 ? 5 : 0))
-                    : TileMath.neighbor(coordinate, (j % 2 == 0 ? 3 : 2));
-            }
-            startCoordinate = TileMath.neighbor(
-                startCoordinate,
-                height > 0 ? 1 : 4
-            );
-            coordinate = startCoordinate;
-        }
-    }
-
-    /**
-     * @notice get avatar infos by tile sets start by start coordinate and end by end coordinates
-     * @param startCoordinate start tile coordinate
-     * @param endCoordinate end tile coordinate
-     */
-    function getAccountsByStartEndCoordinate(
-        uint32 startCoordinate,
-        uint32 endCoordinate
-    ) public view returns (AccountDataOutput[] memory accountDatas) {
-        TileMath.XYCoordinate memory startxy = TileMath.coordinateToXY(
-            startCoordinate
-        );
-        TileMath.XYCoordinate memory endxy = TileMath.coordinateToXY(
-            endCoordinate
-        );
-        int32 width = endxy.x - startxy.x;
-        int32 height;
-        if (width > 0) {
-            height = startxy.y - (width / 2) - endxy.y;
-            width += 1;
-        } else {
-            height = startxy.y + (width / 2) - endxy.y;
-            width -= 1;
-        }
-
-        return getAccountsByCoordinateRange(startCoordinate, width, height);
     }
 
     /**
@@ -174,15 +125,13 @@ contract MOPNDataHelper is Ownable {
      * @param coordinates array of coordinates
      * @return accountDatas avatar datas format struct AccountDataOutput
      */
-    function getAccountsByCoordinates(
+    function getAccountsDataByCoordinates(
         uint32[] memory coordinates
     ) public view returns (AccountDataOutput[] memory accountDatas) {
         accountDatas = new AccountDataOutput[](coordinates.length);
         for (uint256 i = 0; i < coordinates.length; i++) {
-            accountDatas[i] = getAccount(
-                IMOPNMap(governance.mapContract()).getTileAccount(
-                    coordinates[i]
-                )
+            accountDatas[i] = getAccountData(
+                IMOPN(governance.mopnContract()).getTileAccount(coordinates[i])
             );
             accountDatas[i].tileCoordinate = coordinates[i];
         }
@@ -201,27 +150,14 @@ contract MOPNDataHelper is Ownable {
 
     /**
      * get collection contract, on map num, avatar num etc from IGovernance.
-     * struct CollectionDataOutput {
-        address contractAddress;
-        uint256 OnMapNum;
-        uint256 AvatarNum;
-        uint256 MTBalance;
-        uint256 AdditionalNFTPoint;
-        uint256 CollectionNFTPoint;
-        uint256 AvatarNFTPoint;
-        uint256 CollectionPoint;
-        uint256 additionalPoint;
-        address collectionVault;
-        IMOPNCollectionVault.NFTAuction NFTAuction;
-    }
      */
     function getCollectionInfo(
         address collectionAddress
     ) public view returns (CollectionDataOutput memory cData) {
-        IMOPNData miningData = IMOPNData(governance.miningDataContract());
+        IMOPNData miningData = IMOPNData(governance.mopnDataContract());
         cData.contractAddress = collectionAddress;
         cData.OnMapNum = miningData.getCollectionOnMapNum(collectionAddress);
-        cData.AvatarNum = miningData.getCollectionAvatarNum(collectionAddress);
+        cData.AvatarNum = miningData.getCollectionAccountNum(collectionAddress);
         cData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
             governance.getCollectionVault(collectionAddress)
         );
@@ -231,7 +167,7 @@ contract MOPNDataHelper is Ownable {
         cData.CollectionNFTPoint = miningData.getCollectionNFTPoints(
             collectionAddress
         );
-        cData.AvatarNFTPoint = miningData.getCollectionAvatarNFTPoints(
+        cData.AvatarNFTPoint = miningData.getCollectionAccountNFTPoints(
             collectionAddress
         );
         cData.CollectionPoint = miningData.getCollectionPoint(

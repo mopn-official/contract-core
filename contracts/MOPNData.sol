@@ -24,7 +24,7 @@ contract MOPNData is IMOPNData, Multicall {
     /// @notice uint64 AdditionalFinishSnapshot + uint64 TotalAdditionalNFTPoints + uint64 NFTOfferCoefficient + uint64 TotalMTStaking
     uint256 public MiningData2;
 
-    /// @notice  uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerNFTPointMinted + uint32 TotalNFTPoints + uint32 coordinate
+    /// @notice  uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerNFTPointMinted + uint32 coordinate + uint32 TotalNFTPoints
     mapping(address => uint256) public AccountsData;
 
     /// @notice uint64 PerCollectionNFTMinted + uint64 PerNFTPointMinted + uint64 CollectionNFTPoints + uint32 additionalNFTPoints + uint32 AvatarNFTPoints
@@ -168,6 +168,12 @@ contract MOPNData is IMOPNData, Multicall {
         return perNFTPointMinted;
     }
 
+    function accountClaimAvailable(address account) public view returns (bool) {
+        return
+            getAccountSettledMT(account) > 0 ||
+            getAccountCoordinate(account) > 0;
+    }
+
     function getAccountCollection(
         address account
     ) public view returns (address collectionAddress) {
@@ -200,20 +206,10 @@ contract MOPNData is IMOPNData, Multicall {
         return uint64(AccountsData[account] >> 64);
     }
 
-    /**
-     * @notice get avatar on map mining mopn token allocation weight
-     * @param account account wallet address
-     */
-    function getAccountTotalNFTPoint(
-        address account
-    ) public view returns (uint256) {
-        return uint32(AccountsData[account] >> 32);
-    }
-
     function getAccountCoordinate(
         address account
     ) public view returns (uint32) {
-        return uint32(AccountsData[account]);
+        return uint32(AccountsData[account] >> 32);
     }
 
     function setAccountCoordinate(
@@ -222,8 +218,18 @@ contract MOPNData is IMOPNData, Multicall {
     ) public onlyMOPNOrBomb {
         AccountsData[account] =
             AccountsData[account] -
-            getAccountCoordinate(account) +
-            coordinate;
+            (uint256(getAccountCoordinate(account)) << 32) +
+            (uint256(coordinate) << 32);
+    }
+
+    /**
+     * @notice get avatar on map mining mopn token allocation weight
+     * @param account account wallet address
+     */
+    function getAccountTotalNFTPoint(
+        address account
+    ) public view returns (uint256) {
+        return uint32(AccountsData[account]);
     }
 
     /**
@@ -347,7 +353,7 @@ contract MOPNData is IMOPNData, Multicall {
         return uint32(CollectionsData1[collectionAddress] >> 32);
     }
 
-    function getCollectionAvatarNFTPoints(
+    function getCollectionAccountNFTPoints(
         address collectionAddress
     ) public view returns (uint256) {
         return uint32(CollectionsData1[collectionAddress]);
@@ -378,13 +384,13 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice get NFT collection minted avatar number
      * @param collectionAddress collection contract address
      */
-    function getCollectionAvatarNum(
+    function getCollectionAccountNum(
         address collectionAddress
     ) public view returns (uint256) {
         return uint32(CollectionsData2[collectionAddress] >> 32);
     }
 
-    function addCollectionAvatarNum(
+    function addCollectionAccountNum(
         address collectionAddress
     ) public onlyMOPNOrBomb {
         CollectionsData2[collectionAddress] += uint256(1) << 32;
@@ -436,7 +442,7 @@ contract MOPNData is IMOPNData, Multicall {
             collectionAddress
         );
         uint256 CollectionNFTPoints = getCollectionNFTPoints(collectionAddress);
-        uint256 AvatarNFTPoints = getCollectionAvatarNFTPoints(
+        uint256 AvatarNFTPoints = getCollectionAccountNFTPoints(
             collectionAddress
         );
 
@@ -476,7 +482,7 @@ contract MOPNData is IMOPNData, Multicall {
         uint256 CollectionPerNFTPointMintedDiff = PerNFTPointMinted() -
             CollectionPerNFTPointMinted;
         if (CollectionPerNFTPointMintedDiff > 0) {
-            uint256 AvatarNFTPoints = getCollectionAvatarNFTPoints(
+            uint256 AvatarNFTPoints = getCollectionAccountNFTPoints(
                 collectionAddress
             );
             if (AvatarNFTPoints > 0) {

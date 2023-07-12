@@ -2,11 +2,6 @@
 pragma solidity ^0.8.19;
 
 interface IMOPN {
-    struct NFTParams {
-        address collectionAddress;
-        uint256 tokenId;
-    }
-
     event NFTJoin(
         address indexed account,
         address collectionAddress,
@@ -51,6 +46,10 @@ interface IMOPN {
         address[] victims,
         uint32[] victimsCoordinates
     );
+
+    function getAccountNFT(
+        address account
+    ) external view returns (address collectionAddress, uint256 tokenId);
 
     /**
      * @notice an on map avatar move to a new tile

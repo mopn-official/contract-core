@@ -260,10 +260,10 @@ address mapContract
 address landContract
 ```
 
-### miningDataContract
+### mopnDataContract
 
 ```solidity
-address miningDataContract
+address mopnDataContract
 ```
 
 ### mopnCollectionVaultContract
@@ -275,7 +275,7 @@ address mopnCollectionVaultContract
 ### updateMOPNContracts
 
 ```solidity
-function updateMOPNContracts(address auctionHouseContract_, address mopnContract_, address bombContract_, address mtContract_, address mapContract_, address landContract_, address miningDataContract_, address mopnCollectionVaultContract_) public
+function updateMOPNContracts(address auctionHouseContract_, address mopnContract_, address bombContract_, address mtContract_, address mapContract_, address landContract_, address mopnDataContract_, address mopnCollectionVaultContract_) public
 ```
 
 ### mintMT

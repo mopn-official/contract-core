@@ -16,6 +16,25 @@ contract MOPNERC6551AccountProxy is Multicall {
         governance = IMOPNGovernance(governance_);
     }
 
+    function createAccount(
+        address implementation,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId,
+        uint256 salt,
+        bytes calldata initData
+    ) external returns (address) {
+        return
+            IERC6551Registry(governance.erc6551Registry()).createAccount(
+                implementation,
+                chainId,
+                tokenContract,
+                tokenId,
+                salt,
+                initData
+            );
+    }
+
     function computeAccount(
         address implementation,
         uint256 chainId,

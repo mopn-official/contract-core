@@ -41,13 +41,13 @@ contract MOPNBomb is ERC1155, Ownable {
         uint256[] memory amounts,
         bytes memory
     ) internal virtual override {
-        IMOPNData miningData = IMOPNData(governance.miningDataContract());
+        IMOPNData miningData = IMOPNData(governance.mopnDataContract());
         for (uint256 i = 0; i < ids.length; i++) {
             if (ids[i] == 2) {
-                if (miningData.checkNFTAccount(from)) {
+                if (miningData.getAccountCoordinate(from) > 0) {
                     miningData.subNFTPoint(from, amounts[i]);
                 }
-                if (miningData.checkNFTAccount(to)) {
+                if (miningData.getAccountCoordinate(to) > 0) {
                     miningData.addNFTPoint(to, amounts[i]);
                 }
             }

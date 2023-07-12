@@ -56,7 +56,7 @@
                     "mtContract",
                     "mapContract",
                     "landContract",
-                    "miningDataContract",
+                    "mopnDataContract",
                     "mopnCollectionVaultContract"
                 ],
                 "updateMethod": "updateMOPNContracts"

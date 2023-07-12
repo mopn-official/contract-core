@@ -5,7 +5,6 @@ import "./erc6551/interfaces/IERC6551Account.sol";
 import "./interfaces/IMOPNAuctionHouse.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNMap.sol";
 import "./interfaces/IMOPNData.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
@@ -36,7 +35,7 @@ contract MOPNBatchHelper is Multicall, Ownable {
     }
 
     function batchMintAccountMT(address payable[] memory accounts) public {
-        IMOPNData miningData = IMOPNData(governance.miningDataContract());
+        IMOPNData miningData = IMOPNData(governance.mopnDataContract());
         miningData.settlePerNFTPointMinted();
         for (uint256 i = 0; i < accounts.length; i++) {
             (, address accountCollection, ) = IERC6551Account(accounts[i])
@@ -51,7 +50,7 @@ contract MOPNBatchHelper is Multicall, Ownable {
         address payable[] memory accounts
     ) public {
         batchMintAccountMT(accounts);
-        IMOPNData(governance.miningDataContract()).redeemLandHolderMT(LandId);
+        IMOPNData(governance.mopnDataContract()).redeemLandHolderMT(LandId);
     }
 
     /**
@@ -65,7 +64,7 @@ contract MOPNBatchHelper is Multicall, Ownable {
         for (uint256 i = 0; i < LandIds.length; i++) {
             batchMintAccountMT(accounts[i]);
         }
-        IMOPNData(governance.miningDataContract()).batchRedeemSameLandHolderMT(
+        IMOPNData(governance.mopnDataContract()).batchRedeemSameLandHolderMT(
             LandIds
         );
     }

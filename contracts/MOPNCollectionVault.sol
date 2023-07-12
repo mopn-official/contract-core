@@ -127,7 +127,7 @@ contract MOPNCollectionVault is
     }
 
     function withdraw(uint256 amount) public {
-        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
         mopnData.settleCollectionMining(collectionAddress);
         uint256 mtAmount = V2MTAmount(amount);
         require(mtAmount > 0, "zero to withdraw");
@@ -138,11 +138,11 @@ contract MOPNCollectionVault is
     }
 
     function getNFTOfferPrice() public view returns (uint256) {
-        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
         uint256 amount = mopnData.calcCollectionMT(collectionAddress) +
             IMOPNToken(governance.mtContract()).balanceOf(address(this));
 
-        return (amount * mopnData.getNFTOfferCoefficient()) / 10 ** 18;
+        return (amount * mopnData.NFTOfferCoefficient()) / 10 ** 18;
     }
 
     function MTBalance() public view returns (uint256 balance) {
@@ -162,13 +162,13 @@ contract MOPNCollectionVault is
             "0x"
         );
 
-        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
 
         mopnData.settleCollectionMining(collectionAddress);
 
         uint256 offerPrice = (IMOPNToken(governance.mtContract()).balanceOf(
             address(this)
-        ) * mopnData.getNFTOfferCoefficient()) / 10 ** 18;
+        ) * mopnData.NFTOfferCoefficient()) / 10 ** 18;
 
         IMOPNToken(governance.mtContract()).transfer(msg.sender, offerPrice);
 
@@ -193,7 +193,7 @@ contract MOPNCollectionVault is
             "only accept mopn token"
         );
 
-        IMOPNData mopnData = IMOPNData(governance.miningDataContract());
+        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
 
         if (bytes32(data) == keccak256("acceptAuctionBid")) {
             require(getOfferStatus() == 1, "auction not exist");
