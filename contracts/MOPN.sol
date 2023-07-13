@@ -17,15 +17,6 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-interface IDelegationRegistry {
-    function checkDelegateForToken(
-        address delegate,
-        address vault,
-        address contract_,
-        uint256 tokenId
-    ) external view returns (bool);
-}
-
 /*
 .___  ___.   ______   .______   .__   __. 
 |   \/   |  /  __  \  |   _  \  |  \ |  | 

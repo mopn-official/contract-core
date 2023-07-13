@@ -13,6 +13,15 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "./lib/ERC6551AccountLib.sol";
 
+interface IDelegationRegistry {
+    function checkDelegateForToken(
+        address delegate,
+        address vault,
+        address contract_,
+        uint256 tokenId
+    ) external view returns (bool);
+}
+
 error NotAuthorized();
 
 contract MOPNERC6551Account is
@@ -21,6 +30,9 @@ contract MOPNERC6551Account is
     IERC1155Receiver,
     IMOPNERC6551Account
 {
+    address public constant delegatecash =
+        0x00000000000076A84feF008CDAbe6409d2FE638B;
+
     uint256 _nonce;
 
     address public immutable governance;
@@ -42,7 +54,7 @@ contract MOPNERC6551Account is
         uint256 value,
         bytes calldata data
     ) external payable returns (bytes memory result) {
-        require(msg.sender == owner(), "Not token owner");
+        require(isOwner(msg.sender), "Not token owner");
 
         _incrementNonce();
 
@@ -54,8 +66,8 @@ contract MOPNERC6551Account is
         uint256 value,
         bytes calldata data,
         address msgsender
-    ) external payable returns (bytes memory result) {
-        require(msgsender == owner(), "Not token owner");
+    ) external payable onlyProxy returns (bytes memory result) {
+        require(isOwner(msgsender), "Not token owner");
 
         _incrementNonce();
 
@@ -92,6 +104,18 @@ contract MOPNERC6551Account is
         if (chainId != block.chainid) return address(0);
 
         return IERC721(tokenContract).ownerOf(tokenId);
+    }
+
+    function isOwner(address caller) public view returns (bool) {
+        if (caller == owner()) return true;
+        (, address tokenContract, uint256 tokenId) = this.token();
+        return
+            IDelegationRegistry(delegatecash).checkDelegateForToken(
+                caller,
+                owner(),
+                tokenContract,
+                tokenId
+            );
     }
 
     function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
@@ -136,7 +160,7 @@ contract MOPNERC6551Account is
             data.length > 0 &&
             msg.sender == IMOPNGovernance(governance).bombContract() &&
             id == 1 &&
-            operator == owner()
+            isOwner(operator)
         ) {
             uint256 coordinate = abi.decode(data, (uint256));
             IMOPN(IMOPNGovernance(governance).mopnContract()).bomb(
