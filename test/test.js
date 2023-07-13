@@ -246,7 +246,7 @@ describe("MOPN", function () {
     await new Promise((r) => setTimeout(r, 5000));
 
     console.log(await mopndatahelper.getCollectionInfo(1));
-    console.log(await mopnminingData.calcCollectionMT(1)); getCollectionMOPNPoint getCollectionAvatarMOPNPoint getCollectionPoint 
+    console.log(await mopnminingData.calcCollectionMT(1));
   });
 
   it("test redeemAvatarInboxMT", async function () {
