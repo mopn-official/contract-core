@@ -36,7 +36,7 @@ contract MOPNBatchHelper is Multicall, Ownable {
 
     function batchMintAccountMT(address payable[] memory accounts) public {
         IMOPNData miningData = IMOPNData(governance.mopnDataContract());
-        miningData.settlePerNFTPointMinted();
+        miningData.settlePerMOPNPointMinted();
         for (uint256 i = 0; i < accounts.length; i++) {
             (, address accountCollection, ) = IERC6551Account(accounts[i])
                 .token();

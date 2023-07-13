@@ -21,7 +21,7 @@ contract MOPNPoint is ERC20 {
      * @dev See {IERC20-totalSupply}.
      */
     function totalSupply() public view virtual override returns (uint256) {
-        return IMOPNData(governance.mopnDataContract()).TotalNFTPoints();
+        return IMOPNData(governance.mopnDataContract()).TotalMOPNPoints();
     }
 
     /**
@@ -33,11 +33,11 @@ contract MOPNPoint is ERC20 {
         IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
         balance = IMOPNBomb(governance.bombContract()).balanceOf(account, 2);
         if (mopnData.getAccountCoordinate(account) > 0) {
-            balance += mopnData.getAccountTotalNFTPoint(account);
-            balance += mopnData.getCollectionPoint(
+            balance += mopnData.getAccountTotalMOPNPoint(account);
+            balance += mopnData.getCollectionMOPNPoint(
                 mopnData.getAccountCollection(account)
             );
-            balance += mopnData.getCollectionAdditionalNFTPoint(
+            balance += mopnData.getCollectionAdditionalMOPNPoint(
                 mopnData.getAccountCollection(account)
             );
         }

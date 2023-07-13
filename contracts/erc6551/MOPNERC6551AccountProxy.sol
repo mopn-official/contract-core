@@ -52,6 +52,8 @@ contract MOPNERC6551AccountProxy is Multicall {
             );
     }
 
+    function checkAccountExist() external view returns (bool) {}
+
     /// @dev executes a low-level call against an account if the caller is authorized to make calls
     function proxyCall(
         address account,

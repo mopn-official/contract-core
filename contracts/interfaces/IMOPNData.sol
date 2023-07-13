@@ -20,19 +20,19 @@ interface IMOPNData {
         uint256 price
     );
 
-    event SettleCollectionNFTPoint(address collectionAddress);
+    event SettleCollectionMOPNPoint(address collectionAddress);
 
     function MTTotalMinted() external view returns (uint256);
 
-    function PerNFTPointMinted() external view returns (uint256);
+    function PerMOPNPointMinted() external view returns (uint256);
 
-    function TotalNFTPoints() external view returns (uint256);
+    function TotalMOPNPoints() external view returns (uint256);
 
     function NFTOfferCoefficient() external view returns (uint256);
 
-    function calcPerNFTPointMinted() external view returns (uint256);
+    function calcPerMOPNPointMinted() external view returns (uint256);
 
-    function settlePerNFTPointMinted() external;
+    function settlePerMOPNPointMinted() external;
 
     function accountClaimAvailable(
         address account
@@ -42,11 +42,11 @@ interface IMOPNData {
         address account
     ) external view returns (address collectionAddress);
 
-    function getAccountTotalNFTPoint(
+    function getAccountTotalMOPNPoint(
         address account
     ) external view returns (uint256);
 
-    function getAccountPerNFTPointMinted(
+    function getAccountPerMOPNPointMinted(
         address account
     ) external view returns (uint256);
 
@@ -64,36 +64,32 @@ interface IMOPNData {
 
     function claimAccountMT(address account) external returns (uint256);
 
-    function getCollectionNFTPoints(
+    function getCollectionMOPNPoints(
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAdditionalNFTPoints(
+    function getCollectionAdditionalMOPNPoints(
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAccountNFTPoints(
+    function getCollectionAccountMOPNPoints(
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAdditionalNFTPoint(
+    function getCollectionAdditionalMOPNPoint(
         address collectionAddress
     ) external view returns (uint256);
 
-    function setCollectionAdditionalNFTPoint(
+    function setCollectionAdditionalMOPNPoint(
         address collectionAddress,
-        uint256 additionalNFTPoint
+        uint256 additionalMOPNPoint
     ) external;
 
     function getCollectionOnMapNum(
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAccountNum(
-        address collectionAddress
-    ) external view returns (uint256);
-
-    function getCollectionPoint(
+    function getCollectionMOPNPoint(
         address collectionAddress
     ) external view returns (uint256);
 
@@ -107,7 +103,7 @@ interface IMOPNData {
 
     function settleCollectionMining(address collectionAddress) external;
 
-    function settleCollectionNFTPoint(address collectionAddress) external;
+    function settleCollectionMOPNPoint(address collectionAddress) external;
 
     /**
      * @notice get Land holder realtime unclaimed minted mopn token
@@ -145,7 +141,7 @@ interface IMOPNData {
 
     function closeWhiteList() external;
 
-    function addNFTPoint(address account, uint256 amount) external;
+    function addMOPNPoint(address account, uint256 amount) external;
 
-    function subNFTPoint(address account, uint256 amount) external;
+    function subMOPNPoint(address account, uint256 amount) external;
 }

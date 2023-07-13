@@ -17,7 +17,7 @@ struct coordinate {
 ```solidity
 struct tileData {
   uint256 color;
-  uint256 tileNFTPoint;
+  uint256 tileMOPNPoint;
 }
 ```
 
@@ -62,4 +62,3 @@ function generateBlocks(struct NFTSVG.tileData[] tileDatas) public pure returns 
 ```solidity
 function COIDToColor(uint256 COID) public pure returns (string)
 ```
-

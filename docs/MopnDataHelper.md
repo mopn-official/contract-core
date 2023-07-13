@@ -12,7 +12,7 @@ struct AvatarDataOutput {
   uint256 COID;
   uint256 BombUsed;
   uint256 inboxMT;
-  uint256 NFTPoint;
+  uint256 MOPNPoint;
   uint32 tileCoordinate;
 }
 ```
@@ -26,8 +26,8 @@ struct CollectionDataOutput {
   uint256 OnMapNum;
   uint256 AvatarNum;
   uint256 inboxMT;
-  uint256 NFTPoint;
-  uint256 AvatarNFTPoint;
+  uint256 MOPNPoint;
+  uint256 AvatarMOPNPoint;
 }
 ```
 
@@ -83,15 +83,15 @@ get avatar info by nft contractAddress and tokenId
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name       | Type    | Description                 |
+| ---------- | ------- | --------------------------- |
 | collection | address | collection contract address |
-| tokenId | uint256 | token Id |
+| tokenId    | uint256 | token Id                    |
 
 #### Return Values
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name       | Type                                   | Description                                |
+| ---------- | -------------------------------------- | ------------------------------------------ |
 | avatarData | struct MopnDataHelper.AvatarDataOutput | avatar data format struct AvatarDataOutput |
 
 ### getAvatarsByNFTs
@@ -104,15 +104,15 @@ get avatar infos by nft contractAddresses and tokenIds
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name        | Type      | Description                          |
+| ----------- | --------- | ------------------------------------ |
 | collections | address[] | array of collection contract address |
-| tokenIds | uint256[] | array of token Ids |
+| tokenIds    | uint256[] | array of token Ids                   |
 
 #### Return Values
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name        | Type                                     | Description                                 |
+| ----------- | ---------------------------------------- | ------------------------------------------- |
 | avatarDatas | struct MopnDataHelper.AvatarDataOutput[] | avatar datas format struct AvatarDataOutput |
 
 ### getAvatarsByCoordinateRange
@@ -125,11 +125,11 @@ get avatar infos by tile sets start by start coordinate and range by width and h
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name            | Type   | Description           |
+| --------------- | ------ | --------------------- |
 | startCoordinate | uint32 | start tile coordinate |
-| width | int32 | range width |
-| height | int32 | range height |
+| width           | int32  | range width           |
+| height          | int32  | range height          |
 
 ### getAvatarsByStartEndCoordinate
 
@@ -141,10 +141,10 @@ get avatar infos by tile sets start by start coordinate and end by end coordinat
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name            | Type   | Description           |
+| --------------- | ------ | --------------------- |
 | startCoordinate | uint32 | start tile coordinate |
-| endCoordinate | uint32 | end tile coordinate |
+| endCoordinate   | uint32 | end tile coordinate   |
 
 ### getAvatarsByCoordinates
 
@@ -156,14 +156,14 @@ get avatars by coordinate array
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name        | Type     | Description          |
+| ----------- | -------- | -------------------- |
 | coordinates | uint32[] | array of coordinates |
 
 #### Return Values
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name        | Type                                     | Description                                 |
+| ----------- | ---------------------------------------- | ------------------------------------------- |
 | avatarDatas | struct MopnDataHelper.AvatarDataOutput[] | avatar datas format struct AvatarDataOutput |
 
 ### getBatchAvatarInboxMT
@@ -185,4 +185,3 @@ get collection contract, on map num, avatar num etc from IGovernance.
 ```solidity
 function getBatchCollectionInfo(uint256[] COIDs) public view returns (struct MopnDataHelper.CollectionDataOutput[] cDatas)
 ```
-

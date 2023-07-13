@@ -49,13 +49,16 @@ contract MOPNGovernance is Multicall, Ownable {
 
     address public erc6551Registry;
     address public erc6551AccountImplementation;
+    address public mopnErc6551AccountProxy;
 
     function updateERC6551Contract(
         address erc6551Registry_,
-        address erc6551AccountImplementation_
+        address erc6551AccountImplementation_,
+        address mopnErc6551AccountProxy_
     ) public onlyOwner {
         erc6551Registry = erc6551Registry_;
         erc6551AccountImplementation = erc6551AccountImplementation_;
+        mopnErc6551AccountProxy = mopnErc6551AccountProxy_;
     }
 
     address public auctionHouseContract;
@@ -129,7 +132,7 @@ contract MOPNGovernance is Multicall, Ownable {
         );
 
         bytes memory _initializationCalldata = abi.encodeWithSignature(
-            "initialize(uint256)",
+            "initialize(address)",
             collectionAddress
         );
         address vaultAddress = address(

@@ -114,30 +114,30 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
 
         IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
-        if (mopnData.getAccountPerNFTPointMinted(msg.sender) == 0) {
+        if (mopnData.getAccountPerMOPNPointMinted(msg.sender) == 0) {
             emit NFTJoin(msg.sender, collectionAddress, tokenId);
         }
 
         uint32 orgCoordinate = mopnData.getAccountCoordinate(msg.sender);
-        uint256 orgNFTPoint;
+        uint256 orgMOPNPoint;
         if (orgCoordinate > 0) {
             accountRemove(orgCoordinate);
-            orgNFTPoint = orgCoordinate.getTileNFTPoint();
+            orgMOPNPoint = orgCoordinate.getTileMOPNPoint();
 
             emit NFTMove(msg.sender, LandId, orgCoordinate, tileCoordinate);
         } else {
             emit NFTJumpIn(msg.sender, LandId, tileCoordinate);
         }
 
-        uint256 tileNFTPoint = tileCoordinate.getTileNFTPoint();
+        uint256 tileMOPNPoint = tileCoordinate.getTileMOPNPoint();
         accountSet(msg.sender, tileCoordinate, LandId);
 
         mopnData.setAccountCoordinate(msg.sender, tileCoordinate);
-        console.log(msg.sender, tileNFTPoint, orgNFTPoint);
-        if (tileNFTPoint > orgNFTPoint) {
-            mopnData.addNFTPoint(msg.sender, tileNFTPoint - orgNFTPoint);
-        } else if (orgNFTPoint < tileNFTPoint) {
-            mopnData.subNFTPoint(msg.sender, orgNFTPoint - tileNFTPoint);
+
+        if (tileMOPNPoint > orgMOPNPoint) {
+            mopnData.addMOPNPoint(msg.sender, tileMOPNPoint - orgMOPNPoint);
+        } else if (orgMOPNPoint < tileMOPNPoint) {
+            mopnData.subMOPNPoint(msg.sender, orgMOPNPoint - tileMOPNPoint);
         }
     }
 
@@ -168,7 +168,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 mopnData.setAccountCoordinate(attackAccount, 0);
                 attackAccounts[i] = attackAccount;
                 victimsCoordinates[i] = tileCoordinate;
-                mopnData.subNFTPoint(attackAccount, 0);
+                mopnData.subMOPNPoint(attackAccount, 0);
             }
 
             if (i == 0) {
@@ -189,12 +189,12 @@ contract MOPN is IMOPN, Multicall, Ownable {
     /**
      * @notice check if this collection is in white list
      * @param collectionAddress collection contract address
-     * @param additionalNFTPoints additional NFT Points
+     * @param additionalMOPNPoints additional NFT Points
      * @param proofs collection whitelist proofs
      */
-    function setCollectionAdditionalNFTPoints(
+    function setCollectionAdditionalMOPNPoints(
         address collectionAddress,
-        uint256 additionalNFTPoints,
+        uint256 additionalMOPNPoints,
         bytes32[] memory proofs
     ) public {
         require(
@@ -204,18 +204,18 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 keccak256(
                     bytes.concat(
                         keccak256(
-                            abi.encode(collectionAddress, additionalNFTPoints)
+                            abi.encode(collectionAddress, additionalMOPNPoints)
                         )
                     )
                 )
             ),
-            "collection additionalNFTPoints can't verify"
+            "collection additionalMOPNPoints can't verify"
         );
 
         IMOPNData(governance.mopnDataContract())
-            .setCollectionAdditionalNFTPoint(
+            .setCollectionAdditionalMOPNPoint(
                 collectionAddress,
-                additionalNFTPoints
+                additionalMOPNPoints
             );
     }
 

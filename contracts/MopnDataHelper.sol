@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "hardhat/console.sol";
+
 import "./erc6551/interfaces/IERC6551Account.sol";
 import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
@@ -23,23 +25,22 @@ contract MOPNDataHelper is Ownable {
         address account;
         address contractAddress;
         uint256 tokenId;
-        uint256 BombUsed;
+        uint256 BombBadge;
         uint256 MTBalance;
-        uint256 NFTPoint;
+        uint256 MOPNPoint;
         uint32 tileCoordinate;
     }
 
     struct CollectionDataOutput {
         address contractAddress;
-        uint256 OnMapNum;
-        uint256 AvatarNum;
-        uint256 MTBalance;
-        uint256 AdditionalNFTPoint;
-        uint256 CollectionNFTPoint;
-        uint256 AvatarNFTPoint;
-        uint256 CollectionPoint;
-        uint256 additionalPoint;
         address collectionVault;
+        uint256 OnMapNum;
+        uint256 MTBalance;
+        uint256 AdditionalMOPNPoints;
+        uint256 CollectionMOPNPoints;
+        uint256 AvatarMOPNPoints;
+        uint256 CollectionMOPNPoint;
+        uint256 AdditionalMOPNPoint;
         IMOPNCollectionVault.NFTAuction NFTAuction;
     }
 
@@ -60,14 +61,14 @@ contract MOPNDataHelper is Ownable {
 
         accountData.tokenId = tokenId;
         accountData.contractAddress = collectionAddress;
-        accountData.BombUsed = IMOPNBomb(governance.bombContract()).balanceOf(
+        accountData.BombBadge = IMOPNBomb(governance.bombContract()).balanceOf(
             account,
             2
         );
         accountData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
             account
         );
-        accountData.NFTPoint = IERC20(governance.pointContract()).balanceOf(
+        accountData.MOPNPoint = IERC20(governance.pointContract()).balanceOf(
             account
         );
         accountData.tileCoordinate = miningData.getAccountCoordinate(account);
@@ -156,29 +157,31 @@ contract MOPNDataHelper is Ownable {
     ) public view returns (CollectionDataOutput memory cData) {
         IMOPNData miningData = IMOPNData(governance.mopnDataContract());
         cData.contractAddress = collectionAddress;
-        cData.OnMapNum = miningData.getCollectionOnMapNum(collectionAddress);
-        cData.AvatarNum = miningData.getCollectionAccountNum(collectionAddress);
-        cData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
-            governance.getCollectionVault(collectionAddress)
-        );
-        cData.AdditionalNFTPoint = miningData.getCollectionAdditionalNFTPoints(
-            collectionAddress
-        );
-        cData.CollectionNFTPoint = miningData.getCollectionNFTPoints(
-            collectionAddress
-        );
-        cData.AvatarNFTPoint = miningData.getCollectionAccountNFTPoints(
-            collectionAddress
-        );
-        cData.CollectionPoint = miningData.getCollectionPoint(
-            collectionAddress
-        );
-        cData.additionalPoint = miningData.getCollectionAdditionalNFTPoint(
-            collectionAddress
-        );
         cData.collectionVault = governance.getCollectionVault(
             collectionAddress
         );
+
+        cData.OnMapNum = miningData.getCollectionOnMapNum(collectionAddress);
+        cData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
+            governance.getCollectionVault(collectionAddress)
+        );
+
+        cData.AdditionalMOPNPoints = miningData
+            .getCollectionAdditionalMOPNPoints(collectionAddress);
+
+        cData.CollectionMOPNPoints = miningData.getCollectionMOPNPoints(
+            collectionAddress
+        );
+        cData.AvatarMOPNPoints = miningData.getCollectionAccountMOPNPoints(
+            collectionAddress
+        );
+        cData.CollectionMOPNPoint = miningData.getCollectionMOPNPoint(
+            collectionAddress
+        );
+        cData.AdditionalMOPNPoint = miningData.getCollectionAdditionalMOPNPoint(
+            collectionAddress
+        );
+
         if (cData.collectionVault != address(0)) {
             cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
                 .getAuctionInfo();

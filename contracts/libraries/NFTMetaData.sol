@@ -23,9 +23,9 @@ library NFTMetaData {
             )
         );
 
-        uint32 totalNFTPoint;
+        uint32 totalMOPNPoint;
         for (uint256 i = 0; i < tileDatas.length; i++) {
-            totalNFTPoint += uint32(tileDatas[i].tileNFTPoint);
+            totalMOPNPoint += uint32(tileDatas[i].tileMOPNPoint);
         }
 
         return
@@ -42,7 +42,7 @@ library NFTMetaData {
                                 LandId,
                                 blockCoordinate,
                                 ringNum,
-                                totalNFTPoint,
+                                totalMOPNPoint,
                                 MTMinted
                             ),
                             ', "image": "',
@@ -62,13 +62,13 @@ library NFTMetaData {
         uint32 LandId,
         uint32 blockCoordinate,
         uint32 ringNum,
-        uint32 totalNFTPoint,
+        uint32 totalMOPNPoint,
         uint256 MTMinted
     ) public pure returns (bytes memory) {
         return
             abi.encodePacked(
                 '[{"trait_type": "Weights", "value": "',
-                totalNFTPoint.toString(),
+                totalMOPNPoint.toString(),
                 '"}',
                 getIntAttributesRangeBytes(blockCoordinate),
                 ',{"trait_type": "Tax Revenue ($MT)", "display_type": "boost_number", "value": ',

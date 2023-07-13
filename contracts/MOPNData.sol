@@ -18,21 +18,21 @@ contract MOPNData is IMOPNData, Multicall {
 
     uint256 public immutable MTProduceStartTimestamp;
 
-    /// @notice uint96 MTTotalMinted + uint32 LastTickTimestamp + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
+    /// @notice uint96 MTTotalMinted + uint32 LastTickTimestamp + uint64 PerMOPNPointMinted + uint64 TotalMOPNPoints
     uint256 public MiningData1;
 
-    /// @notice uint64 AdditionalFinishSnapshot + uint64 TotalAdditionalNFTPoints + uint64 NFTOfferCoefficient + uint64 TotalMTStaking
+    /// @notice uint64 AdditionalFinishSnapshot + uint64 TotalAdditionalMOPNPoints + uint64 NFTOfferCoefficient + uint64 TotalMTStaking
     uint256 public MiningData2;
 
-    /// @notice  uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerNFTPointMinted + uint32 coordinate + uint32 TotalNFTPoints
+    /// @notice  uint64 settled MT + uint64 PerCollectionNFTMinted  + uint64 PerMOPNPointMinted + uint32 coordinate + uint32 TotalMOPNPoints
     mapping(address => uint256) public AccountsData;
 
-    /// @notice uint64 PerCollectionNFTMinted + uint64 PerNFTPointMinted + uint64 CollectionNFTPoints + uint32 additionalNFTPoints + uint32 AvatarNFTPoints
+    /// @notice uint64 PerCollectionNFTMinted + uint64 PerMOPNPointMinted + uint64 CollectionMOPNPoints + uint32 additionalMOPNPoints + uint32 AvatarMOPNPoints
     mapping(address => uint256) public CollectionsData1;
 
     /**
      * @notice record the collection's states info
-     * Collection address => uint32 additionalNFTPoint + uint64 mintedMT + uint32 registered account num + uint32 on map nft number
+     * Collection address => uint32 additionalMOPNPoint + uint64 mintedMT +  uint32 on map nft number
      */
     mapping(address => uint256) public CollectionsData2;
 
@@ -61,14 +61,14 @@ contract MOPNData is IMOPNData, Multicall {
     /**
      * @notice get settled Per MT Allocation Weight minted mopn token number
      */
-    function PerNFTPointMinted() public view returns (uint256) {
+    function PerMOPNPointMinted() public view returns (uint256) {
         return uint64(MiningData1 >> 64);
     }
 
     /**
      * @notice get total mopn token allocation weights
      */
-    function TotalNFTPoints() public view returns (uint256) {
+    function TotalMOPNPoints() public view returns (uint256) {
         return uint64(MiningData1);
     }
 
@@ -76,7 +76,7 @@ contract MOPNData is IMOPNData, Multicall {
         return uint48(MiningData2 >> 192);
     }
 
-    function TotalAdditionalNFTPoints() public view returns (uint256) {
+    function TotalAdditionalMOPNPoints() public view returns (uint256) {
         return uint64(MiningData2 >> 128);
     }
 
@@ -112,30 +112,30 @@ contract MOPNData is IMOPNData, Multicall {
     /**
      * @notice settle per mopn token allocation weight minted mopn token
      */
-    function settlePerNFTPointMinted() public {
+    function settlePerMOPNPointMinted() public {
         if (block.timestamp > LastTickTimestamp()) {
-            uint256 PerNFTPointMintDiff = calcPerNFTPointMinted() -
-                PerNFTPointMinted();
+            uint256 PerMOPNPointMintDiff = calcPerMOPNPointMinted() -
+                PerMOPNPointMinted();
             MiningData1 +=
-                ((PerNFTPointMintDiff * TotalNFTPoints()) << 160) |
+                ((PerMOPNPointMintDiff * TotalMOPNPoints()) << 160) |
                 ((block.timestamp - LastTickTimestamp()) << 128) |
-                ((PerNFTPointMintDiff) << 64);
+                ((PerMOPNPointMintDiff) << 64);
         }
     }
 
     function closeWhiteList() public onlyGovernance {
-        settlePerNFTPointMinted();
-        MiningData2 += PerNFTPointMinted() << 192;
-        MiningData1 -= TotalAdditionalNFTPoints();
+        settlePerMOPNPointMinted();
+        MiningData2 += PerMOPNPointMinted() << 192;
+        MiningData1 -= TotalAdditionalMOPNPoints();
     }
 
-    function calcPerNFTPointMinted() public view returns (uint256) {
+    function calcPerMOPNPointMinted() public view returns (uint256) {
         if (MTProduceStartTimestamp > block.timestamp) {
             return 0;
         }
-        uint256 totalNFTPoints = TotalNFTPoints();
-        uint256 perNFTPointMinted = PerNFTPointMinted();
-        if (totalNFTPoints > 0) {
+        uint256 totalMOPNPoints = TotalMOPNPoints();
+        uint256 perMOPNPointMinted = PerMOPNPointMinted();
+        if (totalMOPNPoints > 0) {
             uint256 lastTickTimestamp = LastTickTimestamp();
             if (MTProduceStartTimestamp > lastTickTimestamp) {
                 lastTickTimestamp = MTProduceStartTimestamp;
@@ -149,23 +149,23 @@ contract MOPNData is IMOPNData, Multicall {
 
             while (true) {
                 if (block.timestamp > nextReduceTimestamp) {
-                    perNFTPointMinted +=
+                    perMOPNPointMinted +=
                         ((nextReduceTimestamp - lastTickTimestamp) *
                             currentMTPPS(reduceTimes)) /
-                        totalNFTPoints;
+                        totalMOPNPoints;
                     lastTickTimestamp = nextReduceTimestamp;
                     reduceTimes++;
                     nextReduceTimestamp += MTProduceReduceInterval;
                 } else {
-                    perNFTPointMinted +=
+                    perMOPNPointMinted +=
                         ((block.timestamp - lastTickTimestamp) *
                             currentMTPPS(reduceTimes)) /
-                        totalNFTPoints;
+                        totalMOPNPoints;
                     break;
                 }
             }
         }
-        return perNFTPointMinted;
+        return perMOPNPointMinted;
     }
 
     function accountClaimAvailable(address account) public view returns (bool) {
@@ -200,7 +200,7 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice get avatar settled per mopn token allocation weight minted mopn token number
      * @param account account wallet address
      */
-    function getAccountPerNFTPointMinted(
+    function getAccountPerMOPNPointMinted(
         address account
     ) public view returns (uint256) {
         return uint64(AccountsData[account] >> 64);
@@ -226,7 +226,7 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice get avatar on map mining mopn token allocation weight
      * @param account account wallet address
      */
-    function getAccountTotalNFTPoint(
+    function getAccountTotalMOPNPoint(
         address account
     ) public view returns (uint256) {
         return uint32(AccountsData[account]);
@@ -240,17 +240,17 @@ contract MOPNData is IMOPNData, Multicall {
         address account
     ) public view returns (uint256 inbox) {
         inbox = getAccountSettledMT(account);
-        uint256 AccountTotalNFTPoint = getAccountTotalNFTPoint(account);
-        uint256 AccountPerNFTPointMintedDiff = calcPerNFTPointMinted() -
-            getAccountPerNFTPointMinted(account);
+        uint256 AccountTotalMOPNPoint = getAccountTotalMOPNPoint(account);
+        uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
+            getAccountPerMOPNPointMinted(account);
 
-        if (AccountPerNFTPointMintedDiff > 0 && AccountTotalNFTPoint > 0) {
+        if (AccountPerMOPNPointMintedDiff > 0 && AccountTotalMOPNPoint > 0) {
             address collectionAddress = getAccountCollection(account);
             uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
                     collectionAddress
                 ) - getAccountPerCollectionNFTMinted(account);
             inbox +=
-                ((AccountPerNFTPointMintedDiff * AccountTotalNFTPoint) * 90) /
+                ((AccountPerMOPNPointMintedDiff * AccountTotalMOPNPoint) * 90) /
                 100;
             if (AccountPerCollectionNFTMintedDiff > 0) {
                 inbox += (AccountPerCollectionNFTMintedDiff * 90) / 100;
@@ -263,11 +263,11 @@ contract MOPNData is IMOPNData, Multicall {
      * @param account account wallet address
      */
     function mintAccountMT(address account) public returns (uint256) {
-        uint256 AccountTotalNFTPoint = getAccountTotalNFTPoint(account);
-        uint256 AccountPerNFTPointMintedDiff = PerNFTPointMinted() -
-            getAccountPerNFTPointMinted(account);
-        if (AccountPerNFTPointMintedDiff <= 0) {
-            return AccountTotalNFTPoint;
+        uint256 AccountTotalMOPNPoint = getAccountTotalMOPNPoint(account);
+        uint256 AccountPerMOPNPointMintedDiff = PerMOPNPointMinted() -
+            getAccountPerMOPNPointMinted(account);
+        if (AccountPerMOPNPointMintedDiff <= 0) {
+            return AccountTotalMOPNPoint;
         }
 
         uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
@@ -275,10 +275,10 @@ contract MOPNData is IMOPNData, Multicall {
         ) - getAccountPerCollectionNFTMinted(account);
 
         uint256 amount;
-        if (AccountTotalNFTPoint > 0) {
+        if (AccountTotalMOPNPoint > 0) {
             amount =
-                AccountPerNFTPointMintedDiff *
-                AccountTotalNFTPoint +
+                AccountPerMOPNPointMintedDiff *
+                AccountTotalMOPNPoint +
                 (
                     AccountPerCollectionNFTMintedDiff > 0
                         ? AccountPerCollectionNFTMintedDiff
@@ -299,9 +299,9 @@ contract MOPNData is IMOPNData, Multicall {
         }
         AccountsData[account] +=
             (AccountPerCollectionNFTMintedDiff << 128) |
-            (AccountPerNFTPointMintedDiff << 64);
+            (AccountPerMOPNPointMintedDiff << 64);
 
-        return AccountTotalNFTPoint;
+        return AccountTotalMOPNPoint;
     }
 
     /**
@@ -311,7 +311,7 @@ contract MOPNData is IMOPNData, Multicall {
     function claimAccountMT(
         address account
     ) public onlyMT returns (uint256 amount) {
-        settlePerNFTPointMinted();
+        settlePerMOPNPointMinted();
         mintCollectionMT(getAccountCollection(account));
         mintAccountMT(account);
 
@@ -331,7 +331,7 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice get collection settled per mopn token allocation weight minted mopn token number
      * @param collectionAddress collection contract address
      */
-    function getCollectionPerNFTPointMinted(
+    function getCollectionPerMOPNPointMinted(
         address collectionAddress
     ) public view returns (uint256) {
         return uint64(CollectionsData1[collectionAddress] >> 128);
@@ -341,59 +341,43 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice get collection on map mining mopn token allocation weight
      * @param collectionAddress collection contract adddress
      */
-    function getCollectionNFTPoints(
+    function getCollectionMOPNPoints(
         address collectionAddress
     ) public view returns (uint256) {
         return uint64(CollectionsData1[collectionAddress] >> 64);
     }
 
-    function getCollectionAdditionalNFTPoints(
+    function getCollectionAdditionalMOPNPoints(
         address collectionAddress
     ) public view returns (uint256) {
         return uint32(CollectionsData1[collectionAddress] >> 32);
     }
 
-    function getCollectionAccountNFTPoints(
+    function getCollectionAccountMOPNPoints(
         address collectionAddress
     ) public view returns (uint256) {
         return uint32(CollectionsData1[collectionAddress]);
     }
 
-    function getCollectionAdditionalNFTPoint(
+    function getCollectionAdditionalMOPNPoint(
         address collectionAddress
     ) public view returns (uint256) {
-        return uint32(CollectionsData2[collectionAddress] >> 128);
+        return uint32(CollectionsData2[collectionAddress] >> 96);
     }
 
-    function setCollectionAdditionalNFTPoint(
+    function setCollectionAdditionalMOPNPoint(
         address collectionAddress,
-        uint256 additionalNFTPoint
+        uint256 additionalMOPNPoint
     ) public onlyMOPNOrBomb {
         CollectionsData2[collectionAddress] =
-            (additionalNFTPoint << 128) |
-            uint128(CollectionsData2[collectionAddress]);
+            (additionalMOPNPoint << 96) |
+            uint96(CollectionsData2[collectionAddress]);
     }
 
     function getCollectionSettledMT(
         address collectionAddress
     ) public view returns (uint256) {
-        return uint64(CollectionsData2[collectionAddress] >> 64);
-    }
-
-    /**
-     * @notice get NFT collection minted avatar number
-     * @param collectionAddress collection contract address
-     */
-    function getCollectionAccountNum(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint32(CollectionsData2[collectionAddress] >> 32);
-    }
-
-    function addCollectionAccountNum(
-        address collectionAddress
-    ) public onlyMOPNOrBomb {
-        CollectionsData2[collectionAddress] += uint256(1) << 32;
+        return uint64(CollectionsData2[collectionAddress] >> 32);
     }
 
     /**
@@ -414,7 +398,7 @@ contract MOPNData is IMOPNData, Multicall {
         CollectionsData2[collectionAddress]--;
     }
 
-    function getCollectionPoint(
+    function getCollectionMOPNPoint(
         address collectionAddress
     ) public view returns (uint256 point) {
         if (governance.getCollectionVault(collectionAddress) != address(0)) {
@@ -434,37 +418,39 @@ contract MOPNData is IMOPNData, Multicall {
         address collectionAddress
     ) public view returns (uint256 inbox) {
         inbox = getCollectionSettledMT(collectionAddress);
-        uint256 perNFTPointMinted = calcPerNFTPointMinted();
-        uint256 CollectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
+        uint256 perMOPNPointMinted = calcPerMOPNPointMinted();
+        uint256 CollectionPerMOPNPointMinted = getCollectionPerMOPNPointMinted(
             collectionAddress
         );
-        uint256 WhiteListNFTPoints = getCollectionAdditionalNFTPoints(
+        uint256 WhiteListMOPNPoints = getCollectionAdditionalMOPNPoints(
             collectionAddress
         );
-        uint256 CollectionNFTPoints = getCollectionNFTPoints(collectionAddress);
-        uint256 AvatarNFTPoints = getCollectionAccountNFTPoints(
+        uint256 CollectionMOPNPoints = getCollectionMOPNPoints(
+            collectionAddress
+        );
+        uint256 AvatarMOPNPoints = getCollectionAccountMOPNPoints(
             collectionAddress
         );
 
         if (
-            CollectionPerNFTPointMinted < perNFTPointMinted &&
-            AvatarNFTPoints > 0
+            CollectionPerMOPNPointMinted < perMOPNPointMinted &&
+            AvatarMOPNPoints > 0
         ) {
             inbox +=
-                (((perNFTPointMinted - CollectionPerNFTPointMinted) *
-                    (CollectionNFTPoints + AvatarNFTPoints)) * 5) /
+                (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
+                    (CollectionMOPNPoints + AvatarMOPNPoints)) * 5) /
                 100;
-            if (WhiteListNFTPoints > 0) {
+            if (WhiteListMOPNPoints > 0) {
                 if (AdditionalFinishSnapshot() > 0) {
                     inbox +=
                         (((AdditionalFinishSnapshot() -
-                            CollectionPerNFTPointMinted) * WhiteListNFTPoints) *
-                            5) /
+                            CollectionPerMOPNPointMinted) *
+                            WhiteListMOPNPoints) * 5) /
                         100;
                 } else {
                     inbox +=
-                        (((perNFTPointMinted - CollectionPerNFTPointMinted) *
-                            WhiteListNFTPoints) * 5) /
+                        (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
+                            WhiteListMOPNPoints) * 5) /
                         100;
                 }
             }
@@ -476,75 +462,75 @@ contract MOPNData is IMOPNData, Multicall {
      * @param collectionAddress collection contract address
      */
     function mintCollectionMT(address collectionAddress) public {
-        uint256 CollectionPerNFTPointMinted = getCollectionPerNFTPointMinted(
+        uint256 CollectionPerMOPNPointMinted = getCollectionPerMOPNPointMinted(
             collectionAddress
         );
-        uint256 CollectionPerNFTPointMintedDiff = PerNFTPointMinted() -
-            CollectionPerNFTPointMinted;
-        if (CollectionPerNFTPointMintedDiff > 0) {
-            uint256 AvatarNFTPoints = getCollectionAccountNFTPoints(
+        uint256 CollectionPerMOPNPointMintedDiff = PerMOPNPointMinted() -
+            CollectionPerMOPNPointMinted;
+        if (CollectionPerMOPNPointMintedDiff > 0) {
+            uint256 AvatarMOPNPoints = getCollectionAccountMOPNPoints(
                 collectionAddress
             );
-            if (AvatarNFTPoints > 0) {
+            if (AvatarMOPNPoints > 0) {
                 uint256 CollectionData1 = CollectionsData1[collectionAddress];
 
-                uint256 amount = ((CollectionPerNFTPointMintedDiff *
-                    AvatarNFTPoints) * 5) / 100;
-                CollectionData1 += CollectionPerNFTPointMintedDiff << 128;
+                uint256 amount = ((CollectionPerMOPNPointMintedDiff *
+                    AvatarMOPNPoints) * 5) / 100;
+                CollectionData1 += CollectionPerMOPNPointMintedDiff << 128;
 
-                uint256 CollectionNFTPoints = getCollectionNFTPoints(
+                uint256 CollectionMOPNPoints = getCollectionMOPNPoints(
                     collectionAddress
                 );
-                if (CollectionNFTPoints > 0) {
+                if (CollectionMOPNPoints > 0) {
                     amount +=
-                        ((CollectionPerNFTPointMintedDiff *
-                            CollectionNFTPoints) * 5) /
+                        ((CollectionPerMOPNPointMintedDiff *
+                            CollectionMOPNPoints) * 5) /
                         100;
                     CollectionData1 +=
-                        ((CollectionPerNFTPointMintedDiff *
-                            CollectionNFTPoints) /
+                        ((CollectionPerMOPNPointMintedDiff *
+                            CollectionMOPNPoints) /
                             getCollectionOnMapNum(collectionAddress)) <<
                         192;
                 }
 
-                uint256 WhiteListNFTPoints = getCollectionAdditionalNFTPoints(
+                uint256 WhiteListMOPNPoints = getCollectionAdditionalMOPNPoints(
                     collectionAddress
                 );
-                if (WhiteListNFTPoints > 0) {
-                    uint256 whiteListFinPerNFTPointMinted = AdditionalFinishSnapshot();
-                    if (whiteListFinPerNFTPointMinted > 0) {
+                if (WhiteListMOPNPoints > 0) {
+                    uint256 whiteListFinPerMOPNPointMinted = AdditionalFinishSnapshot();
+                    if (whiteListFinPerMOPNPointMinted > 0) {
                         if (
-                            whiteListFinPerNFTPointMinted >
-                            CollectionPerNFTPointMinted
+                            whiteListFinPerMOPNPointMinted >
+                            CollectionPerMOPNPointMinted
                         ) {
-                            amount = ((((whiteListFinPerNFTPointMinted -
-                                CollectionPerNFTPointMinted) *
-                                WhiteListNFTPoints) * 5) / 100);
+                            amount = ((((whiteListFinPerMOPNPointMinted -
+                                CollectionPerMOPNPointMinted) *
+                                WhiteListMOPNPoints) * 5) / 100);
                             CollectionData1 +=
-                                (((whiteListFinPerNFTPointMinted -
-                                    CollectionPerNFTPointMinted) *
-                                    WhiteListNFTPoints) /
+                                (((whiteListFinPerMOPNPointMinted -
+                                    CollectionPerMOPNPointMinted) *
+                                    WhiteListMOPNPoints) /
                                     getCollectionOnMapNum(collectionAddress)) <<
                                 192;
-                            CollectionData1 -= WhiteListNFTPoints << 32;
+                            CollectionData1 -= WhiteListMOPNPoints << 32;
                         }
                     } else {
-                        amount += (((CollectionPerNFTPointMintedDiff *
-                            WhiteListNFTPoints) * 5) / 100);
+                        amount += (((CollectionPerMOPNPointMintedDiff *
+                            WhiteListMOPNPoints) * 5) / 100);
                         CollectionData1 +=
-                            (((CollectionPerNFTPointMintedDiff) *
-                                WhiteListNFTPoints) /
+                            (((CollectionPerMOPNPointMintedDiff) *
+                                WhiteListMOPNPoints) /
                                 getCollectionOnMapNum(collectionAddress)) <<
                             192;
                     }
                 }
 
                 CollectionsData1[collectionAddress] = CollectionData1;
-                CollectionsData2[collectionAddress] += amount << 64;
+                CollectionsData2[collectionAddress] += amount << 32;
                 emit CollectionMTMinted(collectionAddress, amount);
             } else {
                 CollectionsData1[collectionAddress] +=
-                    CollectionPerNFTPointMintedDiff <<
+                    CollectionPerMOPNPointMintedDiff <<
                     128;
             }
         }
@@ -562,79 +548,79 @@ contract MOPNData is IMOPNData, Multicall {
                 );
             }
             governance.mintMT(collectionVault, amount);
-            CollectionsData2[collectionAddress] -= amount << 64;
+            CollectionsData2[collectionAddress] -= amount << 32;
             MiningData2 += amount;
         }
     }
 
-    function settleCollectionNFTPoint(
+    function settleCollectionMOPNPoint(
         address collectionAddress
     ) public onlyCollectionVault(collectionAddress) {
-        _settleCollectionNFTPoint(collectionAddress);
+        _settleCollectionMOPNPoint(collectionAddress);
 
-        emit SettleCollectionNFTPoint(collectionAddress);
+        emit SettleCollectionMOPNPoint(collectionAddress);
     }
 
-    function _settleCollectionNFTPoint(address collectionAddress) internal {
-        uint256 point = getCollectionPoint(collectionAddress);
-        uint256 collectionNFTPoint;
+    function _settleCollectionMOPNPoint(address collectionAddress) internal {
+        uint256 point = getCollectionMOPNPoint(collectionAddress);
+        uint256 collectionMOPNPoint;
         if (point > 0) {
-            collectionNFTPoint =
+            collectionMOPNPoint =
                 point *
                 getCollectionOnMapNum(collectionAddress);
         }
-        uint256 preCollectionNFTPoint = getCollectionNFTPoints(
+        uint256 preCollectionMOPNPoint = getCollectionMOPNPoints(
             collectionAddress
         );
 
-        if (collectionNFTPoint > preCollectionNFTPoint) {
-            MiningData1 += collectionNFTPoint - preCollectionNFTPoint;
-            CollectionsData1[collectionAddress] += ((collectionNFTPoint -
-                preCollectionNFTPoint) << 64);
-        } else if (collectionNFTPoint < preCollectionNFTPoint) {
-            MiningData1 -= preCollectionNFTPoint - collectionNFTPoint;
-            CollectionsData1[collectionAddress] -= ((preCollectionNFTPoint -
-                collectionNFTPoint) << 64);
+        if (collectionMOPNPoint > preCollectionMOPNPoint) {
+            MiningData1 += collectionMOPNPoint - preCollectionMOPNPoint;
+            CollectionsData1[collectionAddress] += ((collectionMOPNPoint -
+                preCollectionMOPNPoint) << 64);
+        } else if (collectionMOPNPoint < preCollectionMOPNPoint) {
+            MiningData1 -= preCollectionMOPNPoint - collectionMOPNPoint;
+            CollectionsData1[collectionAddress] -= ((preCollectionMOPNPoint -
+                collectionMOPNPoint) << 64);
         }
 
-        uint256 additionalpoint = getCollectionAdditionalNFTPoint(
+        uint256 additionalpoint = getCollectionAdditionalMOPNPoint(
             collectionAddress
         );
-        uint256 collectionAdditionalNFTPoint;
+        uint256 collectionAdditionalMOPNPoint;
         if (additionalpoint > 0) {
-            collectionAdditionalNFTPoint =
+            collectionAdditionalMOPNPoint =
                 additionalpoint *
                 getCollectionOnMapNum(collectionAddress);
         }
-        uint256 preCollectionAdditionalNFTPoint = getCollectionAdditionalNFTPoints(
+        uint256 preCollectionAdditionalMOPNPoint = getCollectionAdditionalMOPNPoints(
                 collectionAddress
             );
 
-        if (collectionAdditionalNFTPoint > preCollectionAdditionalNFTPoint) {
+        if (collectionAdditionalMOPNPoint > preCollectionAdditionalMOPNPoint) {
             MiningData1 +=
-                collectionAdditionalNFTPoint -
-                preCollectionAdditionalNFTPoint;
+                collectionAdditionalMOPNPoint -
+                preCollectionAdditionalMOPNPoint;
             CollectionsData1[
                 collectionAddress
-            ] += ((collectionAdditionalNFTPoint -
-                preCollectionAdditionalNFTPoint) << 32);
+            ] += ((collectionAdditionalMOPNPoint -
+                preCollectionAdditionalMOPNPoint) << 32);
         } else if (
-            collectionAdditionalNFTPoint < preCollectionAdditionalNFTPoint
+            collectionAdditionalMOPNPoint < preCollectionAdditionalMOPNPoint
         ) {
             MiningData1 -=
-                preCollectionAdditionalNFTPoint -
-                collectionAdditionalNFTPoint;
+                preCollectionAdditionalMOPNPoint -
+                collectionAdditionalMOPNPoint;
             CollectionsData1[
                 collectionAddress
-            ] -= ((preCollectionAdditionalNFTPoint -
-                collectionAdditionalNFTPoint) << 32);
+            ] -= ((preCollectionAdditionalMOPNPoint -
+                collectionAdditionalMOPNPoint) << 32);
         }
     }
 
     function settleCollectionMining(
         address collectionAddress
     ) public onlyCollectionVault(collectionAddress) {
-        settlePerNFTPointMinted();
+        settlePerMOPNPointMinted();
         mintCollectionMT(collectionAddress);
         claimCollectionMT(collectionAddress);
     }
@@ -689,18 +675,18 @@ contract MOPNData is IMOPNData, Multicall {
         }
     }
 
-    function addNFTPoint(
+    function addMOPNPoint(
         address account,
         uint256 amount
     ) public onlyMOPNOrBomb {
-        _addNFTPoint(account, amount);
+        _addMOPNPoint(account, amount);
     }
 
-    function subNFTPoint(
+    function subMOPNPoint(
         address account,
         uint256 amount
     ) public onlyMOPNOrBomb {
-        _subNFTPoint(account, amount);
+        _subMOPNPoint(account, amount);
     }
 
     /**
@@ -708,9 +694,9 @@ contract MOPNData is IMOPNData, Multicall {
      * @param account account wallet address
      * @param amount Points amount
      */
-    function _addNFTPoint(address account, uint256 amount) internal {
+    function _addMOPNPoint(address account, uint256 amount) internal {
         amount *= 100;
-        settlePerNFTPointMinted();
+        settlePerMOPNPointMinted();
         address collectionAddress = getAccountCollection(account);
         mintCollectionMT(collectionAddress);
         uint256 exist = mintAccountMT(account);
@@ -718,7 +704,7 @@ contract MOPNData is IMOPNData, Multicall {
             addCollectionOnMapNum(collectionAddress);
         }
 
-        _settleCollectionNFTPoint(collectionAddress);
+        _settleCollectionMOPNPoint(collectionAddress);
 
         MiningData1 += amount;
         CollectionsData1[collectionAddress] += amount;
@@ -729,8 +715,9 @@ contract MOPNData is IMOPNData, Multicall {
      * substruct on map mining mopn token allocation weight
      * @param account account wallet address
      */
-    function _subNFTPoint(address account, uint256 amount) internal {
-        settlePerNFTPointMinted();
+    function _subMOPNPoint(address account, uint256 amount) internal {
+        amount *= 100;
+        settlePerMOPNPointMinted();
         address collectionAddress = getAccountCollection(account);
         mintCollectionMT(collectionAddress);
         if (amount == 0) {
@@ -740,7 +727,7 @@ contract MOPNData is IMOPNData, Multicall {
             mintAccountMT(account);
         }
 
-        _settleCollectionNFTPoint(collectionAddress);
+        _settleCollectionMOPNPoint(collectionAddress);
 
         MiningData1 -= amount;
         CollectionsData1[collectionAddress] -= amount;

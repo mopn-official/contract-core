@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "hardhat/console.sol";
+
 import "./interfaces/IMOPNCollectionVault.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNToken.sol";
@@ -133,7 +135,7 @@ contract MOPNCollectionVault is
         require(mtAmount > 0, "zero to withdraw");
         IMOPNToken(governance.mtContract()).transfer(msg.sender, mtAmount);
         _burn(msg.sender, amount);
-        mopnData.settleCollectionNFTPoint(collectionAddress);
+        mopnData.settleCollectionMOPNPoint(collectionAddress);
         mopnData.changeTotalMTStaking(collectionAddress, false, mtAmount);
     }
 
@@ -173,12 +175,12 @@ contract MOPNCollectionVault is
         IMOPNToken(governance.mtContract()).transfer(msg.sender, offerPrice);
 
         NFTOfferData =
-            (tokenId << 97) |
-            (offerPrice << 33) |
-            (block.timestamp << 1) |
+            (tokenId << 104) |
+            (offerPrice << 40) |
+            (block.timestamp << 8) |
             uint256(1);
 
-        mopnData.settleCollectionNFTPoint(collectionAddress);
+        mopnData.settleCollectionMOPNPoint(collectionAddress);
         mopnData.NFTOfferAcceptNotify(collectionAddress, offerPrice, tokenId);
     }
 
@@ -220,7 +222,7 @@ contract MOPNCollectionVault is
             }
 
             mopnData.settleCollectionMining(collectionAddress);
-            mopnData.settleCollectionNFTPoint(collectionAddress);
+            mopnData.settleCollectionMOPNPoint(collectionAddress);
             uint256 offerAcceptPrice = getOfferAcceptPrice();
             if (price > offerAcceptPrice) {
                 mopnData.changeTotalMTStaking(
@@ -253,7 +255,7 @@ contract MOPNCollectionVault is
 
             uint256 vtokenAmount = MT2VAmount(value);
             _mint(from, vtokenAmount);
-            mopnData.settleCollectionNFTPoint(collectionAddress);
+            mopnData.settleCollectionMOPNPoint(collectionAddress);
             mopnData.changeTotalMTStaking(collectionAddress, true, value);
         }
 

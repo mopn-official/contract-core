@@ -2,27 +2,37 @@
 pragma solidity ^0.8.19;
 
 import "hardhat/console.sol";
+
+import "../interfaces/IMOPN.sol";
+import "../interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNERC6551Account.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "./lib/ERC6551AccountLib.sol";
 
 error NotAuthorized();
 
-contract MOPNERC6551Account is IERC165, IERC1271, IMOPNERC6551Account {
+contract MOPNERC6551Account is
+    IERC165,
+    IERC1271,
+    IERC1155Receiver,
+    IMOPNERC6551Account
+{
     uint256 _nonce;
 
-    address _proxy;
+    address public immutable governance;
 
     modifier onlyProxy() {
-        if (msg.sender != _proxy) revert NotAuthorized();
+        if (msg.sender != IMOPNGovernance(governance).mopnErc6551AccountProxy())
+            revert NotAuthorized();
         _;
     }
 
-    constructor(address proxy) {
-        _proxy = proxy;
+    constructor(address governance_) {
+        governance = governance_;
     }
 
     receive() external payable {}
@@ -113,4 +123,41 @@ contract MOPNERC6551Account is IERC165, IERC1271, IMOPNERC6551Account {
     function _incrementNonce() internal {
         _nonce++;
     }
+
+    /// @dev Allows ERC-1155 tokens to be received. This function can be overriden.
+    function onERC1155Received(
+        address operator,
+        address,
+        uint256 id,
+        uint256,
+        bytes calldata data
+    ) public override returns (bytes4) {
+        if (
+            data.length > 0 &&
+            msg.sender == IMOPNGovernance(governance).bombContract() &&
+            id == 1 &&
+            operator == owner()
+        ) {
+            uint256 coordinate = abi.decode(data, (uint256));
+            IMOPN(IMOPNGovernance(governance).mopnContract()).bomb(
+                uint32(coordinate)
+            );
+        }
+        return IERC1155Receiver.onERC1155Received.selector;
+    }
+
+    /// @dev Allows ERC-1155 token batches to be received. This function can be overriden.
+    function onERC1155BatchReceived(
+        address,
+        address,
+        uint256[] memory,
+        uint256[] memory,
+        bytes memory
+    ) public pure override returns (bytes4) {
+        return IERC1155Receiver.onERC1155BatchReceived.selector;
+    }
+
+    function approveOwnerTransfer(address to, uint256 timeRange) public {}
+
+    function ownerTransfer(address to, uint256 timeRange) public {}
 }

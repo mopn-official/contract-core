@@ -26,7 +26,7 @@ uint256 MTProduceStartTimestamp
 uint256 MTProduceData
 ```
 
-uint64 PerNFTPointMinted + uint64 LastPerNFTPointMintedCalcTimestamp + uint64 TotalNFTPoints
+uint64 PerMOPNPointMinted + uint64 LastPerMOPNPointMintedCalcTimestamp + uint64 TotalMOPNPoints
 
 ### AvatarMTs
 
@@ -34,7 +34,7 @@ uint64 PerNFTPointMinted + uint64 LastPerNFTPointMintedCalcTimestamp + uint64 To
 mapping(uint256 => uint256) AvatarMTs
 ```
 
-uint64 MT Inbox + uint64 CollectionPerNFTMinted + uint64 PerNFTPointMinted + uint64 TotalNFTPoints
+uint64 MT Inbox + uint64 CollectionPerNFTMinted + uint64 PerMOPNPointMinted + uint64 TotalMOPNPoints
 
 ### CollectionMTs
 
@@ -42,7 +42,7 @@ uint64 MT Inbox + uint64 CollectionPerNFTMinted + uint64 PerNFTPointMinted + uin
 mapping(uint256 => uint256) CollectionMTs
 ```
 
-uint64 CollectionPerNFTMinted + uint64 PerNFTPointMinted + uint64 CollectionNFTPoints + uint64 AvatarNFTPoints
+uint64 CollectionPerNFTMinted + uint64 PerMOPNPointMinted + uint64 CollectionMOPNPoints + uint64 AvatarMOPNPoints
 
 ### LandHolderMTs
 
@@ -118,26 +118,26 @@ constructor(address governance_, uint256 MTProduceStartTimestamp_) public
 function getNFTOfferCoefficient() public view returns (uint256)
 ```
 
-### getPerNFTPointMinted
+### getPerMOPNPointMinted
 
 ```solidity
-function getPerNFTPointMinted() public view returns (uint256)
+function getPerMOPNPointMinted() public view returns (uint256)
 ```
 
 get settled Per MT Allocation Weight minted mopn token number
 
-### getLastPerNFTPointMintedCalcTimestamp
+### getLastPerMOPNPointMintedCalcTimestamp
 
 ```solidity
-function getLastPerNFTPointMintedCalcTimestamp() public view returns (uint256)
+function getLastPerMOPNPointMintedCalcTimestamp() public view returns (uint256)
 ```
 
 get last per mopn token allocation weight minted settlement timestamp
 
-### getTotalNFTPoints
+### getTotalMOPNPoints
 
 ```solidity
-function getTotalNFTPoints() public view returns (uint256)
+function getTotalMOPNPoints() public view returns (uint256)
 ```
 
 get total mopn token allocation weights
@@ -152,8 +152,8 @@ get current mt produce per second
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name        | Type    | Description  |
+| ----------- | ------- | ------------ |
 | reduceTimes | uint256 | reduce times |
 
 ### currentMTPPS
@@ -162,18 +162,18 @@ get current mt produce per second
 function currentMTPPS() public view returns (uint256 MTPPB)
 ```
 
-### settlePerNFTPointMinted
+### settlePerMOPNPointMinted
 
 ```solidity
-function settlePerNFTPointMinted() public
+function settlePerMOPNPointMinted() public
 ```
 
 settle per mopn token allocation weight minted mopn token
 
-### calcPerNFTPointMinted
+### calcPerMOPNPointMinted
 
 ```solidity
-function calcPerNFTPointMinted() public view returns (uint256)
+function calcPerMOPNPointMinted() public view returns (uint256)
 ```
 
 ### getAvatarSettledMT
@@ -186,9 +186,9 @@ get avatar settled unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
 ### getAvatarCollectionPerNFTMinted
 
@@ -196,33 +196,33 @@ get avatar settled unclaimed minted mopn token
 function getAvatarCollectionPerNFTMinted(uint256 avatarId) public view returns (uint256)
 ```
 
-### getAvatarPerNFTPointMinted
+### getAvatarPerMOPNPointMinted
 
 ```solidity
-function getAvatarPerNFTPointMinted(uint256 avatarId) public view returns (uint256)
+function getAvatarPerMOPNPointMinted(uint256 avatarId) public view returns (uint256)
 ```
 
 get avatar settled per mopn token allocation weight minted mopn token number
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
-### getAvatarNFTPoint
+### getAvatarMOPNPoint
 
 ```solidity
-function getAvatarNFTPoint(uint256 avatarId) public view returns (uint256)
+function getAvatarMOPNPoint(uint256 avatarId) public view returns (uint256)
 ```
 
 get avatar on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
 ### calcAvatarMT
 
@@ -234,9 +234,9 @@ get avatar realtime unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
 ### mintAvatarMT
 
@@ -248,9 +248,9 @@ mint avatar mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| avatarId | uint256 | avatar Id   |
 
 ### redeemAvatarMT
 
@@ -262,11 +262,11 @@ redeem avatar unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
+| Name           | Type                        | Description                                       |
+| -------------- | --------------------------- | ------------------------------------------------- |
+| avatarId       | uint256                     | avatar Id                                         |
 | delegateWallet | enum IAvatar.DelegateWallet | Delegate coldwallet to specify hotwallet protocol |
-| vault | address | cold wallet address |
+| vault          | address                     | cold wallet address                               |
 
 ### getCollectionPerNFTMinted
 
@@ -274,46 +274,46 @@ redeem avatar unclaimed minted mopn token
 function getCollectionPerNFTMinted(uint256 COID) public view returns (uint256)
 ```
 
-### getCollectionPerNFTPointMinted
+### getCollectionPerMOPNPointMinted
 
 ```solidity
-function getCollectionPerNFTPointMinted(uint256 COID) public view returns (uint256)
+function getCollectionPerMOPNPointMinted(uint256 COID) public view returns (uint256)
 ```
 
 get collection settled per mopn token allocation weight minted mopn token number
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
-### getCollectionNFTPoint
+### getCollectionMOPNPoint
 
 ```solidity
-function getCollectionNFTPoint(uint256 COID) public view returns (uint256)
+function getCollectionMOPNPoint(uint256 COID) public view returns (uint256)
 ```
 
 get collection on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
-### getCollectionAvatarNFTPoint
+### getCollectionAvatarMOPNPoint
 
 ```solidity
-function getCollectionAvatarNFTPoint(uint256 COID) public view returns (uint256)
+function getCollectionAvatarMOPNPoint(uint256 COID) public view returns (uint256)
 ```
 
 get collection avatars on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### getCollectionPoint
@@ -332,8 +332,8 @@ get collection realtime unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### mintCollectionMT
@@ -346,8 +346,8 @@ mint collection mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name | Type    | Description   |
+| ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
 ### redeemCollectionMT
@@ -356,10 +356,10 @@ mint collection mopn token
 function redeemCollectionMT(uint256 COID) public
 ```
 
-### settleCollectionNFTPoint
+### settleCollectionMOPNPoint
 
 ```solidity
-function settleCollectionNFTPoint(uint256 COID) public
+function settleCollectionMOPNPoint(uint256 COID) public
 ```
 
 ### settleCollectionMining
@@ -378,8 +378,8 @@ get Land holder settled minted unclaimed mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
 ### getLandHolderTotalMinted
@@ -398,8 +398,8 @@ get Land holder settled per mopn token allocation weight minted mopn token numbe
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
 ### redeemLandHolderMT
@@ -414,58 +414,58 @@ function redeemLandHolderMT(uint32 LandId) public
 function batchRedeemSameLandHolderMT(uint32[] LandIds) public
 ```
 
-### addNFTPoint
+### addMOPNPoint
 
 ```solidity
-function addNFTPoint(uint256 avatarId, uint256 COID, uint256 amount) public
+function addMOPNPoint(uint256 avatarId, uint256 COID, uint256 amount) public
 ```
 
 add on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| amount | uint256 | EAW amount |
+| Name     | Type    | Description   |
+| -------- | ------- | ------------- |
+| avatarId | uint256 | avatar Id     |
+| COID     | uint256 | collection Id |
+| amount   | uint256 | EAW amount    |
 
-### subNFTPoint
+### subMOPNPoint
 
 ```solidity
-function subNFTPoint(uint256 avatarId, uint256 COID) public
+function subMOPNPoint(uint256 avatarId, uint256 COID) public
 ```
 
-### _addNFTPoint
+### \_addMOPNPoint
 
 ```solidity
-function _addNFTPoint(uint256 avatarId, uint256 COID, uint256 amount) internal
+function _addMOPNPoint(uint256 avatarId, uint256 COID, uint256 amount) internal
 ```
 
 add on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| amount | uint256 | EAW amount |
+| Name     | Type    | Description   |
+| -------- | ------- | ------------- |
+| avatarId | uint256 | avatar Id     |
+| COID     | uint256 | collection Id |
+| amount   | uint256 | EAW amount    |
 
-### _subNFTPoint
+### \_subMOPNPoint
 
 ```solidity
-function _subNFTPoint(uint256 avatarId, uint256 COID) internal
+function _subMOPNPoint(uint256 avatarId, uint256 COID) internal
 ```
 
 substruct on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
+| Name     | Type    | Description   |
+| -------- | ------- | ------------- |
+| avatarId | uint256 | avatar Id     |
+| COID     | uint256 | collection Id |
 
 ### NFTOfferAcceptNotify
 
@@ -490,4 +490,3 @@ modifier onlyCollectionVault(uint256 COID)
 ```solidity
 modifier onlyAvatarOrMap()
 ```
-

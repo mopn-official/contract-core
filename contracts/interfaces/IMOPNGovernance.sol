@@ -28,6 +28,8 @@ interface IMOPNGovernance {
 
     function erc6551AccountImplementation() external view returns (address);
 
+    function mopnErc6551AccountProxy() external view returns (address);
+
     function mopnDataContract() external view returns (address);
 
     function createCollectionVault(

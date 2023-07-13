@@ -8,38 +8,38 @@
 function getNFTOfferCoefficient() external view returns (uint256)
 ```
 
-### addNFTPoint
+### addMOPNPoint
 
 ```solidity
-function addNFTPoint(uint256 avatarId, uint256 COID, uint256 amount) external
+function addMOPNPoint(uint256 avatarId, uint256 COID, uint256 amount) external
 ```
 
 add on map mining mopn token allocation weight
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| avatarId | uint256 | avatar Id |
-| COID | uint256 | collection Id |
-| amount | uint256 | EAW amount |
+| Name     | Type    | Description   |
+| -------- | ------- | ------------- |
+| avatarId | uint256 | avatar Id     |
+| COID     | uint256 | collection Id |
+| amount   | uint256 | EAW amount    |
 
-### subNFTPoint
+### subMOPNPoint
 
 ```solidity
-function subNFTPoint(uint256 avatarId, uint256 COID) external
+function subMOPNPoint(uint256 avatarId, uint256 COID) external
 ```
 
-### settlePerNFTPointMinted
+### settlePerMOPNPointMinted
 
 ```solidity
-function settlePerNFTPointMinted() external
+function settlePerMOPNPointMinted() external
 ```
 
-### getAvatarNFTPoint
+### getAvatarMOPNPoint
 
 ```solidity
-function getAvatarNFTPoint(uint256 avatarId) external view returns (uint256)
+function getAvatarMOPNPoint(uint256 avatarId) external view returns (uint256)
 ```
 
 ### calcAvatarMT
@@ -60,16 +60,16 @@ function mintAvatarMT(uint256 avatarId) external returns (uint256)
 function redeemAvatarMT(uint256 avatarId, enum IAvatar.DelegateWallet delegateWallet, address vault) external
 ```
 
-### getCollectionNFTPoint
+### getCollectionMOPNPoint
 
 ```solidity
-function getCollectionNFTPoint(uint256 COID) external view returns (uint256)
+function getCollectionMOPNPoint(uint256 COID) external view returns (uint256)
 ```
 
-### getCollectionAvatarNFTPoint
+### getCollectionAvatarMOPNPoint
 
 ```solidity
-function getCollectionAvatarNFTPoint(uint256 COID) external view returns (uint256)
+function getCollectionAvatarMOPNPoint(uint256 COID) external view returns (uint256)
 ```
 
 ### getCollectionPoint
@@ -102,10 +102,10 @@ function redeemCollectionMT(uint256 COID) external
 function settleCollectionMining(uint256 COID) external
 ```
 
-### settleCollectionNFTPoint
+### settleCollectionMOPNPoint
 
 ```solidity
-function settleCollectionNFTPoint(uint256 COID) external
+function settleCollectionMOPNPoint(uint256 COID) external
 ```
 
 ### getLandHolderInboxMT
@@ -118,8 +118,8 @@ get Land holder realtime unclaimed minted mopn token
 
 #### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+| Name   | Type   | Description  |
+| ------ | ------ | ------------ |
 | LandId | uint32 | MOPN Land Id |
 
 ### getLandHolderTotalMinted
@@ -151,4 +151,3 @@ function changeTotalMTStaking(uint256 COID, bool increase, uint256 amount) exter
 ```solidity
 function NFTOfferAcceptNotify(uint256 price) external
 ```
-

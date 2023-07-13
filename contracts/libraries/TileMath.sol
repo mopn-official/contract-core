@@ -93,28 +93,28 @@ library TileMath {
         return (xrange, yrange);
     }
 
-    function getLandTilesNFTPoint(
+    function getLandTilesMOPNPoint(
         uint32 LandId
     ) public pure returns (uint256[] memory) {
         uint32 tileCoordinate = LandCenterTile(LandId);
-        uint256[] memory TilesNFTPoint = new uint256[](91);
-        TilesNFTPoint[0] = getTileNFTPoint(tileCoordinate);
+        uint256[] memory TilesMOPNPoint = new uint256[](91);
+        TilesMOPNPoint[0] = getTileMOPNPoint(tileCoordinate);
         for (uint256 i = 1; i <= 5; i++) {
             tileCoordinate++;
             uint256 preringblocks = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
-                    TilesNFTPoint[
+                    TilesMOPNPoint[
                         preringblocks + j * i + k + 1
-                    ] = getTileNFTPoint(tileCoordinate);
+                    ] = getTileMOPNPoint(tileCoordinate);
                     tileCoordinate = neighbor(tileCoordinate, j);
                 }
             }
         }
-        return TilesNFTPoint;
+        return TilesMOPNPoint;
     }
 
-    function getTileNFTPoint(
+    function getTileMOPNPoint(
         uint32 tileCoordinate
     ) public pure returns (uint256) {
         if ((tileCoordinate / 10000) % 10 == 0) {

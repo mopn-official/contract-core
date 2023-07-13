@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "hardhat/console.sol";
+
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNData.sol";
 import "./interfaces/IERC20Receiver.sol";
@@ -65,8 +67,9 @@ contract MOPNToken is ERC20Burnable, Ownable {
         IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
         return
             mopnData.MTTotalMinted() +
-            (mopnData.calcPerNFTPointMinted() - mopnData.PerNFTPointMinted()) *
-            mopnData.TotalNFTPoints();
+            (mopnData.calcPerMOPNPointMinted() -
+                mopnData.PerMOPNPointMinted()) *
+            mopnData.TotalMOPNPoints();
     }
 
     function balanceOf(
@@ -90,7 +93,10 @@ contract MOPNToken is ERC20Burnable, Ownable {
         uint256 amount
     ) internal virtual override {
         uint256 realbalance = super.balanceOf(from);
-        if (realbalance < amount) {
+        if (
+            realbalance < amount &&
+            IMOPNData(governance.mopnDataContract()).accountClaimAvailable(from)
+        ) {
             uint256 claimed = IMOPNData(governance.mopnDataContract())
                 .claimAccountMT(from);
             if (claimed > 0) {

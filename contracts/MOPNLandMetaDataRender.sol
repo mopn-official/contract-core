@@ -34,7 +34,7 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
         address[] memory collections = new address[](30);
         address collection;
         uint256 COID;
-        tileDatas[0].tileNFTPoint = TileMath.getTileNFTPoint(tileCoordinate);
+        tileDatas[0].tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
 
         address tileAccount = mopn.getTileAccount(tileCoordinate);
         if (tileAccount != address(0)) {
@@ -61,7 +61,7 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
                     index = preringblocks + j * i + k + 1;
-                    tileDatas[index].tileNFTPoint = TileMath.getTileNFTPoint(
+                    tileDatas[index].tileMOPNPoint = TileMath.getTileMOPNPoint(
                         tileCoordinate
                     );
 

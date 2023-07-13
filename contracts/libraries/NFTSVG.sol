@@ -15,7 +15,7 @@ library NFTSVG {
 
     struct tileData {
         uint256 color;
-        uint256 tileNFTPoint;
+        uint256 tileMOPNPoint;
     }
 
     function getBlock(
@@ -97,7 +97,7 @@ library NFTSVG {
                     "<defs><style>.c1 {font-size: 24px;}.c1,.c2 {font-family: ArialMT, Arial;isolation: isolate;}",
                     ".c2 {font-size: 14px;}.c3 {stroke-width: 0.25px;}.c3,.c4 {stroke: #000;stroke-miterlimit: 10;}",
                     ".c4 {fill: none;stroke-width: 0.5px;}.c5 {fill: #F2F2F2;}.c6 {fill: url(#background);}.b1 {fill: #fff;}</style>",
-                    '<symbol id="Block" viewBox="0 0 46.188 40"><polygon class="c3" NFTPoints="34.5688 .125 11.6192 .125 .1443 20 11.6192 39.875 34.5688 39.875 46.0437 20 34.5688 .125"/></symbol>',
+                    '<symbol id="Block" viewBox="0 0 46.188 40"><polygon class="c3" MOPNPoints="34.5688 .125 11.6192 .125 .1443 20 11.6192 39.875 34.5688 39.875 46.0437 20 34.5688 .125"/></symbol>',
                     '<symbol id="Lv5" viewBox="0 0 20.5 20.5"><circle class="c4" cx="10.25" cy="10.25" r="10"/></symbol>'
                     '<symbol id="Lv15" viewBox="0 0 20.5 20.5"><circle class="c4" cx="10.25" cy="10.25" r="10"/>',
                     '<g><circle cx="10.25" cy="10.25" r="4" /><animate attributeName="opacity" values="1;0;1" dur="3.85s" begin="0s" repeatCount="indefinite"/></g></symbol>'
@@ -147,7 +147,7 @@ library NFTSVG {
         for (uint256 i = 0; i < tileDatas.length; i++) {
             output = abi.encodePacked(
                 output,
-                getBlock(co, tileDatas[i].tileNFTPoint, tileDatas[i].color)
+                getBlock(co, tileDatas[i].tileMOPNPoint, tileDatas[i].color)
             );
 
             if (ringPos >= ringNum * 6) {

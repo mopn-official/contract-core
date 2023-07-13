@@ -4,9 +4,10 @@ pragma solidity ^0.8.19;
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNData.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MOPNBomb is ERC1155, Ownable {
+contract MOPNBomb is ERC1155, Multicall, Ownable {
     IMOPNGovernance governance;
 
     constructor(address governance_) ERC1155("") {
@@ -45,10 +46,10 @@ contract MOPNBomb is ERC1155, Ownable {
         for (uint256 i = 0; i < ids.length; i++) {
             if (ids[i] == 2) {
                 if (miningData.getAccountCoordinate(from) > 0) {
-                    miningData.subNFTPoint(from, amounts[i]);
+                    miningData.subMOPNPoint(from, amounts[i]);
                 }
                 if (miningData.getAccountCoordinate(to) > 0) {
-                    miningData.addNFTPoint(to, amounts[i]);
+                    miningData.addMOPNPoint(to, amounts[i]);
                 }
             }
         }

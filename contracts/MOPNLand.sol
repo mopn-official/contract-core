@@ -5,7 +5,7 @@ import "./interfaces/IMOPNLandMetaDataRender.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MOPNLandMirror is ERC721, Ownable {
+contract MOPNLand is ERC721, Ownable {
     uint256 public constant MAX_SUPPLY = 10981;
 
     uint256 private _tokenIdCounter;
@@ -23,8 +23,15 @@ contract MOPNLandMirror is ERC721, Ownable {
         }
     }
 
-    function auctionMint(address to, uint256 amount) public view {
-        require(false, "mirror auction mint not supported");
+    function auctionMint(address to, uint256 amount) public {
+        require(
+            msg.sender == auctionAddress,
+            "only allowed call by mopn auction"
+        );
+        for (uint256 i = 0; i < amount; i++) {
+            _tokenIdCounter++;
+            _mint(to, _tokenIdCounter);
+        }
     }
 
     function nextTokenId() public view returns (uint256) {

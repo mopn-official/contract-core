@@ -246,7 +246,7 @@ describe("MOPN", function () {
     await new Promise((r) => setTimeout(r, 5000));
 
     console.log(await mopndatahelper.getCollectionInfo(1));
-    console.log(await mopnminingData.calcCollectionMT(1)); getCollectionNFTPoint getCollectionAvatarNFTPoint getCollectionPoint 
+    console.log(await mopnminingData.calcCollectionMT(1)); getCollectionMOPNPoint getCollectionAvatarMOPNPoint getCollectionPoint 
   });
 
   it("test redeemAvatarInboxMT", async function () {
@@ -423,7 +423,7 @@ describe("MOPN", function () {
     );
     tx.wait();
 
-    const tx1 = await mopn.setCollectionAdditionalNFTPoints(
+    const tx1 = await mopn.setCollectionAdditionalMOPNPoints(
       "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
       50000,
       ["0x53a9e4f3b38530562374c1fc967127d634f9de0d42fe6b4a9d3c3cc6203e14d5"]
@@ -444,7 +444,7 @@ describe("MOPN", function () {
   // });
 
   const avatarInfo = async () => {
-    console.log("total Point", (await mopnminingData.getTotalNFTPoints()).toString());
+    console.log("total Point", (await mopnminingData.getTotalMOPNPoints()).toString());
     for (let i = 1; i <= 10; i++) {
       console.log(
         "avatarId",
@@ -456,7 +456,7 @@ describe("MOPN", function () {
         "getAvatarBombUsed",
         (await mopn.getAvatarBombUsed(i)).toString(),
         "getAvatarPoint",
-        (await mopnminingData.getAvatarNFTPoint(i)).toString(),
+        (await mopnminingData.getAvatarMOPNPoint(i)).toString(),
         "getAvatarInboxMT",
         ethers.utils.formatUnits(await mopnminingData.calcAvatarMT(i), mtdecimals)
       );
@@ -476,9 +476,9 @@ describe("MOPN", function () {
         "on map avatar number",
         (await mopn.getCollectionOnMapNum(i)).toString(),
         "collection points",
-        (await mopnminingData.getCollectionNFTPoint(i)).toString(),
+        (await mopnminingData.getCollectionMOPNPoint(i)).toString(),
         "collection additional points",
-        (await mopn.getCollectionAdditionalNFTPoints(i)).toString()
+        (await mopn.getCollectionAdditionalMOPNPoints(i)).toString()
       );
     }
   };
