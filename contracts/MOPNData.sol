@@ -47,6 +47,10 @@ contract MOPNData is IMOPNData, Multicall {
         MiningData2 = (10 ** 18) << 64;
     }
 
+    function getGovernance() public view returns (address) {
+        return address(governance);
+    }
+
     function MTTotalMinted() public view returns (uint256) {
         return uint96(MiningData1 >> 160);
     }

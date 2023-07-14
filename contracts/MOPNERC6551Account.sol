@@ -3,15 +3,16 @@ pragma solidity ^0.8.19;
 
 import "hardhat/console.sol";
 
-import "../interfaces/IMOPN.sol";
-import "../interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNERC6551Account.sol";
+import "./erc6551/interfaces/IMOPNERC6551Account.sol";
+import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNGovernance.sol";
+
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import "./lib/ERC6551AccountLib.sol";
+import "./erc6551/lib/ERC6551AccountLib.sol";
 
 interface IDelegationRegistry {
     function checkDelegateForToken(
@@ -172,12 +173,25 @@ contract MOPNERC6551Account is
 
     /// @dev Allows ERC-1155 token batches to be received. This function can be overriden.
     function onERC1155BatchReceived(
+        address operator,
         address,
-        address,
+        uint256[] memory ids,
         uint256[] memory,
-        uint256[] memory,
-        bytes memory
-    ) public pure override returns (bytes4) {
+        bytes memory data
+    ) public override returns (bytes4) {
+        for (uint256 i = 0; i < ids.length; i++) {
+            if (
+                ids[i] == 1 &&
+                data.length > 0 &&
+                msg.sender == IMOPNGovernance(governance).bombContract() &&
+                isOwner(operator)
+            ) {
+                uint256 coordinate = abi.decode(data, (uint256));
+                IMOPN(IMOPNGovernance(governance).mopnContract()).bomb(
+                    uint32(coordinate)
+                );
+            }
+        }
         return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 

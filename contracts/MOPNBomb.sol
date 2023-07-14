@@ -10,12 +10,31 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract MOPNBomb is ERC1155, Multicall, Ownable {
     IMOPNGovernance governance;
 
+    mapping(uint256 => string) private _uris;
+
     constructor(address governance_) ERC1155("") {
         governance = IMOPNGovernance(governance_);
     }
 
-    function setURI(string memory newuri) public onlyOwner {
-        _setURI(newuri);
+    /**
+     * @notice setURI is used to set the URI corresponding to the tokenId
+     * @param tokenId_ token id
+     * @param uri_ metadata uri corresponding to the token
+     */
+    function setURI(uint256 tokenId_, string calldata uri_) external onlyOwner {
+        _uris[tokenId_] = uri_;
+        emit URI(uri_, tokenId_);
+    }
+
+    /**
+     * @notice uri is used to get the URI corresponding to the tokenId
+     * @param tokenId_ token id
+     * @return metadata uri corresponding to the token
+     */
+    function uri(
+        uint256 tokenId_
+    ) public view virtual override returns (string memory) {
+        return _uris[tokenId_];
     }
 
     function mint(

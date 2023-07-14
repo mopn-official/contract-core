@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 interface IMOPN {
-    event NFTJoin(
+    event AccountJoin(
         address indexed account,
         address collectionAddress,
         uint256 tokenId
@@ -14,7 +14,7 @@ interface IMOPN {
      * @param LandId MOPN Land Id
      * @param tileCoordinate tile coordinate
      */
-    event NFTJumpIn(
+    event AccountJumpIn(
         address indexed account,
         uint32 indexed LandId,
         uint32 tileCoordinate
@@ -27,7 +27,7 @@ interface IMOPN {
      * @param fromCoordinate tile coordinate
      * @param toCoordinate tile coordinate
      */
-    event NFTMove(
+    event AccountMove(
         address indexed account,
         uint32 indexed LandId,
         uint32 fromCoordinate,

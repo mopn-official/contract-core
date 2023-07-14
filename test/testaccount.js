@@ -20,8 +20,6 @@ describe("MOPN", function () {
     mtdecimals,
     mopnland,
     mopnlandMetaDataRender,
-    mopnbatchhelper,
-    mopndatahelper,
     accounts = [],
     collections = [];
 
@@ -162,18 +160,6 @@ describe("MOPN", function () {
 
     mtdecimals = await mopnmt.decimals();
     console.log("mtdecimals", mtdecimals);
-  });
-
-  it("deploy helpers", async function () {
-    const MOPNBatchHelper = await ethers.getContractFactory("MOPNBatchHelper");
-    mopnbatchhelper = await MOPNBatchHelper.deploy(mopngovernance.address);
-    await mopnbatchhelper.deployed();
-    console.log("MOPNBatchHelper", mopnbatchhelper.address);
-
-    const MOPNDataHelper = await ethers.getContractFactory("MOPNDataHelper");
-    mopndatahelper = await MOPNDataHelper.deploy(mopngovernance.address);
-    await mopndatahelper.deployed();
-    console.log("MOPNDataHelper", mopndatahelper.address);
   });
 
   it("update contract attributes", async function () {
@@ -388,7 +374,7 @@ describe("MOPN", function () {
         mopn.address,
         0,
         // -1 3
-        mopn.interface.encodeFunctionData("moveTo", [09991003, 0]),
+        mopn.interface.encodeFunctionData("moveTo", [9991003, 0]),
       ]),
       mopnerc6551accountproxy.interface.encodeFunctionData("createAccount", [
         mopnerc6551account.address,
@@ -403,7 +389,7 @@ describe("MOPN", function () {
         mopn.address,
         0,
         // -1 4
-        mopn.interface.encodeFunctionData("moveTo", [09991004, 0]),
+        mopn.interface.encodeFunctionData("moveTo", [9991004, 0]),
       ]),
     ]);
     await tx.wait();
@@ -575,7 +561,7 @@ describe("MOPN", function () {
   });
 
   it("test stakingMT", async function () {
-    console.log(await mopndatahelper.getCollectionInfo(collections[1]));
+    console.log(await mopn.getCollectionData(collections[1]));
 
     const collection1 = collections[0];
     const collection2 = collections[1];
@@ -626,9 +612,9 @@ describe("MOPN", function () {
   });
 
   it("test helpers", async function () {
-    console.log(await mopndatahelper.getAccountData(accounts[0]));
-    console.log(await mopndatahelper.getCollectionInfo(collections[0]));
-    console.log(await mopndatahelper.getCollectionInfo(collections[1]));
+    console.log(await mopn.getAccountData(accounts[0]));
+    console.log(await mopn.getCollectionData(collections[0]));
+    console.log(await mopn.getCollectionData(collections[1]));
   });
 
   it("test additional point", async function () {
