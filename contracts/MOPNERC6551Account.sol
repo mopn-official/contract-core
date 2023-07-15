@@ -195,7 +195,7 @@ contract MOPNERC6551Account is
         return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 
-    function approveOwnerTransfer(address to, uint256 timeRange) public {}
+    function rentPremit(address to, uint256 timeRange) public {}
 
-    function ownerTransfer(address to, uint256 timeRange) public {}
+    function rentExecute(address to, uint256 timeRange) public {}
 }

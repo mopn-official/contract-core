@@ -72,7 +72,7 @@ describe("MOPN", function () {
   });
 
   it("deploy MOPN contracts", async function () {
-    const unixTimeStamp = Math.floor(Date.now() / 1000) - 73200;
+    const unixTimeStamp = 1683828189; // Math.floor(Date.now() / 1000) - 73200;
     console.log("start timestamp", unixTimeStamp);
 
     const AuctionHouse = await ethers.getContractFactory("MOPNAuctionHouse");
