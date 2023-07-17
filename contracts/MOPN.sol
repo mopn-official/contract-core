@@ -95,8 +95,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
         require(
             account ==
-                IERC6551Registry(governance.erc6551Registry()).account(
-                    governance.erc6551AccountImplementation(),
+                IERC6551Registry(governance.ERC6551Registry()).account(
+                    governance.ERC6551AccountProxy(),
                     governance.chainId(),
                     collectionAddress,
                     tokenId,
@@ -405,8 +405,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         NFTParams calldata params
     ) public view returns (address) {
         return
-            IERC6551Registry(governance.erc6551Registry()).account(
-                governance.erc6551AccountImplementation(),
+            IERC6551Registry(governance.ERC6551Registry()).account(
+                governance.ERC6551AccountProxy(),
                 governance.chainId(),
                 params.collectionAddress,
                 params.tokenId,

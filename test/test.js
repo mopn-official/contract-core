@@ -5,28 +5,53 @@ describe("MOPN", function () {
     testnft1,
     owner,
     owner1,
+    erc6551registry,
+    erc6551account,
+    erc6551accountproxy,
+    erc6551accounthelper,
     tileMath,
     mopngovernance,
     mopnauctionHouse,
     mopn,
     mopnbomb,
-    mopnmap,
-    mopnminingData,
-    mopncollectionVault,
+    mopnpoint,
     mopnmt,
+    mopnData,
+    mopncollectionVault,
     mtdecimals,
     mopnland,
     mopnlandMetaDataRender,
-    mopnbatchhelper,
-    mopndatahelper,
-    nftownerproxy;
+    accounts = [],
+    collections = [];
 
-  const testnftproofs = [
-    "0x660483c9423322a71099c52233f089835b378b91a001de56752188209c448f18",
-    "0x9256bc91b3d0811380fcab6b348b4ae8d6911b36f2e791c21a3408dbed596530",
-  ];
+  it("deply Governance", async function () {
+    const MOPNGovernance = await ethers.getContractFactory("MOPNGovernance");
+    mopngovernance = await MOPNGovernance.deploy(31337);
+    await mopngovernance.deployed();
+    console.log("MOPNGovernance", mopngovernance.address);
+  });
 
-  const address0 = "0x0000000000000000000000000000000000000000";
+  it("deply erc6551", async function () {
+    const ERC6551Registry = await ethers.getContractFactory("ERC6551Registry");
+    erc6551registry = await ERC6551Registry.deploy();
+    await erc6551registry.deployed();
+    console.log("ERC6551Registry", erc6551registry.address);
+
+    const MOPNERC6551AccountProxy = await ethers.getContractFactory("MOPNERC6551AccountProxy");
+    erc6551accountproxy = await MOPNERC6551AccountProxy.deploy(mopngovernance.address);
+    await erc6551accountproxy.deployed();
+    console.log("MOPNERC6551AccountProxy", erc6551accountproxy.address);
+
+    const MOPNERC6551AccountHelper = await ethers.getContractFactory("MOPNERC6551AccountHelper");
+    erc6551accounthelper = await MOPNERC6551AccountHelper.deploy(mopngovernance.address);
+    await erc6551accounthelper.deployed();
+    console.log("MOPNERC6551AccountHelper", erc6551accounthelper.address);
+
+    const MOPNERC6551Account = await ethers.getContractFactory("MOPNERC6551Account");
+    erc6551account = await MOPNERC6551Account.deploy(mopngovernance.address);
+    await erc6551account.deployed();
+    console.log("MOPNERC6551Account", erc6551account.address);
+  });
 
   it("deploy TileMath", async function () {
     [owner, owner1] = await ethers.getSigners();
@@ -43,20 +68,18 @@ describe("MOPN", function () {
     testnft = await TESTNFT.deploy();
     await testnft.deployed();
     console.log("TESTNFT ", testnft.address);
+    collections.push(testnft.address);
 
     const TESTNFT1 = await ethers.getContractFactory("TESTNFT");
     testnft1 = await TESTNFT1.deploy();
     await testnft1.deployed();
     console.log("TESTNFT1 ", testnft1.address);
+    collections.push(testnft1.address);
   });
 
   it("deploy MOPN contracts", async function () {
-    const MOPNGovernance = await ethers.getContractFactory("MOPNGovernance");
-    mopngovernance = await MOPNGovernance.deploy();
-    await mopngovernance.deployed();
-    console.log("MOPNGovernance", mopngovernance.address);
-
-    const unixTimeStamp = Math.floor(Date.now() / 1000) - 73200;
+    const unixTimeStamp = 1683828189; // Math.floor(Date.now() / 1000) - 73200;
+    console.log("start timestamp", unixTimeStamp);
 
     const AuctionHouse = await ethers.getContractFactory("MOPNAuctionHouse");
     mopnauctionHouse = await AuctionHouse.deploy(
@@ -67,8 +90,6 @@ describe("MOPN", function () {
     await mopnauctionHouse.deployed();
     console.log("MOPNAuctionHouse", mopnauctionHouse.address);
 
-    console.log("start timestamp", unixTimeStamp);
-
     const MOPN = await ethers.getContractFactory("MOPN", {
       libraries: {
         TileMath: tileMath.address,
@@ -78,19 +99,10 @@ describe("MOPN", function () {
     await mopn.deployed();
     console.log("MOPN", mopn.address);
 
-    const MOPNMap = await ethers.getContractFactory("MOPNMap", {
-      libraries: {
-        TileMath: tileMath.address,
-      },
-    });
-    mopnmap = await MOPNMap.deploy(mopngovernance.address);
-    await mopnmap.deployed();
-    console.log("MOPNMap", mopnmap.address);
-
-    const MOPNMiningData = await ethers.getContractFactory("MOPNMiningData");
-    mopnminingData = await MOPNMiningData.deploy(mopngovernance.address, unixTimeStamp);
-    await mopnminingData.deployed();
-    console.log("MOPNMiningData", mopnminingData.address);
+    const MOPNData = await ethers.getContractFactory("MOPNData");
+    mopnData = await MOPNData.deploy(mopngovernance.address, unixTimeStamp);
+    await mopnData.deployed();
+    console.log("MOPNData", mopnData.address);
 
     const MOPNCollectionVault = await ethers.getContractFactory("MOPNCollectionVault");
     mopncollectionVault = await MOPNCollectionVault.deploy(mopngovernance.address);
@@ -99,7 +111,7 @@ describe("MOPN", function () {
   });
 
   it("deploy MOPNLand", async function () {
-    const MOPNLand = await ethers.getContractFactory("MOPNLandMirror");
+    const MOPNLand = await ethers.getContractFactory("MOPNLand");
     mopnland = await MOPNLand.deploy();
     await mopnland.deployed();
     console.log("MOPNLand ", mopnland.address);
@@ -138,44 +150,22 @@ describe("MOPN", function () {
 
   it("deploy Tokens", async function () {
     const MOPNBomb = await ethers.getContractFactory("MOPNBomb");
-    mopnbomb = await MOPNBomb.deploy();
+    mopnbomb = await MOPNBomb.deploy(mopngovernance.address);
     await mopnbomb.deployed();
     console.log("MOPNBomb", mopnbomb.address);
 
+    const MOPNPoint = await ethers.getContractFactory("MOPNPoint");
+    mopnpoint = await MOPNPoint.deploy(mopngovernance.address);
+    await mopnpoint.deployed();
+    console.log("MOPNPoint", mopnpoint.address);
+
     const MOPNToken = await ethers.getContractFactory("MOPNToken");
-    mopnmt = await MOPNToken.deploy();
+    mopnmt = await MOPNToken.deploy(mopngovernance.address);
     await mopnmt.deployed();
     console.log("MOPNToken", mopnmt.address);
 
     mtdecimals = await mopnmt.decimals();
     console.log("mtdecimals", mtdecimals);
-  });
-
-  it("deploy helpers", async function () {
-    const MOPNBatchHelper = await ethers.getContractFactory("MOPNBatchHelper");
-    mopnbatchhelper = await MOPNBatchHelper.deploy(mopngovernance.address);
-    await mopnbatchhelper.deployed();
-    console.log("MOPNBatchHelper", mopnbatchhelper.address);
-
-    const MOPNDataHelper = await ethers.getContractFactory("MOPNDataHelper", {
-      libraries: {
-        TileMath: tileMath.address,
-      },
-    });
-    mopndatahelper = await MOPNDataHelper.deploy(mopngovernance.address);
-    await mopndatahelper.deployed();
-    console.log("MOPNDataHelper", mopndatahelper.address);
-  });
-
-  it("transfer contract owners", async function () {
-    const mttransownertx = await mopnmt.transferOwnership(mopngovernance.address);
-    await mttransownertx.wait();
-
-    const transownertx = await mopnbomb.transferOwnership(mopngovernance.address);
-    await transownertx.wait();
-
-    const landtransownertx = await mopnland.transferOwnership(mopngovernance.address);
-    await landtransownertx.wait();
   });
 
   it("update contract attributes", async function () {
@@ -189,12 +179,34 @@ describe("MOPN", function () {
       mopn.address,
       mopnbomb.address,
       mopnmt.address,
-      mopnmap.address,
+      mopnpoint.address,
       mopnland.address,
-      mopnminingData.address,
+      mopnData.address,
       mopncollectionVault.address
     );
     await governancesetmopntx.wait();
+
+    const governanceset6551tx = await mopngovernance.updateERC6551Contract(
+      erc6551registry.address,
+      erc6551accountproxy.address,
+      erc6551accounthelper.address,
+      [erc6551account.address]
+    );
+    await governanceset6551tx.wait();
+
+    const setAuctionToLandtx = await mopnland.setAuction(mopnauctionHouse.address);
+    await setAuctionToLandtx.wait();
+  });
+
+  it("transfer contract owners", async function () {
+    const mttransownertx = await mopnmt.transferOwnership(mopngovernance.address);
+    await mttransownertx.wait();
+
+    const transownertx = await mopnbomb.transferOwnership(mopngovernance.address);
+    await transownertx.wait();
+
+    const landtransownertx = await mopnland.transferOwnership(mopngovernance.address);
+    await landtransownertx.wait();
   });
 
   it("mint test nfts", async function () {
@@ -204,71 +216,279 @@ describe("MOPN", function () {
     await mintnfttx.wait();
   });
 
-  it("test moveTo (first jump)", async function () {
-    // 0 1
-    let moveToTx = await mopn.moveTo([testnft.address, 0], 10001001, 0, 0);
-    await moveToTx.wait();
+  it("test moveTo step by step from account", async function () {
+    const tx = await erc6551registry.createAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      0,
+      0,
+      erc6551accountproxy.interface.encodeFunctionData("initialize")
+    );
+    await tx.wait();
 
-    // 0 3
-    moveToTx = await mopn.moveTo([testnft.address, 1], 10001003, 1, 0);
-    await moveToTx.wait();
+    const account = await erc6551registry.account(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      0,
+      0
+    );
+    accounts.push(account);
+    console.log("account", account);
 
-    // 0 2
-    moveToTx = await mopn.moveTo([testnft.address, 2], 10001002, 2, 0);
-    await moveToTx.wait();
+    const accountContract = await ethers.getContractAt("MOPNERC6551Account", account);
 
-    // 1 2
-    moveToTx = await mopn.moveTo([testnft.address, 3], 10011002, 3, 0);
-    await moveToTx.wait();
+    const tx1 = await accountContract.executeCall(
+      mopn.address,
+      0,
+      // 0 1
+      mopn.interface.encodeFunctionData("moveTo", [10001001, 0])
+    );
+    await tx1.wait();
+  });
 
-    // -1 3
-    moveToTx = await mopn.moveTo([testnft.address, 4], 09991003, 4, 0);
-    await moveToTx.wait();
+  it("test moveTo multicall from account proxy", async function () {
+    const account = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      1,
+      0
+    );
+    accounts.push(account);
+    console.log("account", account);
 
-    // -1 4
-    moveToTx = await mopn.moveTo([testnft.address, 5], 09991004, 2, 0);
-    await moveToTx.wait();
+    const tx = await erc6551accounthelper.multicall([
+      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+        erc6551accountproxy.address,
+        31337,
+        testnft.address,
+        1,
+        0,
+        erc6551accountproxy.interface.encodeFunctionData("initialize"),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+        account,
+        mopn.address,
+        0,
+        // 0 3
+        mopn.interface.encodeFunctionData("moveTo", [10001003, 0]),
+      ]),
+    ]);
+    await tx.wait();
+  });
 
-    // 0 4
-    moveToTx = await mopn.moveTo([testnft.address, 6], 10001004, 2, 0);
-    await moveToTx.wait();
+  it("test multi moveTo multicall from account proxy", async function () {
+    const account2 = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      2,
+      0
+    );
+    accounts.push(account2);
+    const account3 = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      3,
+      0
+    );
+    accounts.push(account3);
+    const account4 = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      4,
+      0
+    );
+    accounts.push(account4);
+    const account5 = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      5,
+      0
+    );
+    accounts.push(account5);
+    const account6 = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      6,
+      0
+    );
+    accounts.push(account6);
+    const account7 = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      7,
+      0
+    );
+    accounts.push(account7);
+    const account11 = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft1.address,
+      0,
+      0
+    );
+    accounts.push(account11);
 
-    // 1 3
-    moveToTx = await mopn.moveTo([testnft.address, 7], 10011003, 2, 0);
-    await moveToTx.wait();
+    const tx = await erc6551accounthelper.multicall([
+      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+        erc6551accountproxy.address,
+        31337,
+        testnft.address,
+        2,
+        0,
+        erc6551accountproxy.interface.encodeFunctionData("initialize"),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+        account2,
+        mopn.address,
+        0,
+        // 0 2
+        mopn.interface.encodeFunctionData("moveTo", [10001002, 0]),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+        erc6551accountproxy.address,
+        31337,
+        testnft.address,
+        3,
+        0,
+        erc6551accountproxy.interface.encodeFunctionData("initialize"),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+        account3,
+        mopn.address,
+        0,
+        // 1 2
+        mopn.interface.encodeFunctionData("moveTo", [10011002, 0]),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+        erc6551accountproxy.address,
+        31337,
+        testnft.address,
+        4,
+        0,
+        erc6551accountproxy.interface.encodeFunctionData("initialize"),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+        account4,
+        mopn.address,
+        0,
+        // -1 3
+        mopn.interface.encodeFunctionData("moveTo", [9991003, 0]),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+        erc6551accountproxy.address,
+        31337,
+        testnft.address,
+        5,
+        0,
+        erc6551accountproxy.interface.encodeFunctionData("initialize"),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+        account5,
+        mopn.address,
+        0,
+        // -1 4
+        mopn.interface.encodeFunctionData("moveTo", [9991004, 0]),
+      ]),
+    ]);
+    await tx.wait();
 
-    // 4 0
-    moveToTx = await mopn.moveTo([testnft1.address, 0], 10041000, 0, 0);
-    await moveToTx.wait();
-
-    await avatarInfo();
+    const tx1 = await erc6551accounthelper.multicall([
+      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+        erc6551accountproxy.address,
+        31337,
+        testnft.address,
+        6,
+        0,
+        erc6551accountproxy.interface.encodeFunctionData("initialize"),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+        account6,
+        mopn.address,
+        0,
+        // 0 4
+        mopn.interface.encodeFunctionData("moveTo", [10001004, 0]),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+        erc6551accountproxy.address,
+        31337,
+        testnft.address,
+        7,
+        0,
+        erc6551accountproxy.interface.encodeFunctionData("initialize"),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+        account7,
+        mopn.address,
+        0,
+        // 1 3
+        mopn.interface.encodeFunctionData("moveTo", [10011003, 0]),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+        erc6551accountproxy.address,
+        31337,
+        testnft1.address,
+        0,
+        0,
+        erc6551accountproxy.interface.encodeFunctionData("initialize"),
+      ]),
+      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+        account11,
+        mopn.address,
+        0,
+        // 4 0
+        mopn.interface.encodeFunctionData("moveTo", [10041000, 0]),
+      ]),
+    ]);
+    await tx1.wait();
 
     await new Promise((r) => setTimeout(r, 5000));
 
-    console.log(await mopndatahelper.getCollectionInfo(1));
-    console.log(await mopnminingData.calcCollectionMT(1));
+    await avatarInfo();
+    await collectionInfo();
   });
 
-  it("test redeemAvatarInboxMT", async function () {
+  it("test transfer account MT", async function () {
     console.log(
       "wallet balance",
       ethers.utils.formatUnits(await mopnmt.balanceOf(owner.address), mtdecimals)
     );
 
-    const redeemMTTx = await mopnminingData.redeemAvatarMT(1);
-    await redeemMTTx.wait();
+    const account = accounts[0];
+    const amount = await mopnmt.balanceOf(account);
+    const account1Contract = await ethers.getContractAt("MOPNERC6551Account", account);
+    const tx1 = await account1Contract.executeCall(
+      mopnmt.address,
+      0,
+      mopnmt.interface.encodeFunctionData("transfer", [owner.address, amount])
+    );
+    await tx1.wait();
 
-    const multi10Tx = await mopnminingData.multicall([
-      mopnminingData.interface.encodeFunctionData("redeemAvatarMT", [2]),
-      mopnminingData.interface.encodeFunctionData("redeemAvatarMT", [3]),
-      mopnminingData.interface.encodeFunctionData("redeemAvatarMT", [4]),
-      mopnminingData.interface.encodeFunctionData("redeemAvatarMT", [5]),
-      mopnminingData.interface.encodeFunctionData("redeemAvatarMT", [6]),
-      mopnminingData.interface.encodeFunctionData("redeemAvatarMT", [7]),
-      mopnminingData.interface.encodeFunctionData("redeemAvatarMT", [8]),
-      mopnminingData.interface.encodeFunctionData("redeemAvatarMT", [9]),
-    ]);
-    await multi10Tx.wait();
+    const params = [];
+    for (let i = 1; i < accounts.length; i++) {
+      const account = accounts[i];
+      const amount = await mopnmt.balanceOf(account);
+      params.push(
+        erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+          account,
+          mopnmt.address,
+          0,
+          // 1 3
+          mopnmt.interface.encodeFunctionData("transfer", [owner.address, amount]),
+        ])
+      );
+    }
+
+    const multitx1 = await erc6551accounthelper.multicall(params);
+    await multitx1.wait();
 
     await avatarInfo();
 
@@ -308,56 +528,37 @@ describe("MOPN", function () {
     );
   });
 
-  // it("test auction land", async function () {
-  //   console.log("Current Land round", await auctionHouse.getLandRoundId());
-  //   console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
+  it("test auction land", async function () {
+    console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
+    console.log("Current Land price", await mopnauctionHouse.getLandCurrentPrice());
 
-  //   const buylandtx = await auctionHouse.buyLand();
-  //   await buylandtx.wait();
+    const buylandtx = await mopnauctionHouse.buyLand();
+    await buylandtx.wait();
 
-  //   console.log("Current Land round", await auctionHouse.getLandRoundId());
-  //   console.log("Current Land price", await auctionHouse.getLandCurrentPrice());
+    console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
+    console.log("Current Land price", await mopnauctionHouse.getLandCurrentPrice());
 
-  //   console.log(
-  //     "wallet balance",
-  //     ethers.utils.formatUnits(await mt.balanceOf(owner.address), mtdecimals)
-  //   );
-  // });
+    console.log(
+      "wallet balance",
+      ethers.utils.formatUnits(await mopnmt.balanceOf(owner.address), mtdecimals)
+    );
+  });
 
   it("test bomb", async function () {
     await collectionInfo();
-
     await avatarInfo();
 
-    // -2 3 -1
-    const bombTx = await mopn.bomb([testnft1.address, 0], 09981003);
-    await bombTx.wait();
-
-    // 0 3 -3
-    const bomb1Tx = await mopn.bomb([testnft1.address, 1], 10001003);
-    await bomb1Tx.wait();
+    const account = accounts[8];
+    const tx1 = await mopnbomb.safeTransferFrom(
+      owner.address,
+      account,
+      1,
+      1,
+      ethers.utils.solidityPack(["uint256"], [9981003])
+    );
+    await tx1.wait();
 
     await avatarInfo();
-
-    // console.log(
-    //   await avatar.callStatic.multicall([
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [0]),
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [1]),
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [2]),
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [3]),
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [4]),
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [5]),
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [6]),
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [7]),
-    //     avatar.interface.encodeFunctionData("getAvatarCoordinate", [8]),
-    //   ])
-    // );
-
-    // const bomb2Tx = await avatar.bomb([testnft.address, 1, testnftproofs, 0, address0], 10041000);
-    // await bomb2Tx.wait();
-
-    // await avatarInfo();
-
     await collectionInfo();
 
     console.log(
@@ -367,39 +568,44 @@ describe("MOPN", function () {
   });
 
   it("test stakingMT", async function () {
-    const tx1 = await mopngovernance.createCollectionVault(1);
+    console.log(await mopn.getCollectionData(collections[1]));
+
+    const collection1 = collections[0];
+    const collection2 = collections[1];
+
+    const tx1 = await mopngovernance.createCollectionVault(collection1);
     await tx1.wait();
 
-    const vault1adddress = await mopngovernance.getCollectionVault(1);
+    const vault1adddress = await mopngovernance.getCollectionVault(collection1);
     const vault1 = await ethers.getContractAt("MOPNCollectionVault", vault1adddress);
+    console.log(collection1, "vault", vault1adddress);
 
-    console.log(await mopnminingData.getCollectionPoint(1));
+    console.log(collection1, "collectionpoint", await mopnData.getCollectionMOPNPoint(collection1));
 
     const tx2 = await mopnmt.safeTransferFrom(
       owner.address,
       vault1.address,
-      ethers.BigNumber.from("2500000000"),
+      ethers.BigNumber.from("1500000000"),
       "0x"
     );
     await tx2.wait();
 
-    console.log(await mopnminingData.getCollectionPoint(1));
+    console.log(collection1, "collectionpoint", await mopnData.getCollectionMOPNPoint(collection1));
 
-    console.log(await mopnminingData.getCollectionPoint(2));
+    console.log(collection2, "collectionpoint", await mopnData.getCollectionMOPNPoint(collection2));
 
     const tx3 = await mopnmt.safeTransferFrom(
       owner.address,
       mopngovernance.address,
-      ethers.BigNumber.from("2500000000"),
-      ethers.utils.solidityPack(["address"], [testnft1.address])
+      ethers.BigNumber.from("1500000000"),
+      ethers.utils.solidityPack(["address"], [collection2])
     );
     await tx3.wait();
 
-    console.log(await mopnminingData.getCollectionPoint(2));
-
-    const vault2adddress = await mopngovernance.getCollectionVault(2);
+    const vault2adddress = await mopngovernance.getCollectionVault(collection2);
     const vault2 = await ethers.getContractAt("MOPNCollectionVault", vault2adddress);
-    console.log(await vault2.balanceOf(owner.address));
+    console.log(collection2, "vault", vault2adddress);
+    console.log(collection2, "collectionpoint", await mopnData.getCollectionMOPNPoint(collection2));
 
     console.log("nft offer price", await vault1.getNFTOfferPrice());
 
@@ -413,8 +619,9 @@ describe("MOPN", function () {
   });
 
   it("test helpers", async function () {
-    console.log(await mopndatahelper.getAvatarByAvatarId(1));
-    console.log(await mopndatahelper.getCollectionInfo(1));
+    console.log(await mopn.getAccountData(accounts[0]));
+    console.log(await mopn.getCollectionData(collections[0]));
+    console.log(await mopn.getCollectionData(collections[1]));
   });
 
   it("test additional point", async function () {
@@ -444,41 +651,38 @@ describe("MOPN", function () {
   // });
 
   const avatarInfo = async () => {
-    console.log("total Point", (await mopnminingData.getTotalMOPNPoints()).toString());
-    for (let i = 1; i <= 10; i++) {
+    console.log("total Point", (await mopnData.TotalMOPNPoints()).toString());
+    for (const account of accounts) {
       console.log(
-        "avatarId",
-        i,
-        "COID",
-        (await mopn.getAvatarCOID(i)).toString(),
+        "account",
+        account,
+        "collection",
+        (await mopnData.getAccountCollection(account)).toString(),
         "coordinate",
-        await mopn.getAvatarCoordinate(i),
-        "getAvatarBombUsed",
-        (await mopn.getAvatarBombUsed(i)).toString(),
-        "getAvatarPoint",
-        (await mopnminingData.getAvatarMOPNPoint(i)).toString(),
-        "getAvatarInboxMT",
-        ethers.utils.formatUnits(await mopnminingData.calcAvatarMT(i), mtdecimals)
+        await mopnData.getAccountCoordinate(account),
+        "getAccountBombUsed",
+        (await mopnbomb.balanceOf(account, 1)).toString(),
+        "getAccountPoint",
+        (await mopnData.getAccountTotalMOPNPoint(account)).toString(),
+        "getAccountMT",
+        ethers.utils.formatUnits(await mopnmt.balanceOf(account), mtdecimals)
       );
     }
   };
 
   const collectionInfo = async () => {
-    for (let i = 1; i < 3; i++) {
-      const collectionAddress = await mopn.getCollectionContract(i);
+    for (const collection of collections) {
       console.log(
-        "COID",
-        i,
         "collectionAddress",
-        collectionAddress,
-        "minted avatar number",
-        (await mopn.getCollectionAvatarNum(i)).toString(),
-        "on map avatar number",
-        (await mopn.getCollectionOnMapNum(i)).toString(),
+        collection,
+        "on map account number",
+        (await mopnData.getCollectionOnMapNum(collection)).toString(),
+        "collection account points",
+        (await mopnData.getCollectionAccountMOPNPoints(collection)).toString(),
         "collection points",
-        (await mopnminingData.getCollectionMOPNPoint(i)).toString(),
+        (await mopnData.getCollectionMOPNPoints(collection)).toString(),
         "collection additional points",
-        (await mopn.getCollectionAdditionalMOPNPoints(i)).toString()
+        (await mopnData.getCollectionAdditionalMOPNPoints(collection)).toString()
       );
     }
   };

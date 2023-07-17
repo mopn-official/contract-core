@@ -24,13 +24,22 @@ interface IMOPNGovernance {
 
     function landContract() external view returns (address);
 
-    function erc6551Registry() external view returns (address);
-
-    function erc6551AccountImplementation() external view returns (address);
-
-    function mopnErc6551AccountProxy() external view returns (address);
-
     function mopnDataContract() external view returns (address);
+
+    function ERC6551Registry() external view returns (address);
+
+    function ERC6551AccountProxy() external view returns (address);
+
+    function ERC6551AccountHelper() external view returns (address);
+
+    function getDefault6551AccountImplementation()
+        external
+        view
+        returns (address);
+
+    function checkImplementationExist(
+        address implementation
+    ) external view returns (bool);
 
     function createCollectionVault(
         address collectionAddress

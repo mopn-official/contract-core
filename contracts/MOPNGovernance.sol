@@ -47,18 +47,96 @@ contract MOPNGovernance is Multicall, Ownable {
         whiteListRoot = whiteListRoot_;
     }
 
-    address public erc6551Registry;
-    address public erc6551AccountImplementation;
-    address public mopnErc6551AccountProxy;
+    address public ERC6551Registry;
+    address public ERC6551AccountProxy;
+    address public ERC6551AccountHelper;
+
+    address[] public ERC6551AccountImplementations;
 
     function updateERC6551Contract(
-        address erc6551Registry_,
-        address erc6551AccountImplementation_,
-        address mopnErc6551AccountProxy_
+        address ERC6551Registry_,
+        address ERC6551AccountProxy_,
+        address ERC6551AccountHelper_,
+        address[] memory ERC6551AccountImplementations_
     ) public onlyOwner {
-        erc6551Registry = erc6551Registry_;
-        erc6551AccountImplementation = erc6551AccountImplementation_;
-        mopnErc6551AccountProxy = mopnErc6551AccountProxy_;
+        ERC6551Registry = ERC6551Registry_;
+        ERC6551AccountProxy = ERC6551AccountProxy_;
+        ERC6551AccountHelper = ERC6551AccountHelper_;
+        ERC6551AccountImplementations = ERC6551AccountImplementations_;
+    }
+
+    function getDefault6551AccountImplementation()
+        public
+        view
+        returns (address)
+    {
+        return ERC6551AccountImplementations[0];
+    }
+
+    function setDefault6551AccountImplementation(
+        address implementation
+    ) public onlyOwner {
+        address[] memory temps;
+        if (checkImplementationExist(implementation)) {
+            temps = new address[](ERC6551AccountImplementations.length);
+            uint256 i = 0;
+            temps[i] = implementation;
+            for (uint256 k = 0; k < ERC6551AccountImplementations.length; k++) {
+                if (ERC6551AccountImplementations[k] == implementation)
+                    continue;
+                i++;
+                temps[i] = ERC6551AccountImplementations[k];
+            }
+        } else {
+            temps = new address[](ERC6551AccountImplementations.length + 1);
+            temps[0] = implementation;
+            for (uint256 k = 0; k < ERC6551AccountImplementations.length; k++) {
+                temps[k + 1] = ERC6551AccountImplementations[k];
+            }
+        }
+        ERC6551AccountImplementations = temps;
+    }
+
+    function add6551AccountImplementation(
+        address implementation
+    ) public onlyOwner {
+        require(
+            !checkImplementationExist(implementation),
+            "implementation exist"
+        );
+
+        ERC6551AccountImplementations.push(implementation);
+    }
+
+    function del6551AccountImplementation(
+        address implementation
+    ) public onlyOwner {
+        require(
+            checkImplementationExist(implementation),
+            "implementation not exist"
+        );
+
+        address[] memory temps;
+        if (ERC6551AccountImplementations.length > 1) {
+            temps = new address[](ERC6551AccountImplementations.length - 1);
+            uint256 i = 0;
+            for (uint256 k = 0; k < ERC6551AccountImplementations.length; k++) {
+                if (ERC6551AccountImplementations[k] == implementation)
+                    continue;
+                temps[i] = ERC6551AccountImplementations[k];
+                i++;
+            }
+        }
+        ERC6551AccountImplementations = temps;
+    }
+
+    function checkImplementationExist(
+        address implementation
+    ) public view returns (bool) {
+        for (uint256 i = 0; i < ERC6551AccountImplementations.length; i++) {
+            if (ERC6551AccountImplementations[i] == implementation) return true;
+        }
+        return false;
     }
 
     address public auctionHouseContract;

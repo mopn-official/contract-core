@@ -27,8 +27,8 @@
   "dependencies": {
     "@enzoferey/ethers-error-parser": "^0.2.3",
     "@graphprotocol/graph-ts": "^0.30.0",
-    "@openzeppelin/contracts": "^4.8.2",
-    "@openzeppelin/merkle-tree": "^1.0.4",
+    "@openzeppelin/contracts": "^4.9.2",
+    "@openzeppelin/merkle-tree": "^1.0.5",
     "abdk-libraries-solidity": "^3.2.0",
     "base64-sol": "^1.1.0",
     "erc721a": "^4.2.3",
@@ -36,11 +36,11 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
-    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "chai": "^4.3.7",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "ethers": "^5.7.2",
-    "hardhat": "^2.13.0",
+    "hardhat": "^2.17.0",
     "solidity-docgen": "0.6.0-beta.34"
   }
 }

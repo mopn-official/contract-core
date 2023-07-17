@@ -2,71 +2,57 @@
 pragma solidity ^0.8.13;
 
 import "./interfaces/IMOPNGovernance.sol";
-import "./erc6551/interfaces/IERC6551Registry.sol";
-import "./erc6551/interfaces/IMOPNERC6551Account.sol";
-import "@openzeppelin/contracts/utils/Multicall.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
+import "@openzeppelin/contracts/proxy/Proxy.sol";
+import "./erc6551/lib/ERC6551AccountLib.sol";
 
-/**
- * @title A smart contract account owned by a single ERC721 token
- */
-contract MOPNERC6551AccountProxy is Multicall {
-    IMOPNGovernance public governance;
+contract MOPNERC6551AccountProxy is Proxy, ERC1967Upgrade {
+    address immutable governance;
 
     constructor(address governance_) {
-        governance = IMOPNGovernance(governance_);
+        governance = governance_;
     }
 
-    function createAccount(
-        address implementation,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId,
-        uint256 salt,
-        bytes calldata initData
-    ) external returns (address) {
-        return
-            IERC6551Registry(governance.erc6551Registry()).createAccount(
-                implementation,
-                chainId,
-                tokenContract,
-                tokenId,
-                salt,
-                initData
+    function initialize() external {
+        address implementation_ = _implementation();
+
+        if (implementation_ == address(0)) {
+            ERC1967Upgrade._upgradeTo(
+                IMOPNGovernance(governance)
+                    .getDefault6551AccountImplementation()
             );
+        }
     }
 
-    function computeAccount(
-        address implementation,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId,
-        uint256 salt
-    ) external view returns (address) {
-        return
-            IERC6551Registry(governance.erc6551Registry()).account(
-                implementation,
-                chainId,
-                tokenContract,
-                tokenId,
-                salt
-            );
+    function upgradeTo(address implementation_) public {
+        (
+            uint256 chainId,
+            address tokenContract,
+            uint256 tokenId
+        ) = ERC6551AccountLib.token();
+
+        require(chainId == block.chainid, "chainId mismatch");
+        require(
+            msg.sender == IERC721(tokenContract).ownerOf(tokenId),
+            "only owner can upgrade"
+        );
+        require(implementation_ != _implementation(), "same Implementation");
+        require(
+            IMOPNGovernance(governance).checkImplementationExist(
+                implementation_
+            ),
+            "none authorized implementation"
+        );
+
+        ERC1967Upgrade._upgradeTo(implementation_);
     }
 
-    function checkAccountExist() external view returns (bool) {}
+    function _implementation() internal view override returns (address) {
+        return ERC1967Upgrade._getImplementation();
+    }
 
-    /// @dev executes a low-level call against an account if the caller is authorized to make calls
-    function proxyCall(
-        address account,
-        address to,
-        uint256 value,
-        bytes calldata data
-    ) external payable returns (bytes memory) {
-        return
-            IMOPNERC6551Account(payable(account)).executeProxyCall(
-                to,
-                value,
-                data,
-                msg.sender
-            );
+    function implementation() public view returns (address) {
+        return _implementation();
     }
 }
