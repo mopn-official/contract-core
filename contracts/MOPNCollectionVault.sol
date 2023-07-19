@@ -135,7 +135,12 @@ contract MOPNCollectionVault is
         IMOPNToken(governance.mtContract()).transfer(msg.sender, mtAmount);
         _burn(msg.sender, amount);
         mopn.settleCollectionMOPNPoint(collectionAddress);
-        mopn.changeTotalMTStaking(collectionAddress, false, mtAmount);
+        mopn.changeTotalMTStaking(
+            collectionAddress,
+            false,
+            mtAmount,
+            msg.sender
+        );
     }
 
     function getNFTOfferPrice() public view returns (uint256) {
@@ -227,13 +232,15 @@ contract MOPNCollectionVault is
                 mopn.changeTotalMTStaking(
                     collectionAddress,
                     true,
-                    price - offerAcceptPrice
+                    price - offerAcceptPrice,
+                    address(0)
                 );
             } else if (price < offerAcceptPrice) {
                 mopn.changeTotalMTStaking(
                     collectionAddress,
                     false,
-                    offerAcceptPrice - price
+                    offerAcceptPrice - price,
+                    address(0)
                 );
             }
 
@@ -255,7 +262,7 @@ contract MOPNCollectionVault is
             uint256 vtokenAmount = MT2VAmount(value);
             _mint(from, vtokenAmount);
             mopn.settleCollectionMOPNPoint(collectionAddress);
-            mopn.changeTotalMTStaking(collectionAddress, true, value);
+            mopn.changeTotalMTStaking(collectionAddress, true, value, from);
         }
 
         return IERC20Receiver.onERC20Received.selector;
