@@ -57,28 +57,6 @@ contract MOPNData is Multicall {
         }
     }
 
-    function redeemRealtimeLandHolderMT(
-        uint32 LandId,
-        address[] memory accounts
-    ) public {
-        batchMintAccountMT(accounts);
-        IMOPN(governance.mopnContract()).redeemLandHolderMT(LandId);
-    }
-
-    /**
-     * @notice batch redeem land holder unclaimed minted mopn token
-     * @param LandIds Land Ids
-     */
-    function batchRedeemRealtimeLandHolderMT(
-        uint32[] memory LandIds,
-        address[][] memory accounts
-    ) public {
-        for (uint256 i = 0; i < LandIds.length; i++) {
-            batchMintAccountMT(accounts[i]);
-        }
-        IMOPN(governance.mopnContract()).batchRedeemSameLandHolderMT(LandIds);
-    }
-
     function getAccountData(
         address account
     ) public view returns (AccountDataOutput memory accountData) {

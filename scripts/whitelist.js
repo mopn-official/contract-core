@@ -7,7 +7,7 @@ const main = async () => {
   console.log(JSON.parse(whitelistjson));
   const tree = StandardMerkleTree.of(JSON.parse(whitelistjson), ["address", "uint256"]);
 
-  const proof = tree.getProof(2);
+  const proof = tree.getProof(0);
 
   console.log(tree.root);
   console.log(proof);

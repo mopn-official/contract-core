@@ -13,4 +13,6 @@ interface IMOPNCollectionVault is IERC20 {
     }
 
     function getAuctionInfo() external view returns (NFTAuction memory auction);
+
+    function MTBalance() external view returns (uint256 balance);
 }

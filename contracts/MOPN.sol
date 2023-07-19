@@ -61,8 +61,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
      */
     mapping(address => uint256) public CollectionsDataExt;
 
-    /// @notice uint64 settled MT + uint64 totalMTMinted + uint64 OnLandMiningNFT
-    mapping(uint32 => uint256) public LandHolderMTs;
+    /// @notice uint32 Land Id + uint64 settled MT
+    mapping(uint32 => uint256) public LandIdMTs;
+
+    /// @notice uint160 account address + uint64 settled MT
+    mapping(address => uint256) public LandAccountMTs;
 
     IMOPNGovernance public governance;
 
@@ -76,7 +79,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     function getQualifiedAccountCollection(
         address account
-    ) public view returns (address) {
+    ) public view returns (address, uint256) {
         require(
             IERC165(payable(account)).supportsInterface(
                 type(IERC6551Account).interfaceId
@@ -107,7 +110,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             "not a mopn Account Implementation"
         );
 
-        return collectionAddress;
+        return (collectionAddress, tokenId);
     }
 
     /**
@@ -116,7 +119,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
      */
     function moveTo(uint32 tileCoordinate, uint32 LandId) public {
         tileCoordinate.check();
-        address collectionAddress = getQualifiedAccountCollection(msg.sender);
+        (address collectionAddress, ) = getQualifiedAccountCollection(
+            msg.sender
+        );
 
         require(getTileAccount(tileCoordinate) == address(0), "dst Occupied");
 
@@ -531,9 +536,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
     ) public view returns (uint256 point) {
         if (governance.getCollectionVault(collectionAddress) != address(0)) {
             point =
-                IMOPNToken(governance.mtContract()).balanceOf(
+                IMOPNCollectionVault(
                     governance.getCollectionVault(collectionAddress)
-                ) /
+                ).MTBalance() /
                 10 ** 8;
         }
     }
@@ -756,7 +761,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function accountClaimAvailable(address account) public view returns (bool) {
         return
             getAccountSettledMT(account) > 0 ||
-            getAccountCoordinate(account) > 0;
+            getAccountCoordinate(account) > 0 ||
+            getLandAccountSettledMT(account) > 0;
     }
 
     function getAccountCollection(
@@ -826,8 +832,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
             getAccountPerMOPNPointMinted(account);
 
+        address collectionAddress = getAccountCollection(account);
         if (AccountPerMOPNPointMintedDiff > 0 && AccountTotalMOPNPoint > 0) {
-            address collectionAddress = getAccountCollection(account);
             uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
                     collectionAddress
                 ) - getAccountPerCollectionNFTMinted(account);
@@ -838,6 +844,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 inbox += (AccountPerCollectionNFTMintedDiff * 90) / 100;
             }
         }
+
+        inbox += getLandAccountSettledMT(account);
     }
 
     /**
@@ -867,19 +875,23 @@ contract MOPN is IMOPN, Multicall, Ownable {
                         : 0
                 );
 
-            uint32 LandId = IMOPN(governance.mopnContract()).getTileLandId(
-                getAccountCoordinate(account)
-            );
+            uint32 LandId = getTileLandId(getAccountCoordinate(account));
             uint256 landamount = (amount * 5) / 100;
-            LandHolderMTs[LandId] += (landamount << 128) | (landamount << 64);
+            address landAccount = getLandIdAccount(LandId);
+            if (landAccount != address(0)) {
+                LandAccountMTs[landAccount] += landamount;
+            } else {
+                LandIdMTs[LandId] += landamount;
+            }
+
             emit LandHolderMTMinted(LandId, landamount);
 
             amount = (amount * 90) / 100;
 
-            AccountsData[account] += amount << 192;
             emit AccountMTMinted(account, amount);
         }
         AccountsData[account] +=
+            (amount << 192) |
             (AccountPerCollectionNFTMintedDiff << 128) |
             (AccountPerMOPNPointMintedDiff << 64);
 
@@ -901,55 +913,50 @@ contract MOPN is IMOPN, Multicall, Ownable {
         if (amount > 0) {
             AccountsData[account] -= amount << 192;
         }
+
+        uint256 landAmount = getLandAccountSettledMT(account);
+        if (landAmount > 0) {
+            LandAccountMTs[account] -= landAmount;
+            amount += landAmount;
+        }
     }
 
     /**
      * @notice get Land holder settled minted unclaimed mopn token
      * @param LandId MOPN Land Id
      */
-    function getLandHolderInboxMT(uint32 LandId) public view returns (uint256) {
-        return uint128(LandHolderMTs[LandId] >> 128);
+    function getLandIdSettledMT(uint32 LandId) public view returns (uint256) {
+        return uint64(LandIdMTs[LandId]);
     }
 
-    function getLandHolderTotalMinted(
-        uint32 LandId
+    function getLandIdAccount(uint32 LandId) public view returns (address) {
+        return address(uint160(LandIdMTs[LandId] >> 64));
+    }
+
+    function getLandAccountSettledMT(
+        address account
     ) public view returns (uint256) {
-        return uint128(LandHolderMTs[LandId]);
+        return uint64(LandAccountMTs[account]);
     }
 
-    function redeemLandHolderMT(uint32 LandId) public {
-        uint256 amount = getLandHolderInboxMT(LandId);
-        if (amount > 0) {
-            address owner = IMOPNLand(governance.landContract()).ownerOf(
-                LandId
-            );
-            governance.mintMT(owner, amount);
-            LandHolderMTs[LandId] = uint128(LandHolderMTs[LandId]);
-        }
+    function getLandAccountId(address account) public view returns (uint32) {
+        return uint32(LandAccountMTs[account] >> 64);
     }
 
-    function batchRedeemSameLandHolderMT(uint32[] memory LandIds) public {
-        uint256 amount;
-        address owner;
-        for (uint256 i = 0; i < LandIds.length; i++) {
-            if (owner == address(0)) {
-                owner = IMOPNLand(governance.landContract()).ownerOf(
-                    LandIds[i]
-                );
-            } else {
-                require(
-                    owner ==
-                        IMOPNLand(governance.landContract()).ownerOf(
-                            LandIds[i]
-                        ),
-                    "not same owner"
-                );
-            }
-            amount += getLandHolderInboxMT(LandIds[i]);
-            LandHolderMTs[LandIds[i]] = uint128(LandHolderMTs[LandIds[i]]);
-        }
-        if (amount > 0) {
-            governance.mintMT(owner, amount);
+    function registerLandAccount(address account) public {
+        (
+            address collectionAddress,
+            uint256 tokenId
+        ) = getQualifiedAccountCollection(account);
+        require(
+            collectionAddress == governance.landContract(),
+            "not a land account"
+        );
+        if (LandAccountMTs[account] == 0) {
+            LandAccountMTs[account] =
+                (tokenId << 64) |
+                uint64(LandIdMTs[uint32(tokenId)]);
+            LandIdMTs[uint32(tokenId)] = (uint256(uint160(account)) << 64);
         }
     }
 
@@ -1060,12 +1067,21 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function changeTotalMTStaking(
         address collectionAddress,
         bool increase,
-        uint256 amount
+        uint256 amount,
+        address operator
     ) public onlyCollectionVault(collectionAddress) {
         if (increase) {
             MiningDataExt += amount;
         } else {
             MiningDataExt -= amount;
+        }
+        if (operator != address(0)) {
+            emit VaultStakingChange(
+                collectionAddress,
+                operator,
+                increase,
+                amount
+            );
         }
     }
 

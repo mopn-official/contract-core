@@ -65,11 +65,18 @@ interface IMOPN {
         uint256 price
     );
 
+    event VaultStakingChange(
+        address collectionAddress,
+        address operator,
+        bool increase,
+        uint256 amount
+    );
+
     event SettleCollectionMOPNPoint(address collectionAddress);
 
     function getQualifiedAccountCollection(
         address account
-    ) external view returns (address);
+    ) external view returns (address, uint256);
 
     /**
      * @notice an on map avatar move to a new tile
@@ -165,26 +172,11 @@ interface IMOPN {
 
     function settleCollectionMOPNPoint(address collectionAddress) external;
 
-    /**
-     * @notice get Land holder realtime unclaimed minted mopn token
-     * @param LandId MOPN Land Id
-     */
-    function getLandHolderInboxMT(
-        uint32 LandId
-    ) external view returns (uint256 inbox);
-
-    function getLandHolderTotalMinted(
-        uint32 LandId
-    ) external view returns (uint256);
-
-    function redeemLandHolderMT(uint32 LandId) external;
-
-    function batchRedeemSameLandHolderMT(uint32[] memory LandIds) external;
-
     function changeTotalMTStaking(
         address collectionAddress,
         bool increase,
-        uint256 amount
+        uint256 amount,
+        address operator
     ) external;
 
     function NFTOfferAcceptNotify(

@@ -169,11 +169,6 @@ describe("MOPN", function () {
   });
 
   it("update contract attributes", async function () {
-    const governancesetroottx = await mopngovernance.updateWhiteList(
-      "0x8a746c884b5d358e2337e88b5da1afe745ffe4a3a5a378819ec41d0979c9931b"
-    );
-    await governancesetroottx.wait();
-
     const governancesetmopntx = await mopngovernance.updateMOPNContracts(
       mopnauctionHouse.address,
       mopn.address,
@@ -626,29 +621,53 @@ describe("MOPN", function () {
 
   it("test additional point", async function () {
     const tx = await mopngovernance.updateWhiteList(
-      "0xf7b96589e870e255f819741784ace5931052fa1b5b06217ef70b08fbe39384ab"
+      "0x0bc995102810c82009c2fcb63bf790ebd3225586fd9d79a307a0f54c3380ef9f"
     );
     tx.wait();
 
     const tx1 = await mopn.setCollectionAdditionalMOPNPoints(
-      "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-      50000,
-      ["0x53a9e4f3b38530562374c1fc967127d634f9de0d42fe6b4a9d3c3cc6203e14d5"]
+      "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+      1000,
+      [
+        "0x14ef206cab520abf6e628330ec6e7a05bfa83550dd891fec53fc09ab14c58eff",
+        "0xe967985e03fc4d250010085b1c37a1b811c0dc51613e649d7e27131084b07dcb",
+        "0xacd5db390d4a31ca61bb174623da7f6bd80990f3b30f1be0b0609563d04ea2e0",
+      ]
     );
     tx1.wait();
 
     await collectionInfo();
   });
 
-  // it("test owner proxy", async function () {
-  //   const tx1 = await nftownerproxy.registerProxy(
-  //     testnft.address,
-  //     1,
-  //     owner1.address,
-  //     Math.floor(Date.now() / 1000) + 86400
-  //   );
-  //   await tx1.wait();
-  // });
+  it("test land account", async function () {
+    const account = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      mopnland.address,
+      0,
+      0
+    );
+    console.log("account", account, "balance", await mopnmt.balanceOf(account));
+
+    const tx = await erc6551accounthelper.createAccount(
+      erc6551accountproxy.address,
+      31337,
+      mopnland.address,
+      0,
+      0,
+      erc6551accountproxy.interface.encodeFunctionData("initialize")
+    );
+    await tx.wait();
+
+    const tx1 = await mopn.registerLandAccount(account);
+    await tx1.wait();
+
+    console.log(await mopn.getLandIdAccount(0));
+    console.log(await mopn.getLandAccountId(account));
+    console.log(await mopn.calcAccountMT(account));
+
+    console.log("account", account, "balance", await mopnmt.balanceOf(account));
+  });
 
   const avatarInfo = async () => {
     console.log("total Point", (await mopn.TotalMOPNPoints()).toString());

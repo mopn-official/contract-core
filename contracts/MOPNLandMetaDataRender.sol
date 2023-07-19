@@ -143,18 +143,7 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
             }
         }
 
-        return
-            NFTMetaData.constructTokenURI(
-                LandId,
-                tileDatas,
-                getMintedMT(LandId)
-            );
-    }
-
-    function getMintedMT(uint32 LandId) private view returns (uint256) {
-        IMOPN mopn = IMOPN(governance.mopnContract());
-        return ((mopn.getLandHolderTotalMinted(LandId) +
-            mopn.getLandHolderInboxMT(LandId)) / 10 ** 8);
+        return NFTMetaData.constructTokenURI(LandId, tileDatas, 0);
     }
 
     function exists(
