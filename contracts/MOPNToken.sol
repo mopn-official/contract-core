@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "hardhat/console.sol";
 
 import "./interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNData.sol";
+import "./interfaces/IMOPN.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -64,26 +64,19 @@ contract MOPNToken is ERC20Burnable, Ownable {
     }
 
     function totalSupply() public view override returns (uint256) {
-        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
+        IMOPN mopn = IMOPN(governance.mopnContract());
         return
-            mopnData.MTTotalMinted() +
-            (mopnData.calcPerMOPNPointMinted() -
-                mopnData.PerMOPNPointMinted()) *
-            mopnData.TotalMOPNPoints();
+            mopn.MTTotalMinted() +
+            (mopn.calcPerMOPNPointMinted() - mopn.PerMOPNPointMinted()) *
+            mopn.TotalMOPNPoints();
     }
 
     function balanceOf(
         address account
     ) public view virtual override returns (uint256 balance) {
         balance = super.balanceOf(account);
-        if (
-            IMOPNData(governance.mopnDataContract()).accountClaimAvailable(
-                account
-            )
-        ) {
-            balance += IMOPNData(governance.mopnDataContract()).calcAccountMT(
-                account
-            );
+        if (IMOPN(governance.mopnContract()).accountClaimAvailable(account)) {
+            balance += IMOPN(governance.mopnContract()).calcAccountMT(account);
         }
     }
 
@@ -95,10 +88,11 @@ contract MOPNToken is ERC20Burnable, Ownable {
         uint256 realbalance = super.balanceOf(from);
         if (
             realbalance < amount &&
-            IMOPNData(governance.mopnDataContract()).accountClaimAvailable(from)
+            IMOPN(governance.mopnContract()).accountClaimAvailable(from)
         ) {
-            uint256 claimed = IMOPNData(governance.mopnDataContract())
-                .claimAccountMT(from);
+            uint256 claimed = IMOPN(governance.mopnContract()).claimAccountMT(
+                from
+            );
             if (claimed > 0) {
                 _mint(from, claimed);
             }

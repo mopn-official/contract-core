@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "./erc6551/interfaces/IERC6551Account.sol";
 import "./interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNData.sol";
+import "./interfaces/IMOPN.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -61,17 +62,27 @@ contract MOPNBomb is ERC1155, Multicall, Ownable {
         uint256[] memory amounts,
         bytes memory
     ) internal virtual override {
-        IMOPNData miningData = IMOPNData(governance.mopnDataContract());
+        IMOPN mopn = IMOPN(governance.mopnContract());
         for (uint256 i = 0; i < ids.length; i++) {
             if (ids[i] == 2) {
-                if (miningData.getAccountCoordinate(from) > 0) {
-                    miningData.subMOPNPoint(from, amounts[i]);
+                if (mopn.getAccountCoordinate(from) > 0) {
+                    mopn.subMOPNPoint(
+                        from,
+                        getAccountCollection(from),
+                        amounts[i]
+                    );
                 }
-                if (miningData.getAccountCoordinate(to) > 0) {
-                    miningData.addMOPNPoint(to, amounts[i]);
+                if (mopn.getAccountCoordinate(to) > 0) {
+                    mopn.addMOPNPoint(to, getAccountCollection(to), amounts[i]);
                 }
             }
         }
+    }
+
+    function getAccountCollection(
+        address account
+    ) public view returns (address collectionAddress) {
+        (, collectionAddress, ) = IERC6551Account(payable(account)).token();
     }
 
     modifier onlyGovernance() {

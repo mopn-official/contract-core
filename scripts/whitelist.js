@@ -1,7 +1,6 @@
 const { ethers } = require("hardhat");
 const { StandardMerkleTree } = require("@openzeppelin/merkle-tree");
 const fs = require("fs");
-const IPFS = require("ipfs-infura");
 
 const main = async () => {
   const whitelistjson = fs.readFileSync("./scripts/whitelist.json");

@@ -3,29 +3,20 @@ pragma solidity ^0.8.19;
 
 import "hardhat/console.sol";
 
-import "./erc6551/interfaces/IMOPNERC6551Account.sol";
-import "./interfaces/IMOPN.sol";
-import "./interfaces/IMOPNGovernance.sol";
+import "./interfaces/IMOPNERC6551Account.sol";
+import "../interfaces/IMOPN.sol";
+import "../interfaces/IMOPNGovernance.sol";
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import "./erc6551/lib/ERC6551AccountLib.sol";
-
-interface IDelegationRegistry {
-    function checkDelegateForToken(
-        address delegate,
-        address vault,
-        address contract_,
-        uint256 tokenId
-    ) external view returns (bool);
-}
+import "./lib/ERC6551AccountLib.sol";
 
 error NotAuthorized();
 
-contract MOPNERC6551Account is
+contract MOPNERC6551Account1 is
     IERC165,
     IERC1271,
     IERC1155Receiver,
@@ -122,15 +113,7 @@ contract MOPNERC6551Account is
     }
 
     function isOwner(address caller) public view returns (bool) {
-        if (caller == owner()) return true;
-        (, address tokenContract, uint256 tokenId) = this.token();
-        return
-            IDelegationRegistry(delegatecash).checkDelegateForToken(
-                caller,
-                owner(),
-                tokenContract,
-                tokenId
-            );
+        return caller == owner();
     }
 
     function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
@@ -236,5 +219,9 @@ contract MOPNERC6551Account is
         rentData =
             ((block.timestamp + timeRange) << 160) |
             uint256(uint160(to));
+    }
+
+    function testNewVersion() public pure returns (uint256) {
+        return 233333;
     }
 }

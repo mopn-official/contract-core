@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNData.sol";
+import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNBomb.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MOPNPoint is ERC20 {
@@ -21,7 +21,7 @@ contract MOPNPoint is ERC20 {
      * @dev See {IERC20-totalSupply}.
      */
     function totalSupply() public view virtual override returns (uint256) {
-        return IMOPNData(governance.mopnDataContract()).TotalMOPNPoints();
+        return IMOPN(governance.mopnContract()).TotalMOPNPoints();
     }
 
     /**
@@ -30,15 +30,15 @@ contract MOPNPoint is ERC20 {
     function balanceOf(
         address account
     ) public view virtual override returns (uint256 balance) {
-        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
+        IMOPN mopn = IMOPN(governance.mopnContract());
         balance = IMOPNBomb(governance.bombContract()).balanceOf(account, 2);
-        if (mopnData.getAccountCoordinate(account) > 0) {
-            balance += mopnData.getAccountTotalMOPNPoint(account);
-            balance += mopnData.getCollectionMOPNPoint(
-                mopnData.getAccountCollection(account)
+        if (mopn.getAccountCoordinate(account) > 0) {
+            balance += mopn.getAccountTotalMOPNPoint(account);
+            balance += mopn.getCollectionMOPNPoint(
+                mopn.getAccountCollection(account)
             );
-            balance += mopnData.getCollectionAdditionalMOPNPoint(
-                mopnData.getAccountCollection(account)
+            balance += mopn.getCollectionAdditionalMOPNPoint(
+                mopn.getAccountCollection(account)
             );
         }
     }

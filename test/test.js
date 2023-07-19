@@ -95,12 +95,12 @@ describe("MOPN", function () {
         TileMath: tileMath.address,
       },
     });
-    mopn = await MOPN.deploy(mopngovernance.address);
+    mopn = await MOPN.deploy(mopngovernance.address, unixTimeStamp);
     await mopn.deployed();
     console.log("MOPN", mopn.address);
 
     const MOPNData = await ethers.getContractFactory("MOPNData");
-    mopnData = await MOPNData.deploy(mopngovernance.address, unixTimeStamp);
+    mopnData = await MOPNData.deploy(mopngovernance.address);
     await mopnData.deployed();
     console.log("MOPNData", mopnData.address);
 
@@ -568,7 +568,7 @@ describe("MOPN", function () {
   });
 
   it("test stakingMT", async function () {
-    console.log(await mopn.getCollectionData(collections[1]));
+    console.log(await mopnData.getCollectionData(collections[1]));
 
     const collection1 = collections[0];
     const collection2 = collections[1];
@@ -580,7 +580,7 @@ describe("MOPN", function () {
     const vault1 = await ethers.getContractAt("MOPNCollectionVault", vault1adddress);
     console.log(collection1, "vault", vault1adddress);
 
-    console.log(collection1, "collectionpoint", await mopnData.getCollectionMOPNPoint(collection1));
+    console.log(collection1, "collectionpoint", await mopn.getCollectionMOPNPoint(collection1));
 
     const tx2 = await mopnmt.safeTransferFrom(
       owner.address,
@@ -590,9 +590,9 @@ describe("MOPN", function () {
     );
     await tx2.wait();
 
-    console.log(collection1, "collectionpoint", await mopnData.getCollectionMOPNPoint(collection1));
+    console.log(collection1, "collectionpoint", await mopn.getCollectionMOPNPoint(collection1));
 
-    console.log(collection2, "collectionpoint", await mopnData.getCollectionMOPNPoint(collection2));
+    console.log(collection2, "collectionpoint", await mopn.getCollectionMOPNPoint(collection2));
 
     const tx3 = await mopnmt.safeTransferFrom(
       owner.address,
@@ -605,7 +605,7 @@ describe("MOPN", function () {
     const vault2adddress = await mopngovernance.getCollectionVault(collection2);
     const vault2 = await ethers.getContractAt("MOPNCollectionVault", vault2adddress);
     console.log(collection2, "vault", vault2adddress);
-    console.log(collection2, "collectionpoint", await mopnData.getCollectionMOPNPoint(collection2));
+    console.log(collection2, "collectionpoint", await mopn.getCollectionMOPNPoint(collection2));
 
     console.log("nft offer price", await vault1.getNFTOfferPrice());
 
@@ -619,9 +619,9 @@ describe("MOPN", function () {
   });
 
   it("test helpers", async function () {
-    console.log(await mopn.getAccountData(accounts[0]));
-    console.log(await mopn.getCollectionData(collections[0]));
-    console.log(await mopn.getCollectionData(collections[1]));
+    console.log(await mopnData.getAccountData(accounts[0]));
+    console.log(await mopnData.getCollectionData(collections[0]));
+    console.log(await mopnData.getCollectionData(collections[1]));
   });
 
   it("test additional point", async function () {
@@ -651,19 +651,19 @@ describe("MOPN", function () {
   // });
 
   const avatarInfo = async () => {
-    console.log("total Point", (await mopnData.TotalMOPNPoints()).toString());
+    console.log("total Point", (await mopn.TotalMOPNPoints()).toString());
     for (const account of accounts) {
       console.log(
         "account",
         account,
         "collection",
-        (await mopnData.getAccountCollection(account)).toString(),
+        (await mopn.getAccountCollection(account)).toString(),
         "coordinate",
-        await mopnData.getAccountCoordinate(account),
+        await mopn.getAccountCoordinate(account),
         "getAccountBombUsed",
         (await mopnbomb.balanceOf(account, 1)).toString(),
         "getAccountPoint",
-        (await mopnData.getAccountTotalMOPNPoint(account)).toString(),
+        (await mopn.getAccountTotalMOPNPoint(account)).toString(),
         "getAccountMT",
         ethers.utils.formatUnits(await mopnmt.balanceOf(account), mtdecimals)
       );
@@ -676,13 +676,13 @@ describe("MOPN", function () {
         "collectionAddress",
         collection,
         "on map account number",
-        (await mopnData.getCollectionOnMapNum(collection)).toString(),
+        (await mopn.getCollectionOnMapNum(collection)).toString(),
         "collection account points",
-        (await mopnData.getCollectionAccountMOPNPoints(collection)).toString(),
+        (await mopn.getCollectionAccountMOPNPoints(collection)).toString(),
         "collection points",
-        (await mopnData.getCollectionMOPNPoints(collection)).toString(),
+        (await mopn.getCollectionMOPNPoints(collection)).toString(),
         "collection additional points",
-        (await mopnData.getCollectionAdditionalMOPNPoints(collection)).toString()
+        (await mopn.getCollectionAdditionalMOPNPoints(collection)).toString()
       );
     }
   };

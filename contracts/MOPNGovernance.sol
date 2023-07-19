@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPN.sol";
-import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IERC20Receiver.sol";
@@ -168,7 +167,7 @@ contract MOPNGovernance is Multicall, Ownable {
         mopnCollectionVaultContract = mopnCollectionVaultContract_;
     }
 
-    function mintMT(address to, uint256 amount) public onlyMiningData {
+    function mintMT(address to, uint256 amount) public onlyMOPN {
         IMOPNToken(mtContract).mint(to, amount);
     }
 
@@ -177,13 +176,13 @@ contract MOPNGovernance is Multicall, Ownable {
         IMOPNBomb(bombContract).mint(to, 1, amount);
     }
 
-    function burnBomb(address from, uint256 amount) public onlyAvatar {
+    function burnBomb(address from, uint256 amount) public onlyMOPN {
         IMOPNBomb(bombContract).burn(from, 1, amount);
         IMOPNBomb(bombContract).mint(from, 2, amount);
     }
 
     function closeWhiteList() public onlyOwner {
-        IMOPNData(mopnDataContract).closeWhiteList();
+        IMOPN(mopnContract).closeWhiteList();
     }
 
     modifier onlyAuctionHouse() {
@@ -191,13 +190,8 @@ contract MOPNGovernance is Multicall, Ownable {
         _;
     }
 
-    modifier onlyAvatar() {
+    modifier onlyMOPN() {
         require(msg.sender == mopnContract, "not allowed");
-        _;
-    }
-
-    modifier onlyMiningData() {
-        require(msg.sender == mopnDataContract, "not allowed");
         _;
     }
 

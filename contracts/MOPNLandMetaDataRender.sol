@@ -3,7 +3,6 @@ pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPNLandMetaDataRender.sol";
 import "./interfaces/IMOPN.sol";
-import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./libraries/NFTMetaData.sol";
 
@@ -38,7 +37,7 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
 
         address tileAccount = mopn.getTileAccount(tileCoordinate);
         if (tileAccount != address(0)) {
-            (collection, ) = mopn.getAccountNFT(tileAccount);
+            collection = mopn.getAccountCollection(tileAccount);
             COID++;
             collections[COID] = collection;
         }
@@ -67,7 +66,7 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
 
                     tileAccount = mopn.getTileAccount(tileCoordinate);
                     if (tileAccount != address(0)) {
-                        (collection, ) = mopn.getAccountNFT(tileAccount);
+                        collection = mopn.getAccountCollection(tileAccount);
                         COID = exists(collections, collection);
                         if (COID == 0) {
                             COID++;
@@ -153,9 +152,9 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
     }
 
     function getMintedMT(uint32 LandId) private view returns (uint256) {
-        IMOPNData mopnData = IMOPNData(governance.mopnDataContract());
-        return ((mopnData.getLandHolderTotalMinted(LandId) +
-            mopnData.getLandHolderInboxMT(LandId)) / 10 ** 8);
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        return ((mopn.getLandHolderTotalMinted(LandId) +
+            mopn.getLandHolderInboxMT(LandId)) / 10 ** 8);
     }
 
     function exists(
