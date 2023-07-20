@@ -2,12 +2,6 @@
 pragma solidity ^0.8.19;
 
 interface IMOPN {
-    event AccountJoin(
-        address indexed account,
-        address collectionAddress,
-        uint256 tokenId
-    );
-
     /**
      * @notice This event emit when an avatar jump into the map
      * @param account account wallet address
@@ -191,7 +185,7 @@ interface IMOPN {
         uint256 tokenId
     ) external;
 
-    function closeWhiteList() external;
+    function AdditionalMOPNPointFinish() external;
 
     function addMOPNPoint(
         address account,

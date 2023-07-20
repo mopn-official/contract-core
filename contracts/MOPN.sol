@@ -77,6 +77,21 @@ contract MOPN is IMOPN, Multicall, Ownable {
         MiningDataExt = (10 ** 18) << 64;
     }
 
+    function batchSetCollectionAdditionalMOPNPoints(
+        address[] memory collectionAddress,
+        uint256[] memory additionalMOPNPoints
+    ) public onlyOwner {
+        require(
+            collectionAddress.length == additionalMOPNPoints.length,
+            "params illegal"
+        );
+        for (uint256 i = 0; i < collectionAddress.length; i++) {
+            CollectionsDataExt[collectionAddress[i]] =
+                (additionalMOPNPoints[i] << 96) |
+                uint96(CollectionsDataExt[collectionAddress[i]]);
+        }
+    }
+
     function getQualifiedAccountCollection(
         address account
     ) public view returns (address, uint256) {
@@ -210,37 +225,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
             attackAccounts,
             victimsCoordinates
         );
-    }
-
-    /**
-     * @notice check if this collection is in white list
-     * @param collectionAddress collection contract address
-     * @param additionalMOPNPoints additional NFT Points
-     * @param proofs collection whitelist proofs
-     */
-    function setCollectionAdditionalMOPNPoints(
-        address collectionAddress,
-        uint256 additionalMOPNPoints,
-        bytes32[] memory proofs
-    ) public {
-        require(
-            MerkleProof.verify(
-                proofs,
-                governance.whiteListRoot(),
-                keccak256(
-                    bytes.concat(
-                        keccak256(
-                            abi.encode(collectionAddress, additionalMOPNPoints)
-                        )
-                    )
-                )
-            ),
-            "collection additionalMOPNPoints can't verify"
-        );
-
-        CollectionsDataExt[collectionAddress] =
-            (additionalMOPNPoints << 96) |
-            uint96(CollectionsDataExt[collectionAddress]);
     }
 
     /**
@@ -457,7 +441,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return perMOPNPointMinted;
     }
 
-    function closeWhiteList() public onlyGovernance {
+    function AdditionalMOPNPointFinish() public onlyGovernance {
         settlePerMOPNPointMinted();
         MiningDataExt += PerMOPNPointMinted() << 192;
         MiningData -= TotalAdditionalMOPNPoints();
@@ -1075,14 +1059,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         } else {
             MiningDataExt -= amount;
         }
-        if (operator != address(0)) {
-            emit VaultStakingChange(
-                collectionAddress,
-                operator,
-                increase,
-                amount
-            );
-        }
+
+        emit VaultStakingChange(collectionAddress, operator, increase, amount);
     }
 
     modifier onlyCollectionVault(address collectionAddress) {

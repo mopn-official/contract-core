@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 import "./interfaces/IMOPNERC6551Account.sol";
 import "../interfaces/IMOPN.sol";
 import "../interfaces/IMOPNGovernance.sol";
+import "../interfaces/IMOPNERC6551AccountHelper.sol";
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -236,5 +237,9 @@ contract MOPNERC6551Account is
         rentData =
             ((block.timestamp + timeRange) << 160) |
             uint256(uint160(to));
+
+        IMOPNERC6551AccountHelper(
+            IMOPNGovernance(governance).ERC6551AccountHelper()
+        ).AccountRentNotify(to, timeRange);
     }
 }

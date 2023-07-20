@@ -184,10 +184,14 @@ describe("MOPN", function () {
     const governanceset6551tx = await mopngovernance.updateERC6551Contract(
       erc6551registry.address,
       erc6551accountproxy.address,
-      erc6551accounthelper.address,
-      [erc6551account.address]
+      erc6551accounthelper.address
     );
     await governanceset6551tx.wait();
+
+    const governancesetaccounttx = await mopngovernance.add6551AccountImplementation(
+      erc6551account.address
+    );
+    await governancesetaccounttx.wait();
 
     const setAuctionToLandtx = await mopnland.setAuction(mopnauctionHouse.address);
     await setAuctionToLandtx.wait();
@@ -620,19 +624,17 @@ describe("MOPN", function () {
   });
 
   it("test additional point", async function () {
-    const tx = await mopngovernance.updateWhiteList(
-      "0x0bc995102810c82009c2fcb63bf790ebd3225586fd9d79a307a0f54c3380ef9f"
-    );
-    tx.wait();
-
-    const tx1 = await mopn.setCollectionAdditionalMOPNPoints(
-      "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
-      1000,
+    const tx1 = await mopn.batchSetCollectionAdditionalMOPNPoints(
       [
-        "0x14ef206cab520abf6e628330ec6e7a05bfa83550dd891fec53fc09ab14c58eff",
-        "0xe967985e03fc4d250010085b1c37a1b811c0dc51613e649d7e27131084b07dcb",
-        "0xacd5db390d4a31ca61bb174623da7f6bd80990f3b30f1be0b0609563d04ea2e0",
-      ]
+        "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+        "0x9bA6e2D3c9c1e7C1648C5cFC8c99c4b271eDaBc3",
+        "0x82e33ddC22F38A3BeF5541073dF84106B09f04cE",
+        "0xdEa71568724007fFeF75fD2DC5fBc1858B5C7825",
+        "0xf61DAf57CdDbf24Cb011Ac3234e87138709124Ff",
+        "0x7B8E1CF42A48767f187D3D856a4250882e5723fA",
+        "0xA45a84F5873Ded618958A5173b45e334F7df953C",
+      ],
+      [1000, 1000, 2000, 3000, 4000, 4000, 5000]
     );
     tx1.wait();
 

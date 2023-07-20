@@ -2,15 +2,11 @@
 pragma solidity ^0.8.19;
 
 interface IMOPNGovernance {
-    function updateWhiteList(bytes32 whiteListRoot_) external;
-
     function mintMT(address to, uint256 amount) external;
 
     function mintBomb(address to, uint256 amount) external;
 
     function burnBomb(address from, uint256 amount) external;
-
-    function whiteListRoot() external view returns (bytes32);
 
     function auctionHouseContract() external view returns (address);
 

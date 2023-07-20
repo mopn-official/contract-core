@@ -25,8 +25,6 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 contract MOPNGovernance is Multicall, Ownable {
     uint256 public chainId;
 
-    bytes32 public whiteListRoot;
-
     event CollectionVaultCreated(
         address indexed collectionAddress,
         address indexed collectionVault
@@ -38,14 +36,6 @@ contract MOPNGovernance is Multicall, Ownable {
         chainId = chainId_;
     }
 
-    /**
-     * @notice update whitelist root
-     * @param whiteListRoot_ white list merkle tree root
-     */
-    function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
-        whiteListRoot = whiteListRoot_;
-    }
-
     address public ERC6551Registry;
     address public ERC6551AccountProxy;
     address public ERC6551AccountHelper;
@@ -55,13 +45,11 @@ contract MOPNGovernance is Multicall, Ownable {
     function updateERC6551Contract(
         address ERC6551Registry_,
         address ERC6551AccountProxy_,
-        address ERC6551AccountHelper_,
-        address[] memory ERC6551AccountImplementations_
+        address ERC6551AccountHelper_
     ) public onlyOwner {
         ERC6551Registry = ERC6551Registry_;
         ERC6551AccountProxy = ERC6551AccountProxy_;
         ERC6551AccountHelper = ERC6551AccountHelper_;
-        ERC6551AccountImplementations = ERC6551AccountImplementations_;
     }
 
     function getDefault6551AccountImplementation()
@@ -181,8 +169,8 @@ contract MOPNGovernance is Multicall, Ownable {
         IMOPNBomb(bombContract).mint(from, 2, amount);
     }
 
-    function closeWhiteList() public onlyOwner {
-        IMOPN(mopnContract).closeWhiteList();
+    function AdditionalMOPNPointFinish() public onlyOwner {
+        IMOPN(mopnContract).AdditionalMOPNPointFinish();
     }
 
     modifier onlyAuctionHouse() {
