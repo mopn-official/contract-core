@@ -5,10 +5,11 @@ import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IERC20Receiver.sol";
-import "./InitializedProxy.sol";
+import "./libraries/CollectionVaultBytecodeLib.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
+import "@openzeppelin/contracts/utils/Create2.sol";
 
 /*
 .___  ___.   ______   .______   .__   __. 
@@ -191,17 +192,32 @@ contract MOPNGovernance is Multicall, Ownable {
             "collection vault exist"
         );
 
-        bytes memory _initializationCalldata = abi.encodeWithSignature(
-            "initialize(address)",
-            collectionAddress
-        );
-        address vaultAddress = address(
-            new InitializedProxy(address(this), _initializationCalldata)
-        );
+        address vaultAddress = _createCollectionVault(collectionAddress, 0);
         CollectionVaults[collectionAddress] = vaultAddress;
         emit CollectionVaultCreated(collectionAddress, vaultAddress);
 
         return vaultAddress;
+    }
+
+    function _createCollectionVault(
+        address collectionAddress,
+        uint256 salt
+    ) internal returns (address) {
+        bytes memory code = CollectionVaultBytecodeLib.getCreationCode(
+            mopnCollectionVaultContract,
+            collectionAddress,
+            salt
+        );
+
+        address _account = Create2.computeAddress(
+            bytes32(salt),
+            keccak256(code)
+        );
+
+        if (_account.code.length != 0) return _account;
+
+        _account = Create2.deploy(0, bytes32(salt), code);
+        return _account;
     }
 
     function getCollectionVault(

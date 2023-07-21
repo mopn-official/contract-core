@@ -38,6 +38,7 @@ contract MOPNData is Multicall {
         uint256 AvatarMOPNPoints;
         uint256 CollectionMOPNPoint;
         uint256 AdditionalMOPNPoint;
+        uint256 PMTTotalSupply;
         IMOPNCollectionVault.NFTAuction NFTAuction;
     }
 
@@ -193,6 +194,8 @@ contract MOPNData is Multicall {
         if (cData.collectionVault != address(0)) {
             cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
                 .getAuctionInfo();
+            cData.PMTTotalSupply = IMOPNCollectionVault(cData.collectionVault)
+                .totalSupply();
         }
     }
 

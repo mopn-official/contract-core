@@ -30,6 +30,7 @@
     "@openzeppelin/contracts": "^4.9.2",
     "@openzeppelin/merkle-tree": "^1.0.5",
     "abdk-libraries-solidity": "^3.2.0",
+    "axios": "^1.4.0",
     "base64-sol": "^1.1.0",
     "erc721a": "^4.2.3",
     "ipfs-infura": "^1.1.9"

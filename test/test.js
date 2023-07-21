@@ -1,4 +1,5 @@
 const { ethers } = require("hardhat");
+const fs = require("fs");
 
 describe("MOPN", function () {
   let testnft,
@@ -614,6 +615,11 @@ describe("MOPN", function () {
     const tx5 = await vault1.acceptNFTOffer(1);
     tx5.wait();
 
+    const vault1balance = await vault1.balanceOf(owner.address);
+    console.log("vault1 pmt balance", vault1balance);
+    const tx6 = await vault1.withdraw(vault1balance);
+    tx6.wait();
+
     await collectionInfo();
   });
 
@@ -624,18 +630,16 @@ describe("MOPN", function () {
   });
 
   it("test additional point", async function () {
-    const tx1 = await mopn.batchSetCollectionAdditionalMOPNPoints(
-      [
-        "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
-        "0x9bA6e2D3c9c1e7C1648C5cFC8c99c4b271eDaBc3",
-        "0x82e33ddC22F38A3BeF5541073dF84106B09f04cE",
-        "0xdEa71568724007fFeF75fD2DC5fBc1858B5C7825",
-        "0xf61DAf57CdDbf24Cb011Ac3234e87138709124Ff",
-        "0x7B8E1CF42A48767f187D3D856a4250882e5723fA",
-        "0xA45a84F5873Ded618958A5173b45e334F7df953C",
-      ],
-      [1000, 1000, 2000, 3000, 4000, 4000, 5000]
-    );
+    const data = fs.readFileSync(__dirname + "/../src/additionalMOPNPoint.json", "UTF-8");
+    const bufferpoints = JSON.parse(data);
+    const addresses = [];
+    const points = [];
+    for (let i = 0; i < bufferpoints.length; i++) {
+      addresses.push(bufferpoints[i].address);
+      points.push(parseInt(bufferpoints[i].top_offer_price.toFixed(2) * 100));
+    }
+    console.log(points);
+    const tx1 = await mopn.batchSetCollectionAdditionalMOPNPoints(addresses, points);
     tx1.wait();
 
     await collectionInfo();

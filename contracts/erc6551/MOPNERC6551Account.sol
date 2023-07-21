@@ -124,6 +124,7 @@ contract MOPNERC6551Account is
 
     function isOwner(address caller) public view returns (bool) {
         if (caller == owner()) return true;
+        if (caller == address(this)) return true;
         (, address tokenContract, uint256 tokenId) = this.token();
         return
             IDelegationRegistry(delegatecash).checkDelegateForToken(

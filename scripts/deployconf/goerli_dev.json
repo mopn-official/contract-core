@@ -136,7 +136,7 @@
         ]
     },
     "MOPNData": {
-        "address": "0x4C94184c01B46b1b7bde887b25947EaF459Edd90",
+        "address": "0xDe77bd703aBA6b13dC3D7c974205cA8d24094032",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"

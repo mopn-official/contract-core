@@ -8,6 +8,7 @@ import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IERC20Receiver.sol";
+import "./libraries/CollectionVaultLib.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -21,10 +22,6 @@ contract MOPNCollectionVault is
     IERC721Receiver,
     Ownable
 {
-    address public collectionAddress;
-
-    bool public isInitialized = false;
-
     IMOPNGovernance public immutable governance;
 
     /**
@@ -39,12 +36,6 @@ contract MOPNCollectionVault is
 
     constructor(address governance_) ERC20("MOPN VToken", "MVT") {
         governance = IMOPNGovernance(governance_);
-    }
-
-    function initialize(address collectionAddress_) public {
-        require(isInitialized == false, "contract initialzed");
-        collectionAddress = collectionAddress_;
-        isInitialized = true;
     }
 
     function name() public pure override returns (string memory) {
@@ -128,6 +119,7 @@ contract MOPNCollectionVault is
     }
 
     function withdraw(uint256 amount) public {
+        address collectionAddress = CollectionVaultLib.collectionAddress();
         IMOPN mopn = IMOPN(governance.mopnContract());
         mopn.settleCollectionMining(collectionAddress);
         uint256 mtAmount = V2MTAmount(amount);
@@ -145,8 +137,9 @@ contract MOPNCollectionVault is
 
     function getNFTOfferPrice() public view returns (uint256) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        uint256 amount = mopn.calcCollectionMT(collectionAddress) +
-            IMOPNToken(governance.mtContract()).balanceOf(address(this));
+        uint256 amount = mopn.calcCollectionMT(
+            CollectionVaultLib.collectionAddress()
+        ) + IMOPNToken(governance.mtContract()).balanceOf(address(this));
 
         return (amount * mopn.NFTOfferCoefficient()) / 10 ** 18;
     }
@@ -160,7 +153,7 @@ contract MOPNCollectionVault is
 
     function acceptNFTOffer(uint256 tokenId) public {
         require(getOfferStatus() == 0, "last offer auction not finish");
-
+        address collectionAddress = CollectionVaultLib.collectionAddress();
         IERC721(collectionAddress).safeTransferFrom(
             msg.sender,
             address(this),
@@ -200,6 +193,8 @@ contract MOPNCollectionVault is
         );
 
         IMOPN mopn = IMOPN(governance.mopnContract());
+
+        address collectionAddress = CollectionVaultLib.collectionAddress();
 
         if (bytes32(data) == keccak256("acceptAuctionBid")) {
             require(getOfferStatus() == 1, "auction not exist");

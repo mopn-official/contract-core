@@ -78,8 +78,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
     }
 
     function batchSetCollectionAdditionalMOPNPoints(
-        address[] memory collectionAddress,
-        uint256[] memory additionalMOPNPoints
+        address[] calldata collectionAddress,
+        uint256[] calldata additionalMOPNPoints
     ) public onlyOwner {
         require(
             collectionAddress.length == additionalMOPNPoints.length,
@@ -87,8 +87,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         );
         for (uint256 i = 0; i < collectionAddress.length; i++) {
             CollectionsDataExt[collectionAddress[i]] =
-                (additionalMOPNPoints[i] << 96) |
-                uint96(CollectionsDataExt[collectionAddress[i]]);
+                additionalMOPNPoints[i] <<
+                96;
         }
     }
 
@@ -673,12 +673,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function settleCollectionMOPNPoint(
         address collectionAddress
     ) public onlyCollectionVault(collectionAddress) {
-        _settleCollectionMOPNPoint(collectionAddress);
-
-        emit SettleCollectionMOPNPoint(collectionAddress);
-    }
-
-    function _settleCollectionMOPNPoint(address collectionAddress) internal {
         uint256 point = getCollectionMOPNPoint(collectionAddress);
         uint256 collectionMOPNPoint;
         if (point > 0) {
@@ -732,6 +726,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
             ] -= ((preCollectionAdditionalMOPNPoint -
                 collectionAdditionalMOPNPoint) << 32);
         }
+
+        emit SettleCollectionMOPNPoint(collectionAddress);
     }
 
     function settleCollectionMining(
