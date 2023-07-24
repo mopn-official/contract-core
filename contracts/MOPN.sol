@@ -153,16 +153,19 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
         uint32 orgCoordinate = getAccountCoordinate(msg.sender);
         uint256 orgMOPNPoint;
+        uint256 tileMOPNPoint = tileCoordinate.getTileMOPNPoint();
         if (orgCoordinate > 0) {
             tiles[tileCoordinate] = getTileLandId(tileCoordinate);
             orgMOPNPoint = orgCoordinate.getTileMOPNPoint();
 
             emit AccountMove(msg.sender, LandId, orgCoordinate, tileCoordinate);
         } else {
+            tileMOPNPoint +=
+                IMOPNBomb(governance.bombContract()).balanceOf(msg.sender, 2) *
+                100;
             emit AccountJumpIn(msg.sender, LandId, tileCoordinate);
         }
 
-        uint256 tileMOPNPoint = tileCoordinate.getTileMOPNPoint();
         accountSet(msg.sender, collectionAddress, tileCoordinate, LandId);
 
         setAccountCoordinate(msg.sender, tileCoordinate);

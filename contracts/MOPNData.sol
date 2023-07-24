@@ -24,7 +24,7 @@ contract MOPNData is Multicall {
         uint256 tokenId;
         uint256 BombBadge;
         uint256 MTBalance;
-        uint256 MOPNPoint;
+        uint256 OnMapMOPNPoint;
         uint32 tileCoordinate;
     }
 
@@ -33,9 +33,10 @@ contract MOPNData is Multicall {
         address collectionVault;
         uint256 OnMapNum;
         uint256 MTBalance;
+        uint256 UnclaimMTBalance;
         uint256 AdditionalMOPNPoints;
         uint256 CollectionMOPNPoints;
-        uint256 AvatarMOPNPoints;
+        uint256 OnMapMOPNPoints;
         uint256 CollectionMOPNPoint;
         uint256 AdditionalMOPNPoint;
         uint256 PMTTotalSupply;
@@ -75,9 +76,8 @@ contract MOPNData is Multicall {
         accountData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
             account
         );
-        accountData.MOPNPoint = IERC20(governance.pointContract()).balanceOf(
-            account
-        );
+        accountData.OnMapMOPNPoint = IERC20(governance.pointContract())
+            .balanceOf(account);
         accountData.tileCoordinate = IMOPN(governance.mopnContract())
             .getAccountCoordinate(account);
     }
@@ -173,6 +173,7 @@ contract MOPNData is Multicall {
         cData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
             governance.getCollectionVault(collectionAddress)
         );
+        cData.UnclaimMTBalance = mopn.calcCollectionMT(collectionAddress);
 
         cData.AdditionalMOPNPoints = mopn.getCollectionAdditionalMOPNPoints(
             collectionAddress
@@ -181,7 +182,7 @@ contract MOPNData is Multicall {
         cData.CollectionMOPNPoints = mopn.getCollectionMOPNPoints(
             collectionAddress
         );
-        cData.AvatarMOPNPoints = mopn.getCollectionAccountMOPNPoints(
+        cData.OnMapMOPNPoints = mopn.getCollectionAccountMOPNPoints(
             collectionAddress
         );
         cData.CollectionMOPNPoint = mopn.getCollectionMOPNPoint(
