@@ -138,7 +138,7 @@ interface IMOPN {
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAccountMOPNPoints(
+    function getCollectionOnMapMOPNPoints(
         address collectionAddress
     ) external view returns (uint256);
 

@@ -6,7 +6,7 @@ interface IMOPNGovernance {
 
     function mintBomb(address to, uint256 amount) external;
 
-    function burnBomb(address from, uint256 amount) external;
+    function burnBomb(address from, uint256 amount, uint256 killed) external;
 
     function auctionHouseContract() external view returns (address);
 
@@ -44,6 +44,4 @@ interface IMOPNGovernance {
     function getCollectionVault(
         address collectionAddress
     ) external view returns (address);
-
-    function chainId() external view returns (uint256);
 }

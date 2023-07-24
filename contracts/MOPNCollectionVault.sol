@@ -22,7 +22,7 @@ contract MOPNCollectionVault is
     IERC721Receiver,
     Ownable
 {
-    IMOPNGovernance public immutable governance;
+    address public immutable governance;
 
     /**
      * @notice NFTOfferData
@@ -35,7 +35,7 @@ contract MOPNCollectionVault is
     uint256 public NFTOfferData;
 
     constructor(address governance_) ERC20("MOPN VToken", "MVT") {
-        governance = IMOPNGovernance(governance_);
+        governance = governance_;
     }
 
     function name() public pure override returns (string memory) {
@@ -92,14 +92,18 @@ contract MOPNCollectionVault is
     }
 
     function MT2VAmount(
-        uint256 MTAmount
+        uint256 MTAmount,
+        bool onReceived
     ) public view returns (uint256 VAmount) {
         if (totalSupply() == 0) {
             VAmount = MTAmount * 10 ** 10;
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /
-                IMOPNToken(governance.mtContract()).balanceOf(address(this));
+                IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
+                    address(this)
+                ) -
+                (onReceived ? MTAmount : 0);
         }
     }
 
@@ -107,24 +111,27 @@ contract MOPNCollectionVault is
         uint256 VAmount
     ) public view returns (uint256 MTAmount) {
         if (VAmount == totalSupply()) {
-            MTAmount = IMOPNToken(governance.mtContract()).balanceOf(
-                address(this)
-            );
+            MTAmount = IMOPNToken(IMOPNGovernance(governance).mtContract())
+                .balanceOf(address(this));
         } else {
             MTAmount =
-                (IMOPNToken(governance.mtContract()).balanceOf(address(this)) *
-                    VAmount) /
+                (IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
+                    address(this)
+                ) * VAmount) /
                 totalSupply();
         }
     }
 
     function withdraw(uint256 amount) public {
         address collectionAddress = CollectionVaultLib.collectionAddress();
-        IMOPN mopn = IMOPN(governance.mopnContract());
+        IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
         mopn.settleCollectionMining(collectionAddress);
         uint256 mtAmount = V2MTAmount(amount);
         require(mtAmount > 0, "zero to withdraw");
-        IMOPNToken(governance.mtContract()).transfer(msg.sender, mtAmount);
+        IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
+            msg.sender,
+            mtAmount
+        );
         _burn(msg.sender, amount);
         mopn.settleCollectionMOPNPoint(collectionAddress);
         mopn.changeTotalMTStaking(
@@ -136,16 +143,20 @@ contract MOPNCollectionVault is
     }
 
     function getNFTOfferPrice() public view returns (uint256) {
-        IMOPN mopn = IMOPN(governance.mopnContract());
+        IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
         uint256 amount = mopn.calcCollectionMT(
             CollectionVaultLib.collectionAddress()
-        ) + IMOPNToken(governance.mtContract()).balanceOf(address(this));
+        ) +
+            IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
+                address(this)
+            );
 
         return (amount * mopn.NFTOfferCoefficient()) / 10 ** 18;
     }
 
     function MTBalance() public view returns (uint256 balance) {
-        balance = IMOPNToken(governance.mtContract()).balanceOf(address(this));
+        balance = IMOPNToken(IMOPNGovernance(governance).mtContract())
+            .balanceOf(address(this));
         if (getOfferStatus() == 1) {
             balance += getOfferAcceptPrice();
         }
@@ -161,15 +172,18 @@ contract MOPNCollectionVault is
             "0x"
         );
 
-        IMOPN mopn = IMOPN(governance.mopnContract());
+        IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
 
         mopn.settleCollectionMining(collectionAddress);
 
-        uint256 offerPrice = (IMOPNToken(governance.mtContract()).balanceOf(
-            address(this)
-        ) * mopn.NFTOfferCoefficient()) / 10 ** 18;
+        uint256 offerPrice = (IMOPNToken(
+            IMOPNGovernance(governance).mtContract()
+        ).balanceOf(address(this)) * mopn.NFTOfferCoefficient()) / 10 ** 18;
 
-        IMOPNToken(governance.mtContract()).transfer(msg.sender, offerPrice);
+        IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
+            msg.sender,
+            offerPrice
+        );
 
         NFTOfferData =
             (tokenId << 104) |
@@ -188,11 +202,11 @@ contract MOPNCollectionVault is
         bytes calldata data
     ) public returns (bytes4) {
         require(
-            msg.sender == governance.mtContract(),
+            msg.sender == IMOPNGovernance(governance).mtContract(),
             "only accept mopn token"
         );
 
-        IMOPN mopn = IMOPN(governance.mopnContract());
+        IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
 
         address collectionAddress = CollectionVaultLib.collectionAddress();
 
@@ -207,7 +221,7 @@ contract MOPNCollectionVault is
             require(value >= price, "MOPNToken not enough");
 
             if (value > price) {
-                IMOPNToken(governance.mtContract()).transfer(
+                IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
                     from,
                     value - price
                 );
@@ -215,7 +229,9 @@ contract MOPNCollectionVault is
             }
             if (price > 0) {
                 uint256 burnAmount = (price * 2) / 10;
-                IMOPNToken(governance.mtContract()).burn(burnAmount);
+                IMOPNToken(IMOPNGovernance(governance).mtContract()).burn(
+                    burnAmount
+                );
 
                 price = price - burnAmount;
             }
@@ -254,7 +270,7 @@ contract MOPNCollectionVault is
         } else {
             mopn.settleCollectionMining(collectionAddress);
 
-            uint256 vtokenAmount = MT2VAmount(value);
+            uint256 vtokenAmount = MT2VAmount(value, true);
             _mint(from, vtokenAmount);
             mopn.settleCollectionMOPNPoint(collectionAddress);
             mopn.changeTotalMTStaking(collectionAddress, true, value, from);

@@ -97,7 +97,7 @@ contract MOPNData is Multicall {
         return
             IERC6551Registry(governance.ERC6551Registry()).account(
                 governance.ERC6551AccountProxy(),
-                governance.chainId(),
+                block.chainid,
                 params.collectionAddress,
                 params.tokenId,
                 0
@@ -182,7 +182,7 @@ contract MOPNData is Multicall {
         cData.CollectionMOPNPoints = mopn.getCollectionMOPNPoints(
             collectionAddress
         );
-        cData.OnMapMOPNPoints = mopn.getCollectionAccountMOPNPoints(
+        cData.OnMapMOPNPoints = mopn.getCollectionOnMapMOPNPoints(
             collectionAddress
         );
         cData.CollectionMOPNPoint = mopn.getCollectionMOPNPoint(

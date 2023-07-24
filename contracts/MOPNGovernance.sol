@@ -56,9 +56,10 @@ contract MOPNGovernance is Multicall, Ownable {
     function getDefault6551AccountImplementation()
         public
         view
-        returns (address)
+        returns (address implementation)
     {
-        return ERC6551AccountImplementations[0];
+        if (ERC6551AccountImplementations.length > 0)
+            implementation = ERC6551AccountImplementations[0];
     }
 
     function setDefault6551AccountImplementation(
@@ -165,13 +166,15 @@ contract MOPNGovernance is Multicall, Ownable {
         IMOPNBomb(bombContract).mint(to, 1, amount);
     }
 
-    function burnBomb(address from, uint256 amount) public onlyMOPN {
+    function burnBomb(
+        address from,
+        uint256 amount,
+        uint256 killed
+    ) public onlyMOPN {
         IMOPNBomb(bombContract).burn(from, 1, amount);
-        IMOPNBomb(bombContract).mint(from, 2, amount);
-    }
-
-    function AdditionalMOPNPointFinish() public onlyOwner {
-        IMOPN(mopnContract).AdditionalMOPNPointFinish();
+        if (killed > 0) {
+            IMOPNBomb(bombContract).mint(from, 2, killed);
+        }
     }
 
     modifier onlyAuctionHouse() {

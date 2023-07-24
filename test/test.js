@@ -573,14 +573,16 @@ describe("MOPN", function () {
     const collection1 = collections[0];
     const collection2 = collections[1];
 
+    console.log("create collection", collection1, "vault");
     const tx1 = await mopngovernance.createCollectionVault(collection1);
     await tx1.wait();
 
-    const vault1adddress = await mopngovernance.getCollectionVault(collection1);
-    const vault1 = await ethers.getContractAt("MOPNCollectionVault", vault1adddress);
-    console.log(collection1, "vault", vault1adddress);
-
-    console.log(collection1, "collectionpoint", await mopn.getCollectionMOPNPoint(collection1));
+    const vault1 = await ethers.getContractAt(
+      "MOPNCollectionVault",
+      await mopngovernance.getCollectionVault(collection1)
+    );
+    console.log(collection1, "vault1", vault1.address);
+    console.log(collection1, "collectionpoint 1", await mopn.getCollectionMOPNPoint(collection1));
 
     const tx2 = await mopnmt.safeTransferFrom(
       owner.address,
@@ -590,10 +592,10 @@ describe("MOPN", function () {
     );
     await tx2.wait();
 
-    console.log(collection1, "collectionpoint", await mopn.getCollectionMOPNPoint(collection1));
+    console.log("vault1 mt balance", await mopnmt.balanceOf(vault1.address));
+    console.log(collection1, "collectionpoint 1", await mopn.getCollectionMOPNPoint(collection1));
 
-    console.log(collection2, "collectionpoint", await mopn.getCollectionMOPNPoint(collection2));
-
+    console.log("create collection", collection2, "vault by transfer mt");
     const tx3 = await mopnmt.safeTransferFrom(
       owner.address,
       mopngovernance.address,
@@ -602,22 +604,25 @@ describe("MOPN", function () {
     );
     await tx3.wait();
 
-    const vault2adddress = await mopngovernance.getCollectionVault(collection2);
-    const vault2 = await ethers.getContractAt("MOPNCollectionVault", vault2adddress);
-    console.log(collection2, "vault", vault2adddress);
-    console.log(collection2, "collectionpoint", await mopn.getCollectionMOPNPoint(collection2));
+    const vault2 = await ethers.getContractAt(
+      "MOPNCollectionVault",
+      await mopngovernance.getCollectionVault(collection2)
+    );
+    console.log(collection2, "vault2", vault2.address);
+    console.log("vault2 mt balance", await mopnmt.balanceOf(vault2.address));
+    console.log(collection2, "collectionpoint 2", await mopn.getCollectionMOPNPoint(collection2));
 
-    console.log("nft offer price", await vault1.getNFTOfferPrice());
-
+    console.log("vault1 nft offer price", await vault1.getNFTOfferPrice());
     const tx4 = await testnft.approve(vault1.address, 1);
     tx4.wait();
-
+    console.log("accept vault1 nft offer");
     const tx5 = await vault1.acceptNFTOffer(1);
     tx5.wait();
 
-    const vault1balance = await vault1.balanceOf(owner.address);
-    console.log("vault1 pmt balance", vault1balance);
-    const tx6 = await vault1.withdraw(vault1balance);
+    const vault2pmtbalance = await vault2.balanceOf(owner.address);
+    console.log("vault2 pmt balance", vault2pmtbalance);
+    console.log("vault2 mt balance", await mopnmt.balanceOf(vault2.address));
+    const tx6 = await vault2.withdraw(vault2pmtbalance);
     tx6.wait();
 
     await collectionInfo();
@@ -638,7 +643,6 @@ describe("MOPN", function () {
       addresses.push(bufferpoints[i].address);
       points.push(parseInt(bufferpoints[i].top_offer_price.toFixed(2) * 100));
     }
-    console.log(points);
     const tx1 = await mopn.batchSetCollectionAdditionalMOPNPoints(addresses, points);
     tx1.wait();
 
@@ -703,7 +707,7 @@ describe("MOPN", function () {
         "on map account number",
         (await mopn.getCollectionOnMapNum(collection)).toString(),
         "collection account points",
-        (await mopn.getCollectionAccountMOPNPoints(collection)).toString(),
+        (await mopn.getCollectionOnMapMOPNPoints(collection)).toString(),
         "collection points",
         (await mopn.getCollectionMOPNPoints(collection)).toString(),
         "collection additional points",
