@@ -587,7 +587,7 @@ describe("MOPN", function () {
     const tx2 = await mopnmt.safeTransferFrom(
       owner.address,
       vault1.address,
-      ethers.BigNumber.from("1500000000"),
+      ethers.BigNumber.from("15000000"),
       "0x"
     );
     await tx2.wait();
@@ -599,7 +599,7 @@ describe("MOPN", function () {
     const tx3 = await mopnmt.safeTransferFrom(
       owner.address,
       mopngovernance.address,
-      ethers.BigNumber.from("1500000000"),
+      ethers.BigNumber.from("15000000"),
       ethers.utils.solidityPack(["address"], [collection2])
     );
     await tx3.wait();

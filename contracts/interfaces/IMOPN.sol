@@ -50,7 +50,9 @@ interface IMOPN {
     event NFTOfferAccept(
         address indexed collectionAddress,
         uint256 tokenId,
-        uint256 price
+        uint256 price,
+        uint256 totalMTStaking,
+        uint256 NFTOfferCoefficient
     );
 
     event NFTAuctionAccept(
@@ -114,10 +116,6 @@ interface IMOPN {
         address account
     ) external view returns (uint256);
 
-    function getAccountPerMOPNPointMinted(
-        address account
-    ) external view returns (uint256);
-
     function getAccountCoordinate(
         address account
     ) external view returns (uint32);
@@ -160,8 +158,6 @@ interface IMOPN {
 
     function mintCollectionMT(address collectionAddress) external;
 
-    function claimCollectionMT(address collectionAddressD) external;
-
     function settleCollectionMining(address collectionAddress) external;
 
     function settleCollectionMOPNPoint(address collectionAddress) external;
@@ -184,8 +180,6 @@ interface IMOPN {
         uint256 price,
         uint256 tokenId
     ) external;
-
-    function AdditionalMOPNPointFinish() external;
 
     function addMOPNPoint(
         address account,

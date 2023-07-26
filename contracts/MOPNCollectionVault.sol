@@ -96,7 +96,7 @@ contract MOPNCollectionVault is
         bool onReceived
     ) public view returns (uint256 VAmount) {
         if (totalSupply() == 0) {
-            VAmount = MTAmount * 10 ** 10;
+            VAmount = MTAmount * 10 ** 12;
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /

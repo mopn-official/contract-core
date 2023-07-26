@@ -9,11 +9,16 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MOPNBomb is ERC1155, Multicall, Ownable {
+    string public name;
+    string public symbol;
+
     IMOPNGovernance governance;
 
     mapping(uint256 => string) private _uris;
 
     constructor(address governance_) ERC1155("") {
+        name = "MOPN Bomb";
+        symbol = "MOPNBOMB";
         governance = IMOPNGovernance(governance_);
     }
 
