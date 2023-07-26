@@ -81,7 +81,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             "params illegal"
         );
         for (uint256 i = 0; i < collectionAddress.length; i++) {
-            CollectionsData[collectionAddress[i]] =
+            CollectionsData[collectionAddress[i]] +=
                 additionalMOPNPoints[i] <<
                 48;
         }
@@ -165,7 +165,48 @@ contract MOPN is IMOPN, Multicall, Ownable {
             emit AccountJumpIn(msg.sender, LandId, tileCoordinate);
         }
 
-        accountSet(msg.sender, collectionAddress, tileCoordinate, LandId);
+        tiles[tileCoordinate] =
+            (uint256(uint160(msg.sender)) << 32) |
+            uint256(LandId);
+        AccountsData[msg.sender] =
+            AccountsData[msg.sender] -
+            (uint256(orgCoordinate) << 32) +
+            (uint256(tileCoordinate) << 32);
+
+        bool collectionLinked;
+        address tileAccount;
+        address tileCollectionAddress;
+        tileCoordinate = tileCoordinate.neighbor(4);
+        for (uint256 i = 0; i < 18; i++) {
+            tileAccount = getTileAccount(tileCoordinate);
+            if (tileAccount != address(0) && tileAccount != msg.sender) {
+                tileCollectionAddress = getAccountCollection(tileAccount);
+                require(
+                    tileCollectionAddress == collectionAddress,
+                    "tile has enemy"
+                );
+                collectionLinked = true;
+            }
+
+            if (i == 5) {
+                tileCoordinate = tileCoordinate.neighbor(4).neighbor(5);
+            } else if (i < 5) {
+                tileCoordinate = tileCoordinate.neighbor(i);
+            } else {
+                tileCoordinate = tileCoordinate.neighbor((i - 6) / 2);
+            }
+        }
+
+        if (collectionLinked == false) {
+            uint256 collectionOnMapNum = getCollectionOnMapNum(
+                collectionAddress
+            );
+            require(
+                collectionOnMapNum == 0 ||
+                    (orgCoordinate > 0 && collectionOnMapNum == 1),
+                "linked avatar missing"
+            );
+        }
 
         if (tileMOPNPoint > orgMOPNPoint) {
             _addMOPNPoint(
@@ -245,63 +286,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
      */
     function getTileLandId(uint32 tileCoordinate) public view returns (uint32) {
         return uint32(tiles[tileCoordinate]);
-    }
-
-    /**
-     * @notice avatar id occupied a tile
-     * @param account avatar Id
-     * @param tileCoordinate tile coordinate
-     * @param LandId MOPN Land Id
-     * @dev can only called by avatar contract
-     */
-    function accountSet(
-        address account,
-        address collectionAddress,
-        uint32 tileCoordinate,
-        uint32 LandId
-    ) internal returns (bool collectionLinked) {
-        tiles[tileCoordinate] =
-            (uint256(uint160(account)) << 32) |
-            uint256(LandId);
-        AccountsData[account] =
-            AccountsData[account] -
-            (uint256(getAccountCoordinate(account)) << 32) +
-            (uint256(tileCoordinate) << 32);
-        tileCoordinate = tileCoordinate.neighbor(4);
-
-        address tileAccount;
-        address tileCollectionAddress;
-        for (uint256 i = 0; i < 18; i++) {
-            tileAccount = getTileAccount(tileCoordinate);
-            if (tileAccount != address(0) && tileAccount != account) {
-                tileCollectionAddress = getAccountCollection(tileAccount);
-                require(
-                    tileCollectionAddress == collectionAddress,
-                    "tile has enemy"
-                );
-                collectionLinked = true;
-            }
-
-            if (i == 5) {
-                tileCoordinate = tileCoordinate.neighbor(4).neighbor(5);
-            } else if (i < 5) {
-                tileCoordinate = tileCoordinate.neighbor(i);
-            } else {
-                tileCoordinate = tileCoordinate.neighbor((i - 6) / 2);
-            }
-        }
-
-        if (collectionLinked == false) {
-            uint256 collectionOnMapNum = getCollectionOnMapNum(
-                collectionAddress
-            );
-            require(
-                collectionOnMapNum == 0 ||
-                    (getAccountCoordinate(account) > 0 &&
-                        collectionOnMapNum == 1),
-                "linked avatar missing"
-            );
-        }
     }
 
     function getGovernance() public view returns (address) {
