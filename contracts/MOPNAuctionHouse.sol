@@ -279,10 +279,6 @@ contract MOPNAuctionHouse is Multicall, Ownable {
      * @notice buy one land at current block's price
      */
     function buyLand() public {
-        uint256 roundStartTimestamp = getLandRoundStartTimestamp();
-        require(block.timestamp >= roundStartTimestamp, "auction not start");
-
-        uint64 roundId = getLandRoundId();
         uint256 price = getLandCurrentPrice();
 
         if (price > 0) {
@@ -294,7 +290,16 @@ contract MOPNAuctionHouse is Multicall, Ownable {
             IMOPNToken(governance.mtContract()).burnFrom(msg.sender, price);
         }
 
-        IMOPNLand(governance.landContract()).auctionMint(msg.sender, 1);
+        _buyLand(msg.sender);
+    }
+
+    function _buyLand(address buyer) internal {
+        uint256 roundStartTimestamp = getLandRoundStartTimestamp();
+        require(block.timestamp >= roundStartTimestamp, "auction not start");
+
+        uint64 roundId = getLandRoundId();
+
+        IMOPNLand(governance.landContract()).auctionMint(buyer, 1);
 
         landRound =
             (uint256(roundId + 1) << _BITPOS_LAND_ROUNDID) |
@@ -345,25 +350,48 @@ contract MOPNAuctionHouse is Multicall, Ownable {
             "only accept mopn token"
         );
 
-        uint256 amount = abi.decode(data, (uint256));
-        if (amount > 0) {
-            _redeemAgio(from);
+        if (data.length > 0) {
+            (uint256 buyType, uint256 amount) = abi.decode(
+                data,
+                (uint256, uint256)
+            );
+            if (buyType == 1) {
+                if (amount > 0) {
+                    _redeemAgio(from);
 
-            uint256 price = getBombCurrentPrice() * amount;
+                    uint256 price = getBombCurrentPrice() * amount;
 
-            if (price > 0) {
-                require(value >= price, "mopn token not enough");
+                    if (price > 0) {
+                        require(value >= price, "mopn token not enough");
+                    }
+
+                    if (value > price) {
+                        IMOPNToken(governance.mtContract()).transferFrom(
+                            address(this),
+                            from,
+                            value - price
+                        );
+                    }
+
+                    _buyBomb(from, amount);
+                }
+            } else if (buyType == 2) {
+                uint256 price = getLandCurrentPrice();
+
+                if (price > 0) {
+                    require(value >= price, "mopn token not enough");
+                }
+
+                if (value > price) {
+                    IMOPNToken(governance.mtContract()).transferFrom(
+                        address(this),
+                        from,
+                        value - price
+                    );
+                }
+
+                _buyLand(from);
             }
-
-            if (value > price) {
-                IMOPNToken(governance.mtContract()).transferFrom(
-                    address(this),
-                    from,
-                    value - price
-                );
-            }
-
-            _buyBomb(from, amount);
         }
 
         return IERC20Receiver.onERC20Received.selector;

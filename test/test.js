@@ -519,7 +519,7 @@ describe("MOPN", function () {
       owner.address,
       mopnauctionHouse.address,
       (await mopnauctionHouse.getBombCurrentPrice()) * 5,
-      ethers.utils.solidityPack(["uint256"], [5])
+      ethers.utils.solidityPack(["uint256", "uint256"], [1, 5])
     );
     await buybombtx1.wait();
 
