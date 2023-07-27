@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "hardhat/console.sol";
 
-import "./erc6551/interfaces/IERC6551Account.sol";
+import "./erc6551/interfaces/IMOPNERC6551Account.sol";
 import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
@@ -49,14 +49,32 @@ contract MOPNData is Multicall {
         governance = IMOPNGovernance(governance_);
     }
 
-    function batchMintAccountMT(address[] memory accounts) public {
+    function batchsettleAccountMT(address[] memory accounts) public {
         IMOPN mopn = IMOPN(governance.mopnContract());
         mopn.settlePerMOPNPointMinted();
         for (uint256 i = 0; i < accounts.length; i++) {
             address accountCollection = mopn.getAccountCollection(accounts[i]);
-            mopn.mintCollectionMT(accountCollection);
-            mopn.mintAccountMT(accounts[i]);
+            mopn.settleCollectionMT(accountCollection);
+            mopn.settleAccountMT(accounts[i]);
         }
+    }
+
+    function batchClaimAccountMT(address[] memory accounts) public {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        mopn.settlePerMOPNPointMinted();
+        uint256 amount;
+        for (uint256 i = 0; i < accounts.length; i++) {
+            if (
+                !IMOPNERC6551Account(payable(accounts[i])).isOwner(msg.sender)
+            ) {
+                continue;
+            }
+            address accountCollection = mopn.getAccountCollection(accounts[i]);
+            mopn.settleCollectionMT(accountCollection);
+            mopn.settleAccountMT(accounts[i]);
+            amount += mopn.claimAccountMT(accounts[i]);
+        }
+        governance.mintMT(msg.sender, amount);
     }
 
     function getAccountData(
@@ -173,7 +191,9 @@ contract MOPNData is Multicall {
         cData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
             governance.getCollectionVault(collectionAddress)
         );
-        cData.UnclaimMTBalance = mopn.calcCollectionMT(collectionAddress);
+        cData.UnclaimMTBalance = mopn.calcCollectionSettledMT(
+            collectionAddress
+        );
 
         cData.AdditionalMOPNPoints = mopn.getCollectionAdditionalMOPNPoints(
             collectionAddress
@@ -207,5 +227,15 @@ contract MOPNData is Multicall {
         for (uint256 i = 0; i < collectionAddresses.length; i++) {
             cDatas[i] = getCollectionData(collectionAddresses[i]);
         }
+    }
+
+    function getTotalMTStakingRealtime() public view returns (uint256) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        return
+            (((mopn.MTTotalMinted() +
+                (mopn.calcPerMOPNPointMinted() - mopn.PerMOPNPointMinted()) *
+                mopn.TotalMOPNPoints()) * 5) / 100) -
+            mopn.TotalCollectionClaimed() +
+            mopn.TotalMTStaking();
     }
 }

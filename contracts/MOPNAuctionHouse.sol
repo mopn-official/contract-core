@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "hardhat/console.sol";
+
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNLand.sol";
+import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
@@ -29,9 +32,7 @@ contract MOPNAuctionHouse is Multicall, Ownable {
     uint256 public bombRound;
 
     uint256 private constant _BITPOS_STARTTIMESTAMP = 8;
-    uint256 private constant _BITMASK_TIMESTAMP_ENTRY = (1 << 32) - 1;
     uint256 private constant _BITPOS_ROUNDID = 40;
-    uint256 private constant _BITMASK_ROUNDID_ENTRY = (1 << 8) - 1;
 
     /**
      * @dev record the deal price by round
@@ -41,19 +42,15 @@ contract MOPNAuctionHouse is Multicall, Ownable {
 
     /**
      * @dev record the last participate round auction data
-     * @dev wallet address => uint64 total spend + uint64 roundId + uint8 auction amount + uint8 agio redeem status
+     * @dev wallet address => uint64 total spend + uint64 roundId + uint8 auction amount
      *
      * Bits Layout:
-     * - [0]        `agio redeem status`
-     * - [1..8]     `auction amount`
-     * - [9..72]    `roundId`
-     * - [72..255]  `total spend`
+     * - [0..7]     `auction amount`
+     * - [8..71]    `roundId`
+     * - [72..135]  `total spend`
      */
     mapping(address => uint256) public bombWalletData;
-    uint256 private constant _BITPOS_WALLET_AMOUNT = 1;
-    uint256 private constant _BITMASK_WALLET_AMOUNT_ENTRY = (1 << 8) - 1;
-    uint256 private constant _BITPOS_WALLET_ROUNDID = 9;
-    uint256 private constant _BITMASK_WALLET_ROUNDID_ENTRY = (1 << 64) - 1;
+    uint256 private constant _BITPOS_WALLET_ROUNDID = 8;
     uint256 private constant _BITPOS_WALLET_TOTAL_SPEND = 72;
 
     event BombSold(address indexed buyer, uint256 amount, uint256 price);
@@ -90,16 +87,9 @@ contract MOPNAuctionHouse is Multicall, Ownable {
      * @param amount the amount of bombs
      */
     function buyBomb(uint8 amount) public {
-        uint256 roundStartTimestamp = getBombRoundStartTimestamp();
-        require(block.timestamp > roundStartTimestamp, "auction not start");
+        _redeemAgio(msg.sender);
 
-        redeemAgio();
-
-        uint256 roundId = getBombRoundId();
-        uint8 roundSold = getBombRoundSold() + amount;
-        require(roundSold <= bombRoundProduce, "round out of stock");
-        uint256 currentPrice = getBombCurrentPrice();
-        uint256 price = currentPrice * amount;
+        uint256 price = getBombCurrentPrice() * amount;
 
         if (price > 0) {
             require(
@@ -114,21 +104,31 @@ contract MOPNAuctionHouse is Multicall, Ownable {
             );
         }
 
-        governance.mintBomb(msg.sender, amount);
+        _buyBomb(msg.sender, amount);
+    }
 
-        bombWalletData[msg.sender] =
-            ((getBombWalletTotalSpend(msg.sender) + price) <<
+    function _buyBomb(address buyer, uint256 amount) internal {
+        uint256 roundId = getBombRoundId();
+        uint256 roundSold = getBombRoundSold() + amount;
+        require(roundSold <= bombRoundProduce, "round out of stock");
+        uint256 currentPrice = getBombCurrentPrice();
+        uint256 price = getBombCurrentPrice() * amount;
+
+        governance.mintBomb(buyer, amount);
+
+        bombWalletData[buyer] =
+            ((getBombWalletTotalSpend(buyer) + price) <<
                 _BITPOS_WALLET_TOTAL_SPEND) |
             (uint256(roundId) << _BITPOS_WALLET_ROUNDID) |
-            (uint256(getBombWalletAuctionAmount(msg.sender) + amount) <<
-                _BITPOS_WALLET_AMOUNT);
+            uint256(getBombWalletAuctionAmount(buyer) + amount);
 
         if (roundSold >= bombRoundProduce) {
             settleBombPreviousRound(roundId, currentPrice);
+            _redeemAgio(buyer);
         } else {
             bombRound += amount;
         }
-        emit BombSold(msg.sender, amount, currentPrice);
+        emit BombSold(buyer, amount, currentPrice);
     }
 
     /**
@@ -140,14 +140,11 @@ contract MOPNAuctionHouse is Multicall, Ownable {
     }
 
     function getBombRoundStartTimestamp() public view returns (uint32) {
-        return
-            uint32(
-                (bombRound >> _BITPOS_STARTTIMESTAMP) & _BITMASK_TIMESTAMP_ENTRY
-            );
+        return uint32(bombRound >> _BITPOS_STARTTIMESTAMP);
     }
 
-    function getBombRoundSold() public view returns (uint8) {
-        return uint8(bombRound & _BITMASK_ROUNDID_ENTRY);
+    function getBombRoundSold() public view returns (uint256) {
+        return uint8(bombRound);
     }
 
     function getBombWalletTotalSpend(
@@ -157,27 +154,13 @@ contract MOPNAuctionHouse is Multicall, Ownable {
     }
 
     function getBombWalletRoundId(address wallet) public view returns (uint64) {
-        return
-            uint64(
-                (bombWalletData[wallet] >> _BITPOS_WALLET_ROUNDID) &
-                    _BITMASK_WALLET_ROUNDID_ENTRY
-            );
+        return uint64(bombWalletData[wallet] >> _BITPOS_WALLET_ROUNDID);
     }
 
     function getBombWalletAuctionAmount(
         address wallet
     ) public view returns (uint8) {
-        return
-            uint8(
-                (bombWalletData[wallet] >> _BITPOS_WALLET_AMOUNT) &
-                    _BITMASK_WALLET_AMOUNT_ENTRY
-            );
-    }
-
-    function getBombWalletAgioRedeemStatus(
-        address wallet
-    ) public view returns (uint8) {
-        return uint8(bombWalletData[wallet] & 0x1);
+        return uint8(bombWalletData[wallet]);
     }
 
     function getBombRoundPrice(uint256 roundId) public view returns (uint256) {
@@ -235,9 +218,6 @@ contract MOPNAuctionHouse is Multicall, Ownable {
         if (bombWalletData[to] == 0) {
             return (0, 0);
         }
-        if (getBombWalletAgioRedeemStatus(to) == 1) {
-            return (0, 0);
-        }
         roundId = getBombWalletRoundId(to);
         if (roundId != getBombRoundId()) {
             uint8 amount = getBombWalletAuctionAmount(to);
@@ -292,7 +272,7 @@ contract MOPNAuctionHouse is Multicall, Ownable {
     }
 
     function getLandRoundStartTimestamp() public view returns (uint32) {
-        return uint32(landRound & _BITMASK_TIMESTAMP_ENTRY);
+        return uint32(landRound);
     }
 
     /**
@@ -352,5 +332,40 @@ contract MOPNAuctionHouse is Multicall, Ownable {
         roundId = getLandRoundId();
         price = getLandCurrentPrice();
         startTimestamp = getLandRoundStartTimestamp();
+    }
+
+    function onERC20Received(
+        address,
+        address from,
+        uint256 value,
+        bytes memory data
+    ) public returns (bytes4) {
+        require(
+            msg.sender == governance.mtContract(),
+            "only accept mopn token"
+        );
+
+        uint256 amount = abi.decode(data, (uint256));
+        if (amount > 0) {
+            _redeemAgio(from);
+
+            uint256 price = getBombCurrentPrice() * amount;
+
+            if (price > 0) {
+                require(value >= price, "mopn token not enough");
+            }
+
+            if (value > price) {
+                IMOPNToken(governance.mtContract()).transferFrom(
+                    address(this),
+                    from,
+                    value - price
+                );
+            }
+
+            _buyBomb(from, amount);
+        }
+
+        return IERC20Receiver.onERC20Received.selector;
     }
 }

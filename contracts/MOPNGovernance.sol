@@ -183,7 +183,10 @@ contract MOPNGovernance is Multicall, Ownable {
     }
 
     modifier onlyMOPN() {
-        require(msg.sender == mopnContract, "not allowed");
+        require(
+            msg.sender == mopnContract || msg.sender == mopnDataContract,
+            "not allowed"
+        );
         _;
     }
 

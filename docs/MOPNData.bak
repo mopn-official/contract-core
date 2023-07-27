@@ -292,7 +292,7 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice get collection realtime unclaimed minted mopn token
      * @param collectionAddress collection contract address
      */
-    function calcCollectionMT(
+    function calcCollectionSettledMT(
         address collectionAddress
     ) public view returns (uint256 inbox) {
         inbox = getCollectionSettledMT(collectionAddress);
@@ -339,7 +339,7 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice mint collection mopn token
      * @param collectionAddress collection contract address
      */
-    function mintCollectionMT(address collectionAddress) public {
+    function settleCollectionMT(address collectionAddress) public {
         uint256 CollectionPerMOPNPointMinted = getCollectionPerMOPNPointMinted(
             collectionAddress
         );
@@ -499,7 +499,7 @@ contract MOPNData is IMOPNData, Multicall {
         address collectionAddress
     ) public onlyCollectionVault(collectionAddress) {
         settlePerMOPNPointMinted();
-        mintCollectionMT(collectionAddress);
+        settleCollectionMT(collectionAddress);
         claimCollectionMT(collectionAddress);
     }
 
@@ -597,7 +597,7 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice mint avatar mopn token
      * @param account account wallet address
      */
-    function mintAccountMT(address account) public returns (uint256) {
+    function settleAccountMT(address account) public returns (uint256) {
         uint256 AccountTotalMOPNPoint = getAccountTotalMOPNPoint(account);
         uint256 AccountPerMOPNPointMintedDiff = PerMOPNPointMinted() -
             getAccountPerMOPNPointMinted(account);
@@ -643,12 +643,12 @@ contract MOPNData is IMOPNData, Multicall {
      * @notice redeem account unclaimed minted mopn token
      * @param account account wallet address
      */
-    function claimAccountMT(
+    function settleAndClaimAccountMT(
         address account
     ) public onlyMT returns (uint256 amount) {
         settlePerMOPNPointMinted();
-        mintCollectionMT(getAccountCollection(account));
-        mintAccountMT(account);
+        settleCollectionMT(getAccountCollection(account));
+        settleAccountMT(account);
 
         amount = getAccountSettledMT(account);
         if (amount > 0) {
@@ -734,8 +734,8 @@ contract MOPNData is IMOPNData, Multicall {
     ) internal {
         amount *= 100;
         settlePerMOPNPointMinted();
-        mintCollectionMT(collectionAddress);
-        uint256 exist = mintAccountMT(account);
+        settleCollectionMT(collectionAddress);
+        uint256 exist = settleAccountMT(account);
         if (exist == 0) {
             addCollectionOnMapNum(collectionAddress);
             uint256 collectinPoint = getCollectionMOPNPoint(collectionAddress);
@@ -765,9 +765,9 @@ contract MOPNData is IMOPNData, Multicall {
     ) internal {
         amount *= 100;
         settlePerMOPNPointMinted();
-        mintCollectionMT(collectionAddress);
+        settleCollectionMT(collectionAddress);
         if (amount == 0) {
-            amount = mintAccountMT(account);
+            amount = settleAccountMT(account);
             subCollectionOnMapNum(collectionAddress);
             uint256 collectinPoint = getCollectionMOPNPoint(collectionAddress);
             uint256 additionalPoint = getCollectionAdditionalMOPNPoint(
@@ -779,7 +779,7 @@ contract MOPNData is IMOPNData, Multicall {
                 (additionalPoint << 32) |
                 amount;
         } else {
-            mintAccountMT(account);
+            settleAccountMT(account);
             MiningData1 -= amount;
             CollectionsData1[collectionAddress] -= amount;
         }

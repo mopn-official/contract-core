@@ -100,6 +100,10 @@ interface IMOPN {
 
     function NFTOfferCoefficient() external view returns (uint256);
 
+    function TotalCollectionClaimed() external view returns (uint256);
+
+    function TotalMTStaking() external view returns (uint256);
+
     function calcPerMOPNPointMinted() external view returns (uint256);
 
     function settlePerMOPNPointMinted() external;
@@ -124,7 +128,11 @@ interface IMOPN {
         address account
     ) external view returns (uint256 inbox);
 
-    function mintAccountMT(address account) external returns (uint256);
+    function settleAccountMT(address account) external returns (uint256);
+
+    function settleAndClaimAccountMT(
+        address account
+    ) external returns (uint256);
 
     function claimAccountMT(address account) external returns (uint256);
 
@@ -152,11 +160,11 @@ interface IMOPN {
         address collectionAddress
     ) external view returns (uint256);
 
-    function calcCollectionMT(
+    function calcCollectionSettledMT(
         address collectionAddress
     ) external view returns (uint256);
 
-    function mintCollectionMT(address collectionAddress) external;
+    function settleCollectionMT(address collectionAddress) external;
 
     function settleCollectionMining(address collectionAddress) external;
 

@@ -79,7 +79,7 @@ describe("MOPN", function () {
   });
 
   it("deploy MOPN contracts", async function () {
-    const unixTimeStamp = 1683828189; // Math.floor(Date.now() / 1000) - 73200;
+    const unixTimeStamp = Math.floor(Date.now() / 1000) - 86000;
     console.log("start timestamp", unixTimeStamp);
 
     const AuctionHouse = await ethers.getContractFactory("MOPNAuctionHouse");
@@ -450,7 +450,7 @@ describe("MOPN", function () {
     ]);
     await tx1.wait();
 
-    await new Promise((r) => setTimeout(r, 5000));
+    await new Promise((r) => setTimeout(r, 6000));
 
     await avatarInfo();
     await collectionInfo();
@@ -512,8 +512,16 @@ describe("MOPN", function () {
       ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
     );
 
-    const buybombtx = await mopnauctionHouse.buyBomb(10);
+    const buybombtx = await mopnauctionHouse.buyBomb(5);
     await buybombtx.wait();
+
+    const buybombtx1 = await mopnmt.safeTransferFrom(
+      owner.address,
+      mopnauctionHouse.address,
+      (await mopnauctionHouse.getBombCurrentPrice()) * 5,
+      ethers.utils.solidityPack(["uint256"], [5])
+    );
+    await buybombtx1.wait();
 
     console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
     console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());

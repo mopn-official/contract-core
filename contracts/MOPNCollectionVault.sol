@@ -100,10 +100,9 @@ contract MOPNCollectionVault is
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /
-                IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
+                (IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
                     address(this)
-                ) -
-                (onReceived ? MTAmount : 0);
+                ) - (onReceived ? MTAmount : 0));
         }
     }
 
@@ -144,7 +143,7 @@ contract MOPNCollectionVault is
 
     function getNFTOfferPrice() public view returns (uint256) {
         IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
-        uint256 amount = mopn.calcCollectionMT(
+        uint256 amount = mopn.calcCollectionSettledMT(
             CollectionVaultLib.collectionAddress()
         ) +
             IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(

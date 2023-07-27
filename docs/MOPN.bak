@@ -336,13 +336,13 @@ contract MOPN is IMOPN, Multicall, Ownable {
         tiles[tileCoordinate] = LandId;
     }
 
-    function batchMintAccountMT(address[] memory accounts) public {
+    function batchsettleAccountMT(address[] memory accounts) public {
         IMOPNData miningData = IMOPNData(governance.mopnDataContract());
         miningData.settlePerMOPNPointMinted();
         for (uint256 i = 0; i < accounts.length; i++) {
             address accountCollection = getAccountCollection(accounts[i]);
-            miningData.mintCollectionMT(accountCollection);
-            miningData.mintAccountMT(accounts[i]);
+            miningData.settleCollectionMT(accountCollection);
+            miningData.settleAccountMT(accounts[i]);
         }
     }
 
@@ -350,7 +350,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint32 LandId,
         address[] memory accounts
     ) public {
-        batchMintAccountMT(accounts);
+        batchsettleAccountMT(accounts);
         IMOPNData(governance.mopnDataContract()).redeemLandHolderMT(LandId);
     }
 
@@ -363,7 +363,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address[][] memory accounts
     ) public {
         for (uint256 i = 0; i < LandIds.length; i++) {
-            batchMintAccountMT(accounts[i]);
+            batchsettleAccountMT(accounts[i]);
         }
         IMOPNData(governance.mopnDataContract()).batchRedeemSameLandHolderMT(
             LandIds

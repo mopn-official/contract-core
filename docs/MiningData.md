@@ -322,10 +322,10 @@ get collection avatars on map mining mopn token allocation weight
 function getCollectionPoint(uint256 COID) public view returns (uint256 point)
 ```
 
-### calcCollectionMT
+### calcCollectionSettledMT
 
 ```solidity
-function calcCollectionMT(uint256 COID) public view returns (uint256 inbox)
+function calcCollectionSettledMT(uint256 COID) public view returns (uint256 inbox)
 ```
 
 get collection realtime unclaimed minted mopn token
@@ -336,10 +336,10 @@ get collection realtime unclaimed minted mopn token
 | ---- | ------- | ------------- |
 | COID | uint256 | collection Id |
 
-### mintCollectionMT
+### settleCollectionMT
 
 ```solidity
-function mintCollectionMT(uint256 COID) public
+function settleCollectionMT(uint256 COID) public
 ```
 
 mint collection mopn token

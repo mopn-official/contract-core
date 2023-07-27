@@ -11,4 +11,6 @@ interface IMOPNERC6551Account is IERC6551Account {
         bytes calldata data,
         address msgsender
     ) external payable returns (bytes memory);
+
+    function isOwner(address caller) external view returns (bool);
 }

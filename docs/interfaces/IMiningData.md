@@ -78,16 +78,16 @@ function getCollectionAvatarMOPNPoint(uint256 COID) external view returns (uint2
 function getCollectionPoint(uint256 COID) external view returns (uint256)
 ```
 
-### calcCollectionMT
+### calcCollectionSettledMT
 
 ```solidity
-function calcCollectionMT(uint256 COID) external view returns (uint256)
+function calcCollectionSettledMT(uint256 COID) external view returns (uint256)
 ```
 
-### mintCollectionMT
+### settleCollectionMT
 
 ```solidity
-function mintCollectionMT(uint256 COID) external
+function settleCollectionMT(uint256 COID) external
 ```
 
 ### redeemCollectionMT
