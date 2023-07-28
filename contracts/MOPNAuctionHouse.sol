@@ -358,42 +358,33 @@ contract MOPNAuctionHouse is Multicall, Ownable {
             if (buyType == 1) {
                 if (amount > 0) {
                     _redeemAgio(from);
-
-                    uint256 price = getBombCurrentPrice() * amount;
-
-                    if (price > 0) {
-                        require(value >= price, "mopn token not enough");
-                    }
-
-                    if (value > price) {
-                        IMOPNToken(governance.mtContract()).transferFrom(
-                            address(this),
-                            from,
-                            value - price
-                        );
-                    }
-
+                    _checkTransferInAndRefund(
+                        from,
+                        value,
+                        getBombCurrentPrice() * amount
+                    );
                     _buyBomb(from, amount);
                 }
             } else if (buyType == 2) {
-                uint256 price = getLandCurrentPrice();
-
-                if (price > 0) {
-                    require(value >= price, "mopn token not enough");
-                }
-
-                if (value > price) {
-                    IMOPNToken(governance.mtContract()).transferFrom(
-                        address(this),
-                        from,
-                        value - price
-                    );
-                }
-
+                _checkTransferInAndRefund(from, value, getLandCurrentPrice());
                 _buyLand(from);
             }
         }
 
         return IERC20Receiver.onERC20Received.selector;
+    }
+
+    function _checkTransferInAndRefund(
+        address from,
+        uint256 amount,
+        uint256 charge
+    ) internal {
+        if (charge > 0) {
+            require(amount >= charge, "mopn token not enough");
+        }
+
+        if (amount > charge) {
+            IMOPNToken(governance.mtContract()).transfer(from, amount - charge);
+        }
     }
 }

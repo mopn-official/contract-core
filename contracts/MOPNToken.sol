@@ -8,8 +8,9 @@ import "./interfaces/IMOPN.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MOPNToken is ERC20Burnable, Ownable {
+contract MOPNToken is ERC20Burnable, Ownable, Multicall {
     /**
      * @dev Magic value to be returned by ERC20Receiver upon successful reception of token(s)
      * @dev Equal to `bytes4(keccak256("onERC20Received(address,address,uint256,bytes)"))`,
@@ -31,6 +32,10 @@ contract MOPNToken is ERC20Burnable, Ownable {
 
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
+    }
+
+    function createCollectionVault(address collectionAddress) public {
+        governance.createCollectionVault(collectionAddress);
     }
 
     function safeTransferFrom(

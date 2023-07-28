@@ -38,8 +38,11 @@ contract MOPNCollectionVault is
         governance = governance_;
     }
 
-    function name() public pure override returns (string memory) {
-        return "MOPN VToken";
+    function name() public view override returns (string memory) {
+        return
+            string(
+                abi.encodePacked("MOPN VToken", " #", CollectionVaultLib.salt())
+            );
     }
 
     function symbol() public pure override returns (string memory) {

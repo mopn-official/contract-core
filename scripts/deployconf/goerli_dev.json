@@ -116,7 +116,7 @@
         ]
     },
     "MOPNAuctionHouse": {
-        "address": "0x8691DED0a41d2379A3705aC612E0c1E96941368e",
+        "address": "0x85d318b8F0607b341e38f4A210e2d511e136CB0e",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
