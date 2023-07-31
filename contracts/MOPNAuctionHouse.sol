@@ -70,6 +70,8 @@ contract MOPNAuctionHouse is Multicall, Ownable {
 
     uint256 private constant _BITPOS_LAND_ROUNDID = 32;
 
+    event LandSold(address indexed buyer, uint256 price);
+
     constructor(
         address governance_,
         uint256 bombStartTimestamp,
@@ -300,6 +302,8 @@ contract MOPNAuctionHouse is Multicall, Ownable {
         uint64 roundId = getLandRoundId();
 
         IMOPNLand(governance.landContract()).auctionMint(buyer, 1);
+
+        emit LandSold(buyer, getLandCurrentPrice());
 
         landRound =
             (uint256(roundId + 1) << _BITPOS_LAND_ROUNDID) |

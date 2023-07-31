@@ -7,8 +7,6 @@ import "./erc6551/interfaces/IMOPNERC6551Account.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MOPNERC6551AccountHelper is Multicall {
-    event AccountRent(address indexed account, address to, uint256 expiredAt);
-
     IMOPNGovernance immutable governance;
 
     constructor(address governance_) {
@@ -83,27 +81,5 @@ contract MOPNERC6551AccountHelper is Multicall {
                 data,
                 msg.sender
             );
-    }
-
-    function AccountRentNotify(address to, uint256 timeRange) public {
-        (
-            uint256 chainId,
-            address tokenContract,
-            uint256 tokenId
-        ) = IMOPNERC6551Account(payable(msg.sender)).token();
-
-        require(
-            msg.sender ==
-                computeAccount(
-                    governance.ERC6551AccountProxy(),
-                    chainId,
-                    tokenContract,
-                    tokenId,
-                    0
-                ),
-            "not allowed"
-        );
-
-        emit AccountRent(msg.sender, to, block.timestamp + timeRange);
     }
 }

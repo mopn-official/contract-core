@@ -12,7 +12,23 @@ interface IMOPNCollectionVault is IERC20 {
         uint256 currentPrice;
     }
 
+    event NFTOfferAccept(
+        address indexed collectionAddress,
+        uint256 tokenId,
+        uint256 price,
+        uint256 oldNFTOfferCoefficient,
+        uint256 newNFTOfferCoefficient
+    );
+
+    event NFTAuctionAccept(
+        address indexed collectionAddress,
+        uint256 tokenId,
+        uint256 price
+    );
+
     function getAuctionInfo() external view returns (NFTAuction memory auction);
 
     function MTBalance() external view returns (uint256 balance);
+
+    function collectionAddress() external view returns (address);
 }

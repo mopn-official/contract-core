@@ -23,7 +23,7 @@ import "@openzeppelin/contracts/utils/Create2.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
 contract MOPNGovernance is Multicall, Ownable {
-    uint256 vaultIndex;
+    uint256 public vaultIndex;
     event CollectionVaultCreated(
         address indexed collectionAddress,
         address indexed collectionVault
@@ -227,5 +227,18 @@ contract MOPNGovernance is Multicall, Ownable {
         address collectionAddress
     ) public view returns (address) {
         return CollectionVaults[collectionAddress];
+    }
+
+    function computeCollectionVault(
+        address collectionAddress,
+        uint256 salt
+    ) public view returns (address) {
+        bytes memory code = CollectionVaultBytecodeLib.getCreationCode(
+            mopnCollectionVaultContract,
+            collectionAddress,
+            salt
+        );
+
+        return Create2.computeAddress(bytes32(salt), keccak256(code));
     }
 }

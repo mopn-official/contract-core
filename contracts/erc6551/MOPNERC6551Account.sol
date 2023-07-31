@@ -32,6 +32,8 @@ contract MOPNERC6551Account is
     IERC1155Receiver,
     IMOPNERC6551Account
 {
+    event AccountRent(address to, uint256 expiredAt);
+
     address private constant delegatecash =
         0x00000000000076A84feF008CDAbe6409d2FE638B;
 
@@ -242,5 +244,7 @@ contract MOPNERC6551Account is
         IMOPNERC6551AccountHelper(
             IMOPNGovernance(governance).ERC6551AccountHelper()
         ).AccountRentNotify(to, timeRange);
+
+        emit AccountRent(to, block.timestamp + timeRange);
     }
 }

@@ -689,8 +689,10 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
-    function claimCollectionMT(address collectionAddress) public {
-        uint256 amount = getCollectionSettledMT(collectionAddress);
+    function claimCollectionMT(
+        address collectionAddress
+    ) public returns (uint256 amount) {
+        amount = getCollectionSettledMT(collectionAddress);
         if (amount > 0) {
             address collectionVault = governance.getCollectionVault(
                 collectionAddress
@@ -728,17 +730,15 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 CollectionsData[collectionAddress] -
                 (lastPoint << 72) +
                 (point << 72);
-
-            emit SettleCollectionMOPNPoint(collectionAddress);
         }
     }
 
     function settleCollectionMining(
         address collectionAddress
-    ) public onlyCollectionVault(collectionAddress) {
+    ) public onlyCollectionVault(collectionAddress) returns (uint256) {
         settlePerMOPNPointMinted();
         settleCollectionMT(collectionAddress);
-        claimCollectionMT(collectionAddress);
+        return claimCollectionMT(collectionAddress);
     }
 
     function accountClaimAvailable(address account) public view returns (bool) {
@@ -1032,51 +1032,38 @@ contract MOPN is IMOPN, Multicall, Ownable {
         AccountsData[account] -= amount;
     }
 
-    function NFTOfferAcceptNotify(
+    function NFTOfferAccept(
         address collectionAddress,
-        uint256 price,
-        uint256 tokenId
-    ) public onlyCollectionVault(collectionAddress) {
+        uint256 price
+    )
+        public
+        onlyCollectionVault(collectionAddress)
+        returns (uint256 oldNFTOfferCoefficient, uint256 newNFTOfferCoefficient)
+    {
         uint256 totalMTStakingRealtime = ((MTTotalMinted() * 5) / 100) -
             TotalCollectionClaimed() +
             TotalMTStaking();
-        uint256 NFTOfferCoefficient_ = NFTOfferCoefficient();
+        oldNFTOfferCoefficient = NFTOfferCoefficient();
+        newNFTOfferCoefficient =
+            ((totalMTStakingRealtime + 1000000 - price) *
+                oldNFTOfferCoefficient) /
+            (totalMTStakingRealtime + 1000000);
         MiningDataExt =
             MiningDataExt -
-            (NFTOfferCoefficient_ << 128) +
-            ((((totalMTStakingRealtime + 1000000 - price) *
-                NFTOfferCoefficient_) / (totalMTStakingRealtime + 1000000)) <<
-                128);
-        emit NFTOfferAccept(
-            collectionAddress,
-            tokenId,
-            price,
-            totalMTStakingRealtime,
-            NFTOfferCoefficient_
-        );
-    }
-
-    function NFTAuctionAcceptNotify(
-        address collectionAddress,
-        uint256 price,
-        uint256 tokenId
-    ) public onlyCollectionVault(collectionAddress) {
-        emit NFTAuctionAccept(collectionAddress, tokenId, price);
+            (oldNFTOfferCoefficient << 128) +
+            (newNFTOfferCoefficient << 128);
     }
 
     function changeTotalMTStaking(
         address collectionAddress,
-        bool increase,
-        uint256 amount,
-        address operator
+        uint256 direction,
+        uint256 amount
     ) public onlyCollectionVault(collectionAddress) {
-        if (increase) {
+        if (direction > 0) {
             MiningDataExt += amount;
         } else {
             MiningDataExt -= amount;
         }
-
-        emit VaultStakingChange(collectionAddress, operator, increase, amount);
     }
 
     modifier onlyCollectionVault(address collectionAddress) {

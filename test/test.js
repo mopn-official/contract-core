@@ -27,7 +27,7 @@ describe("MOPN", function () {
 
   it("deply Governance", async function () {
     const MOPNGovernance = await ethers.getContractFactory("MOPNGovernance");
-    mopngovernance = await MOPNGovernance.deploy(31337);
+    mopngovernance = await MOPNGovernance.deploy();
     await mopngovernance.deployed();
     console.log("MOPNGovernance", mopngovernance.address);
   });
@@ -112,11 +112,6 @@ describe("MOPN", function () {
   });
 
   it("deploy MOPNLand", async function () {
-    const MOPNLand = await ethers.getContractFactory("MOPNLand");
-    mopnland = await MOPNLand.deploy();
-    await mopnland.deployed();
-    console.log("MOPNLand ", mopnland.address);
-
     const NFTSVG = await ethers.getContractFactory("NFTSVG");
     const nftsvg = await NFTSVG.deploy();
     await nftsvg.deployed();
@@ -142,10 +137,21 @@ describe("MOPN", function () {
     await mopnlandMetaDataRender.deployed();
     console.log("MOPNLandMetaDataRender", mopnlandMetaDataRender.address);
 
+    const unixTimeStamp = Math.floor(Date.now() / 1000) - 86000;
+    const MOPNLand = await ethers.getContractFactory("MOPNLand");
+    mopnland = await MOPNLand.deploy(
+      unixTimeStamp,
+      200000000000000,
+      1001,
+      owner.address,
+      mopnlandMetaDataRender.address,
+      mopnauctionHouse.address
+    );
+    await mopnland.deployed();
+    console.log("MOPNLand ", mopnland.address);
+
     console.log("mint some land");
-    let minpasstx = await mopnland.claim(owner.address, 0);
-    await minpasstx.wait();
-    minpasstx = await mopnland.claim(owner.address, 100);
+    let minpasstx = await mopnland.ethMint(5, { value: "1000000000000000000" });
     await minpasstx.wait();
   });
 
@@ -575,6 +581,16 @@ describe("MOPN", function () {
     );
   });
 
+  it("test mopndata batchClaimAccountMT", async function () {
+    const tx = await mopnData.batchClaimAccountMT(accounts);
+    await tx.wait();
+
+    console.log(
+      "wallet balance",
+      ethers.utils.formatUnits(await mopnmt.balanceOf(owner.address), mtdecimals)
+    );
+  });
+
   it("test stakingMT", async function () {
     console.log(await mopnData.getCollectionData(collections[1]));
 
@@ -603,13 +619,16 @@ describe("MOPN", function () {
     console.log("vault1 mt balance", await mopnmt.balanceOf(vault1.address));
     console.log(collection1, "collectionpoint 1", await mopn.getCollectionMOPNPoint(collection1));
 
-    console.log("create collection", collection2, "vault by transfer mt");
-    const tx3 = await mopnmt.safeTransferFrom(
-      owner.address,
-      mopngovernance.address,
-      ethers.BigNumber.from("15000000"),
-      ethers.utils.solidityPack(["address"], [collection2])
-    );
+    console.log("create collection", collection2, "multi call");
+    const tx3 = await mopnmt.multicall([
+      mopnmt.interface.encodeFunctionData("createCollectionVault", [collection2]),
+      mopnmt.interface.encodeFunctionData("safeTransferFrom", [
+        owner.address,
+        await mopngovernance.computeCollectionVault(collection2, await mopngovernance.vaultIndex()),
+        ethers.BigNumber.from("15000000"),
+        "0x",
+      ]),
+    ]);
     await tx3.wait();
 
     const vault2 = await ethers.getContractAt(

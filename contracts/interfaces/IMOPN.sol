@@ -47,29 +47,6 @@ interface IMOPN {
 
     event LandHolderMTMinted(uint32 indexed LandId, uint256 amount);
 
-    event NFTOfferAccept(
-        address indexed collectionAddress,
-        uint256 tokenId,
-        uint256 price,
-        uint256 totalMTStaking,
-        uint256 NFTOfferCoefficient
-    );
-
-    event NFTAuctionAccept(
-        address indexed collectionAddress,
-        uint256 tokenId,
-        uint256 price
-    );
-
-    event VaultStakingChange(
-        address collectionAddress,
-        address operator,
-        bool increase,
-        uint256 amount
-    );
-
-    event SettleCollectionMOPNPoint(address collectionAddress);
-
     function getQualifiedAccountCollection(
         address account
     ) external view returns (address, uint256);
@@ -166,28 +143,22 @@ interface IMOPN {
 
     function settleCollectionMT(address collectionAddress) external;
 
-    function settleCollectionMining(address collectionAddress) external;
+    function settleCollectionMining(
+        address collectionAddress
+    ) external returns (uint256);
 
     function settleCollectionMOPNPoint(address collectionAddress) external;
 
     function changeTotalMTStaking(
         address collectionAddress,
-        bool increase,
-        uint256 amount,
-        address operator
+        uint256 direction,
+        uint256 amount
     ) external;
 
-    function NFTOfferAcceptNotify(
+    function NFTOfferAccept(
         address collectionAddress,
-        uint256 price,
-        uint256 tokenId
-    ) external;
-
-    function NFTAuctionAcceptNotify(
-        address collectionAddress,
-        uint256 price,
-        uint256 tokenId
-    ) external;
+        uint256 price
+    ) external returns (uint256, uint256);
 
     function addMOPNPoint(
         address account,

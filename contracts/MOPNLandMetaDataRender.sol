@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "./interfaces/IMOPNLandMetaDataRender.sol";
+import "./interfaces/ILandMetaDataRender.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./libraries/NFTMetaData.sol";
 
-contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
+contract MOPNLandMetaDataRender is ILandMetaDataRender {
     IMOPNGovernance public governance;
 
     /**
