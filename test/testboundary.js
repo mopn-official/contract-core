@@ -678,8 +678,6 @@ describe("MOPN", function () {
   });
 
   it("test land account", async function () {
-    console.log(await mopn.getLandIdSettledMT(0));
-
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
       31337,
@@ -702,8 +700,8 @@ describe("MOPN", function () {
     const tx1 = await mopn.registerLandAccount(account);
     await tx1.wait();
 
-    console.log(await mopn.getLandIdSettledMT(0));
     console.log(await mopn.getLandIdAccount(0));
+    console.log(await mopn.getLandAccountId(account));
     console.log(await mopn.calcAccountMT(account));
 
     console.log("account", account, "balance", await mopnmt.balanceOf(account));

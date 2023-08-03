@@ -41,7 +41,13 @@ contract MOPNCollectionVault is
     function name() public view override returns (string memory) {
         return
             string(
-                abi.encodePacked("MOPN VToken", " #", CollectionVaultLib.salt())
+                abi.encodePacked(
+                    "MOPN VToken",
+                    " #",
+                    IMOPNGovernance(governance).getCollectionVaultIndex(
+                        collectionAddress()
+                    )
+                )
             );
     }
 
@@ -87,7 +93,7 @@ contract MOPNCollectionVault is
     ) public view returns (uint256) {
         int128 reducePercentage = ABDKMath64x64.divu(99, 100);
         int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, getOfferAcceptPrice() * 2);
+        return ABDKMath64x64.mulu(reducePower, getOfferAcceptPrice() * 10);
     }
 
     function getAuctionInfo() public view returns (NFTAuction memory auction) {
@@ -280,6 +286,8 @@ contract MOPNCollectionVault is
                 price + burnAmount
             );
         } else {
+            require(value >= 1000000000, "minimum staking value is 1000");
+            require(getOfferStatus() == 0, "no staking during auction");
             mopn.settleCollectionMining(collectionAddress_);
 
             uint256 vtokenAmount = MT2VAmount(value, true);

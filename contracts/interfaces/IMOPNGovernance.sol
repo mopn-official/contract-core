@@ -41,6 +41,10 @@ interface IMOPNGovernance {
         address collectionAddress
     ) external returns (address);
 
+    function getCollectionVaultIndex(
+        address collectionAddress
+    ) external view returns (uint256);
+
     function getCollectionVault(
         address collectionAddress
     ) external view returns (address);

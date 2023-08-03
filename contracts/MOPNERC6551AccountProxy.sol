@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.19;
+
+import "hardhat/console.sol";
 
 import "./interfaces/IMOPNGovernance.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -8,16 +10,16 @@ import "@openzeppelin/contracts/proxy/Proxy.sol";
 import "./erc6551/lib/ERC6551AccountLib.sol";
 
 contract MOPNERC6551AccountProxy is Proxy, ERC1967Upgrade {
-    address immutable governance;
+    address public immutable governance;
+    address public immutable defaultImplementation;
 
-    constructor(address governance_) {
+    constructor(address governance_, address defaultImplementation_) {
         governance = governance_;
+        defaultImplementation = defaultImplementation_;
     }
 
     function initialize() external {
-        address implementation_ = _implementation();
-
-        if (implementation_ == address(0)) {
+        if (ERC1967Upgrade._getImplementation() == address(0)) {
             ERC1967Upgrade._upgradeTo(
                 IMOPNGovernance(governance)
                     .getDefault6551AccountImplementation()
@@ -48,8 +50,15 @@ contract MOPNERC6551AccountProxy is Proxy, ERC1967Upgrade {
         ERC1967Upgrade._upgradeTo(implementation_);
     }
 
-    function _implementation() internal view override returns (address) {
-        return ERC1967Upgrade._getImplementation();
+    function _implementation()
+        internal
+        view
+        override
+        returns (address implementation_)
+    {
+        implementation_ = ERC1967Upgrade._getImplementation();
+        if (implementation_ == address(0))
+            implementation_ = defaultImplementation;
     }
 
     function implementation() public view returns (address) {

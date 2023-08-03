@@ -35,10 +35,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract MOPN is IMOPN, Multicall, Ownable {
     using TileMath for uint32;
 
-    uint256 public constant MTReduceInterval = 604800;
-
     uint256 public MTOutputPerSec;
     uint256 public MTStepStartTimestamp;
+
+    uint256 public immutable MTReduceInterval;
+    uint256 public immutable MaxCollectionOnMapNum;
+    uint256 public immutable MaxCollectionMOPNPoint;
 
     // Tile => uint160 account + uint32 MOPN Land Id
     mapping(uint32 => uint256) public tiles;
@@ -56,20 +58,27 @@ contract MOPN is IMOPN, Multicall, Ownable {
     ///         + uint24 AdditionalMOPNPoint + uint16 OnMapNftNumber + uint32 OnMapMOPNPoints
     mapping(address => uint256) public CollectionsData;
 
-    /// @notice uint32 Land Id + uint64 settled MT
+    /// @notice uint160 account address +  uint96 settled MT
     mapping(uint32 => uint256) public LandIdMTs;
-
-    /// @notice uint160 account address + uint64 settled MT
-    mapping(address => uint256) public LandAccountMTs;
 
     IMOPNGovernance public governance;
 
-    constructor(address governance_, uint256 MTStepStartTimestamp_) {
-        MTOutputPerSec = 5000000;
+    constructor(
+        address governance_,
+        uint256 MTOutputPerSec_,
+        uint256 MTStepStartTimestamp_,
+        uint256 MTReduceInterval_,
+        uint256 MaxCollectionOnMapNum_,
+        uint256 MaxCollectionMOPNPoint_
+    ) {
+        MTOutputPerSec = MTOutputPerSec_; //5000000
         MTStepStartTimestamp = MTStepStartTimestamp_;
+        MTReduceInterval = MTReduceInterval_; //604800
+        MaxCollectionOnMapNum = MaxCollectionOnMapNum_; //10000
+        MaxCollectionMOPNPoint = MaxCollectionMOPNPoint_; //99999
         governance = IMOPNGovernance(governance_);
         MiningData = MTStepStartTimestamp_ << 128;
-        MiningDataExt = (10 ** 18) << 128;
+        MiningDataExt = (10 ** 17) << 128;
     }
 
     function batchSetCollectionAdditionalMOPNPoints(
@@ -132,6 +141,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
      * @param tileCoordinate NFT move To coordinate
      */
     function moveTo(uint32 tileCoordinate, uint32 LandId) public {
+        require(block.timestamp > MTStepStartTimestamp, "mopn is not open yet");
         tileCoordinate.check();
         (address collectionAddress, ) = getQualifiedAccountCollection(
             msg.sender
@@ -159,6 +169,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
             emit AccountMove(msg.sender, LandId, orgCoordinate, tileCoordinate);
         } else {
+            require(
+                getCollectionOnMapNum(collectionAddress) <
+                    MaxCollectionOnMapNum,
+                "collection on map nft number overflow"
+            );
             tileMOPNPoint +=
                 IMOPNBomb(governance.bombContract()).balanceOf(msg.sender, 2) *
                 100;
@@ -501,6 +516,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 ).MTBalance() /
                 10 ** 8;
         }
+        if (point > MaxCollectionMOPNPoint) {
+            point = MaxCollectionMOPNPoint;
+        }
     }
 
     /**
@@ -744,8 +762,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function accountClaimAvailable(address account) public view returns (bool) {
         return
             getAccountSettledMT(account) > 0 ||
-            getAccountCoordinate(account) > 0 ||
-            getLandAccountSettledMT(account) > 0;
+            getAccountCoordinate(account) > 0;
     }
 
     function getAccountCollection(
@@ -820,8 +837,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 inbox += (AccountPerCollectionNFTMintedDiff * 90) / 100;
             }
         }
-
-        inbox += getLandAccountSettledMT(account);
     }
 
     /**
@@ -855,7 +870,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             uint256 landamount = (amount * 5) / 100;
             address landAccount = getLandIdAccount(LandId);
             if (landAccount != address(0)) {
-                LandAccountMTs[landAccount] += landamount;
+                AccountsData[landAccount] += landamount << 192;
             } else {
                 LandIdMTs[LandId] += landamount;
             }
@@ -900,12 +915,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
         if (amount > 0) {
             AccountsData[account] -= amount << 192;
         }
-
-        uint256 landAmount = getLandAccountSettledMT(account);
-        if (landAmount > 0) {
-            LandAccountMTs[account] -= landAmount;
-            amount += landAmount;
-        }
     }
 
     /**
@@ -913,21 +922,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
      * @param LandId MOPN Land Id
      */
     function getLandIdSettledMT(uint32 LandId) public view returns (uint256) {
-        return uint64(LandIdMTs[LandId]);
+        return uint96(LandIdMTs[LandId]);
     }
 
     function getLandIdAccount(uint32 LandId) public view returns (address) {
-        return address(uint160(LandIdMTs[LandId] >> 64));
-    }
-
-    function getLandAccountSettledMT(
-        address account
-    ) public view returns (uint256) {
-        return uint64(LandAccountMTs[account]);
-    }
-
-    function getLandAccountId(address account) public view returns (uint32) {
-        return uint32(LandAccountMTs[account] >> 64);
+        return address(uint160(LandIdMTs[LandId] >> 96));
     }
 
     function registerLandAccount(address account) public {
@@ -939,12 +938,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
             collectionAddress == governance.landContract(),
             "not a land account"
         );
-        if (LandAccountMTs[account] == 0) {
-            LandAccountMTs[account] =
-                (tokenId << 64) |
-                uint64(LandIdMTs[uint32(tokenId)]);
-            LandIdMTs[uint32(tokenId)] = (uint256(uint160(account)) << 64);
-        }
+        AccountsData[account] += getLandIdSettledMT(uint32(tokenId)) << 192;
+        LandIdMTs[uint32(tokenId)] = (uint256(uint160(account)) << 96);
     }
 
     function addMOPNPoint(

@@ -29,7 +29,8 @@ contract MOPNGovernance is Multicall, Ownable {
         address indexed collectionVault
     );
 
-    mapping(address => address) public CollectionVaults;
+    /// uint160 vaultAdderss + uint96 vaultIndex
+    mapping(address => uint256) public CollectionVaults;
 
     address public ERC6551Registry;
     address public ERC6551AccountProxy;
@@ -45,6 +46,35 @@ contract MOPNGovernance is Multicall, Ownable {
         ERC6551Registry = ERC6551Registry_;
         ERC6551AccountProxy = ERC6551AccountProxy_;
         ERC6551AccountHelper = ERC6551AccountHelper_;
+    }
+
+    address public auctionHouseContract;
+    address public mopnContract;
+    address public bombContract;
+    address public mtContract;
+    address public pointContract;
+    address public landContract;
+    address public mopnDataContract;
+    address public mopnCollectionVaultContract;
+
+    function updateMOPNContracts(
+        address auctionHouseContract_,
+        address mopnContract_,
+        address bombContract_,
+        address mtContract_,
+        address pointContract_,
+        address landContract_,
+        address mopnDataContract_,
+        address mopnCollectionVaultContract_
+    ) public onlyOwner {
+        auctionHouseContract = auctionHouseContract_;
+        mopnContract = mopnContract_;
+        bombContract = bombContract_;
+        mtContract = mtContract_;
+        pointContract = pointContract_;
+        landContract = landContract_;
+        mopnDataContract = mopnDataContract_;
+        mopnCollectionVaultContract = mopnCollectionVaultContract_;
     }
 
     function getDefault6551AccountImplementation()
@@ -122,36 +152,11 @@ contract MOPNGovernance is Multicall, Ownable {
         return false;
     }
 
-    address public auctionHouseContract;
-    address public mopnContract;
-    address public bombContract;
-    address public mtContract;
-    address public pointContract;
-    address public landContract;
-    address public mopnDataContract;
-    address public mopnCollectionVaultContract;
-
-    function updateMOPNContracts(
-        address auctionHouseContract_,
-        address mopnContract_,
-        address bombContract_,
-        address mtContract_,
-        address pointContract_,
-        address landContract_,
-        address mopnDataContract_,
-        address mopnCollectionVaultContract_
-    ) public onlyOwner {
-        auctionHouseContract = auctionHouseContract_;
-        mopnContract = mopnContract_;
-        bombContract = bombContract_;
-        mtContract = mtContract_;
-        pointContract = pointContract_;
-        landContract = landContract_;
-        mopnDataContract = mopnDataContract_;
-        mopnCollectionVaultContract = mopnCollectionVaultContract_;
+    function mintMT(address to, uint256 amount) public onlyMOPN {
+        IMOPNToken(mtContract).mint(to, amount);
     }
 
-    function mintMT(address to, uint256 amount) public onlyMOPN {
+    function mintMT1(address to, uint256 amount) public onlyOwner {
         IMOPNToken(mtContract).mint(to, amount);
     }
 
@@ -188,57 +193,57 @@ contract MOPNGovernance is Multicall, Ownable {
         address collectionAddress
     ) public returns (address) {
         require(
-            CollectionVaults[collectionAddress] == address(0),
+            CollectionVaults[collectionAddress] == 0,
             "collection vault exist"
         );
 
-        address vaultAddress = _createCollectionVault(
-            collectionAddress,
-            vaultIndex
-        );
-        CollectionVaults[collectionAddress] = vaultAddress;
+        address vaultAddress = _createCollectionVault(collectionAddress);
+        CollectionVaults[collectionAddress] =
+            (uint256(uint160(vaultAddress)) << 96) |
+            vaultIndex;
         emit CollectionVaultCreated(collectionAddress, vaultAddress);
         vaultIndex++;
         return vaultAddress;
     }
 
     function _createCollectionVault(
-        address collectionAddress,
-        uint256 salt
+        address collectionAddress
     ) internal returns (address) {
         bytes memory code = CollectionVaultBytecodeLib.getCreationCode(
             mopnCollectionVaultContract,
             collectionAddress,
-            salt
+            0
         );
 
-        address _account = Create2.computeAddress(
-            bytes32(salt),
-            keccak256(code)
-        );
+        address _account = Create2.computeAddress(bytes32(0), keccak256(code));
 
         if (_account.code.length != 0) return _account;
 
-        _account = Create2.deploy(0, bytes32(salt), code);
+        _account = Create2.deploy(0, bytes32(0), code);
         return _account;
     }
 
     function getCollectionVault(
         address collectionAddress
     ) public view returns (address) {
-        return CollectionVaults[collectionAddress];
+        return address(uint160(CollectionVaults[collectionAddress] >> 96));
+    }
+
+    function getCollectionVaultIndex(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint96(CollectionVaults[collectionAddress]);
     }
 
     function computeCollectionVault(
-        address collectionAddress,
-        uint256 salt
+        address collectionAddress
     ) public view returns (address) {
         bytes memory code = CollectionVaultBytecodeLib.getCreationCode(
             mopnCollectionVaultContract,
             collectionAddress,
-            salt
+            0
         );
 
-        return Create2.computeAddress(bytes32(salt), keccak256(code));
+        return Create2.computeAddress(bytes32(0), keccak256(code));
     }
 }
