@@ -214,7 +214,7 @@ describe("MOPN", function () {
     await showWalletBalance();
   }
 
-  it("set allowance", async function () {
+  it("test bomb", async function () {
     await loadFixture(deployAndSetInitialNFTS);
 
     const allowanceTx = await mopnmt.approve(
@@ -222,57 +222,25 @@ describe("MOPN", function () {
       hre.ethers.BigNumber.from("10000000000000000")
     );
     await allowanceTx.wait();
-  });
 
-  it("test auction bomb", async function () {
-    for (let i = 0; i < 8; i++) {
-      console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
-      console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
-      console.log(
-        "current bomb price",
-        hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
-      );
+    const buybombtx = await mopnauctionHouse.buyBomb(10);
+    await buybombtx.wait();
 
-      const buybombtx = await mopnauctionHouse.buyBomb(1);
-      await buybombtx.wait();
+    await avatarInfo();
+    await collectionInfo();
 
-      await timeIncrease(600);
-    }
-
-    console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
-    console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
-    console.log(
-      "current bomb price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
-    );
-    const buybombtx1 = await mopnmt.safeTransferFrom(
+    const account = accounts[8];
+    const tx1 = await mopnbomb.safeTransferFrom(
       owner.address,
-      mopnauctionHouse.address,
-      (await mopnauctionHouse.getBombCurrentPrice()) * 2,
-      hre.ethers.utils.solidityPack(["uint256", "uint256"], [1, 1])
+      account,
+      1,
+      1,
+      hre.ethers.utils.solidityPack(["uint256"], [10001002])
     );
-    await buybombtx1.wait();
+    await tx1.wait();
 
-    await showWalletBalance();
-  });
-
-  it("test auction land", async function () {
-    console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
-    console.log(
-      "Current Land price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getLandCurrentPrice(), mtdecimals)
-    );
-
-    const buylandtx = await mopnauctionHouse.buyLand();
-    await buylandtx.wait();
-
-    console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
-    console.log(
-      "Current Land price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getLandCurrentPrice(), mtdecimals)
-    );
-
-    await showWalletBalance();
+    await avatarInfo();
+    await collectionInfo();
   });
 
   const avatarInfo = async () => {

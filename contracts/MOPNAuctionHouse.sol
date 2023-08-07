@@ -85,43 +85,41 @@ contract MOPNAuctionHouse is Multicall, Ownable {
      * @param amount the amount of bombs
      */
     function buyBomb(uint8 amount) public {
-        uint256 price = getBombCurrentPrice() * amount;
+        uint256 price = getBombCurrentPrice();
 
         if (price > 0) {
             require(
                 IMOPNToken(governance.mtContract()).balanceOf(msg.sender) >
-                    price,
+                    price * amount,
                 "mopn token not enough"
             );
             IMOPNToken(governance.mtContract()).transferFrom(
                 msg.sender,
                 address(this),
-                price
+                price * amount
             );
         }
 
-        _buyBomb(msg.sender, amount);
+        _buyBomb(msg.sender, amount, price);
     }
 
-    function _buyBomb(address buyer, uint256 amount) internal {
+    function _buyBomb(address buyer, uint256 amount, uint256 price) internal {
         uint256 roundSold = getBombRoundSold() + amount;
         require(roundSold <= bombRoundProduce, "round out of stock");
-        uint256 currentPrice = getBombCurrentPrice();
-        uint256 price = getBombCurrentPrice() * amount;
 
         governance.mintBomb(buyer, amount);
 
         bombRoundBuyers[getBombRoundBuyerNumber()] =
             (uint256(uint160(buyer)) << _BITPOS_BUYER_WALLET) |
-            (price << _BITPOS_BUYER_TOTAL_SPEND) |
+            ((price * amount) << _BITPOS_BUYER_TOTAL_SPEND) |
             amount;
 
         if (roundSold >= bombRoundProduce) {
-            settleBombRound(currentPrice);
+            settleBombRound(price);
         } else {
             bombRound += (uint256(1) << _BITPOS_BUYER_NUMBER) | amount;
         }
-        emit BombSold(buyer, amount, currentPrice);
+        emit BombSold(buyer, amount, price);
     }
 
     /**
@@ -255,10 +253,10 @@ contract MOPNAuctionHouse is Multicall, Ownable {
             IMOPNToken(governance.mtContract()).burnFrom(msg.sender, price);
         }
 
-        _buyLand(msg.sender);
+        _buyLand(msg.sender, price);
     }
 
-    function _buyLand(address buyer) internal {
+    function _buyLand(address buyer, uint256 price) internal {
         uint256 roundStartTimestamp = getLandRoundStartTimestamp();
         require(block.timestamp >= roundStartTimestamp, "auction not start");
 
@@ -266,7 +264,7 @@ contract MOPNAuctionHouse is Multicall, Ownable {
 
         IMOPNLand(governance.landContract()).auctionMint(buyer, 1);
 
-        emit LandSold(buyer, getLandCurrentPrice());
+        emit LandSold(buyer, price);
 
         landRound =
             (uint256(roundId + 1) << _BITPOS_LAND_ROUNDID) |
@@ -324,16 +322,15 @@ contract MOPNAuctionHouse is Multicall, Ownable {
             );
             if (buyType == 1) {
                 if (amount > 0) {
-                    _checkTransferInAndRefund(
-                        from,
-                        value,
-                        getBombCurrentPrice() * amount
-                    );
-                    _buyBomb(from, amount);
+                    uint256 price = getBombCurrentPrice();
+                    _checkTransferInAndRefund(from, value, price * amount);
+                    _buyBomb(from, amount, price);
                 }
             } else if (buyType == 2) {
-                _checkTransferInAndRefund(from, value, getLandCurrentPrice());
-                _buyLand(from);
+                uint256 price = getLandCurrentPrice();
+                _checkTransferInAndRefund(from, value, price);
+                _buyLand(from, price);
+                IMOPNToken(governance.mtContract()).burn(price);
             }
         }
 

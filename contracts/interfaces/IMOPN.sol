@@ -93,7 +93,7 @@ interface IMOPN {
         address account
     ) external view returns (address collectionAddress);
 
-    function getAccountTotalMOPNPoint(
+    function getAccountOnMapMOPNPoint(
         address account
     ) external view returns (uint256);
 
@@ -105,7 +105,10 @@ interface IMOPN {
         address account
     ) external view returns (uint256 inbox);
 
-    function settleAccountMT(address account) external returns (uint256);
+    function settleAccountMT(
+        address account,
+        address collectionAddress
+    ) external returns (uint256);
 
     function settleAndClaimAccountMT(
         address account

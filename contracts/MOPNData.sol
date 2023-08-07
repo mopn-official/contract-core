@@ -25,6 +25,7 @@ contract MOPNData is Multicall {
         uint256 BombBadge;
         uint256 MTBalance;
         uint256 OnMapMOPNPoint;
+        uint256 TotalMOPNPoint;
         uint32 tileCoordinate;
     }
 
@@ -55,7 +56,7 @@ contract MOPNData is Multicall {
         for (uint256 i = 0; i < accounts.length; i++) {
             address accountCollection = mopn.getAccountCollection(accounts[i]);
             mopn.settleCollectionMT(accountCollection);
-            mopn.settleAccountMT(accounts[i]);
+            mopn.settleAccountMT(accounts[i], accountCollection);
         }
     }
 
@@ -71,7 +72,7 @@ contract MOPNData is Multicall {
             }
             address accountCollection = mopn.getAccountCollection(accounts[i]);
             mopn.settleCollectionMT(accountCollection);
-            mopn.settleAccountMT(accounts[i]);
+            mopn.settleAccountMT(accounts[i], accountCollection);
             amount += mopn.claimAccountMT(accounts[i]);
         }
         governance.mintMT(msg.sender, amount);
@@ -94,7 +95,9 @@ contract MOPNData is Multicall {
         accountData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
             account
         );
-        accountData.OnMapMOPNPoint = IERC20(governance.pointContract())
+        accountData.OnMapMOPNPoint = IMOPN(governance.mopnContract())
+            .getAccountOnMapMOPNPoint(account);
+        accountData.TotalMOPNPoint = IERC20(governance.pointContract())
             .balanceOf(account);
         accountData.tileCoordinate = IMOPN(governance.mopnContract())
             .getAccountCoordinate(account);

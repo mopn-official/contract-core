@@ -10,10 +10,14 @@ library TileMath {
     }
 
     function check(uint32 tileCoordinate) public pure {
-        uint32[3] memory coodinateArr = coordinateIntToArr(tileCoordinate);
         require(
-            coodinateArr[0] + coodinateArr[1] + coodinateArr[2] == 3000,
-            "tile coordinate overflow"
+            tileCoordinate > 3000000 && tileCoordinate < 17000000,
+            "coordinate x overflow"
+        );
+        tileCoordinate = tileCoordinate % 10000;
+        require(
+            tileCoordinate > 300 && tileCoordinate < 1700,
+            "coordinate y overflow"
         );
     }
 
@@ -209,7 +213,21 @@ library TileMath {
         uint32 tileCoordinate,
         uint256 direction_
     ) public pure returns (uint32) {
-        return uint32(int32(tileCoordinate) + direction(direction_));
+        if (direction_ == 0) {
+            return tileCoordinate + 9999;
+        } else if (direction_ == 1) {
+            return tileCoordinate - 1;
+        } else if (direction_ == 2) {
+            return tileCoordinate - 10000;
+        } else if (direction_ == 3) {
+            return tileCoordinate - 9999;
+        } else if (direction_ == 4) {
+            return tileCoordinate + 1;
+        } else if (direction_ == 5) {
+            return tileCoordinate + 10000;
+        } else {
+            revert();
+        }
     }
 
     function distance(uint32 a, uint32 b) public pure returns (uint32 d) {

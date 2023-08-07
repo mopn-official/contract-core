@@ -208,71 +208,88 @@ describe("MOPN", function () {
 
     accounts.push(await deployAccount(testnft1.address, 0, 10000997, 0));
 
-    await timeIncrease(500);
+    await timeIncrease(1200);
 
     await claimAccountsMT();
     await showWalletBalance();
   }
 
-  it("set allowance", async function () {
+  it("test stakingMT", async function () {
     await loadFixture(deployAndSetInitialNFTS);
 
-    const allowanceTx = await mopnmt.approve(
-      mopnauctionHouse.address,
-      hre.ethers.BigNumber.from("10000000000000000")
+    const collection1 = collections[0];
+    const collection2 = collections[1];
+
+    console.log("create collection", collection1, "vault");
+    const tx1 = await mopngovernance.createCollectionVault(collection1);
+    await tx1.wait();
+
+    const vault1 = await hre.ethers.getContractAt(
+      "MOPNCollectionVault",
+      await mopngovernance.getCollectionVault(collection1)
     );
-    await allowanceTx.wait();
-  });
+    console.log(collection1, "vault1", vault1.address);
+    console.log(collection1, "collectionpoint 1", await mopn.getCollectionMOPNPoint(collection1));
 
-  it("test auction bomb", async function () {
-    for (let i = 0; i < 8; i++) {
-      console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
-      console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
-      console.log(
-        "current bomb price",
-        hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
-      );
-
-      const buybombtx = await mopnauctionHouse.buyBomb(1);
-      await buybombtx.wait();
-
-      await timeIncrease(600);
-    }
-
-    console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
-    console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
-    console.log(
-      "current bomb price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
-    );
-    const buybombtx1 = await mopnmt.safeTransferFrom(
+    const tx2 = await mopnmt.safeTransferFrom(
       owner.address,
-      mopnauctionHouse.address,
-      (await mopnauctionHouse.getBombCurrentPrice()) * 2,
-      hre.ethers.utils.solidityPack(["uint256", "uint256"], [1, 1])
+      vault1.address,
+      hre.ethers.BigNumber.from("1500000000"),
+      "0x"
     );
-    await buybombtx1.wait();
+    await tx2.wait();
 
-    await showWalletBalance();
-  });
-
-  it("test auction land", async function () {
-    console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
     console.log(
-      "Current Land price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getLandCurrentPrice(), mtdecimals)
+      "vault1 mt balance",
+      hre.ethers.utils.formatUnits(await mopnmt.balanceOf(vault1.address), mtdecimals)
     );
+    console.log(collection1, "collectionpoint 1", await mopn.getCollectionMOPNPoint(collection1));
 
-    const buylandtx = await mopnauctionHouse.buyLand();
-    await buylandtx.wait();
+    console.log("vault1 nft offer price", await vault1.getNFTOfferPrice());
+    const tx4 = await testnft.approve(vault1.address, 1);
+    await tx4.wait();
 
-    console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
-    console.log(
-      "Current Land price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getLandCurrentPrice(), mtdecimals)
+    console.log("accept vault1 nft offer");
+    const tx5 = await vault1.acceptNFTOffer(1);
+    await tx5.wait();
+
+    console.log("vault1 auction info", await vault1.getAuctionInfo());
+    const tx6 = await mopnmt.safeTransferFrom(
+      owner.address,
+      vault1.address,
+      await vault1.getAuctionCurrentPrice(),
+      hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("acceptAuctionBid"))
     );
+    await tx6.wait();
+    console.log("vault1 auction info", await vault1.getAuctionInfo());
 
-    await showWalletBalance();
+    console.log("create collection", collection2, "multi call");
+    const tx3 = await mopnmt.multicall([
+      mopnmt.interface.encodeFunctionData("createCollectionVault", [collection2]),
+      mopnmt.interface.encodeFunctionData("safeTransferFrom", [
+        owner.address,
+        await mopngovernance.computeCollectionVault(collection2),
+        hre.ethers.BigNumber.from("1500000000"),
+        "0x",
+      ]),
+    ]);
+    await tx3.wait();
+
+    const vault2 = await hre.ethers.getContractAt(
+      "MOPNCollectionVault",
+      await mopngovernance.getCollectionVault(collection2)
+    );
+    console.log(collection2, "vault2", vault2.address);
+    console.log("vault2 mt balance", await mopnmt.balanceOf(vault2.address));
+    console.log(collection2, "collectionpoint 2", await mopn.getCollectionMOPNPoint(collection2));
+
+    const vault2pmtbalance = await vault2.balanceOf(owner.address);
+    console.log("vault2 pmt balance", vault2pmtbalance);
+    console.log("vault2 mt balance", await mopnmt.balanceOf(vault2.address));
+    const tx7 = await vault2.withdraw(vault2pmtbalance);
+    await tx7.wait();
+
+    await collectionInfo();
   });
 
   const avatarInfo = async () => {

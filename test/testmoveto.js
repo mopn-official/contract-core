@@ -202,78 +202,69 @@ describe("MOPN", function () {
     const coordinates = [
       9991003, 9991002, 10001003, 10001002, 10001001, 10011002, 10011001, 10001000,
     ];
-    for (let i = 0; i < 8; i++) {
-      accounts.push(await deployAccount(testnft.address, i, coordinates[i], 0));
-    }
 
-    accounts.push(await deployAccount(testnft1.address, 0, 10000997, 0));
+    // for (let i = 1; i < 8; i++) {
+    //   accounts.push(await deployAccount(testnft.address, i, coordinates[i], 0));
+    // }
 
-    await timeIncrease(500);
+    // accounts.push(await deployAccount(testnft1.address, 0, 10000997, 0));
 
-    await claimAccountsMT();
-    await showWalletBalance();
+    // await timeIncrease(500);
+
+    // await claimAccountsMT();
+    // await showWalletBalance();
   }
 
-  it("set allowance", async function () {
+  it("test move with mint land account", async function () {
     await loadFixture(deployAndSetInitialNFTS);
 
-    const allowanceTx = await mopnmt.approve(
-      mopnauctionHouse.address,
-      hre.ethers.BigNumber.from("10000000000000000")
+    const account = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      testnft.address,
+      0,
+      0
     );
-    await allowanceTx.wait();
+
+    (
+      await erc6551accounthelper.multicall([
+        erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+          erc6551accountproxy.address,
+          31337,
+          mopnland.address,
+          0,
+          0,
+          "0x",
+        ]),
+        erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+          erc6551accountproxy.address,
+          31337,
+          testnft.address,
+          0,
+          0,
+          "0x",
+        ]),
+        erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+          account,
+          mopn.address,
+          0,
+          // 0 3
+          mopn.interface.encodeFunctionData("moveTo", [10001000, 0]),
+        ]),
+      ])
+    ).wait();
   });
 
-  it("test auction bomb", async function () {
-    for (let i = 0; i < 8; i++) {
-      console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
-      console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
-      console.log(
-        "current bomb price",
-        hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
-      );
-
-      const buybombtx = await mopnauctionHouse.buyBomb(1);
-      await buybombtx.wait();
-
-      await timeIncrease(600);
-    }
-
-    console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
-    console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
-    console.log(
-      "current bomb price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
-    );
-    const buybombtx1 = await mopnmt.safeTransferFrom(
-      owner.address,
-      mopnauctionHouse.address,
-      (await mopnauctionHouse.getBombCurrentPrice()) * 2,
-      hre.ethers.utils.solidityPack(["uint256", "uint256"], [1, 1])
-    );
-    await buybombtx1.wait();
-
-    await showWalletBalance();
-  });
-
-  it("test auction land", async function () {
-    console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
-    console.log(
-      "Current Land price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getLandCurrentPrice(), mtdecimals)
-    );
-
-    const buylandtx = await mopnauctionHouse.buyLand();
-    await buylandtx.wait();
-
-    console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
-    console.log(
-      "Current Land price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getLandCurrentPrice(), mtdecimals)
-    );
-
-    await showWalletBalance();
-  });
+  // it("test move", async function () {
+  //   await loadFixture(deployAndSetInitialNFTS);
+  //   const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", accounts[7]);
+  //   const txmove = await accountContract.executeCall(
+  //     mopn.address,
+  //     0,
+  //     mopn.interface.encodeFunctionData("moveTo", [9991001, 0])
+  //   );
+  //   await txmove.wait();
+  // });
 
   const avatarInfo = async () => {
     console.log("total Point", (await mopn.TotalMOPNPoints()).toString());

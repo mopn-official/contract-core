@@ -31,9 +31,11 @@ contract MOPNPoint is ERC20 {
         address account
     ) public view virtual override returns (uint256 balance) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        balance = IMOPNBomb(governance.bombContract()).balanceOf(account, 2);
+        balance =
+            IMOPNBomb(governance.bombContract()).balanceOf(account, 2) *
+            100;
         if (mopn.getAccountCoordinate(account) > 0) {
-            balance += mopn.getAccountTotalMOPNPoint(account);
+            balance += mopn.getAccountOnMapMOPNPoint(account);
             balance += mopn.getCollectionMOPNPoint(
                 mopn.getAccountCollection(account)
             );

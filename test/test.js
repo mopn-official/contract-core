@@ -560,8 +560,8 @@ describe("MOPN", function () {
   });
 
   it("test bomb", async function () {
-    await collectionInfo();
     await avatarInfo();
+    await collectionInfo();
 
     const account = accounts[8];
     const tx1 = await mopnbomb.safeTransferFrom(
@@ -569,7 +569,7 @@ describe("MOPN", function () {
       account,
       1,
       1,
-      ethers.utils.solidityPack(["uint256"], [9981003])
+      ethers.utils.solidityPack(["uint256"], [10001002])
     );
     await tx1.wait();
 
@@ -722,7 +722,7 @@ describe("MOPN", function () {
         "getAccountBombUsed",
         (await mopnbomb.balanceOf(account, 1)).toString(),
         "getAccountPoint",
-        (await mopn.getAccountTotalMOPNPoint(account)).toString(),
+        (await mopn.getAccountOnMapMOPNPoint(account)).toString(),
         "getAccountMT",
         ethers.utils.formatUnits(await mopnmt.balanceOf(account), mtdecimals)
       );

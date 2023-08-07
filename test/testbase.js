@@ -214,7 +214,37 @@ describe("MOPN", function () {
     await showWalletBalance();
   }
 
-  it("set allowance", async function () {
+  it("test transfer account MT", async function () {
+    await loadFixture(deployAndSetInitialNFTS);
+
+    await timeIncrease(600);
+
+    await avatarInfo();
+
+    const params = [];
+    for (let i = 0; i < accounts.length; i++) {
+      const account = accounts[i];
+      const amount = await mopnmt.balanceOf(account);
+      params.push(
+        erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+          account,
+          mopnmt.address,
+          0,
+          // 1 3
+          mopnmt.interface.encodeFunctionData("transfer", [owner.address, amount]),
+        ])
+      );
+    }
+
+    const multitx1 = await erc6551accounthelper.multicall(params);
+    await multitx1.wait();
+
+    await avatarInfo();
+
+    await showWalletBalance();
+  });
+
+  it("test auctionHouse", async function () {
     await loadFixture(deployAndSetInitialNFTS);
 
     const allowanceTx = await mopnmt.approve(
@@ -222,22 +252,6 @@ describe("MOPN", function () {
       hre.ethers.BigNumber.from("10000000000000000")
     );
     await allowanceTx.wait();
-  });
-
-  it("test auction bomb", async function () {
-    for (let i = 0; i < 8; i++) {
-      console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
-      console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
-      console.log(
-        "current bomb price",
-        hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
-      );
-
-      const buybombtx = await mopnauctionHouse.buyBomb(1);
-      await buybombtx.wait();
-
-      await timeIncrease(600);
-    }
 
     console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
     console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
@@ -245,34 +259,194 @@ describe("MOPN", function () {
       "current bomb price",
       hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
     );
+
+    const buybombtx = await mopnauctionHouse.buyBomb(5);
+    await buybombtx.wait();
+
+    await timeIncrease(600);
+
+    console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
+    console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
+    console.log(
+      "current bomb price",
+      hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
+    );
+
     const buybombtx1 = await mopnmt.safeTransferFrom(
       owner.address,
       mopnauctionHouse.address,
-      (await mopnauctionHouse.getBombCurrentPrice()) * 2,
-      hre.ethers.utils.solidityPack(["uint256", "uint256"], [1, 1])
+      (await mopnauctionHouse.getBombCurrentPrice()) * 6,
+      hre.ethers.utils.solidityPack(["uint256", "uint256"], [1, 5])
     );
     await buybombtx1.wait();
 
-    await showWalletBalance();
+    console.log("Current Bomb round", await mopnauctionHouse.getBombRoundId());
+    console.log("Current Bomb round sold", await mopnauctionHouse.getBombRoundSold());
+    console.log(
+      "current bomb price",
+      hre.ethers.utils.formatUnits(await mopnauctionHouse.getBombCurrentPrice(), mtdecimals)
+    );
+
+    console.log(
+      "wallet balance",
+      hre.ethers.utils.formatUnits(await mopnmt.balanceOf(owner.address), mtdecimals)
+    );
   });
 
   it("test auction land", async function () {
     console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
-    console.log(
-      "Current Land price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getLandCurrentPrice(), mtdecimals)
-    );
+    console.log("Current Land price", await mopnauctionHouse.getLandCurrentPrice());
 
     const buylandtx = await mopnauctionHouse.buyLand();
     await buylandtx.wait();
 
     console.log("Current Land round", await mopnauctionHouse.getLandRoundId());
-    console.log(
-      "Current Land price",
-      hre.ethers.utils.formatUnits(await mopnauctionHouse.getLandCurrentPrice(), mtdecimals)
-    );
+    console.log("Current Land price", await mopnauctionHouse.getLandCurrentPrice());
 
-    await showWalletBalance();
+    console.log(
+      "wallet balance",
+      hre.ethers.utils.formatUnits(await mopnmt.balanceOf(owner.address), mtdecimals)
+    );
+  });
+
+  it("test bomb", async function () {
+    await avatarInfo();
+    await collectionInfo();
+
+    const account = accounts[8];
+    const tx1 = await mopnbomb.safeTransferFrom(
+      owner.address,
+      account,
+      1,
+      1,
+      hre.ethers.utils.solidityPack(["uint256"], [10001002])
+    );
+    await tx1.wait();
+
+    await avatarInfo();
+    await collectionInfo();
+
+    console.log(
+      "wallet balance",
+      hre.ethers.utils.formatUnits(await mopnmt.balanceOf(owner.address), mtdecimals)
+    );
+  });
+
+  it("test stakingMT", async function () {
+    console.log(await mopnData.getCollectionData(collections[1]));
+
+    const collection1 = collections[0];
+    const collection2 = collections[1];
+
+    console.log("create collection", collection1, "vault");
+    const tx1 = await mopngovernance.createCollectionVault(collection1);
+    await tx1.wait();
+
+    const vault1 = await hre.ethers.getContractAt(
+      "MOPNCollectionVault",
+      await mopngovernance.getCollectionVault(collection1)
+    );
+    console.log(collection1, "vault1", vault1.address);
+    console.log(collection1, "collectionpoint 1", await mopn.getCollectionMOPNPoint(collection1));
+
+    const tx2 = await mopnmt.safeTransferFrom(
+      owner.address,
+      vault1.address,
+      hre.ethers.BigNumber.from("1500000000"),
+      "0x"
+    );
+    await tx2.wait();
+
+    console.log("vault1 mt balance", await mopnmt.balanceOf(vault1.address));
+    console.log(collection1, "collectionpoint 1", await mopn.getCollectionMOPNPoint(collection1));
+
+    console.log("create collection", collection2, "multi call");
+    const tx3 = await mopnmt.multicall([
+      mopnmt.interface.encodeFunctionData("createCollectionVault", [collection2]),
+      mopnmt.interface.encodeFunctionData("safeTransferFrom", [
+        owner.address,
+        await mopngovernance.computeCollectionVault(collection2),
+        hre.ethers.BigNumber.from("1500000000"),
+        "0x",
+      ]),
+    ]);
+    await tx3.wait();
+
+    const vault2 = await hre.ethers.getContractAt(
+      "MOPNCollectionVault",
+      await mopngovernance.getCollectionVault(collection2)
+    );
+    console.log(collection2, "vault2", vault2.address);
+    console.log("vault2 mt balance", await mopnmt.balanceOf(vault2.address));
+    console.log(collection2, "collectionpoint 2", await mopn.getCollectionMOPNPoint(collection2));
+
+    console.log("vault1 nft offer price", await vault1.getNFTOfferPrice());
+    const tx4 = await testnft.approve(vault1.address, 1);
+    tx4.wait();
+    console.log("accept vault1 nft offer");
+    const tx5 = await vault1.acceptNFTOffer(1);
+    tx5.wait();
+
+    const vault2pmtbalance = await vault2.balanceOf(owner.address);
+    console.log("vault2 pmt balance", vault2pmtbalance);
+    console.log("vault2 mt balance", await mopnmt.balanceOf(vault2.address));
+    const tx6 = await vault2.withdraw(vault2pmtbalance);
+    tx6.wait();
+
+    await collectionInfo();
+  });
+
+  it("test helpers", async function () {
+    console.log(await mopnData.getAccountData(accounts[0]));
+    console.log(await mopnData.getCollectionData(collections[0]));
+    console.log(await mopnData.getCollectionData(collections[1]));
+  });
+
+  it("test additional point", async function () {
+    const data = fs.readFileSync(__dirname + "/../src/additionalMOPNPoint.json", "UTF-8");
+    const bufferpoints = JSON.parse(data);
+    const addresses = [];
+    const points = [];
+    for (let i = 0; i < bufferpoints.length; i++) {
+      addresses.push(bufferpoints[i].address);
+      points.push(parseInt(bufferpoints[i].top_offer_price.toFixed(2) * 100));
+    }
+    const tx1 = await mopn.batchSetCollectionAdditionalMOPNPoints(addresses, points);
+    tx1.wait();
+
+    await collectionInfo();
+  });
+
+  it("test land account", async function () {
+    console.log(await mopn.getLandIdSettledMT(0));
+
+    const account = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      mopnland.address,
+      0,
+      0
+    );
+    console.log("account", account, "balance", await mopnmt.balanceOf(account));
+
+    const tx = await erc6551accounthelper.createAccount(
+      erc6551accountproxy.address,
+      31337,
+      mopnland.address,
+      0,
+      0,
+      "0x"
+    );
+    await tx.wait();
+
+    const tx1 = await mopn.registerLandAccount(account);
+    await tx1.wait();
+
+    console.log(await mopn.getLandIdSettledMT(0));
+    console.log(await mopn.getLandIdAccount(0));
+    console.log(await mopn.calcAccountMT(account));
+
+    console.log("account", account, "balance", await mopnmt.balanceOf(account));
   });
 
   const avatarInfo = async () => {
