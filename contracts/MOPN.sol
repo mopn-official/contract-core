@@ -47,8 +47,27 @@ contract MOPN is IMOPN, Multicall, Ownable {
     /// @notice uint32 AdditionalFinishSnapshot + uint32 TotalAdditionalMOPNPoints + uint64 NFTOfferCoefficient + uint64 TotalCollectionClaimed + uint64 TotalMTStaking
     uint256 public MiningDataExt;
 
+    struct AccountData {
+        uint256 SettledMT;
+        uint256 PerCollectionNFTMinted;
+        uint256 PerMOPNPointMinted;
+        uint32 coordinate;
+    }
+
     /// @notice  uint64 settled MT + uint48 PerCollectionNFTMinted  + uint48 PerMOPNPointMinted + uint32 coordinate
     mapping(address => uint256) public AccountsData;
+
+    struct CollectionData {
+        uint256 SettledMT;
+        uint256 PerCollectionNFTMinted;
+        uint256 PerMOPNPointMinted;
+        uint256 CollectionMOPNPoint;
+        uint256 AdditionalMOPNPoint;
+        uint256 OnMapNftNumber;
+        uint256 OnMapMOPNPoints;
+        uint256 CollectionMOPNPoints;
+        uint256 AdditionalMOPNPoints;
+    }
 
     /// @notice uint64 mintedMT + uint48 PerCollectionNFTMinted + uint48 PerMOPNPointMinted + uint24 CollectionMOPNPoint
     ///         + uint24 AdditionalMOPNPoint + uint16 OnMapNftNumber + uint32 OnMapMOPNPoints
@@ -75,6 +94,10 @@ contract MOPN is IMOPN, Multicall, Ownable {
         MaxCollectionMOPNPoint = MaxCollectionMOPNPoint_;
         MiningData = MTStepStartTimestamp_ << 128;
         MiningDataExt = (10 ** 17) << 128;
+    }
+
+    function getGovernance() public view returns (address) {
+        return address(governance);
     }
 
     function batchSetCollectionAdditionalMOPNPoints(
@@ -315,10 +338,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return uint32(tiles[tileCoordinate]);
     }
 
-    function getGovernance() public view returns (address) {
-        return address(governance);
-    }
-
     function MTTotalMinted() public view returns (uint256) {
         return uint96(MiningData >> 160);
     }
@@ -533,6 +552,24 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
+    function _unpackedCollectionData(
+        uint256 packed
+    ) private pure returns (CollectionData memory collectionData) {
+        collectionData.SettledMT = uint64(packed >> 192);
+        collectionData.PerCollectionNFTMinted = uint48(packed >> 144);
+        collectionData.PerMOPNPointMinted = uint48(packed >> 96);
+        collectionData.CollectionMOPNPoint = uint24(packed >> 72);
+        collectionData.AdditionalMOPNPoint = uint24(packed >> 48);
+        collectionData.OnMapNftNumber = uint16(packed >> 32);
+        collectionData.OnMapMOPNPoints = uint32(packed);
+        collectionData.CollectionMOPNPoints =
+            collectionData.CollectionMOPNPoint *
+            collectionData.OnMapNftNumber;
+        collectionData.AdditionalMOPNPoints =
+            collectionData.AdditionalMOPNPoint *
+            collectionData.OnMapNftNumber;
+    }
+
     /**
      * @notice get collection realtime unclaimed minted mopn token
      * @param collectionAddress collection contract address
@@ -632,90 +669,66 @@ contract MOPN is IMOPN, Multicall, Ownable {
      * @param collectionAddress collection contract address
      */
     function settleCollectionMT(address collectionAddress) public {
-        uint256 CollectionPerMOPNPointMinted = getCollectionPerMOPNPointMinted(
-            collectionAddress
-        );
-        uint256 CollectionPerMOPNPointMintedDiff = PerMOPNPointMinted() -
-            CollectionPerMOPNPointMinted;
-        if (CollectionPerMOPNPointMintedDiff > 0) {
-            uint256 OnMapMOPNPoints = getCollectionOnMapMOPNPoints(
-                collectionAddress
-            );
-            if (OnMapMOPNPoints > 0) {
-                uint256 CollectionData = CollectionsData[collectionAddress];
+        uint256 unpacked = CollectionsData[collectionAddress];
+        uint256 perMOPNPointMinted = uint48(unpacked >> 96);
+        uint256 perMOPNPointMintedDiff = PerMOPNPointMinted() -
+            perMOPNPointMinted;
+        if (perMOPNPointMintedDiff > 0) {
+            CollectionData memory cData = _unpackedCollectionData(unpacked);
+            unpacked += perMOPNPointMintedDiff << 96;
+            if (cData.OnMapMOPNPoints > 0) {
+                uint256 amount = ((perMOPNPointMintedDiff *
+                    (cData.OnMapMOPNPoints + cData.CollectionMOPNPoints)) * 5) /
+                    100;
 
-                uint256 CollectionMOPNPoints = getCollectionMOPNPoints(
-                    collectionAddress
-                );
-
-                uint256 amount = ((CollectionPerMOPNPointMintedDiff *
-                    (OnMapMOPNPoints + CollectionMOPNPoints)) * 5) / 100;
-                CollectionData += CollectionPerMOPNPointMintedDiff << 96;
-
-                if (CollectionMOPNPoints > 0) {
-                    CollectionData +=
-                        ((CollectionPerMOPNPointMintedDiff *
-                            CollectionMOPNPoints) /
-                            getCollectionOnMapNum(collectionAddress)) <<
+                if (cData.CollectionMOPNPoints > 0) {
+                    unpacked +=
+                        ((perMOPNPointMintedDiff * cData.CollectionMOPNPoints) /
+                            cData.OnMapNftNumber) <<
                         144;
                 }
 
-                uint256 AdditionalMOPNPoints = getCollectionAdditionalMOPNPoints(
-                        collectionAddress
-                    );
-                if (AdditionalMOPNPoints > 0) {
+                if (cData.AdditionalMOPNPoints > 0) {
                     uint256 AdditionalFinishSnapshot_ = AdditionalFinishSnapshot();
                     if (AdditionalFinishSnapshot_ > 0) {
-                        if (
-                            AdditionalFinishSnapshot_ >
-                            CollectionPerMOPNPointMinted
-                        ) {
+                        if (AdditionalFinishSnapshot_ > perMOPNPointMinted) {
                             amount +=
                                 (((AdditionalFinishSnapshot_ -
-                                    CollectionPerMOPNPointMinted) *
-                                    AdditionalMOPNPoints) * 5) /
+                                    perMOPNPointMinted) *
+                                    cData.AdditionalMOPNPoints) * 5) /
                                 100;
-                            CollectionData +=
+                            unpacked +=
                                 (((AdditionalFinishSnapshot_ -
-                                    CollectionPerMOPNPointMinted) *
-                                    AdditionalMOPNPoints) /
-                                    getCollectionOnMapNum(collectionAddress)) <<
+                                    perMOPNPointMinted) *
+                                    cData.AdditionalMOPNPoints) /
+                                    cData.OnMapNftNumber) <<
                                 144;
                         }
-                        CollectionData -=
-                            getCollectionAdditionalMOPNPoint(
-                                collectionAddress
-                            ) <<
-                            48;
+                        unpacked -= cData.AdditionalMOPNPoint << 48;
                     } else {
-                        amount += (((CollectionPerMOPNPointMintedDiff *
-                            AdditionalMOPNPoints) * 5) / 100);
-                        CollectionData +=
-                            (((CollectionPerMOPNPointMintedDiff) *
-                                AdditionalMOPNPoints) /
-                                getCollectionOnMapNum(collectionAddress)) <<
+                        amount += (((perMOPNPointMintedDiff *
+                            cData.AdditionalMOPNPoints) * 5) / 100);
+                        unpacked +=
+                            (((perMOPNPointMinted) *
+                                cData.AdditionalMOPNPoints) /
+                                cData.OnMapNftNumber) <<
                             144;
                     }
                 }
 
-                CollectionData += amount << 192;
+                unpacked += amount << 192;
 
-                CollectionsData[collectionAddress] = CollectionData;
                 emit CollectionMTMinted(collectionAddress, amount);
             } else {
                 if (
-                    getCollectionAdditionalMOPNPoint(collectionAddress) > 0 &&
+                    cData.AdditionalMOPNPoint > 0 &&
                     AdditionalFinishSnapshot() > 0
                 ) {
-                    CollectionsData[collectionAddress] -=
-                        getCollectionAdditionalMOPNPoint(collectionAddress) <<
-                        48;
+                    unpacked -= cData.AdditionalMOPNPoint << 48;
                 }
-
-                CollectionsData[collectionAddress] +=
-                    CollectionPerMOPNPointMintedDiff <<
-                    96;
             }
+
+            CollectionsData[collectionAddress] = unpacked;
         }
     }
 
@@ -834,6 +847,15 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
+    function _unpackedAccountData(
+        uint256 packed
+    ) private pure returns (AccountData memory accountData) {
+        accountData.SettledMT = uint64(packed >> 128);
+        accountData.PerCollectionNFTMinted = uint48(packed >> 80);
+        accountData.PerMOPNPointMinted = uint48(packed >> 32);
+        accountData.coordinate = uint32(packed);
+    }
+
     /**
      * @notice get avatar realtime unclaimed minted mopn token
      * @param account account wallet address
@@ -867,53 +889,54 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function settleAccountMT(
         address account,
         address collectionAddress
-    ) public returns (uint256) {
-        uint256 AccountOnMapMOPNPoint = getAccountOnMapMOPNPoint(account);
+    ) public returns (bool) {
+        uint256 unpacked = AccountsData[account];
+        AccountData memory aData = _unpackedAccountData(unpacked);
+        uint256 perMOPNPointMintedDiff = PerMOPNPointMinted() -
+            aData.PerMOPNPointMinted;
 
-        uint256 amount;
-        if (AccountOnMapMOPNPoint > 0) {
-            uint256 AccountPerMOPNPointMintedDiff = PerMOPNPointMinted() -
-                getAccountPerMOPNPointMinted(account);
-            if (AccountPerMOPNPointMintedDiff <= 0) {
-                return AccountOnMapMOPNPoint;
-            }
-
-            uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
-                    collectionAddress
-                ) - getAccountPerCollectionNFTMinted(account);
-
-            amount =
-                AccountPerMOPNPointMintedDiff *
-                AccountOnMapMOPNPoint +
-                (
-                    AccountPerCollectionNFTMintedDiff > 0
-                        ? AccountPerCollectionNFTMintedDiff
-                        : 0
+        if (perMOPNPointMintedDiff > 0) {
+            if (aData.coordinate > 0) {
+                uint256 AccountOnMapMOPNPoint = getAccountOnMapMOPNPoint(
+                    account
                 );
+                uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
+                        collectionAddress
+                    ) - aData.PerCollectionNFTMinted;
 
-            uint32 LandId = getTileLandId(getAccountCoordinate(account));
-            uint256 landamount = (amount * 5) / 100;
-            address landAccount = getLandIdAccount(LandId);
-            if (landAccount != address(0)) {
-                AccountsData[landAccount] += landamount << 128;
+                uint256 amount = perMOPNPointMintedDiff *
+                    AccountOnMapMOPNPoint +
+                    (
+                        AccountPerCollectionNFTMintedDiff > 0
+                            ? AccountPerCollectionNFTMintedDiff
+                            : 0
+                    );
+
+                uint32 LandId = getTileLandId(aData.coordinate);
+                uint256 landamount = (amount * 5) / 100;
+                address landAccount = getLandIdAccount(LandId);
+                if (landAccount != address(0)) {
+                    AccountsData[landAccount] += landamount << 128;
+                } else {
+                    LandIdMTs[LandId] += landamount;
+                }
+
+                emit LandHolderMTMinted(LandId, landamount);
+
+                amount = (amount * 90) / 100;
+
+                emit AccountMTMinted(account, amount);
+                unpacked +=
+                    (amount << 128) |
+                    (AccountPerCollectionNFTMintedDiff << 80) |
+                    (perMOPNPointMintedDiff << 32);
             } else {
-                LandIdMTs[LandId] += landamount;
+                unpacked += (perMOPNPointMintedDiff << 32);
             }
-
-            emit LandHolderMTMinted(LandId, landamount);
-
-            amount = (amount * 90) / 100;
-
-            emit AccountMTMinted(account, amount);
-            AccountsData[account] +=
-                (amount << 128) |
-                (AccountPerCollectionNFTMintedDiff << 80) |
-                (AccountPerMOPNPointMintedDiff << 32);
-        } else {
-            AccountsData[account] += (amount << 128);
+            AccountsData[account] = unpacked;
         }
 
-        return AccountOnMapMOPNPoint;
+        return aData.coordinate > 0;
     }
 
     /**
@@ -999,8 +1022,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         amount *= 100;
         settlePerMOPNPointMinted();
         settleCollectionMT(collectionAddress);
-        uint256 exist = settleAccountMT(account, collectionAddress);
-        if (exist == 0) {
+
+        if (!settleAccountMT(account, collectionAddress)) {
             uint256 collectinPoint = getCollectionMOPNPoint(collectionAddress);
             uint256 additionalMOPNPoint = getCollectionAdditionalMOPNPoint(
                 collectionAddress
@@ -1032,7 +1055,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         settlePerMOPNPointMinted();
         settleCollectionMT(collectionAddress);
         if (amount == 0) {
-            amount = settleAccountMT(account, collectionAddress);
+            settleAccountMT(account, collectionAddress);
+            amount = getAccountOnMapMOPNPoint(account);
             uint256 collectinPoint = getCollectionMOPNPoint(collectionAddress);
             uint256 additionalMOPNPoint = getCollectionAdditionalMOPNPoint(
                 collectionAddress

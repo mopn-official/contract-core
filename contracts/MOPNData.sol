@@ -78,6 +78,35 @@ contract MOPNData is Multicall {
         governance.mintMT(msg.sender, amount);
     }
 
+    function batchClaimAccountGroupMT(address[][] memory accounts) public {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        mopn.settlePerMOPNPointMinted();
+        uint256 amount;
+
+        for (uint256 i = 0; i < accounts.length; i++) {
+            address accountCollection = address(0);
+            for (uint256 j = 0; j < accounts[i].length; j++) {
+                if (
+                    !IMOPNERC6551Account(payable(accounts[i][j])).isOwner(
+                        msg.sender
+                    )
+                ) {
+                    continue;
+                }
+                if (accountCollection == address(0)) {
+                    accountCollection = mopn.getAccountCollection(
+                        accounts[i][j]
+                    );
+                    mopn.settleCollectionMT(accountCollection);
+                }
+
+                mopn.settleAccountMT(accounts[i][j], accountCollection);
+                amount += mopn.claimAccountMT(accounts[i][j]);
+            }
+        }
+        governance.mintMT(msg.sender, amount);
+    }
+
     function getAccountData(
         address account
     ) public view returns (AccountDataOutput memory accountData) {

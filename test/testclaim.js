@@ -207,6 +207,7 @@ describe("MOPN", function () {
     }
 
     accounts.push(await deployAccount(testnft1.address, 0, 10000997, 0));
+    accounts.push(await deployAccount(testnft1.address, 1, 10000996, 0));
 
     await timeIncrease(500);
   }
@@ -227,7 +228,14 @@ describe("MOPN", function () {
     // );
     // await tx.wait();
 
-    await claimAccountsMT(9);
+    await claimAccountsMT(10);
+
+    console.log([accounts.slice(0, 8), [accounts[8], accounts[9]]]);
+    const tx = await mopnData.batchClaimAccountGroupMT([
+      accounts.slice(0, 8),
+      [accounts[8], accounts[9]],
+    ]);
+    await tx.wait();
 
     await avatarInfo();
     await showWalletBalance();

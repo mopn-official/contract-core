@@ -108,7 +108,7 @@ interface IMOPN {
     function settleAccountMT(
         address account,
         address collectionAddress
-    ) external returns (uint256);
+    ) external returns (bool);
 
     function settleAndClaimAccountMT(
         address account
