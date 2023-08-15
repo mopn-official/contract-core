@@ -210,6 +210,8 @@ describe("MOPN", function () {
 
     await timeIncrease(500);
 
+    await avatarInfo();
+
     await claimAccountsMT();
     await showWalletBalance();
   }

@@ -5,10 +5,12 @@ import "hardhat/console.sol";
 
 import "./interfaces/IMOPNCollectionVault.sol";
 import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "./libraries/CollectionVaultLib.sol";
+import "./libraries/MOPNBitMap.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -150,15 +152,19 @@ contract MOPNCollectionVault is
     }
 
     function getNFTOfferPrice() public view returns (uint256) {
-        IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
-        uint256 amount = mopn.calcCollectionSettledMT(
-            CollectionVaultLib.collectionAddress()
-        ) +
+        uint256 amount = IMOPNData(
+            IMOPNGovernance(governance).mopnDataContract()
+        ).calcCollectionSettledMT(CollectionVaultLib.collectionAddress()) +
             IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
                 address(this)
             );
 
-        return (amount * mopn.NFTOfferCoefficient()) / 10 ** 18;
+        return
+            (amount *
+                MOPNBitMap.NFTOfferCoefficient(
+                    IMOPN(IMOPNGovernance(governance).mopnContract())
+                        .getmDataExt()
+                )) / 10 ** 14;
     }
 
     function MTBalance() public view returns (uint256 balance) {
@@ -185,7 +191,8 @@ contract MOPNCollectionVault is
 
         uint256 offerPrice = (IMOPNToken(
             IMOPNGovernance(governance).mtContract()
-        ).balanceOf(address(this)) * mopn.NFTOfferCoefficient()) / 10 ** 18;
+        ).balanceOf(address(this)) *
+            MOPNBitMap.NFTOfferCoefficient(mopn.getmDataExt())) / 10 ** 14;
 
         IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
             msg.sender,

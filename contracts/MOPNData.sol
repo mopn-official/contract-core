@@ -10,9 +10,12 @@ import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNCollectionVault.sol";
+import "./libraries/MOPNBitMap.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MOPNData is Multicall {
+    using MOPNBitMap for uint256;
+
     struct NFTParams {
         address collectionAddress;
         uint256 tokenId;
@@ -50,19 +53,166 @@ contract MOPNData is Multicall {
         governance = IMOPNGovernance(governance_);
     }
 
+    function calcPerMOPNPointMinted() public view returns (uint256) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        if (mopn.MTStepStartTimestamp() > block.timestamp) {
+            return 0;
+        }
+        uint256 mData = mopn.getmData();
+        if (mData.TotalMOPNPoints() > 0) {
+            uint256 lastTickTimestamp = mData.LastTickTimestamp();
+            uint256 reduceTimes = mopn.MTReduceTimes();
+            if (reduceTimes == 0) {
+                mData +=
+                    ((block.timestamp - lastTickTimestamp) *
+                        mopn.currentMTPPS(reduceTimes)) /
+                    mData.TotalMOPNPoints();
+            } else {
+                uint256 nextReduceTimestamp = mopn.MTStepStartTimestamp() +
+                    mopn.MTReduceInterval();
+                for (uint256 i = 0; i <= reduceTimes; i++) {
+                    mData +=
+                        ((nextReduceTimestamp - lastTickTimestamp) *
+                            mopn.currentMTPPS(i)) /
+                        mData.TotalMOPNPoints();
+                    lastTickTimestamp = nextReduceTimestamp;
+                    nextReduceTimestamp += mopn.MTReduceInterval();
+                    if (nextReduceTimestamp > block.timestamp) {
+                        nextReduceTimestamp = block.timestamp;
+                    }
+                }
+            }
+        }
+        return mData.PerMOPNPointMinted();
+    }
+
+    /**
+     * @notice get collection realtime unclaimed minted mopn token
+     * @param collectionAddress collection contract address
+     */
+    function calcCollectionSettledMT(
+        address collectionAddress
+    ) public view returns (uint256 inbox) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        uint256 cData = mopn.getcData(collectionAddress);
+        inbox = cData.CollectionSettledMT();
+        uint256 perMOPNPointMinted = calcPerMOPNPointMinted();
+
+        if (
+            cData.CollectionPerMOPNPointMinted() < perMOPNPointMinted &&
+            cData.CollectionOnMapMOPNPoints() > 0
+        ) {
+            inbox +=
+                (((perMOPNPointMinted - cData.CollectionPerMOPNPointMinted()) *
+                    (cData.CollectionMOPNPoints() +
+                        cData.CollectionOnMapMOPNPoints())) * 5) /
+                100;
+            if (cData.CollectionAdditionalMOPNPoints() > 0) {
+                uint256 meData = mopn.getmDataExt();
+                if (meData.AdditionalFinishSnapshot() > 0) {
+                    inbox +=
+                        (((meData.AdditionalFinishSnapshot() -
+                            cData.CollectionPerMOPNPointMinted()) *
+                            cData.CollectionAdditionalMOPNPoints()) * 5) /
+                        100;
+                } else {
+                    inbox +=
+                        (((perMOPNPointMinted -
+                            cData.CollectionPerMOPNPointMinted()) *
+                            cData.CollectionAdditionalMOPNPoints()) * 5) /
+                        100;
+                }
+            }
+        }
+    }
+
+    function calcPerCollectionNFTMintedMT(
+        address collectionAddress
+    ) public view returns (uint256 result) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        uint256 cData = mopn.getcData(collectionAddress);
+        result = cData.PerCollectionNFTMinted();
+
+        uint256 CollectionPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
+            cData.CollectionPerMOPNPointMinted();
+        if (
+            CollectionPerMOPNPointMintedDiff > 0 &&
+            cData.CollectionOnMapMOPNPoints() > 0
+        ) {
+            if (cData.CollectionMOPNPoints() > 0) {
+                result += ((CollectionPerMOPNPointMintedDiff *
+                    cData.CollectionMOPNPoints()) / cData.CollectionOnMapNum());
+            }
+
+            if (cData.CollectionAdditionalMOPNPoints() > 0) {
+                uint256 AdditionalFinishSnapshot_ = mopn
+                    .getmDataExt()
+                    .AdditionalFinishSnapshot();
+                if (AdditionalFinishSnapshot_ > 0) {
+                    if (
+                        AdditionalFinishSnapshot_ >
+                        cData.CollectionPerMOPNPointMinted()
+                    ) {
+                        result += (((AdditionalFinishSnapshot_ -
+                            cData.CollectionPerMOPNPointMinted()) *
+                            cData.CollectionAdditionalMOPNPoints()) /
+                            cData.CollectionOnMapNum());
+                    }
+                } else {
+                    result += (((CollectionPerMOPNPointMintedDiff) *
+                        cData.CollectionAdditionalMOPNPoints()) /
+                        cData.CollectionOnMapNum());
+                }
+            }
+        }
+    }
+
+    /**
+     * @notice get avatar realtime unclaimed minted mopn token
+     * @param account account wallet address
+     */
+    function calcAccountMT(
+        address account
+    ) public view returns (uint256 inbox) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        uint256 aData = mopn.getaData(account);
+        inbox = aData.AccountSettledMT();
+
+        uint256 AccountOnMapMOPNPoint = mopn.getAccountOnMapMOPNPoint(account);
+
+        uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
+            aData.AccountPerMOPNPointMinted();
+
+        address collectionAddress = mopn.getAccountCollection(account);
+
+        if (AccountPerMOPNPointMintedDiff > 0 && AccountOnMapMOPNPoint > 0) {
+            uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(
+                    collectionAddress
+                ) - aData.AccountPerCollectionNFTMinted();
+
+            inbox +=
+                ((AccountPerMOPNPointMintedDiff * AccountOnMapMOPNPoint) * 90) /
+                100;
+
+            if (AccountPerCollectionNFTMintedDiff > 0) {
+                inbox += (AccountPerCollectionNFTMintedDiff * 90) / 100;
+            }
+        }
+    }
+
     function batchsettleAccountMT(address[] memory accounts) public {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        mopn.settlePerMOPNPointMinted();
+        uint256 mData = mopn.settlePerMOPNPointMinted();
         for (uint256 i = 0; i < accounts.length; i++) {
             address accountCollection = mopn.getAccountCollection(accounts[i]);
-            mopn.settleCollectionMT(accountCollection);
-            mopn.settleAccountMT(accounts[i], accountCollection);
+            uint256 cData = mopn.settleCollectionMT(accountCollection, mData);
+            mopn.settleAccountMT(accounts[i], cData);
         }
     }
 
     function batchClaimAccountMT(address[] memory accounts) public {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        mopn.settlePerMOPNPointMinted();
+        uint256 mData = mopn.settlePerMOPNPointMinted();
         uint256 amount;
         for (uint256 i = 0; i < accounts.length; i++) {
             if (
@@ -71,39 +221,12 @@ contract MOPNData is Multicall {
                 continue;
             }
             address accountCollection = mopn.getAccountCollection(accounts[i]);
-            mopn.settleCollectionMT(accountCollection);
-            mopn.settleAccountMT(accounts[i], accountCollection);
-            amount += mopn.claimAccountMT(accounts[i]);
+            uint256 cData = mopn.settleCollectionMT(accountCollection, mData);
+            uint256 aData = mopn.settleAccountMT(accounts[i], cData);
+
+            //todo
         }
-        governance.mintMT(msg.sender, amount);
-    }
 
-    function batchClaimAccountGroupMT(address[][] memory accounts) public {
-        IMOPN mopn = IMOPN(governance.mopnContract());
-        mopn.settlePerMOPNPointMinted();
-        uint256 amount;
-
-        for (uint256 i = 0; i < accounts.length; i++) {
-            address accountCollection = address(0);
-            for (uint256 j = 0; j < accounts[i].length; j++) {
-                if (
-                    !IMOPNERC6551Account(payable(accounts[i][j])).isOwner(
-                        msg.sender
-                    )
-                ) {
-                    continue;
-                }
-                if (accountCollection == address(0)) {
-                    accountCollection = mopn.getAccountCollection(
-                        accounts[i][j]
-                    );
-                    mopn.settleCollectionMT(accountCollection);
-                }
-
-                mopn.settleAccountMT(accounts[i][j], accountCollection);
-                amount += mopn.claimAccountMT(accounts[i][j]);
-            }
-        }
         governance.mintMT(msg.sender, amount);
     }
 
@@ -129,7 +252,8 @@ contract MOPNData is Multicall {
         accountData.TotalMOPNPoint = IERC20(governance.pointContract())
             .balanceOf(account);
         accountData.tileCoordinate = IMOPN(governance.mopnContract())
-            .getAccountCoordinate(account);
+            .getaData(account)
+            .AccountCoordinate();
     }
 
     function getAccountsData(
@@ -190,7 +314,9 @@ contract MOPNData is Multicall {
         accountDatas = new AccountDataOutput[](coordinates.length);
         for (uint256 i = 0; i < coordinates.length; i++) {
             accountDatas[i] = getAccountData(
-                IMOPN(governance.mopnContract()).getTileAccount(coordinates[i])
+                MOPNBitMap.TileAccount(
+                    IMOPN(governance.mopnContract()).gettData(coordinates[i])
+                )
             );
             accountDatas[i].tileCoordinate = coordinates[i];
         }
@@ -212,42 +338,36 @@ contract MOPNData is Multicall {
      */
     function getCollectionData(
         address collectionAddress
-    ) public view returns (CollectionDataOutput memory cData) {
+    ) public view returns (CollectionDataOutput memory CDO) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        cData.contractAddress = collectionAddress;
-        cData.collectionVault = governance.getCollectionVault(
-            collectionAddress
-        );
+        CDO.contractAddress = collectionAddress;
+        CDO.collectionVault = governance.getCollectionVault(collectionAddress);
 
-        cData.OnMapNum = mopn.getCollectionOnMapNum(collectionAddress);
-        cData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
+        uint256 cData = mopn.getcData(collectionAddress);
+
+        CDO.OnMapNum = MOPNBitMap.CollectionOnMapNum(cData);
+        CDO.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
             governance.getCollectionVault(collectionAddress)
         );
-        cData.UnclaimMTBalance = mopn.calcCollectionSettledMT(
-            collectionAddress
+        CDO.UnclaimMTBalance = calcCollectionSettledMT(collectionAddress);
+
+        CDO.AdditionalMOPNPoints = MOPNBitMap.CollectionAdditionalMOPNPoints(
+            cData
         );
 
-        cData.AdditionalMOPNPoints = mopn.getCollectionAdditionalMOPNPoints(
+        CDO.CollectionMOPNPoints = MOPNBitMap.CollectionMOPNPoints(cData);
+        CDO.OnMapMOPNPoints = MOPNBitMap.CollectionOnMapMOPNPoints(cData);
+        CDO.CollectionMOPNPoint = mopn.getCollectionMOPNPoint(
             collectionAddress
+        );
+        CDO.AdditionalMOPNPoint = MOPNBitMap.CollectionAdditionalMOPNPoint(
+            cData
         );
 
-        cData.CollectionMOPNPoints = mopn.getCollectionMOPNPoints(
-            collectionAddress
-        );
-        cData.OnMapMOPNPoints = mopn.getCollectionOnMapMOPNPoints(
-            collectionAddress
-        );
-        cData.CollectionMOPNPoint = mopn.getCollectionMOPNPoint(
-            collectionAddress
-        );
-        cData.AdditionalMOPNPoint = mopn.getCollectionAdditionalMOPNPoint(
-            collectionAddress
-        );
-
-        if (cData.collectionVault != address(0)) {
-            cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
+        if (CDO.collectionVault != address(0)) {
+            CDO.NFTAuction = IMOPNCollectionVault(CDO.collectionVault)
                 .getAuctionInfo();
-            cData.PMTTotalSupply = IMOPNCollectionVault(cData.collectionVault)
+            CDO.PMTTotalSupply = IMOPNCollectionVault(CDO.collectionVault)
                 .totalSupply();
         }
     }
@@ -263,11 +383,14 @@ contract MOPNData is Multicall {
 
     function getTotalMTStakingRealtime() public view returns (uint256) {
         IMOPN mopn = IMOPN(governance.mopnContract());
+        uint256 mData = mopn.getmData();
+        uint256 meData = mopn.getmDataExt();
         return
-            (((mopn.MTTotalMinted() +
-                (mopn.calcPerMOPNPointMinted() - mopn.PerMOPNPointMinted()) *
-                mopn.TotalMOPNPoints()) * 5) / 100) -
-            mopn.TotalCollectionClaimed() +
-            mopn.TotalMTStaking();
+            (((MOPNBitMap.MTTotalMinted(mData) +
+                (calcPerMOPNPointMinted() -
+                    MOPNBitMap.PerMOPNPointMinted(mData)) *
+                MOPNBitMap.TotalMOPNPoints(mData)) * 5) / 100) -
+            MOPNBitMap.TotalCollectionClaimed(meData) +
+            MOPNBitMap.TotalMTStaking(meData);
     }
 }

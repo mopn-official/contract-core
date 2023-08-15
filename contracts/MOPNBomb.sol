@@ -60,25 +60,31 @@ contract MOPNBomb is ERC1155, Multicall, Ownable {
     }
 
     function _beforeTokenTransfer(
-        address,
+        address operator,
         address from,
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory
     ) internal virtual override {
-        IMOPN mopn = IMOPN(governance.mopnContract());
-        for (uint256 i = 0; i < ids.length; i++) {
-            if (ids[i] == 2) {
-                if (mopn.getAccountCoordinate(from) > 0) {
-                    mopn.subMOPNPoint(
-                        from,
-                        getAccountCollection(from),
-                        amounts[i]
-                    );
-                }
-                if (mopn.getAccountCoordinate(to) > 0) {
-                    mopn.addMOPNPoint(to, getAccountCollection(to), amounts[i]);
+        if (operator != address(governance)) {
+            IMOPN mopn = IMOPN(governance.mopnContract());
+            for (uint256 i = 0; i < ids.length; i++) {
+                if (ids[i] == 2) {
+                    if (mopn.accountClaimAvailable(from)) {
+                        mopn.subMOPNPoint(
+                            from,
+                            getAccountCollection(from),
+                            amounts[i]
+                        );
+                    }
+                    if (mopn.accountClaimAvailable(to)) {
+                        mopn.addMOPNPoint(
+                            to,
+                            getAccountCollection(to),
+                            amounts[i]
+                        );
+                    }
                 }
             }
         }

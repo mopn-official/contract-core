@@ -3,7 +3,7 @@ const { loadFixture, time } = require("@nomicfoundation/hardhat-network-helpers"
 const fs = require("fs");
 
 describe("MOPN", function () {
-  let erc6551registry, tileMath, testnft, testnft1, nftsvg, nftmetadata;
+  let erc6551registry, tileMath, mopnbitmap, testnft, testnft1, nftsvg, nftmetadata;
   let erc6551account,
     erc6551accountproxy,
     erc6551accounthelper,
@@ -30,6 +30,10 @@ describe("MOPN", function () {
     tileMath = await hre.ethers.deployContract("TileMath");
     await tileMath.deployed();
     console.log("TileMath", tileMath.address);
+
+    mopnbitmap = await hre.ethers.deployContract("MOPNBitMap");
+    await mopnbitmap.deployed();
+    console.log("MOPNBitMap", mopnbitmap.address);
 
     nftsvg = await hre.ethers.deployContract("NFTSVG");
     await nftsvg.deployed();
@@ -103,18 +107,27 @@ describe("MOPN", function () {
     const MOPN = await hre.ethers.getContractFactory("MOPN", {
       libraries: {
         TileMath: tileMath.address,
+        MOPNBitMap: mopnbitmap.address,
       },
     });
     mopn = await MOPN.deploy(mopngovernance.address, 5000000, unixTimeStamp, 604800, 10000, 99999);
     await mopn.deployed();
     console.log("MOPN", mopn.address);
 
-    const MOPNData = await hre.ethers.getContractFactory("MOPNData");
+    const MOPNData = await hre.ethers.getContractFactory("MOPNData", {
+      libraries: {
+        MOPNBitMap: mopnbitmap.address,
+      },
+    });
     mopnData = await MOPNData.deploy(mopngovernance.address);
     await mopnData.deployed();
     console.log("MOPNData", mopnData.address);
 
-    const MOPNCollectionVault = await hre.ethers.getContractFactory("MOPNCollectionVault");
+    const MOPNCollectionVault = await hre.ethers.getContractFactory("MOPNCollectionVault", {
+      libraries: {
+        MOPNBitMap: mopnbitmap.address,
+      },
+    });
     mopncollectionVault = await MOPNCollectionVault.deploy(mopngovernance.address);
     await mopncollectionVault.deployed();
     console.log("MOPNCollectionVault", mopncollectionVault.address);
@@ -123,6 +136,7 @@ describe("MOPN", function () {
       libraries: {
         NFTMetaData: nftmetadata.address,
         TileMath: tileMath.address,
+        MOPNBitMap: mopnbitmap.address,
       },
     });
     mopnlandMetaDataRender = await MOPNLandMetaDataRender.deploy(mopngovernance.address);
@@ -148,12 +162,20 @@ describe("MOPN", function () {
     mopnbomb = await hre.ethers.deployContract("MOPNBomb", [mopngovernance.address]);
     console.log("MOPNBomb", mopnbomb.address);
 
-    const MOPNPoint = await hre.ethers.getContractFactory("MOPNPoint");
+    const MOPNPoint = await hre.ethers.getContractFactory("MOPNPoint", {
+      libraries: {
+        MOPNBitMap: mopnbitmap.address,
+      },
+    });
     mopnpoint = await MOPNPoint.deploy(mopngovernance.address);
     await mopnpoint.deployed();
     console.log("MOPNPoint", mopnpoint.address);
 
-    const MOPNToken = await hre.ethers.getContractFactory("MOPNToken");
+    const MOPNToken = await hre.ethers.getContractFactory("MOPNToken", {
+      libraries: {
+        MOPNBitMap: mopnbitmap.address,
+      },
+    });
     mopnmt = await MOPNToken.deploy(mopngovernance.address);
     await mopnmt.deployed();
     console.log("MOPNToken", mopnmt.address);
@@ -203,83 +225,85 @@ describe("MOPN", function () {
       9991003, 9991002, 10001003, 10001002, 10001001, 10011002, 10011001, 10001000,
     ];
 
-    // for (let i = 1; i < 8; i++) {
-    //   accounts.push(await deployAccount(testnft.address, i, coordinates[i], 0));
-    // }
+    for (let i = 0; i < 8; i++) {
+      accounts.push(await deployAccount(testnft.address, i, coordinates[i], 0));
+    }
 
-    // accounts.push(await deployAccount(testnft1.address, 0, 10000997, 0));
+    accounts.push(await deployAccount(testnft1.address, 0, 10000997, 0));
 
-    // await timeIncrease(500);
-
-    // await claimAccountsMT();
-    // await showWalletBalance();
+    await avatarInfo();
+    await timeIncrease(605000);
+    await claimAccountsMT();
+    await avatarInfo();
+    await showWalletBalance();
   }
 
-  it("test move with mint land account", async function () {
-    await loadFixture(deployAndSetInitialNFTS);
-
-    const account = await erc6551accounthelper.computeAccount(
-      erc6551accountproxy.address,
-      31337,
-      testnft.address,
-      0,
-      0
-    );
-
-    (
-      await erc6551accounthelper.multicall([
-        erc6551accounthelper.interface.encodeFunctionData("createAccount", [
-          erc6551accountproxy.address,
-          31337,
-          mopnland.address,
-          0,
-          0,
-          "0x",
-        ]),
-        erc6551accounthelper.interface.encodeFunctionData("createAccount", [
-          erc6551accountproxy.address,
-          31337,
-          testnft.address,
-          0,
-          0,
-          "0x",
-        ]),
-        erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
-          account,
-          mopn.address,
-          0,
-          // 0 3
-          mopn.interface.encodeFunctionData("moveTo", [10001000, 0]),
-        ]),
-      ])
-    ).wait();
-  });
-
-  // it("test move", async function () {
+  // it("test move with mint land account", async function () {
   //   await loadFixture(deployAndSetInitialNFTS);
-  //   const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", accounts[7]);
-  //   const txmove = await accountContract.executeCall(
-  //     mopn.address,
-  //     0,
-  //     mopn.interface.encodeFunctionData("moveTo", [9991001, 0])
+
+  //   const account = await erc6551accounthelper.computeAccount(
+  //     erc6551accountproxy.address,
+  //     31337,
+  //     testnft.address,
+  //     8,
+  //     0
   //   );
-  //   await txmove.wait();
+
+  //   (
+  //     await erc6551accounthelper.multicall([
+  //       erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+  //         erc6551accountproxy.address,
+  //         31337,
+  //         mopnland.address,
+  //         0,
+  //         0,
+  //         "0x",
+  //       ]),
+  //       erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+  //         erc6551accountproxy.address,
+  //         31337,
+  //         testnft.address,
+  //         8,
+  //         0,
+  //         "0x",
+  //       ]),
+  //       erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
+  //         account,
+  //         mopn.address,
+  //         0,
+  //         // 0 3
+  //         mopn.interface.encodeFunctionData("moveTo", [10001004, 0]),
+  //       ]),
+  //     ])
+  //   ).wait();
   // });
 
+  it("test move", async function () {
+    await loadFixture(deployAndSetInitialNFTS);
+    const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", accounts[7]);
+    const txmove = await accountContract.executeCall(
+      mopn.address,
+      0,
+      mopn.interface.encodeFunctionData("moveTo", [9991001, 0])
+    );
+    await txmove.wait();
+  });
+
   const avatarInfo = async () => {
-    console.log("total Point", (await mopn.TotalMOPNPoints()).toString());
+    console.log("total Point", (await mopnpoint.totalSupply()).toString());
     for (const account of accounts) {
+      const accountData = await mopnData.getAccountData(account);
       console.log(
         "account",
         account,
         "collection",
         (await mopn.getAccountCollection(account)).toString(),
         "coordinate",
-        await mopn.getAccountCoordinate(account),
+        await accountData.tileCoordinate,
         "getAccountBombUsed",
         (await mopnbomb.balanceOf(account, 1)).toString(),
         "getAccountPoint",
-        (await mopn.getAccountOnMapMOPNPoint(account)).toString(),
+        accountData.TotalMOPNPoint.toString(),
         "getAccountMT",
         hre.ethers.utils.formatUnits(await mopnmt.balanceOf(account), mtdecimals)
       );

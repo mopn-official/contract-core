@@ -5,7 +5,9 @@ import "hardhat/console.sol";
 
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IERC20Receiver.sol";
+import "./libraries/MOPNBitMap.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
@@ -69,11 +71,12 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
     }
 
     function totalSupply() public view override returns (uint256) {
-        IMOPN mopn = IMOPN(governance.mopnContract());
+        uint256 mData = IMOPN(governance.mopnContract()).getmData();
         return
-            mopn.MTTotalMinted() +
-            (mopn.calcPerMOPNPointMinted() - mopn.PerMOPNPointMinted()) *
-            mopn.TotalMOPNPoints();
+            MOPNBitMap.MTTotalMinted(mData) +
+            (IMOPNData(governance.mopnDataContract()).calcPerMOPNPointMinted() -
+                MOPNBitMap.PerMOPNPointMinted(mData)) *
+            MOPNBitMap.TotalMOPNPoints(mData);
     }
 
     function balanceOf(
@@ -81,7 +84,9 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
     ) public view virtual override returns (uint256 balance) {
         balance = super.balanceOf(account);
         if (IMOPN(governance.mopnContract()).accountClaimAvailable(account)) {
-            balance += IMOPN(governance.mopnContract()).calcAccountMT(account);
+            balance += IMOPNData(governance.mopnDataContract()).calcAccountMT(
+                account
+            );
         }
     }
 

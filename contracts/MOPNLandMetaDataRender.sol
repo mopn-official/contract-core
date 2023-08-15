@@ -5,6 +5,7 @@ import "./interfaces/ILandMetaDataRender.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./libraries/NFTMetaData.sol";
+import "./libraries/MOPNBitMap.sol";
 
 contract MOPNLandMetaDataRender is ILandMetaDataRender {
     IMOPNGovernance public governance;
@@ -23,9 +24,8 @@ contract MOPNLandMetaDataRender is ILandMetaDataRender {
     ) public view returns (string memory) {
         IMOPN mopn = IMOPN(governance.mopnContract());
 
-        uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
-        uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
+        uint32 tileCoordinate = TileMath.LandCenterTile(uint32(LandId_));
         uint32[3] memory centerTileArr = TileMath.coordinateIntToArr(
             tileCoordinate
         );
@@ -35,7 +35,9 @@ contract MOPNLandMetaDataRender is ILandMetaDataRender {
         uint256 COID;
         tileDatas[0].tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
 
-        address tileAccount = mopn.getTileAccount(tileCoordinate);
+        address tileAccount = MOPNBitMap.TileAccount(
+            mopn.gettData(tileCoordinate)
+        );
         if (tileAccount != address(0)) {
             collection = mopn.getAccountCollection(tileAccount);
             COID++;
@@ -64,7 +66,9 @@ contract MOPNLandMetaDataRender is ILandMetaDataRender {
                         tileCoordinate
                     );
 
-                    tileAccount = mopn.getTileAccount(tileCoordinate);
+                    tileAccount = MOPNBitMap.TileAccount(
+                        mopn.gettData(tileCoordinate)
+                    );
                     if (tileAccount != address(0)) {
                         collection = mopn.getAccountCollection(tileAccount);
                         COID = exists(collections, collection);
@@ -143,7 +147,7 @@ contract MOPNLandMetaDataRender is ILandMetaDataRender {
             }
         }
 
-        return NFTMetaData.constructTokenURI(LandId, tileDatas, 0);
+        return NFTMetaData.constructTokenURI(uint32(LandId_), tileDatas, 0);
     }
 
     function exists(

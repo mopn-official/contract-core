@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNBomb.sol";
+import "./libraries/MOPNBitMap.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MOPNPoint is ERC20 {
@@ -21,7 +22,10 @@ contract MOPNPoint is ERC20 {
      * @dev See {IERC20-totalSupply}.
      */
     function totalSupply() public view virtual override returns (uint256) {
-        return IMOPN(governance.mopnContract()).TotalMOPNPoints();
+        return
+            MOPNBitMap.TotalMOPNPoints(
+                IMOPN(governance.mopnContract()).getmData()
+            );
     }
 
     /**
@@ -34,13 +38,12 @@ contract MOPNPoint is ERC20 {
         balance =
             IMOPNBomb(governance.bombContract()).balanceOf(account, 2) *
             100;
-        if (mopn.getAccountCoordinate(account) > 0) {
+        if (MOPNBitMap.AccountCoordinate(mopn.getaData(account)) > 0) {
             balance += mopn.getAccountOnMapMOPNPoint(account);
-            balance += mopn.getCollectionMOPNPoint(
-                mopn.getAccountCollection(account)
-            );
-            balance += mopn.getCollectionAdditionalMOPNPoint(
-                mopn.getAccountCollection(account)
+            address collectionAddress = mopn.getAccountCollection(account);
+            balance += mopn.getCollectionMOPNPoint(collectionAddress);
+            balance += MOPNBitMap.CollectionAdditionalMOPNPoint(
+                mopn.getcData(collectionAddress)
             );
         }
     }
