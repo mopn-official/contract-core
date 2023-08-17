@@ -13,7 +13,7 @@ interface IMOPNCollectionVault is IERC20 {
     }
 
     event NFTOfferAccept(
-        address indexed collectionAddress,
+        address indexed operator,
         uint256 tokenId,
         uint256 price,
         uint256 oldNFTOfferCoefficient,
@@ -21,9 +21,21 @@ interface IMOPNCollectionVault is IERC20 {
     );
 
     event NFTAuctionAccept(
-        address indexed collectionAddress,
+        address indexed operator,
         uint256 tokenId,
         uint256 price
+    );
+
+    event MTDeposit(
+        address indexed operator,
+        uint256 MTAmount,
+        uint256 VTAmount
+    );
+
+    event MTWithdraw(
+        address indexed operator,
+        uint256 MTAmount,
+        uint256 VTAmount
     );
 
     function getAuctionInfo() external view returns (NFTAuction memory auction);

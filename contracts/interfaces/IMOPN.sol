@@ -69,11 +69,21 @@ interface IMOPN {
         uint32 tileCoordinate
     ) external view returns (uint32);
 
-    function MTTotalMinted() external view returns (uint256);
+    function MTOutputPerSec() external view returns (uint256);
+
+    function MTStepStartTimestamp() external view returns (uint256);
+
+    function MTReduceInterval() external view returns (uint256);
+
+    function TotalMOPNPoints() external view returns (uint256);
+
+    function LastTickTimestamp() external view returns (uint256);
 
     function PerMOPNPointMinted() external view returns (uint256);
 
-    function TotalMOPNPoints() external view returns (uint256);
+    function MTTotalMinted() external view returns (uint256);
+
+    function AdditionalFinishSnapshot() external view returns (uint256);
 
     function NFTOfferCoefficient() external view returns (uint256);
 
@@ -81,7 +91,9 @@ interface IMOPN {
 
     function TotalMTStaking() external view returns (uint256);
 
-    function calcPerMOPNPointMinted() external view returns (uint256);
+    function currentMTPPS(uint256 reduceTimes) external view returns (uint256);
+
+    function MTReduceTimes() external view returns (uint256);
 
     function settlePerMOPNPointMinted() external;
 
@@ -101,9 +113,17 @@ interface IMOPN {
         address account
     ) external view returns (uint32);
 
-    function calcAccountMT(
+    function getAccountPerCollectionNFTMinted(
         address account
-    ) external view returns (uint256 inbox);
+    ) external view returns (uint256);
+
+    function getAccountPerMOPNPointMinted(
+        address account
+    ) external view returns (uint256);
+
+    function getAccountSettledMT(
+        address account
+    ) external view returns (uint256);
 
     function settleAccountMT(
         address account,
@@ -140,7 +160,15 @@ interface IMOPN {
         address collectionAddress
     ) external view returns (uint256);
 
-    function calcCollectionSettledMT(
+    function getCollectionPerMOPNPointMinted(
+        address collectionAddress
+    ) external view returns (uint256);
+
+    function getPerCollectionNFTMinted(
+        address collectionAddress
+    ) external view returns (uint256);
+
+    function getCollectionSettledMT(
         address collectionAddress
     ) external view returns (uint256);
 

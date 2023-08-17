@@ -5,6 +5,7 @@ import "hardhat/console.sol";
 
 import "./interfaces/IMOPNCollectionVault.sol";
 import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IERC20Receiver.sol";
@@ -147,18 +148,22 @@ contract MOPNCollectionVault is
         _burn(msg.sender, amount);
         mopn.settleCollectionMOPNPoint(collectionAddress_);
         mopn.changeTotalMTStaking(collectionAddress_, 0, mtAmount);
+
+        emit MTWithdraw(msg.sender, mtAmount, amount);
     }
 
     function getNFTOfferPrice() public view returns (uint256) {
-        IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
-        uint256 amount = mopn.calcCollectionSettledMT(
-            CollectionVaultLib.collectionAddress()
-        ) +
+        uint256 amount = IMOPNData(
+            IMOPNGovernance(governance).mopnDataContract()
+        ).calcCollectionSettledMT(CollectionVaultLib.collectionAddress()) +
             IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
                 address(this)
             );
 
-        return (amount * mopn.NFTOfferCoefficient()) / 10 ** 18;
+        return
+            (amount *
+                IMOPN(IMOPNGovernance(governance).mopnContract())
+                    .NFTOfferCoefficient()) / 10 ** 18;
     }
 
     function MTBalance() public view returns (uint256 balance) {
@@ -203,7 +208,7 @@ contract MOPNCollectionVault is
             .NFTOfferAccept(collectionAddress_, offerPrice);
 
         emit NFTOfferAccept(
-            collectionAddress_,
+            msg.sender,
             tokenId,
             offerPrice,
             oldNFTOfferCoefficient,
@@ -280,11 +285,7 @@ contract MOPNCollectionVault is
                 "0x"
             );
 
-            emit NFTAuctionAccept(
-                collectionAddress_,
-                tokenId,
-                price + burnAmount
-            );
+            emit NFTAuctionAccept(from, tokenId, price + burnAmount);
         } else {
             require(value >= 1000000000, "minimum staking value is 1000");
             require(getOfferStatus() == 0, "no staking during auction");
@@ -294,6 +295,8 @@ contract MOPNCollectionVault is
             _mint(from, vtokenAmount);
             mopn.settleCollectionMOPNPoint(collectionAddress_);
             mopn.changeTotalMTStaking(collectionAddress_, 1, value);
+
+            emit MTDeposit(from, value, vtokenAmount);
         }
 
         return IERC20Receiver.onERC20Received.selector;

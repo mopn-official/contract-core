@@ -246,4 +246,29 @@ library TileMath {
         xycoordinate.x = int32(tileCoordinate / 10000) - 1000;
         xycoordinate.y = int32(tileCoordinate % 10000) - 1000;
     }
+
+    function tileToBitIndex(
+        uint32 tileCoordinate
+    ) public pure returns (uint256 index) {
+        uint32 x = tileCoordinate / 10000;
+        uint32 y = tileCoordinate % 10000;
+        if (x >= 1000 && y >= 1000) {
+            x = x - 1000;
+            y = y - 1000;
+        } else if (x >= 1000 && y < 1000) {
+            x = x - 1000;
+            y = 1000 - y;
+            index = 640000;
+        } else if (x < 1000 && y <= 1000) {
+            x = 1000 - x;
+            y = 1000 - y;
+            index = 1280000;
+        } else {
+            x = 1000 - x;
+            y = y - 1000;
+            index = 1920000;
+        }
+
+        index += ((y / 16) * 50 + x / 16) * 256 + (y % 16) * 16 + (x % 16);
+    }
 }
