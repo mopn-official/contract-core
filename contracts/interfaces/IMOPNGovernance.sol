@@ -4,9 +4,14 @@ pragma solidity ^0.8.19;
 interface IMOPNGovernance {
     function mintMT(address to, uint256 amount) external;
 
-    function mintBomb(address to, uint256 amount) external;
+    function mintBomb(address to, uint256 tokenId, uint256 amount) external;
 
-    function burnBomb(address from, uint256 amount, uint256 killed) external;
+    function burnBomb(
+        address from,
+        uint256 tokenId,
+        uint256 amount,
+        uint256 killed
+    ) external;
 
     function auctionHouseContract() external view returns (address);
 

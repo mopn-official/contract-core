@@ -1,5 +1,6 @@
 const { ethers } = require("hardhat");
 const fs = require("fs");
+const {  time } = require("@nomicfoundation/hardhat-network-helpers");
 
 describe("MOPN", function () {
   let testnft,
@@ -459,7 +460,7 @@ describe("MOPN", function () {
     ]);
     await tx.wait();
 
-    await new Promise((r) => setTimeout(r, 6000));
+    await timeIncrease(500);
 
     await avatarInfo();
     await collectionInfo();
@@ -480,7 +481,6 @@ describe("MOPN", function () {
           account,
           mopnmt.address,
           0,
-          // 1 3
           mopnmt.interface.encodeFunctionData("transfer", [owner.address, amount]),
         ])
       );
@@ -583,7 +583,7 @@ describe("MOPN", function () {
   });
 
   it("test mopndata batchClaimAccountMT", async function () {
-    const tx = await mopnData.batchClaimAccountMT(accounts);
+    const tx = await mopn.batchClaimAccountMT([accounts.slice(0,7), [accounts[8]]]);
     await tx.wait();
 
     console.log(
@@ -678,7 +678,6 @@ describe("MOPN", function () {
   });
 
   it("test land account", async function () {
-    console.log(await mopn.getLandIdSettledMT(0));
 
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
@@ -687,26 +686,9 @@ describe("MOPN", function () {
       0,
       0
     );
-    console.log("account", account, "balance", await mopnmt.balanceOf(account));
-
-    const tx = await erc6551accounthelper.createAccount(
-      erc6551accountproxy.address,
-      31337,
-      mopnland.address,
-      0,
-      0,
-      "0x"
-    );
-    await tx.wait();
-
-    const tx1 = await mopn.registerLandAccount(account);
-    await tx1.wait();
-
-    console.log(await mopn.getLandIdSettledMT(0));
-    console.log(await mopn.getLandIdAccount(0));
-    console.log(await mopn.calcAccountMT(account));
-
-    console.log("account", account, "balance", await mopnmt.balanceOf(account));
+    console.log(account);
+    console.log(await mopnData.calcAccountMT(account));
+    console.log("land account", account, "balance", await mopnmt.balanceOf(account));
   });
 
   const avatarInfo = async () => {
@@ -744,5 +726,10 @@ describe("MOPN", function () {
         (await mopn.getCollectionAdditionalMOPNPoints(collection)).toString()
       );
     }
+  };
+
+  const timeIncrease = async (seconds) => {
+    console.log("increase", seconds, "seconds");
+    await time.increase(seconds);
   };
 });

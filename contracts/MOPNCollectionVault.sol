@@ -14,6 +14,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 contract MOPNCollectionVault is
@@ -45,8 +46,10 @@ contract MOPNCollectionVault is
                 abi.encodePacked(
                     "MOPN VToken",
                     " #",
-                    IMOPNGovernance(governance).getCollectionVaultIndex(
-                        collectionAddress()
+                    Strings.toString(
+                        IMOPNGovernance(governance).getCollectionVaultIndex(
+                            collectionAddress()
+                        )
                     )
                 )
             );
@@ -138,7 +141,7 @@ contract MOPNCollectionVault is
     function withdraw(uint256 amount) public {
         address collectionAddress_ = CollectionVaultLib.collectionAddress();
         IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
-        mopn.settleCollectionMining(collectionAddress_);
+        mopn.claimCollectionMT(collectionAddress_);
         uint256 mtAmount = V2MTAmount(amount);
         require(mtAmount > 0, "zero to withdraw");
         IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
@@ -186,7 +189,7 @@ contract MOPNCollectionVault is
 
         IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
 
-        mopn.settleCollectionMining(collectionAddress_);
+        mopn.claimCollectionMT(collectionAddress_);
 
         uint256 offerPrice = (IMOPNToken(
             IMOPNGovernance(governance).mtContract()
@@ -261,7 +264,7 @@ contract MOPNCollectionVault is
                 price = price - burnAmount;
             }
 
-            mopn.settleCollectionMining(collectionAddress_);
+            mopn.claimCollectionMT(collectionAddress_);
             mopn.settleCollectionMOPNPoint(collectionAddress_);
 
             if (price > offerAcceptPrice) {
@@ -289,7 +292,7 @@ contract MOPNCollectionVault is
         } else {
             require(value >= 1000000000, "minimum staking value is 1000");
             require(getOfferStatus() == 0, "no staking during auction");
-            mopn.settleCollectionMining(collectionAddress_);
+            mopn.claimCollectionMT(collectionAddress_);
 
             uint256 vtokenAmount = MT2VAmount(value, true);
             _mint(from, vtokenAmount);

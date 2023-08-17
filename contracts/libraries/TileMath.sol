@@ -9,6 +9,12 @@ library TileMath {
         int32 y;
     }
 
+    struct XYZCoordinate {
+        uint32 x;
+        uint32 y;
+        uint32 z;
+    }
+
     function check(uint32 tileCoordinate) public pure {
         require(
             tileCoordinate > 3000000 && tileCoordinate < 17000000,
@@ -120,7 +126,7 @@ library TileMath {
 
     function getTileMOPNPoint(
         uint32 tileCoordinate
-    ) public pure returns (uint256) {
+    ) public pure returns (uint256 tile) {
         if ((tileCoordinate / 10000) % 10 == 0) {
             if (tileCoordinate % 10 == 0) {
                 return 15;
@@ -138,6 +144,14 @@ library TileMath {
         coordinateArr[0] = tileCoordinate / 10000;
         coordinateArr[1] = tileCoordinate % 10000;
         coordinateArr[2] = 3000 - (coordinateArr[0] + coordinateArr[1]);
+    }
+
+    function coordinateIntToStuct(
+        uint32 tileCoordinate
+    ) public pure returns (XYZCoordinate memory coordinate) {
+        coordinate.x = tileCoordinate / 10000;
+        coordinate.y = tileCoordinate % 10000;
+        coordinate.z = 3000 - (coordinate.x + coordinate.y);
     }
 
     function spiralRingTiles(
@@ -231,11 +245,12 @@ library TileMath {
     }
 
     function distance(uint32 a, uint32 b) public pure returns (uint32 d) {
-        uint32[3] memory aarr = coordinateIntToArr(a);
-        uint32[3] memory barr = coordinateIntToArr(b);
-        for (uint256 i = 0; i < 3; i++) {
-            d += aarr[i] > barr[i] ? aarr[i] - barr[i] : barr[i] - aarr[i];
-        }
+        XYZCoordinate memory aarr = coordinateIntToStuct(a);
+        XYZCoordinate memory barr = coordinateIntToStuct(b);
+
+        d += aarr.x > barr.x ? aarr.x - barr.x : barr.x - aarr.x;
+        d += aarr.y > barr.y ? aarr.y - barr.y : barr.y - aarr.y;
+        d += aarr.z > barr.z ? aarr.z - barr.z : barr.z - aarr.z;
 
         return d / 2;
     }

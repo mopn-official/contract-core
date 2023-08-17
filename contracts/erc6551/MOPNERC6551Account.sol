@@ -6,7 +6,6 @@ import "hardhat/console.sol";
 import "./interfaces/IMOPNERC6551Account.sol";
 import "../interfaces/IMOPN.sol";
 import "../interfaces/IMOPNGovernance.sol";
-import "../interfaces/IMOPNERC6551AccountHelper.sol";
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -172,7 +171,7 @@ contract MOPNERC6551Account is
         address operator,
         address,
         uint256 id,
-        uint256,
+        uint256 value,
         bytes calldata data
     ) public override returns (bytes4) {
         if (
@@ -183,7 +182,8 @@ contract MOPNERC6551Account is
         ) {
             uint256 coordinate = abi.decode(data, (uint256));
             IMOPN(IMOPNGovernance(governance).mopnContract()).bomb(
-                uint32(coordinate)
+                uint32(coordinate),
+                value
             );
         }
         return IERC1155Receiver.onERC1155Received.selector;
@@ -194,7 +194,7 @@ contract MOPNERC6551Account is
         address operator,
         address,
         uint256[] memory ids,
-        uint256[] memory,
+        uint256[] memory values,
         bytes memory data
     ) public override returns (bytes4) {
         for (uint256 i = 0; i < ids.length; i++) {
@@ -206,7 +206,8 @@ contract MOPNERC6551Account is
             ) {
                 uint256 coordinate = abi.decode(data, (uint256));
                 IMOPN(IMOPNGovernance(governance).mopnContract()).bomb(
-                    uint32(coordinate)
+                    uint32(coordinate),
+                    values[i]
                 );
             }
         }
@@ -240,10 +241,6 @@ contract MOPNERC6551Account is
         rentData =
             ((block.timestamp + timeRange) << 160) |
             uint256(uint160(to));
-
-        IMOPNERC6551AccountHelper(
-            IMOPNGovernance(governance).ERC6551AccountHelper()
-        ).AccountRentNotify(to, timeRange);
 
         emit AccountRent(to, block.timestamp + timeRange);
     }

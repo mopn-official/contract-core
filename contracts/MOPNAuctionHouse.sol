@@ -107,7 +107,7 @@ contract MOPNAuctionHouse is Multicall, Ownable {
         uint256 roundSold = getBombRoundSold() + amount;
         require(roundSold <= bombRoundProduce, "round out of stock");
 
-        governance.mintBomb(buyer, amount);
+        governance.mintBomb(buyer, 1, amount);
 
         bombRoundBuyers[getBombRoundBuyerNumber()] =
             (uint256(uint160(buyer)) << _BITPOS_BUYER_WALLET) |

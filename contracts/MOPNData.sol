@@ -50,46 +50,6 @@ contract MOPNData is Multicall {
         governance = IMOPNGovernance(governance_);
     }
 
-    function batchsettleAccountMT(address[] memory accounts) public {
-        IMOPN mopn = IMOPN(governance.mopnContract());
-        mopn.settlePerMOPNPointMinted();
-        for (uint256 i = 0; i < accounts.length; i++) {
-            address accountCollection = mopn.getAccountCollection(accounts[i]);
-            mopn.settleCollectionMT(accountCollection);
-            mopn.settleAccountMT(accounts[i], accountCollection);
-        }
-    }
-
-    function batchClaimAccountMT(address[][] memory accounts) public {
-        IMOPN mopn = IMOPN(governance.mopnContract());
-        mopn.settlePerMOPNPointMinted();
-        uint256 amount;
-        address collectionAddress;
-        for (uint256 i = 0; i < accounts.length; i++) {
-            collectionAddress = address(0);
-            for (uint256 k = 0; k < accounts[i].length; k++) {
-                if (
-                    !IMOPNERC6551Account(payable(accounts[i][k])).isOwner(
-                        msg.sender
-                    )
-                ) {
-                    continue;
-                }
-
-                if (collectionAddress == address(0)) {
-                    collectionAddress = mopn.getAccountCollection(
-                        accounts[i][k]
-                    );
-                    mopn.settleCollectionMT(collectionAddress);
-                }
-
-                mopn.settleAccountMT(accounts[i][k], collectionAddress);
-                amount += mopn.claimAccountMT(accounts[i][k]);
-            }
-        }
-        governance.mintMT(msg.sender, amount);
-    }
-
     function calcPerMOPNPointMinted() public view returns (uint256) {
         IMOPN mopn = IMOPN(governance.mopnContract());
         if (mopn.MTStepStartTimestamp() > block.timestamp) {
@@ -231,8 +191,8 @@ contract MOPNData is Multicall {
         uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
             mopn.getAccountPerMOPNPointMinted(account);
 
-        address collectionAddress = mopn.getAccountCollection(account);
         if (AccountPerMOPNPointMintedDiff > 0 && AccountOnMapMOPNPoint > 0) {
+            address collectionAddress = mopn.getAccountCollection(account);
             uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(
                     collectionAddress
                 ) - mopn.getAccountPerCollectionNFTMinted(account);

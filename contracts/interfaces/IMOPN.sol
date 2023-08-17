@@ -59,7 +59,7 @@ interface IMOPN {
     /**
      * @notice throw a bomb to a tile
      */
-    function bomb(uint32 tileCoordinate) external;
+    function bomb(uint32 tileCoordinate, uint256 num) external;
 
     function getTileAccount(
         uint32 tileCoordinate
@@ -128,11 +128,7 @@ interface IMOPN {
     function settleAccountMT(
         address account,
         address collectionAddress
-    ) external returns (uint256);
-
-    function settleAndClaimAccountMT(
-        address account
-    ) external returns (uint256);
+    ) external;
 
     function claimAccountMT(address account) external returns (uint256);
 
@@ -174,7 +170,7 @@ interface IMOPN {
 
     function settleCollectionMT(address collectionAddress) external;
 
-    function settleCollectionMining(
+    function claimCollectionMT(
         address collectionAddress
     ) external returns (uint256);
 
@@ -190,16 +186,4 @@ interface IMOPN {
         address collectionAddress,
         uint256 price
     ) external returns (uint256, uint256);
-
-    function addMOPNPoint(
-        address account,
-        address collectionAddress,
-        uint256 amount
-    ) external;
-
-    function subMOPNPoint(
-        address account,
-        address collectionAddress,
-        uint256 amount
-    ) external;
 }
