@@ -10,6 +10,7 @@ import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNCollectionVault.sol";
+import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MOPNData is Multicall {
@@ -52,31 +53,30 @@ contract MOPNData is Multicall {
 
     function calcPerMOPNPointMinted() public view returns (uint256) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        if (mopn.MTStepStartTimestamp() > block.timestamp) {
+        if (mopn.MTStepStartBlock() > block.number) {
             return 0;
         }
         uint256 totalMOPNPoints = mopn.TotalMOPNPoints();
         uint256 perMOPNPointMinted = mopn.PerMOPNPointMinted();
         if (totalMOPNPoints > 0) {
-            uint256 lastTickTimestamp = mopn.LastTickTimestamp();
+            uint256 lastTickBlock = mopn.LastTickBlock();
             uint256 reduceTimes = mopn.MTReduceTimes();
             if (reduceTimes == 0) {
                 perMOPNPointMinted +=
-                    ((block.timestamp - lastTickTimestamp) *
-                        mopn.MTOutputPerSec()) /
+                    ((block.number - lastTickBlock) * mopn.MTOutputPerBlock()) /
                     totalMOPNPoints;
             } else {
-                uint256 nextReduceTimestamp = mopn.MTStepStartTimestamp() +
+                uint256 nextReduceBlock = mopn.MTStepStartBlock() +
                     mopn.MTReduceInterval();
                 for (uint256 i = 0; i <= reduceTimes; i++) {
                     perMOPNPointMinted +=
-                        ((nextReduceTimestamp - lastTickTimestamp) *
-                            mopn.currentMTPPS(i)) /
+                        ((nextReduceBlock - lastTickBlock) *
+                            mopn.currentMTPPB(i)) /
                         totalMOPNPoints;
-                    lastTickTimestamp = nextReduceTimestamp;
-                    nextReduceTimestamp += mopn.MTReduceInterval();
-                    if (nextReduceTimestamp > block.timestamp) {
-                        nextReduceTimestamp = block.timestamp;
+                    lastTickBlock = nextReduceBlock;
+                    nextReduceBlock += mopn.MTReduceInterval();
+                    if (nextReduceBlock > block.number) {
+                        nextReduceBlock = block.number;
                     }
                 }
             }
@@ -139,8 +139,10 @@ contract MOPNData is Multicall {
 
         uint256 CollectionPerMOPNPointMinted = mopn
             .getCollectionPerMOPNPointMinted(collectionAddress);
+
         uint256 CollectionPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
             CollectionPerMOPNPointMinted;
+
         if (
             CollectionPerMOPNPointMintedDiff > 0 &&
             mopn.getCollectionOnMapMOPNPoints(collectionAddress) > 0
@@ -154,7 +156,6 @@ contract MOPNData is Multicall {
                     CollectionMOPNPoints) /
                     mopn.getCollectionOnMapNum(collectionAddress));
             }
-
             uint256 AdditionalMOPNPoints = mopn
                 .getCollectionAdditionalMOPNPoints(collectionAddress);
             if (AdditionalMOPNPoints > 0) {
@@ -192,15 +193,71 @@ contract MOPNData is Multicall {
             mopn.getAccountPerMOPNPointMinted(account);
 
         if (AccountPerMOPNPointMintedDiff > 0 && AccountOnMapMOPNPoint > 0) {
-            address collectionAddress = mopn.getAccountCollection(account);
-            uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(
-                    collectionAddress
-                ) - mopn.getAccountPerCollectionNFTMinted(account);
             inbox +=
                 ((AccountPerMOPNPointMintedDiff * AccountOnMapMOPNPoint) * 90) /
                 100;
+            uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(
+                    mopn.getAccountCollection(account)
+                ) - mopn.getAccountPerCollectionNFTMinted(account);
+
             if (AccountPerCollectionNFTMintedDiff > 0) {
                 inbox += (AccountPerCollectionNFTMintedDiff * 90) / 100;
+            }
+        }
+    }
+
+    function calcLandsMT(
+        uint32[] memory LandIds
+    ) public view returns (uint256[] memory amounts) {
+        amounts = new uint256[](LandIds.length);
+        for (uint256 i = 0; i < LandIds.length; i++) {
+            amounts[i] = calcLandMT(LandIds[i]);
+        }
+    }
+
+    function calcLandMT(uint32 LandId) public view returns (uint256 amount) {
+        uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
+
+        for (uint256 i = 0; i <= 5; i++) {
+            if (i == 0) {
+                amount += calcLandCoordinateMT(tileCoordinate);
+            } else {
+                for (uint256 j = 0; j < 6; j++) {
+                    for (uint256 k = 0; k < i; k++) {
+                        amount += calcLandCoordinateMT(tileCoordinate);
+                        tileCoordinate = TileMath.neighbor(tileCoordinate, j);
+                    }
+                }
+            }
+
+            tileCoordinate++;
+        }
+    }
+
+    function calcLandCoordinateMT(
+        uint32 coordinate
+    ) public view returns (uint256 amount) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        address account = mopn.getTileAccount(coordinate);
+        if (account != address(0)) {
+            uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
+                mopn.getAccountPerMOPNPointMinted(account);
+
+            if (AccountPerMOPNPointMintedDiff > 0) {
+                address collectionAddress = mopn.getAccountCollection(account);
+                uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(
+                        collectionAddress
+                    ) - mopn.getAccountPerCollectionNFTMinted(account);
+                uint256 AccountOnMapMOPNPoint = mopn.getAccountOnMapMOPNPoint(
+                    account
+                );
+                amount +=
+                    ((AccountPerMOPNPointMintedDiff * AccountOnMapMOPNPoint) *
+                        5) /
+                    100;
+                if (AccountPerCollectionNFTMintedDiff > 0) {
+                    amount += (AccountPerCollectionNFTMintedDiff * 5) / 100;
+                }
             }
         }
     }

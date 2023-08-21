@@ -127,15 +127,17 @@ library TileMath {
     function getTileMOPNPoint(
         uint32 tileCoordinate
     ) public pure returns (uint256 tile) {
-        if ((tileCoordinate / 10000) % 10 == 0) {
-            if (tileCoordinate % 10 == 0) {
-                return 15;
+        unchecked {
+            if ((tileCoordinate / 10000) % 10 == 0) {
+                if (tileCoordinate % 10 == 0) {
+                    return 15;
+                }
+                return 5;
+            } else if (tileCoordinate % 10 == 0) {
+                return 5;
             }
-            return 5;
-        } else if (tileCoordinate % 10 == 0) {
-            return 5;
+            return 1;
         }
-        return 1;
     }
 
     function coordinateIntToArr(

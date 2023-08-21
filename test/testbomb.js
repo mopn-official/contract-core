@@ -314,7 +314,7 @@ describe("MOPN", function () {
   };
 
   const claimAccountsMT = async () => {
-    const tx = await mopnData.batchClaimAccountMT(accounts);
+    const tx = await mopn.batchClaimAccountMT([accounts.slice(0,7), [accounts[8]]]);
     await tx.wait();
   };
 

@@ -69,15 +69,15 @@ interface IMOPN {
         uint32 tileCoordinate
     ) external view returns (uint32);
 
-    function MTOutputPerSec() external view returns (uint256);
+    function MTOutputPerBlock() external view returns (uint256);
 
-    function MTStepStartTimestamp() external view returns (uint256);
+    function MTStepStartBlock() external view returns (uint256);
 
     function MTReduceInterval() external view returns (uint256);
 
     function TotalMOPNPoints() external view returns (uint256);
 
-    function LastTickTimestamp() external view returns (uint256);
+    function LastTickBlock() external view returns (uint256);
 
     function PerMOPNPointMinted() external view returns (uint256);
 
@@ -91,7 +91,7 @@ interface IMOPN {
 
     function TotalMTStaking() external view returns (uint256);
 
-    function currentMTPPS(uint256 reduceTimes) external view returns (uint256);
+    function currentMTPPB(uint256 reduceTimes) external view returns (uint256);
 
     function MTReduceTimes() external view returns (uint256);
 

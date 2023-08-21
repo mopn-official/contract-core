@@ -100,11 +100,15 @@ describe("MOPN", function () {
         TileMath: tileMath.address,
       },
     });
-    mopn = await MOPN.deploy(mopngovernance.address, 5000000, unixTimeStamp, 604800, 10000, 99999);
+    mopn = await MOPN.deploy(mopngovernance.address, 60000000, 0, 50400, 10000, 99999);
     await mopn.deployed();
     console.log("MOPN", mopn.address);
 
-    const MOPNData = await ethers.getContractFactory("MOPNData");
+    const MOPNData = await ethers.getContractFactory("MOPNData",{
+      libraries: {
+        TileMath: tileMath.address,
+      },
+    });
     mopnData = await MOPNData.deploy(mopngovernance.address);
     await mopnData.deployed();
     console.log("MOPNData", mopnData.address);
@@ -689,6 +693,8 @@ describe("MOPN", function () {
     console.log(account);
     console.log(await mopnData.calcAccountMT(account));
     console.log("land account", account, "balance", await mopnmt.balanceOf(account));
+
+    console.log("land unclaimed mt", await mopnData.calcLandsMT([0]));
   });
 
   const avatarInfo = async () => {
