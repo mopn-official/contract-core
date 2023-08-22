@@ -658,6 +658,9 @@ describe("MOPN", function () {
     tx6.wait();
 
     await collectionInfo();
+
+    console.log(await mopnData.calcCollectionSettledMT(collection1));
+    console.log(await mopnData.calcCollectionSettledMT(collection2));
   });
 
   it("test helpers", async function () {

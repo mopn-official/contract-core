@@ -56,8 +56,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
     uint256 public MiningData;
 
     /// @notice MiningDataExt structure:
-    /// - uint16 nextLandId: bits 176-191
-    /// - uint48 AdditionalFinishSnapshot: bits 160-175
+    /// - uint16 nextLandId: bits 208-223
+    /// - uint48 AdditionalFinishSnapshot: bits 160-207
     /// - uint48 NFTOfferCoefficient: bits 112-159
     /// - uint48 TotalCollectionClaimed: bits 64-111
     /// - uint64 TotalMTStaking: bits 0-63
@@ -220,7 +220,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
                     .nextTokenId();
                 require(nextLandId > LandId, "Land Not Open");
                 unchecked {
-                    MiningDataExt += (nextLandId - NextLandId()) << 176;
+                    MiningDataExt += (nextLandId - NextLandId()) << 208;
                 }
             }
         }
@@ -522,7 +522,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     // MiningDataExt
     function NextLandId() public view returns (uint256) {
-        return uint16(MiningDataExt >> 176);
+        return uint16(MiningDataExt >> 208);
     }
 
     function AdditionalFinishSnapshot() public view returns (uint256) {

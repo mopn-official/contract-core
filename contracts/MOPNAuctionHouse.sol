@@ -19,7 +19,7 @@ contract MOPNAuctionHouse is Multicall, Ownable {
 
     uint8 public immutable bombRoundProduce = 10;
 
-    uint256 public immutable bombPrice = 1000000000000;
+    uint256 public immutable bombPrice = 100000000000;
 
     /**
      * @dev last active round and it's start timestamp and it's settlement status
