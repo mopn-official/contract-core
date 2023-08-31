@@ -171,7 +171,7 @@ contract MOPNERC6551Account is
         address operator,
         address,
         uint256 id,
-        uint256 value,
+        uint256,
         bytes calldata data
     ) public override returns (bytes4) {
         if (
@@ -180,10 +180,15 @@ contract MOPNERC6551Account is
             id == 1 &&
             isOwner(operator)
         ) {
-            uint256 coordinate = abi.decode(data, (uint256));
-            IMOPN(IMOPNGovernance(governance).mopnContract()).bomb(
-                uint32(coordinate),
-                value
+            (
+                uint32 coordinate,
+                uint32 LandId,
+                address[] memory tileAccounts
+            ) = abi.decode(data, (uint32, uint32, address[]));
+            IMOPN(IMOPNGovernance(governance).mopnContract()).moveTo(
+                coordinate,
+                LandId,
+                tileAccounts
             );
         }
         return IERC1155Receiver.onERC1155Received.selector;
@@ -194,7 +199,7 @@ contract MOPNERC6551Account is
         address operator,
         address,
         uint256[] memory ids,
-        uint256[] memory values,
+        uint256[] memory,
         bytes memory data
     ) public override returns (bytes4) {
         for (uint256 i = 0; i < ids.length; i++) {
@@ -204,10 +209,15 @@ contract MOPNERC6551Account is
                 msg.sender == IMOPNGovernance(governance).bombContract() &&
                 isOwner(operator)
             ) {
-                uint256 coordinate = abi.decode(data, (uint256));
-                IMOPN(IMOPNGovernance(governance).mopnContract()).bomb(
-                    uint32(coordinate),
-                    values[i]
+                (
+                    uint32 coordinate,
+                    uint32 LandId,
+                    address[] memory tileAccounts
+                ) = abi.decode(data, (uint32, uint32, address[]));
+                IMOPN(IMOPNGovernance(governance).mopnContract()).moveTo(
+                    coordinate,
+                    LandId,
+                    tileAccounts
                 );
             }
         }

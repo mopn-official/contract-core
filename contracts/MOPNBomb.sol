@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./erc6551/interfaces/IERC6551Account.sol";
+import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPN.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -57,6 +58,25 @@ contract MOPNBomb is ERC1155, Multicall, Ownable {
         uint256 amount
     ) public onlyGovernance {
         _burn(from, id, amount);
+    }
+
+    function createAccount(
+        address implementation,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId,
+        uint256 salt,
+        bytes calldata initData
+    ) external returns (address) {
+        return
+            IERC6551Registry(governance.ERC6551Registry()).createAccount(
+                implementation,
+                chainId,
+                tokenContract,
+                tokenId,
+                salt,
+                initData
+            );
     }
 
     modifier onlyGovernance() {

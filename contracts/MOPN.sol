@@ -39,15 +39,12 @@ contract MOPN is IMOPN, Multicall, Ownable {
     uint256 public immutable MaxCollectionOnMapNum;
     uint256 public immutable MaxCollectionMOPNPoint;
 
-    // Tile => uint160 account + uint32 MOPN Land Id
-    mapping(uint32 => uint256) public tiles;
-
     BitMaps.BitMap private tilesbitmap;
 
     /**
      * @notice Mining Data
      * @dev This includes the following data:
-     * - uint48 TotalAdditionalMOPNPoints: bits 208-255
+     * - uint48 TotalBuffMOPNPoints: bits 208-255
      * - uint64 TotalMOPNPoints: bits 144-207
      * - uint32 LastTickBlock: bits 112-143
      * - uint48 PerMOPNPointMinted: bits 64-111
@@ -64,9 +61,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
     uint256 public MiningDataExt;
 
     /// @notice CollectionData structure:
-    /// - uint24 AdditionalMOPNPoint: bits 232-255
-    /// - uint24 CollectionMOPNPoint: bits 208-231
-    /// - uint32 OnMapMOPNPoints: bits 176-207
+    /// - uint32 AdditionalMOPNPoint: bits 224-255
+    /// - uint24 CollectionMOPNPoint: bits 200-223
+    /// - uint24 OnMapMOPNPoints: bits 176-199
     /// - uint16 OnMapNftNumber: bits 160-175
     /// - uint48 PerCollectionNFTMinted: bits 112-159
     /// - uint48 PerMOPNPointMinted: bits 64-111
@@ -74,6 +71,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
     mapping(address => uint256) public CollectionsData;
 
     /// @notice AccountData structure:
+    /// - uint32 LandId: bits 192-223
     /// - uint32 Coordinate: bits 160-191
     /// - uint48 PerCollectionNFTMinted: bits 112-159
     /// - uint48 PerMOPNPointMinted: bits 64-111
@@ -106,31 +104,29 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return address(governance);
     }
 
-    function batchSetCollectionAdditionalMOPNPoints(
+    function batchSetCollectionBuffMOPNPoints(
         address[] calldata collectionAddress,
-        uint256[] calldata additionalMOPNPoints
+        uint256[] calldata buffMOPNPoints
     ) public onlyOwner {
         require(
-            collectionAddress.length == additionalMOPNPoints.length,
+            collectionAddress.length == buffMOPNPoints.length,
             "params illegal"
         );
         for (uint256 i = 0; i < collectionAddress.length; i++) {
-            CollectionsData[collectionAddress[i]] +=
-                (additionalMOPNPoints[i] << 232) |
-                (additionalMOPNPoints[i] << 208);
+            CollectionsData[collectionAddress[i]] = buffMOPNPoints[i] << 224;
         }
     }
 
-    function AdditionalMOPNPointFinish() public onlyOwner {
+    function BuffMOPNPointFinish() public onlyOwner {
         require(AdditionalFinishSnapshot() == 0, "already finished");
         settlePerMOPNPointMinted();
         MiningDataExt += PerMOPNPointMinted() << 160;
-        MiningData -= TotalAdditionalMOPNPoints() << 144;
+        MiningData -= TotalBuffMOPNPoints() << 144;
     }
 
     function getQualifiedAccountCollection(
         address account
-    ) public view returns (address, uint256) {
+    ) public view returns (address) {
         (
             uint256 chainId,
             address collectionAddress,
@@ -156,7 +152,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             );
         }
 
-        return (collectionAddress, tokenId);
+        return collectionAddress;
     }
 
     uint32[] neighbors = [9999, 1, 10000, 9999, 1, 10000];
@@ -198,164 +194,124 @@ contract MOPN is IMOPN, Multicall, Ownable {
      * @notice an on map NFT move to a new tile
      * @param tileCoordinate move To coordinate
      */
-    function moveTo(uint32 tileCoordinate, uint32 LandId) public {
+    function moveTo(
+        uint32 tileCoordinate,
+        uint32 LandId,
+        address[] memory tileAccounts
+    ) public {
         require(block.number >= MTStepStartBlock, "mopn is not open yet");
         TileMath.check(tileCoordinate);
-        (address collectionAddress, ) = getQualifiedAccountCollection(
-            msg.sender
+        address collectionAddress = getQualifiedAccountCollection(msg.sender);
+
+        require(
+            TileMath.distance(tileCoordinate, TileMath.LandCenterTile(LandId)) <
+                6,
+            "LandId error"
         );
-
-        require(!tilesbitmap.get(tileCoordinate), "dst Occupied");
-
-        if (LandId == 0 || getTileLandId(tileCoordinate) != LandId) {
-            require(
-                TileMath.distance(
-                    tileCoordinate,
-                    TileMath.LandCenterTile(LandId)
-                ) < 6,
-                "LandId error"
-            );
-            if (LandId > NextLandId()) {
-                uint256 nextLandId = IMOPNLand(governance.landContract())
-                    .nextTokenId();
-                require(nextLandId > LandId, "Land Not Open");
-                unchecked {
-                    MiningDataExt += (nextLandId - NextLandId()) << 208;
-                }
+        if (LandId > NextLandId()) {
+            uint256 nextLandId = IMOPNLand(governance.landContract())
+                .nextTokenId();
+            require(nextLandId > LandId, "Land Not Open");
+            unchecked {
+                MiningDataExt += (nextLandId - NextLandId()) << 208;
             }
         }
 
-        settlePerMOPNPointMinted();
-        settleCollectionMT(collectionAddress);
-        settleAccountMT(msg.sender, collectionAddress);
+        uint256 mData = calcPerMOPNPointMinted();
+        uint256 cData = calcCollectionMT(collectionAddress, mData);
+        uint256 aData = calcAccountMT(msg.sender, cData);
 
-        uint32 orgCoordinate = getAccountCoordinate(msg.sender);
-        uint256 tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
-        uint256 collectionOnMapNum = getCollectionOnMapNum(collectionAddress);
-        if (orgCoordinate > 0) {
-            tiles[orgCoordinate] = getTileLandId(orgCoordinate);
-            tilesbitmap.unset(orgCoordinate);
-            uint256 orgMOPNPoint = TileMath.getTileMOPNPoint(orgCoordinate);
-
-            unchecked {
-                if (tileMOPNPoint > orgMOPNPoint) {
-                    tileMOPNPoint -= orgMOPNPoint;
-                } else if (tileMOPNPoint < orgMOPNPoint) {
-                    tileMOPNPoint = orgMOPNPoint - tileMOPNPoint;
-                }
-
-                tileMOPNPoint *= 100;
-
-                MiningData += tileMOPNPoint << 144;
-                CollectionsData[collectionAddress] += tileMOPNPoint << 176;
-
-                if (orgCoordinate > tileCoordinate) {
-                    AccountsData[msg.sender] -=
-                        uint256(orgCoordinate - tileCoordinate) <<
-                        160;
-                } else {
-                    AccountsData[msg.sender] +=
-                        uint256(tileCoordinate - orgCoordinate) <<
-                        160;
-                }
-            }
-            emit AccountMove(msg.sender, LandId, orgCoordinate, tileCoordinate);
-        } else {
-            require(
-                collectionOnMapNum < MaxCollectionOnMapNum,
-                "collection on map nft number overflow"
-            );
-
-            uint256 collectinPoint = getCollectionMOPNPoint(collectionAddress);
-            uint256 additionalMOPNPoint = getCollectionAdditionalMOPNPoint(
-                collectionAddress
-            );
-
-            unchecked {
-                tileMOPNPoint *= 100;
-                if (additionalMOPNPoint == 0) {
-                    MiningData += (tileMOPNPoint + collectinPoint) << 144;
-                } else {
-                    MiningData +=
-                        (additionalMOPNPoint << 208) |
-                        ((tileMOPNPoint +
-                            collectinPoint +
-                            additionalMOPNPoint) << 144);
-                }
-
-                CollectionsData[collectionAddress] +=
-                    (tileMOPNPoint << 176) |
-                    (uint256(1) << 160);
-
-                AccountsData[msg.sender] += uint256(tileCoordinate) << 160;
-            }
-            emit AccountJumpIn(msg.sender, LandId, tileCoordinate);
-        }
-
-        tiles[tileCoordinate] =
-            (uint256(uint160(msg.sender)) << 32) |
-            uint256(LandId);
-        tilesbitmap.set(tileCoordinate);
+        uint256 dstBitMap;
+        uint256 enemies;
 
         unchecked {
-            ++tileCoordinate;
-            uint256 dstBitMap;
+            if (tilesbitmap.get(tileCoordinate)) {
+                address tileAccountCollection = getAccountCollection(
+                    tileAccounts[0]
+                );
+                require(
+                    collectionAddress != tileAccountCollection,
+                    "dst has ally"
+                );
+                enemies++;
+                mData = bombATile(
+                    msg.sender,
+                    tileCoordinate,
+                    tileAccounts[0],
+                    tileAccountCollection,
+                    mData
+                );
+            }
+
+            tileCoordinate++;
             for (uint256 i = 0; i < 18; i++) {
                 if (
                     !get256bitmap(dstBitMap, i) &&
                     tilesbitmap.get(tileCoordinate)
                 ) {
-                    address tileAccount = getTileAccount(tileCoordinate);
-                    if (tileAccount != msg.sender) {
-                        require(
-                            getAccountCollection(tileAccount) ==
-                                collectionAddress,
-                            "tile has enemy"
+                    require(
+                        tileCoordinate ==
+                            getAccountCoordinate(tileAccounts[i + 1]),
+                        "tile accounts error"
+                    );
+                    if (tileAccounts[i + 1] != msg.sender) {
+                        address tileAccountCollection = getAccountCollection(
+                            tileAccounts[i + 1]
                         );
-                        dstBitMap = set256bitmap(dstBitMap, 100);
-                    }
+                        if (tileAccountCollection == collectionAddress) {
+                            dstBitMap = set256bitmap(dstBitMap, 100);
+                            uint256 k = i;
+                            if (i < 5) {
+                                k++;
+                                while (k < 6) {
+                                    dstBitMap = set256bitmap(dstBitMap, k);
+                                    k++;
+                                }
+                                k = 6 + i * 2;
 
-                    uint256 k = i;
-                    if (i < 5) {
-                        k++;
-                        while (k < 6) {
-                            dstBitMap = set256bitmap(dstBitMap, k);
-                            k++;
-                        }
-                        k = 6 + i * 2;
+                                dstBitMap = set256bitmap(
+                                    dstBitMap,
+                                    (k - 3) < 6 ? 9 + k : k - 3
+                                );
+                                dstBitMap = set256bitmap(
+                                    dstBitMap,
+                                    (k - 2) < 6 ? 10 + k : k - 2
+                                );
+                                dstBitMap = set256bitmap(
+                                    dstBitMap,
+                                    (k - 1) < 6 ? 11 + k : k - 1
+                                );
+                                dstBitMap = set256bitmap(dstBitMap, k);
+                                dstBitMap = set256bitmap(
+                                    dstBitMap,
+                                    (k + 1) > 17 ? (k - 11) : k + 1
+                                );
+                                dstBitMap = set256bitmap(
+                                    dstBitMap,
+                                    (k + 2) > 17 ? (k - 10) : k + 2
+                                );
+                                dstBitMap = set256bitmap(
+                                    dstBitMap,
+                                    (k + 3) > 17 ? (k - 9) : k + 3
+                                );
+                            } else {
+                                if (k < 16) {
+                                    dstBitMap = set256bitmap(dstBitMap, k + 1);
+                                    dstBitMap = set256bitmap(dstBitMap, k + 2);
+                                } else if (k == 16) {
+                                    dstBitMap = set256bitmap(dstBitMap, 17);
+                                }
+                            }
+                        } else {
+                            enemies++;
 
-                        dstBitMap = set256bitmap(
-                            dstBitMap,
-                            (k - 3) < 6 ? 9 + k : k - 3
-                        );
-
-                        dstBitMap = set256bitmap(
-                            dstBitMap,
-                            (k - 2) < 6 ? 10 + k : k - 2
-                        );
-                        dstBitMap = set256bitmap(
-                            dstBitMap,
-                            (k - 1) < 6 ? 11 + k : k - 1
-                        );
-                        dstBitMap = set256bitmap(dstBitMap, k);
-                        dstBitMap = set256bitmap(
-                            dstBitMap,
-                            (k + 1) > 17 ? (k - 11) : k + 1
-                        );
-                        dstBitMap = set256bitmap(
-                            dstBitMap,
-                            (k + 2) > 17 ? (k - 10) : k + 2
-                        );
-                        dstBitMap = set256bitmap(
-                            dstBitMap,
-                            (k + 3) > 17 ? (k - 9) : k + 3
-                        );
-                    } else {
-                        if (k < 16) {
-                            dstBitMap = set256bitmap(dstBitMap, k + 1);
-                            dstBitMap = set256bitmap(dstBitMap, k + 2);
-                        } else if (k == 16) {
-                            dstBitMap = set256bitmap(dstBitMap, 17);
+                            mData = bombATile(
+                                msg.sender,
+                                tileCoordinate,
+                                tileAccounts[i + 1],
+                                tileAccountCollection,
+                                mData
+                            );
                         }
                     }
                 }
@@ -369,268 +325,106 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 }
             }
 
-            if (!get256bitmap(dstBitMap, 100)) {
-                require(
-                    collectionOnMapNum == 0 ||
-                        (orgCoordinate > 0 && collectionOnMapNum == 1),
-                    "linked avatar missing"
-                );
+            if (enemies > 0) {
+                governance.burnBomb(msg.sender, 1, enemies);
             }
+
+            tileCoordinate -= 2;
         }
-    }
 
-    /**
-     * @notice throw a bomb to a tile
-     * @param tileCoordinate bomb to tile coordinate
-     */
-    function bomb(uint32 tileCoordinate, uint256 num) public {
-        getQualifiedAccountCollection(msg.sender);
+        uint32 orgCoordinate = getAccountCoordinate(msg.sender);
+        uint256 collectionOnMapNum = getCollectionOnMapNum(collectionAddress);
 
-        require(getAccountCoordinate(msg.sender) > 0, "NFT not on the map");
+        if (!get256bitmap(dstBitMap, 100)) {
+            require(
+                collectionOnMapNum == 0 ||
+                    (orgCoordinate > 0 && collectionOnMapNum == 1),
+                "linked account missing"
+            );
+        }
 
-        address[] memory attackAccounts = new address[](7);
-        uint32[] memory victimsCoordinates = new uint32[](7);
+        uint256 tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
+        if (orgCoordinate > 0) {
+            emit AccountMove(msg.sender, LandId, orgCoordinate, tileCoordinate);
+            tilesbitmap.unset(orgCoordinate);
+            uint256 orgMOPNPoint = TileMath.getTileMOPNPoint(orgCoordinate);
 
-        uint256 killed;
-        address victimsCollection;
-        uint256 collectinPoint;
-        uint256 additionalMOPNPoint;
-
-        uint256 cData;
-        settlePerMOPNPointMinted();
-        uint256 mData = MiningData;
-        for (uint256 i = 0; i < 7; i++) {
-            if (tilesbitmap.get(tileCoordinate)) {
-                address attackAccount = getTileAccount(tileCoordinate);
-                if (attackAccount != msg.sender) {
-                    uint256 shield = IMOPNBomb(governance.bombContract())
-                        .balanceOf(attackAccount, 2);
-                    if (shield < num) {
-                        //remove tile account
-                        tiles[tileCoordinate] = getTileLandId(tileCoordinate);
-                        tilesbitmap.unset(tileCoordinate);
-
-                        attackAccounts[i] = attackAccount;
-                        victimsCoordinates[i] = tileCoordinate;
-                        if (victimsCollection == address(0)) {
-                            victimsCollection = getAccountCollection(
-                                attackAccount
-                            );
-                            settleCollectionMT(victimsCollection);
-                            collectinPoint = getCollectionMOPNPoint(
-                                victimsCollection
-                            );
-                            additionalMOPNPoint = getCollectionAdditionalMOPNPoint(
-                                victimsCollection
-                            );
-                            cData = CollectionsData[victimsCollection];
-                        }
-
-                        settleAccountMT(attackAccount, victimsCollection);
-
-                        unchecked {
-                            uint256 accountOnMapMOPNPoint = TileMath
-                                .getTileMOPNPoint(tileCoordinate) * 100;
-                            if (additionalMOPNPoint == 0) {
-                                mData -=
-                                    (accountOnMapMOPNPoint + collectinPoint) <<
-                                    144;
-                            } else {
-                                mData -=
-                                    (additionalMOPNPoint << 208) |
-                                    ((accountOnMapMOPNPoint + collectinPoint) <<
-                                        144);
-                            }
-
-                            cData -=
-                                (accountOnMapMOPNPoint << 176) |
-                                (uint256(1) << 160);
-
-                            AccountsData[attackAccount] -=
-                                uint256(tileCoordinate) <<
-                                160;
-                            killed++;
-                        }
-                        if (shield > 0) {
-                            governance.burnBomb(msg.sender, 2, shield, 0);
-                        }
-                    } else {
-                        governance.burnBomb(msg.sender, 2, num, 0);
-                    }
+            unchecked {
+                if (tileMOPNPoint > orgMOPNPoint) {
+                    tileMOPNPoint -= orgMOPNPoint;
+                } else if (tileMOPNPoint < orgMOPNPoint) {
+                    tileMOPNPoint = orgMOPNPoint - tileMOPNPoint;
                 }
-            }
 
-            if (i == 0) {
-                ++tileCoordinate;
-            } else {
-                tileCoordinate = neighbor(tileCoordinate, i - 1);
+                mData += tileMOPNPoint << 144;
+                cData += tileMOPNPoint << 176;
+
+                aData =
+                    aData -
+                    ((uint256(getAccountLandId(msg.sender)) << 192) |
+                        (uint256(orgCoordinate) << 160)) +
+                    ((uint256(LandId) << 192) |
+                        (uint256(tileCoordinate) << 160));
+            }
+        } else {
+            require(
+                collectionOnMapNum < MaxCollectionOnMapNum,
+                "collection on map nft number overflow"
+            );
+            emit AccountJumpIn(msg.sender, LandId, tileCoordinate);
+            unchecked {
+                mData +=
+                    (uint256(uint32(cData >> 224)) << 208) |
+                    ((tileMOPNPoint +
+                        uint32(cData >> 224) +
+                        uint24(cData >> 200)) << 144);
+
+                cData += (tileMOPNPoint << 176) | (uint256(1) << 160);
+
+                aData +=
+                    (uint256(LandId) << 192) |
+                    (uint256(tileCoordinate) << 160);
             }
         }
-
-        governance.burnBomb(msg.sender, 1, num, killed > 0 ? 1 : 0);
 
         MiningData = mData;
-        CollectionsData[victimsCollection] = cData;
+        CollectionsData[collectionAddress] = cData;
+        AccountsData[msg.sender] = aData;
+        tilesbitmap.set(tileCoordinate);
+    }
 
-        --tileCoordinate;
-        emit BombUse(
-            msg.sender,
-            tileCoordinate,
-            attackAccounts,
-            victimsCoordinates
+    function bombATile(
+        address account,
+        uint32 tileCoordinate,
+        address tileAccount,
+        address tileAccountCollection,
+        uint256 mData
+    ) internal returns (uint256) {
+        //remove tile account
+        tilesbitmap.unset(tileCoordinate);
+
+        settleCollectionMT(tileAccountCollection);
+        settleAccountMT(tileAccount, tileAccountCollection);
+
+        uint256 accountOnMapMOPNPoint = TileMath.getTileMOPNPoint(
+            tileCoordinate
         );
-    }
 
-    /**
-     * @notice get the avatar Id who is standing on a tile
-     * @param tileCoordinate tile coordinate
-     */
-    function getTileAccount(
-        uint32 tileCoordinate
-    ) public view returns (address) {
-        return address(uint160(tiles[tileCoordinate] >> 32));
-    }
+        unchecked {
+            mData -=
+                (getCollectionAdditionalMOPNPoint(tileAccountCollection) <<
+                    208) |
+                ((accountOnMapMOPNPoint +
+                    getCollectionNFTMOPNPoint(tileAccountCollection)) << 144);
 
-    /**
-     * @notice get MOPN Land Id which a tile belongs(only have data if someone has occupied this tile before)
-     * @param tileCoordinate tile coordinate
-     */
-    function getTileLandId(uint32 tileCoordinate) public view returns (uint32) {
-        return uint32(tiles[tileCoordinate]);
-    }
+            CollectionsData[tileAccountCollection] -=
+                (accountOnMapMOPNPoint << 176) |
+                (uint256(1) << 160);
 
-    // MiningData
-    function TotalAdditionalMOPNPoints() public view returns (uint256) {
-        return uint48(MiningData >> 208);
-    }
-
-    function TotalMOPNPoints() public view returns (uint256) {
-        return uint64(MiningData >> 144);
-    }
-
-    function LastTickBlock() public view returns (uint256) {
-        return uint32(MiningData >> 112);
-    }
-
-    function PerMOPNPointMinted() public view returns (uint256) {
-        return uint48(MiningData >> 64);
-    }
-
-    function MTTotalMinted() public view returns (uint256) {
-        return uint64(MiningData);
-    }
-
-    // MiningDataExt
-    function NextLandId() public view returns (uint256) {
-        return uint16(MiningDataExt >> 208);
-    }
-
-    function AdditionalFinishSnapshot() public view returns (uint256) {
-        return uint48(MiningDataExt >> 160);
-    }
-
-    function NFTOfferCoefficient() public view returns (uint256) {
-        return uint48(MiningDataExt >> 112);
-    }
-
-    function TotalCollectionClaimed() public view returns (uint256) {
-        return uint48(MiningDataExt >> 64);
-    }
-
-    function TotalMTStaking() public view returns (uint256) {
-        return uint64(MiningDataExt);
-    }
-
-    /// CollectionData
-    function getCollectionAdditionalMOPNPoint(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint24(CollectionsData[collectionAddress] >> 232);
-    }
-
-    function getCollectionAdditionalMOPNPoints(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return
-            uint256(uint24(CollectionsData[collectionAddress] >> 232)) *
-            getCollectionOnMapNum(collectionAddress);
-    }
-
-    function getCollectionMOPNPoint(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint24(CollectionsData[collectionAddress] >> 208);
-    }
-
-    function getCollectionMOPNPoints(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return
-            uint256(uint24(CollectionsData[collectionAddress] >> 208)) *
-            getCollectionOnMapNum(collectionAddress);
-    }
-
-    function getCollectionOnMapMOPNPoints(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint32(CollectionsData[collectionAddress] >> 176);
-    }
-
-    function getCollectionOnMapNum(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint16(CollectionsData[collectionAddress] >> 160);
-    }
-
-    function getPerCollectionNFTMinted(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint48(CollectionsData[collectionAddress] >> 112);
-    }
-
-    function getCollectionPerMOPNPointMinted(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint48(CollectionsData[collectionAddress] >> 64);
-    }
-
-    function getCollectionSettledMT(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint64(CollectionsData[collectionAddress]);
-    }
-
-    /// AccountData
-    function getAccountCoordinate(
-        address account
-    ) public view returns (uint32) {
-        return uint32(AccountsData[account] >> 160);
-    }
-
-    function getAccountPerCollectionNFTMinted(
-        address account
-    ) public view returns (uint256) {
-        return uint48(AccountsData[account] >> 112);
-    }
-
-    /**
-     * @notice get avatar settled per mopn token allocation weight minted mopn token number
-     * @param account account wallet address
-     */
-    function getAccountPerMOPNPointMinted(
-        address account
-    ) public view returns (uint256) {
-        return uint48(AccountsData[account] >> 64);
-    }
-
-    /**
-     * @notice get avatar settled unclaimed minted mopn token
-     * @param account account wallet address
-     */
-    function getAccountSettledMT(
-        address account
-    ) public view returns (uint256) {
-        return uint64(AccountsData[account]);
+            AccountsData[tileAccount] = uint160(AccountsData[tileAccount]);
+        }
+        emit BombUse(account, tileAccount, tileCoordinate);
+        return mData;
     }
 
     /**
@@ -656,19 +450,17 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return (block.number - MTStepStartBlock) / MTReduceInterval;
     }
 
-    /**
-     * @notice settle per mopn token allocation weight minted mopn token
-     */
-    function settlePerMOPNPointMinted() public {
-        uint256 lastTickBlock = LastTickBlock();
+    function calcPerMOPNPointMinted() public returns (uint256 mData) {
+        mData = MiningData;
+        uint256 lastTickBlock = uint32(mData >> 112);
         if (block.number > lastTickBlock) {
             uint256 reduceTimes = MTReduceTimes();
-            uint256 totalMOPNPoints = TotalMOPNPoints();
+            uint256 totalMOPNPoints = uint64(mData >> 144);
             unchecked {
                 if (totalMOPNPoints > 0) {
-                    uint256 PerMOPNPointMintDiff;
+                    uint256 perMOPNPointMintDiff;
                     if (reduceTimes == 0) {
-                        PerMOPNPointMintDiff +=
+                        perMOPNPointMintDiff +=
                             ((block.number - lastTickBlock) *
                                 MTOutputPerBlock) /
                             totalMOPNPoints;
@@ -676,7 +468,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
                         uint256 nextReduceBlock = MTStepStartBlock +
                             MTReduceInterval;
                         for (uint256 i = 0; i <= reduceTimes; i++) {
-                            PerMOPNPointMintDiff +=
+                            perMOPNPointMintDiff +=
                                 ((nextReduceBlock - lastTickBlock) *
                                     currentMTPPB(i)) /
                                 totalMOPNPoints;
@@ -687,12 +479,12 @@ contract MOPN is IMOPN, Multicall, Ownable {
                             }
                         }
                     }
-                    MiningData +=
-                        ((block.number - LastTickBlock()) << 112) |
-                        ((PerMOPNPointMintDiff) << 64) |
-                        (PerMOPNPointMintDiff * totalMOPNPoints);
+                    mData +=
+                        ((block.number - uint32(mData >> 112)) << 112) |
+                        ((perMOPNPointMintDiff) << 64) |
+                        (perMOPNPointMintDiff * totalMOPNPoints);
                 } else {
-                    MiningData += (block.number - lastTickBlock) << 112;
+                    mData += (block.number - lastTickBlock) << 112;
                 }
             }
 
@@ -701,6 +493,13 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 MTStepStartBlock += reduceTimes * MTReduceInterval;
             }
         }
+    }
+
+    /**
+     * @notice settle per mopn token allocation weight minted mopn token
+     */
+    function settlePerMOPNPointMinted() public {
+        MiningData = calcPerMOPNPointMinted();
     }
 
     function getCollectionMOPNPointFromStaking(
@@ -718,68 +517,71 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
-    /**
-     * @notice mint collection mopn token
-     * @param collectionAddress collection contract address
-     */
-    function settleCollectionMT(address collectionAddress) public {
-        uint256 perMOPNPointMinted = PerMOPNPointMinted();
-        uint256 collectionPerMOPNPointMinted = getCollectionPerMOPNPointMinted(
-            collectionAddress
-        );
+    function calcCollectionMT(
+        address collectionAddress,
+        uint256 mData
+    ) public returns (uint256 cData) {
+        cData = CollectionsData[collectionAddress];
+        uint256 collectionPerMOPNPointMinted = uint48(cData >> 64);
         unchecked {
-            uint256 collectionPerMOPNPointMintedDiff = perMOPNPointMinted -
+            uint256 collectionPerMOPNPointMintedDiff = uint48(mData >> 64) -
                 collectionPerMOPNPointMinted;
             if (collectionPerMOPNPointMintedDiff > 0) {
-                uint256 additionalFinishSnapshot_ = AdditionalFinishSnapshot();
-                if (additionalFinishSnapshot_ > collectionPerMOPNPointMinted) {
+                uint256 collectionOnMapNum = uint16(cData >> 160);
+                uint256 AdditionalFinishSnapshot_ = AdditionalFinishSnapshot();
+                if (AdditionalFinishSnapshot_ > collectionPerMOPNPointMinted) {
                     collectionPerMOPNPointMintedDiff =
-                        additionalFinishSnapshot_ -
+                        AdditionalFinishSnapshot_ -
                         collectionPerMOPNPointMinted;
                 }
-                uint256 OnMapMOPNPoints = getCollectionOnMapMOPNPoints(
-                    collectionAddress
-                );
-                if (OnMapMOPNPoints > 0) {
-                    uint256 CollectionMOPNPoints = getCollectionMOPNPoints(
-                        collectionAddress
-                    );
+                uint256 onMapMOPNPoints = collectionOnMapNum *
+                    uint32(cData >> 176);
+                if (onMapMOPNPoints > 0) {
+                    uint256 collectionNFTMOPNPoints = collectionOnMapNum *
+                        (uint32(cData >> 224) + uint24(cData >> 200));
 
                     uint256 amount = ((collectionPerMOPNPointMintedDiff *
-                        (OnMapMOPNPoints + CollectionMOPNPoints)) * 5) / 100;
+                        (onMapMOPNPoints + collectionNFTMOPNPoints)) * 5) / 100;
 
-                    if (CollectionMOPNPoints > 0) {
-                        CollectionsData[collectionAddress] +=
+                    if (collectionNFTMOPNPoints > 0) {
+                        cData +=
                             (((collectionPerMOPNPointMintedDiff *
-                                CollectionMOPNPoints) /
-                                getCollectionOnMapNum(collectionAddress)) <<
-                                112) |
+                                collectionNFTMOPNPoints) /
+                                collectionOnMapNum) << 112) |
                             (collectionPerMOPNPointMintedDiff << 64) |
                             amount;
                     } else {
-                        CollectionsData[collectionAddress] +=
+                        cData +=
                             (collectionPerMOPNPointMintedDiff << 64) |
                             amount;
                     }
 
                     emit CollectionMTMinted(collectionAddress, amount);
                 } else {
-                    CollectionsData[collectionAddress] +=
-                        collectionPerMOPNPointMintedDiff <<
-                        64;
+                    cData += collectionPerMOPNPointMintedDiff << 64;
                 }
 
-                if (additionalFinishSnapshot_ > collectionPerMOPNPointMinted) {
-                    uint256 additionalMOPNPoint = getCollectionAdditionalMOPNPoint(
-                            collectionAddress
-                        );
-                    CollectionsData[collectionAddress] -=
-                        (additionalMOPNPoint << 232) |
-                        (additionalMOPNPoint << 208);
-                    settleCollectionMT(collectionAddress);
+                if (AdditionalFinishSnapshot_ > collectionPerMOPNPointMinted) {
+                    uint256 buffMOPNPoint = getCollectionAdditionalMOPNPoint(
+                        collectionAddress
+                    );
+                    cData -= buffMOPNPoint << 224;
+                    CollectionsData[collectionAddress] = cData;
+                    cData = calcCollectionMT(collectionAddress, mData);
                 }
             }
         }
+    }
+
+    /**
+     * @notice mint collection mopn token
+     * @param collectionAddress collection contract address
+     */
+    function settleCollectionMT(address collectionAddress) public {
+        CollectionsData[collectionAddress] = calcCollectionMT(
+            collectionAddress,
+            MiningData
+        );
     }
 
     function claimCollectionMT(
@@ -806,26 +608,20 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function settleCollectionMOPNPoint(
         address collectionAddress
     ) public onlyCollectionVault(collectionAddress) {
-        uint256 point = getCollectionMOPNPointFromStaking(collectionAddress) +
-            getCollectionAdditionalMOPNPoint(collectionAddress);
-        uint256 lastPoint = uint24(CollectionsData[collectionAddress] >> 208);
+        uint256 point = getCollectionMOPNPointFromStaking(collectionAddress);
+        uint256 lastPoint = getCollectionMOPNPoint(collectionAddress);
         if (point != lastPoint) {
-            uint256 collectionMOPNPoints = point *
-                getCollectionOnMapNum(collectionAddress);
-
-            uint256 preCollectionMOPNPoints = lastPoint *
-                getCollectionOnMapNum(collectionAddress);
-
-            if (collectionMOPNPoints > preCollectionMOPNPoints) {
-                MiningData += collectionMOPNPoints - preCollectionMOPNPoints;
-            } else if (collectionMOPNPoints < preCollectionMOPNPoints) {
-                MiningData -= preCollectionMOPNPoints - collectionMOPNPoints;
+            if (point > lastPoint) {
+                MiningData +=
+                    (point - lastPoint) *
+                    getCollectionOnMapNum(collectionAddress);
+                CollectionsData[collectionAddress] += point - lastPoint;
+            } else if (point < lastPoint) {
+                MiningData -=
+                    (lastPoint - point) *
+                    getCollectionOnMapNum(collectionAddress);
+                CollectionsData[collectionAddress] -= lastPoint - point;
             }
-
-            CollectionsData[collectionAddress] =
-                CollectionsData[collectionAddress] -
-                (lastPoint << 208) +
-                (point << 208);
         }
     }
 
@@ -850,7 +646,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
     ) public view returns (uint256 OnMapMOPNPoint) {
         uint32 coordinate = getAccountCoordinate(account);
         if (coordinate > 0) {
-            OnMapMOPNPoint = TileMath.getTileMOPNPoint(coordinate) * 100;
+            OnMapMOPNPoint = TileMath.getTileMOPNPoint(coordinate);
         }
     }
 
@@ -858,32 +654,33 @@ contract MOPN is IMOPN, Multicall, Ownable {
      * @notice mint avatar mopn token
      * @param account account wallet address
      */
-    function settleAccountMT(
+    function calcAccountMT(
         address account,
-        address collectionAddress
-    ) public {
+        uint256 cData
+    ) public returns (uint256 aData) {
+        aData = AccountsData[account];
         unchecked {
-            uint256 AccountPerMOPNPointMintedDiff = PerMOPNPointMinted() -
-                getAccountPerMOPNPointMinted(account);
-            if (AccountPerMOPNPointMintedDiff > 0) {
+            uint256 accountPerMOPNPointMintedDiff = uint48(cData >> 64) -
+                uint48(aData >> 64);
+            if (accountPerMOPNPointMintedDiff > 0) {
                 uint32 coordinate = getAccountCoordinate(account);
                 if (coordinate > 0) {
-                    uint256 AccountOnMapMOPNPoint = TileMath.getTileMOPNPoint(
+                    uint256 accountOnMapMOPNPoint = TileMath.getTileMOPNPoint(
                         coordinate
-                    ) * 100;
-                    uint256 AccountPerCollectionNFTMintedDiff = getPerCollectionNFTMinted(
-                            collectionAddress
-                        ) - getAccountPerCollectionNFTMinted(account);
+                    );
+                    uint256 accountPerCollectionNFTMintedDiff = uint48(
+                        cData >> 112
+                    ) - uint48(aData >> 112);
 
-                    uint256 amount = AccountPerMOPNPointMintedDiff *
-                        AccountOnMapMOPNPoint +
+                    uint256 amount = accountPerMOPNPointMintedDiff *
+                        accountOnMapMOPNPoint +
                         (
-                            AccountPerCollectionNFTMintedDiff > 0
-                                ? AccountPerCollectionNFTMintedDiff
+                            accountPerCollectionNFTMintedDiff > 0
+                                ? accountPerCollectionNFTMintedDiff
                                 : 0
                         );
 
-                    uint32 LandId = getTileLandId(coordinate);
+                    uint32 LandId = getAccountLandId(account);
                     address landAccount = LandAccounts[LandId];
                     if (landAccount == address(0)) {
                         landAccount = getLandAccount(LandId);
@@ -897,17 +694,25 @@ contract MOPN is IMOPN, Multicall, Ownable {
                     amount = (amount * 90) / 100;
 
                     emit AccountMTMinted(account, amount);
-                    AccountsData[account] +=
-                        (AccountPerCollectionNFTMintedDiff << 112) |
-                        (AccountPerMOPNPointMintedDiff << 64) |
+                    aData +=
+                        (accountPerCollectionNFTMintedDiff << 112) |
+                        (accountPerMOPNPointMintedDiff << 64) |
                         amount;
                 } else {
-                    AccountsData[account] +=
-                        AccountPerMOPNPointMintedDiff <<
-                        64;
+                    aData += accountPerMOPNPointMintedDiff << 64;
                 }
             }
         }
+    }
+
+    function settleAccountMT(
+        address account,
+        address collectionAddress
+    ) public {
+        AccountsData[account] = calcAccountMT(
+            account,
+            CollectionsData[collectionAddress]
+        );
     }
 
     function batchsettleAccountMT(address[][] memory accounts) public {
@@ -1021,6 +826,160 @@ contract MOPN is IMOPN, Multicall, Ownable {
         } else {
             MiningDataExt -= amount;
         }
+    }
+
+    // MiningData
+    function TotalBuffMOPNPoints() public view returns (uint256) {
+        return uint48(MiningData >> 208);
+    }
+
+    function TotalMOPNPoints() public view returns (uint256) {
+        return uint64(MiningData >> 144);
+    }
+
+    function LastTickBlock() public view returns (uint256) {
+        return uint32(MiningData >> 112);
+    }
+
+    function PerMOPNPointMinted() public view returns (uint256) {
+        return uint48(MiningData >> 64);
+    }
+
+    function MTTotalMinted() public view returns (uint256) {
+        return uint64(MiningData);
+    }
+
+    // MiningDataExt
+    function NextLandId() public view returns (uint256) {
+        return uint16(MiningDataExt >> 208);
+    }
+
+    function AdditionalFinishSnapshot() public view returns (uint256) {
+        return uint48(MiningDataExt >> 160);
+    }
+
+    function NFTOfferCoefficient() public view returns (uint256) {
+        return uint48(MiningDataExt >> 112);
+    }
+
+    function TotalCollectionClaimed() public view returns (uint256) {
+        return uint48(MiningDataExt >> 64);
+    }
+
+    function TotalMTStaking() public view returns (uint256) {
+        return uint64(MiningDataExt);
+    }
+
+    /// CollectionData
+    function getCollectionAdditionalMOPNPoint(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint24(CollectionsData[collectionAddress] >> 224);
+    }
+
+    function getCollectionAdditionalMOPNPoints(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return
+            uint256(uint24(CollectionsData[collectionAddress] >> 224)) *
+            getCollectionOnMapNum(collectionAddress);
+    }
+
+    function getCollectionMOPNPoint(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint24(CollectionsData[collectionAddress] >> 200);
+    }
+
+    function getCollectionMOPNPoints(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return
+            uint256(uint24(CollectionsData[collectionAddress] >> 200)) *
+            getCollectionOnMapNum(collectionAddress);
+    }
+
+    function getCollectionOnMapMOPNPoints(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint32(CollectionsData[collectionAddress] >> 176);
+    }
+
+    function getCollectionOnMapNum(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint16(CollectionsData[collectionAddress] >> 160);
+    }
+
+    function getPerCollectionNFTMinted(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint48(CollectionsData[collectionAddress] >> 112);
+    }
+
+    function getCollectionPerMOPNPointMinted(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint48(CollectionsData[collectionAddress] >> 64);
+    }
+
+    function getCollectionSettledMT(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint64(CollectionsData[collectionAddress]);
+    }
+
+    function getCollectionNFTMOPNPoint(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return
+            getCollectionMOPNPoint(collectionAddress) +
+            getCollectionAdditionalMOPNPoint(collectionAddress);
+    }
+
+    function getCollectionNFTMOPNPoints(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return
+            getCollectionNFTMOPNPoint(collectionAddress) *
+            getCollectionOnMapNum(collectionAddress);
+    }
+
+    /// AccountData
+    function getAccountLandId(address account) public view returns (uint32) {
+        return uint32(AccountsData[account] >> 192);
+    }
+
+    function getAccountCoordinate(
+        address account
+    ) public view returns (uint32) {
+        return uint32(AccountsData[account] >> 160);
+    }
+
+    function getAccountPerCollectionNFTMinted(
+        address account
+    ) public view returns (uint256) {
+        return uint48(AccountsData[account] >> 112);
+    }
+
+    /**
+     * @notice get avatar settled per mopn token allocation weight minted mopn token number
+     * @param account account wallet address
+     */
+    function getAccountPerMOPNPointMinted(
+        address account
+    ) public view returns (uint256) {
+        return uint48(AccountsData[account] >> 64);
+    }
+
+    /**
+     * @notice get avatar settled unclaimed minted mopn token
+     * @param account account wallet address
+     */
+    function getAccountSettledMT(
+        address account
+    ) public view returns (uint256) {
+        return uint64(AccountsData[account]);
     }
 
     modifier onlyCollectionVault(address collectionAddress) {

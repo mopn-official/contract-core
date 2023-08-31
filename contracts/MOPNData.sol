@@ -105,28 +105,29 @@ contract MOPNData is Multicall {
         uint256 OnMapMOPNPoints = mopn.getCollectionOnMapMOPNPoints(
             collectionAddress
         );
+        uint256 AdditionalFinishSnapshot = mopn.AdditionalFinishSnapshot();
 
         if (
             CollectionPerMOPNPointMinted < perMOPNPointMinted &&
             OnMapMOPNPoints > 0
         ) {
-            inbox +=
-                (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
-                    (CollectionMOPNPoints + OnMapMOPNPoints)) * 5) /
-                100;
-            if (AdditionalMOPNPoints > 0) {
-                if (mopn.AdditionalFinishSnapshot() > 0) {
-                    inbox +=
-                        (((mopn.AdditionalFinishSnapshot() -
-                            CollectionPerMOPNPointMinted) *
-                            AdditionalMOPNPoints) * 5) /
-                        100;
-                } else {
-                    inbox +=
-                        (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
-                            AdditionalMOPNPoints) * 5) /
-                        100;
-                }
+            if (AdditionalMOPNPoints > 0 && AdditionalFinishSnapshot > 0) {
+                inbox +=
+                    (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
+                        (CollectionMOPNPoints -
+                            AdditionalMOPNPoints +
+                            OnMapMOPNPoints)) * 5) /
+                    100;
+                inbox +=
+                    (((AdditionalFinishSnapshot -
+                        CollectionPerMOPNPointMinted) * AdditionalMOPNPoints) *
+                        5) /
+                    100;
+            } else {
+                inbox +=
+                    (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
+                        (CollectionMOPNPoints + OnMapMOPNPoints)) * 5) /
+                    100;
             }
         }
     }
@@ -137,44 +138,32 @@ contract MOPNData is Multicall {
         IMOPN mopn = IMOPN(governance.mopnContract());
         result = mopn.getPerCollectionNFTMinted(collectionAddress);
 
-        uint256 CollectionPerMOPNPointMinted = mopn
-            .getCollectionPerMOPNPointMinted(collectionAddress);
+        uint256 CollectionMOPNPoints = mopn.getCollectionMOPNPoints(
+            collectionAddress
+        );
 
-        uint256 CollectionPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
-            CollectionPerMOPNPointMinted;
-
-        if (
-            CollectionPerMOPNPointMintedDiff > 0 &&
-            mopn.getCollectionOnMapMOPNPoints(collectionAddress) > 0
-        ) {
-            uint256 CollectionMOPNPoints = mopn.getCollectionMOPNPoints(
-                collectionAddress
-            );
-
-            if (CollectionMOPNPoints > 0) {
-                result += ((CollectionPerMOPNPointMintedDiff *
-                    CollectionMOPNPoints) /
-                    mopn.getCollectionOnMapNum(collectionAddress));
-            }
+        if (CollectionMOPNPoints > 0) {
+            uint256 CollectionPerMOPNPointMinted = mopn
+                .getCollectionPerMOPNPointMinted(collectionAddress);
+            uint256 PerMOPNPointMinted = calcPerMOPNPointMinted();
             uint256 AdditionalMOPNPoints = mopn
                 .getCollectionAdditionalMOPNPoints(collectionAddress);
-            if (AdditionalMOPNPoints > 0) {
-                uint256 AdditionalFinishSnapshot_ = mopn
-                    .AdditionalFinishSnapshot();
-                if (AdditionalFinishSnapshot_ > 0) {
-                    if (
-                        AdditionalFinishSnapshot_ > CollectionPerMOPNPointMinted
-                    ) {
-                        result += (((AdditionalFinishSnapshot_ -
-                            CollectionPerMOPNPointMinted) *
-                            AdditionalMOPNPoints) /
-                            mopn.getCollectionOnMapNum(collectionAddress));
-                    }
-                } else {
-                    result += (((CollectionPerMOPNPointMintedDiff) *
+            uint256 AdditionalFinishSnapshot = mopn.AdditionalFinishSnapshot();
+
+            if (AdditionalMOPNPoints > 0 && AdditionalFinishSnapshot > 0) {
+                result +=
+                    ((PerMOPNPointMinted - CollectionPerMOPNPointMinted) *
+                        (CollectionMOPNPoints - AdditionalMOPNPoints)) /
+                    mopn.getCollectionOnMapNum(collectionAddress);
+                result +=
+                    ((AdditionalFinishSnapshot - CollectionPerMOPNPointMinted) *
                         AdditionalMOPNPoints) /
-                        mopn.getCollectionOnMapNum(collectionAddress));
-                }
+                    mopn.getCollectionOnMapNum(collectionAddress);
+            } else {
+                result +=
+                    ((PerMOPNPointMinted - CollectionPerMOPNPointMinted) *
+                        CollectionMOPNPoints) /
+                    mopn.getCollectionOnMapNum(collectionAddress);
             }
         }
     }
@@ -207,25 +196,38 @@ contract MOPNData is Multicall {
     }
 
     function calcLandsMT(
-        uint32[] memory LandIds
+        uint32[] memory LandIds,
+        address[][] memory tileAccounts
     ) public view returns (uint256[] memory amounts) {
         amounts = new uint256[](LandIds.length);
         for (uint256 i = 0; i < LandIds.length; i++) {
-            amounts[i] = calcLandMT(LandIds[i]);
+            amounts[i] = calcLandMT(LandIds[i], tileAccounts[i]);
         }
     }
 
-    function calcLandMT(uint32 LandId) public view returns (uint256 amount) {
+    function calcLandMT(
+        uint32 LandId,
+        address[] memory tileAccounts
+    ) public view returns (uint256 amount) {
         uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
 
+        uint256 index;
         for (uint256 i = 0; i <= 5; i++) {
             if (i == 0) {
-                amount += calcLandCoordinateMT(tileCoordinate);
+                amount += calcLandCoordinateMT(
+                    tileCoordinate,
+                    tileAccounts[index]
+                );
+                index++;
             } else {
                 for (uint256 j = 0; j < 6; j++) {
                     for (uint256 k = 0; k < i; k++) {
-                        amount += calcLandCoordinateMT(tileCoordinate);
+                        amount += calcLandCoordinateMT(
+                            tileCoordinate,
+                            tileAccounts[index]
+                        );
                         tileCoordinate = TileMath.neighbor(tileCoordinate, j);
+                        index++;
                     }
                 }
             }
@@ -235,11 +237,15 @@ contract MOPNData is Multicall {
     }
 
     function calcLandCoordinateMT(
-        uint32 coordinate
+        uint32 coordinate,
+        address account
     ) public view returns (uint256 amount) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        address account = mopn.getTileAccount(coordinate);
         if (account != address(0)) {
+            require(
+                coordinate == mopn.getAccountCoordinate(account),
+                "tileAccount error"
+            );
             uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
                 mopn.getAccountPerMOPNPointMinted(account);
 
@@ -334,23 +340,6 @@ contract MOPNData is Multicall {
         }
     }
 
-    /**
-     * @notice get avatars by coordinate array
-     * @param coordinates array of coordinates
-     * @return accountDatas avatar datas format struct AccountDataOutput
-     */
-    function getAccountsDataByCoordinates(
-        uint32[] memory coordinates
-    ) public view returns (AccountDataOutput[] memory accountDatas) {
-        accountDatas = new AccountDataOutput[](coordinates.length);
-        for (uint256 i = 0; i < coordinates.length; i++) {
-            accountDatas[i] = getAccountData(
-                IMOPN(governance.mopnContract()).getTileAccount(coordinates[i])
-            );
-            accountDatas[i].tileCoordinate = coordinates[i];
-        }
-    }
-
     function getBatchAccountMTBalance(
         address[] memory accounts
     ) public view returns (uint256[] memory MTBalances) {
@@ -380,20 +369,17 @@ contract MOPNData is Multicall {
         );
         cData.UnclaimMTBalance = calcCollectionSettledMT(collectionAddress);
 
-        cData.AdditionalMOPNPoints = mopn.getCollectionAdditionalMOPNPoints(
-            collectionAddress
-        );
-
-        cData.CollectionMOPNPoints = mopn.getCollectionMOPNPoints(
-            collectionAddress
-        );
         cData.OnMapMOPNPoints = mopn.getCollectionOnMapMOPNPoints(
             collectionAddress
         );
-        cData.CollectionMOPNPoint = mopn.getCollectionMOPNPoint(
+        cData.CollectionMOPNPoint = mopn.getCollectionMOPNPointFromStaking(
             collectionAddress
         );
+        cData.CollectionMOPNPoints = cData.CollectionMOPNPoint * cData.OnMapNum;
         cData.AdditionalMOPNPoint = mopn.getCollectionAdditionalMOPNPoint(
+            collectionAddress
+        );
+        cData.AdditionalMOPNPoints = mopn.getCollectionAdditionalMOPNPoints(
             collectionAddress
         );
 

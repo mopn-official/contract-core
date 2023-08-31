@@ -21,8 +21,6 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
 
     IMOPNGovernance governance;
 
-    uint256 totalBurned;
-
     constructor(address governance_) ERC20("MOPN Token", "MT") {
         governance = IMOPNGovernance(governance_);
     }

@@ -156,10 +156,6 @@ contract MOPNGovernance is Multicall, Ownable {
         IMOPNToken(mtContract).mint(to, amount);
     }
 
-    function mintMT1(address to, uint256 amount) public onlyOwner {
-        IMOPNToken(mtContract).mint(to, amount);
-    }
-
     // Bomb
     function mintBomb(
         address to,
@@ -172,13 +168,9 @@ contract MOPNGovernance is Multicall, Ownable {
     function burnBomb(
         address from,
         uint256 tokenId,
-        uint256 amount,
-        uint256 mintshield
+        uint256 amount
     ) public onlyMOPN {
         IMOPNBomb(bombContract).burn(from, tokenId, amount);
-        if (mintshield > 0) {
-            IMOPNBomb(bombContract).mint(from, 2, mintshield);
-        }
     }
 
     modifier onlyAuctionHouse() {

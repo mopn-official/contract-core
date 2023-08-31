@@ -35,12 +35,12 @@ contract MOPNLandMetaDataRender is ILandMetaDataRender {
         uint256 COID;
         tileDatas[0].tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
 
-        address tileAccount = mopn.getTileAccount(tileCoordinate);
-        if (tileAccount != address(0)) {
-            collection = mopn.getAccountCollection(tileAccount);
-            COID++;
-            collections[COID] = collection;
-        }
+        // address tileAccount = mopn.getTileAccount(tileCoordinate);
+        // if (tileAccount != address(0)) {
+        //     collection = mopn.getAccountCollection(tileAccount);
+        //     COID++;
+        //     collections[COID] = collection;
+        // }
 
         if (COID > 0) {
             tileDatas[0].color = COID;
@@ -64,15 +64,15 @@ contract MOPNLandMetaDataRender is ILandMetaDataRender {
                         tileCoordinate
                     );
 
-                    tileAccount = mopn.getTileAccount(tileCoordinate);
-                    if (tileAccount != address(0)) {
-                        collection = mopn.getAccountCollection(tileAccount);
-                        COID = exists(collections, collection);
-                        if (COID == 0) {
-                            COID++;
-                            collections[COID] = collection;
-                        }
-                    }
+                    // tileAccount = mopn.getTileAccount(tileCoordinate);
+                    // if (tileAccount != address(0)) {
+                    //     collection = mopn.getAccountCollection(tileAccount);
+                    //     COID = exists(collections, collection);
+                    //     if (COID == 0) {
+                    //         COID++;
+                    //         collections[COID] = collection;
+                    //     }
+                    // }
 
                     if (COID > 0) {
                         uint32[3] memory tileCoordinateArr = TileMath

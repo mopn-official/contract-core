@@ -1,4 +1,4 @@
-const centerTiles = require("./LandCenterTiles.json");
+const centerTiles = require("./data/LandCenterTiles.json");
 
 function LandRingNum(LandId) {
   let n = Math.floor((Math.sqrt(9 + 12 * (LandId - 1)) - 3) / 6);
@@ -113,13 +113,13 @@ function getLandTilesEAW(LandId) {
 function getTileEAW(tileCoordinate) {
   if (Math.floor(tileCoordinate / 10000) % 10 == 0) {
     if (tileCoordinate % 10 == 0) {
-      return 15;
+      return 1500;
     }
-    return 5;
+    return 500;
   } else if (tileCoordinate % 10 == 0) {
-    return 5;
+    return 500;
   }
-  return 1;
+  return 100;
 }
 
 function direction(direction_) {

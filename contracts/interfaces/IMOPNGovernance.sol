@@ -6,12 +6,7 @@ interface IMOPNGovernance {
 
     function mintBomb(address to, uint256 tokenId, uint256 amount) external;
 
-    function burnBomb(
-        address from,
-        uint256 tokenId,
-        uint256 amount,
-        uint256 killed
-    ) external;
+    function burnBomb(address from, uint256 tokenId, uint256 amount) external;
 
     function auctionHouseContract() external view returns (address);
 

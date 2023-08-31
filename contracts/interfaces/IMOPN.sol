@@ -31,14 +31,13 @@ interface IMOPN {
     /**
      * @notice BombUse Event emit when a Bomb is used at a coordinate by an avatar
      * @param account account wallet address
+     * @param victim the victim that bombed out of the map
      * @param tileCoordinate the tileCoordinate
-     * @param victims the victims that bombed out of the map
      */
     event BombUse(
         address indexed account,
-        uint32 tileCoordinate,
-        address[] victims,
-        uint32[] victimsCoordinates
+        address victim,
+        uint32 tileCoordinate
     );
 
     event AccountMTMinted(address indexed account, uint256 amount);
@@ -49,25 +48,16 @@ interface IMOPN {
 
     function getQualifiedAccountCollection(
         address account
-    ) external view returns (address, uint256);
+    ) external view returns (address);
 
     /**
      * @notice an on map avatar move to a new tile
      */
-    function moveTo(uint32 tileCoordinate, uint32 LandId) external;
-
-    /**
-     * @notice throw a bomb to a tile
-     */
-    function bomb(uint32 tileCoordinate, uint256 num) external;
-
-    function getTileAccount(
-        uint32 tileCoordinate
-    ) external view returns (address);
-
-    function getTileLandId(
-        uint32 tileCoordinate
-    ) external view returns (uint32);
+    function moveTo(
+        uint32 tileCoordinate,
+        uint32 LandId,
+        address[] memory tileAccounts
+    ) external;
 
     function MTOutputPerBlock() external view returns (uint256);
 
@@ -96,41 +86,6 @@ interface IMOPN {
     function MTReduceTimes() external view returns (uint256);
 
     function settlePerMOPNPointMinted() external;
-
-    function accountClaimAvailable(
-        address account
-    ) external view returns (bool);
-
-    function getAccountCollection(
-        address account
-    ) external view returns (address collectionAddress);
-
-    function getAccountOnMapMOPNPoint(
-        address account
-    ) external view returns (uint256);
-
-    function getAccountCoordinate(
-        address account
-    ) external view returns (uint32);
-
-    function getAccountPerCollectionNFTMinted(
-        address account
-    ) external view returns (uint256);
-
-    function getAccountPerMOPNPointMinted(
-        address account
-    ) external view returns (uint256);
-
-    function getAccountSettledMT(
-        address account
-    ) external view returns (uint256);
-
-    function settleAccountMT(
-        address account,
-        address collectionAddress
-    ) external;
-
-    function claimAccountMT(address account) external returns (uint256);
 
     function getCollectionMOPNPoints(
         address collectionAddress
@@ -168,6 +123,14 @@ interface IMOPN {
         address collectionAddress
     ) external view returns (uint256);
 
+    function getCollectionNFTMOPNPoints(
+        address collectionAddress
+    ) external view returns (uint256);
+
+    function getCollectionMOPNPointFromStaking(
+        address collectionAddress
+    ) external view returns (uint256);
+
     function settleCollectionMT(address collectionAddress) external;
 
     function claimCollectionMT(
@@ -175,6 +138,41 @@ interface IMOPN {
     ) external returns (uint256);
 
     function settleCollectionMOPNPoint(address collectionAddress) external;
+
+    function accountClaimAvailable(
+        address account
+    ) external view returns (bool);
+
+    function getAccountCollection(
+        address account
+    ) external view returns (address collectionAddress);
+
+    function getAccountOnMapMOPNPoint(
+        address account
+    ) external view returns (uint256);
+
+    function getAccountCoordinate(
+        address account
+    ) external view returns (uint32);
+
+    function getAccountPerCollectionNFTMinted(
+        address account
+    ) external view returns (uint256);
+
+    function getAccountPerMOPNPointMinted(
+        address account
+    ) external view returns (uint256);
+
+    function getAccountSettledMT(
+        address account
+    ) external view returns (uint256);
+
+    function settleAccountMT(
+        address account,
+        address collectionAddress
+    ) external;
+
+    function claimAccountMT(address account) external returns (uint256);
 
     function changeTotalMTStaking(
         address collectionAddress,

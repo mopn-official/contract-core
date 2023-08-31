@@ -130,13 +130,13 @@ library TileMath {
         unchecked {
             if ((tileCoordinate / 10000) % 10 == 0) {
                 if (tileCoordinate % 10 == 0) {
-                    return 15;
+                    return 1500;
                 }
-                return 5;
+                return 500;
             } else if (tileCoordinate % 10 == 0) {
-                return 5;
+                return 500;
             }
-            return 1;
+            return 100;
         }
     }
 

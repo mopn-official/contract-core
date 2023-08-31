@@ -166,7 +166,7 @@ contract MOPNCollectionVault is
         return
             (amount *
                 IMOPN(IMOPNGovernance(governance).mopnContract())
-                    .NFTOfferCoefficient()) / 10 ** 18;
+                    .NFTOfferCoefficient()) / 10 ** 15;
     }
 
     function MTBalance() public view returns (uint256 balance) {
@@ -193,7 +193,7 @@ contract MOPNCollectionVault is
 
         uint256 offerPrice = (IMOPNToken(
             IMOPNGovernance(governance).mtContract()
-        ).balanceOf(address(this)) * mopn.NFTOfferCoefficient()) / 10 ** 18;
+        ).balanceOf(address(this)) * mopn.NFTOfferCoefficient()) / 10 ** 15;
 
         IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
             msg.sender,

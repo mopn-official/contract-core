@@ -1,6 +1,6 @@
 const { ethers } = require("hardhat");
 const fs = require("fs");
-const {  time } = require("@nomicfoundation/hardhat-network-helpers");
+const { time, mine } = require("@nomicfoundation/hardhat-network-helpers");
 
 describe("MOPN", function () {
   let testnft,
@@ -104,7 +104,7 @@ describe("MOPN", function () {
     await mopn.deployed();
     console.log("MOPN", mopn.address);
 
-    const MOPNData = await ethers.getContractFactory("MOPNData",{
+    const MOPNData = await ethers.getContractFactory("MOPNData", {
       libraries: {
         TileMath: tileMath.address,
       },
@@ -231,6 +231,7 @@ describe("MOPN", function () {
   });
 
   it("test moveTo step by step from account", async function () {
+    mine(1);
     const tx = await erc6551registry.createAccount(
       erc6551accountproxy.address,
       31337,
@@ -587,7 +588,7 @@ describe("MOPN", function () {
   });
 
   it("test mopndata batchClaimAccountMT", async function () {
-    const tx = await mopn.batchClaimAccountMT([accounts.slice(0,7), [accounts[8]]]);
+    const tx = await mopn.batchClaimAccountMT([accounts.slice(0, 7), [accounts[8]]]);
     await tx.wait();
 
     console.log(
@@ -670,7 +671,7 @@ describe("MOPN", function () {
   });
 
   it("test additional point", async function () {
-    const data = fs.readFileSync(__dirname + "/../src/additionalMOPNPoint.json", "UTF-8");
+    const data = fs.readFileSync(__dirname + "/../scripts/additionalpoints/goerli_dev.json", "UTF-8");
     const bufferpoints = JSON.parse(data);
     const addresses = [];
     const points = [];
