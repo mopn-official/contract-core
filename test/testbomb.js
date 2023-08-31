@@ -450,6 +450,28 @@ describe("MOPN", function () {
     await mineBlock(1);
     await Promise.all(promises);
 
+    const account2 = await computeAccount(testnft1.address, 2);
+
+    // tx = await mopn.multicall([
+    //   mopn.interface.encodeFunctionData("createAccount", [
+    //     erc6551accountproxy.address,
+    //     31337,
+    //     testnft1.address,
+    //     2,
+    //     0,
+    //     "0x"
+    //   ]),
+    //   mopn.interface.encodeFunctionData("moveToByOwner", [
+    //     account2,
+    //     9971006,
+    //     1,
+    //     await getMoveToTilesAccounts(9971006)
+    //   ])
+    // ]);
+    // await mineBlock(1);
+    // await tx.wait();
+    // tiles[9971006] = account2;
+
     promises = [];
     const coordinates = [
       10001000,
@@ -473,7 +495,7 @@ describe("MOPN", function () {
       9991002,
     ];
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 19; i++) {
       tx = await erc6551accounthelper.multicall(await deployAccountMulticallParams(testnft.address, i, coordinates[i], 0));
       await mineBlock(1);
       await tx.wait();
@@ -519,6 +541,9 @@ describe("MOPN", function () {
     await mineBlock(1);
     await allowanceTx.wait();
 
+    console.log("getBombRoundProduce", await mopnauctionHouse.getBombRoundProduce());
+    console.log("getBombCurrentPrice", await mopnauctionHouse.getBombCurrentPrice());
+
     const buybombtx = await mopnauctionHouse.buyBomb(10);
     await mineBlock(1);
     await buybombtx.wait();
@@ -530,66 +555,22 @@ describe("MOPN", function () {
     await avatarInfo();
     await collectionInfo();
 
-    const account = await computeAccount(testnft1.address, 0);
-    const abi = hre.ethers.utils.defaultAbiCoder;
+    const account = await computeAccount(testnft1.address, 1);
 
-    // let tx = await mopnbomb.createAccount(
-    //   erc6551accountproxy.address,
-    //   31337,
-    //   testnft1.address,
-    //   0,
-    //   0,
-    //   "0x"
-    // );
-    // await mineBlock(1);
-    // await tx.wait();
-
-    // tx = await mopnbomb.safeTransferFrom(
-    //   owner.address,
-    //   account,
-    //   1,
-    //   19,
-    //   abi.encode(["uint32", "uint32", "address[]"], [
-    //     10001000,
-    //     0,
-    //     await getMoveToTilesAccounts(10001000)
-    //   ])
-    // );
-    // await mineBlock(1);
-    // await tx.wait();
-
-    // const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", account);
-    // tx = await accountContract.executeCall(
-    //   mopn.address,
-    //   0,
-    //   mopn.interface.encodeFunctionData("moveTo", [
-    //     10001000,
-    //     0,
-    //     await getMoveToTilesAccounts(10001000)
-    //   ])
-    // );
-    // await mineBlock(1);
-    // await tx.wait();
-
-    let tx = await mopnbomb.multicall([
-      mopnbomb.interface.encodeFunctionData("createAccount", [
+    tx = await mopn.multicall([
+      mopn.interface.encodeFunctionData("createAccount", [
         erc6551accountproxy.address,
         31337,
         testnft1.address,
-        0,
+        1,
         0,
         "0x"
       ]),
-      mopnbomb.interface.encodeFunctionData("safeTransferFrom", [
-        owner.address,
+      mopn.interface.encodeFunctionData("moveToByOwner", [
         account,
-        1,
-        19,
-        abi.encode(["uint32", "uint32", "address[]"], [
-          10001000,
-          0,
-          await getMoveToTilesAccounts(10001000)
-        ])
+        10001000,
+        0,
+        await getMoveToTilesAccounts(10001000)
       ])
     ]);
     await mineBlock(1);

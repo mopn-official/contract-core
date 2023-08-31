@@ -16,12 +16,12 @@ module.exports = {
     },
   },
   networks: {
-    hardhat: {
-      mining: {
-        auto: false,
-        interval: 0
-      }
-    },
+    // hardhat: {
+    //   mining: {
+    //     auto: false,
+    //     interval: 0
+    //   }
+    // },
     localhost: {
       url: `http://127.0.0.1:7545`,
       chainId: 1337,

@@ -17,37 +17,39 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 contract MOPNAuctionHouse is Multicall, Ownable {
     IMOPNGovernance public governance;
 
-    uint8 public immutable bombRoundProduce = 10;
-
-    uint256 public immutable bombPrice = 100000000000;
+    uint256 public immutable bombPrice = 10000000000;
 
     /**
      * @dev last active round and it's start timestamp and it's settlement status
-     * @notice uint64 roundId + uint32 startTimestamp + uint8 round sold
+     * @notice uint64 roundId + uint32 startTimestamp + uint32 BuyerNumber + uint32 Sold
      * Bits Layout:
-     * - [0..7]      `round Sold`
-     * - [8..15]       `round buyer number`
-     * - [16..47]     `starttimestamp`
-     * - [48..111]    `roundId`
+     * - [0..31]        `round Sold`
+     * - [32..63]       `round buyer number`
+     * - [64..95]       `starttimestamp`
+     * - [96..127]      `roundProduce`
+     * - [128..191]     `roundId`
      */
     uint256 public bombRound;
 
-    uint256 private constant _BITPOS_BUYER_NUMBER = 8;
-    uint256 private constant _BITPOS_STARTTIMESTAMP = 16;
-    uint256 private constant _BITPOS_ROUNDID = 48;
+    uint256 private constant _BITPOS_BUYER_NUMBER = 32;
+    uint256 private constant _BITPOS_STARTTIMESTAMP = 64;
+    uint256 private constant _BITPOS_ROUNDPRODUCE = 96;
+    uint256 private constant _BITPOS_ROUNDID = 128;
+
+    mapping(uint256 => uint256) bombRoundPrices;
 
     /**
      * @dev record the last participate round auction data
      *
      * Bits Layout:
-     * - [0..7]     `auction amount`
-     * - [8..71]    `total spend`
-     * - [72..231]  `buyer`
+     * - [0..63]        `auction amount`
+     * - [64..127]      `total spend`
+     * - [128..191]     `round Id`
      */
-    mapping(uint256 => uint256) public bombRoundBuyers;
+    mapping(address => uint256) public bombWalletData;
 
-    uint256 private constant _BITPOS_BUYER_TOTAL_SPEND = 8;
-    uint256 private constant _BITPOS_BUYER_WALLET = 72;
+    uint256 private constant _BITPOS_WALLET_TOTAL_SPEND = 64;
+    uint256 private constant _BITPOS_WALLET_ROUND_ID = 128;
 
     event BombSold(address indexed buyer, uint256 amount, uint256 price);
 
@@ -76,8 +78,16 @@ contract MOPNAuctionHouse is Multicall, Ownable {
         governance = IMOPNGovernance(governance_);
         bombRound =
             (uint256(1) << _BITPOS_ROUNDID) |
+            (uint256(10) << _BITPOS_ROUNDPRODUCE) |
             (bombStartTimestamp << _BITPOS_STARTTIMESTAMP);
         landRound = (uint256(1) << _BITPOS_LAND_ROUNDID) | landStartTimestamp;
+    }
+
+    function bombCurrentProduce() public view returns (uint256 amount) {
+        amount = (IMOPNLand(governance.landContract()).nextTokenId() - 1) / 10;
+        if (amount < 10) {
+            amount = 10;
+        }
     }
 
     /**
@@ -104,18 +114,26 @@ contract MOPNAuctionHouse is Multicall, Ownable {
     }
 
     function _buyBomb(address buyer, uint256 amount, uint256 price) internal {
+        claimRefund(buyer);
         uint256 roundSold = getBombRoundSold() + amount;
-        require(roundSold <= bombRoundProduce, "round out of stock");
+        require(roundSold <= getBombRoundProduce(), "round out of stock");
 
         governance.mintBomb(buyer, 1, amount);
 
-        bombRoundBuyers[getBombRoundBuyerNumber()] =
-            (uint256(uint160(buyer)) << _BITPOS_BUYER_WALLET) |
-            ((price * amount) << _BITPOS_BUYER_TOTAL_SPEND) |
-            amount;
+        if (bombWalletData[buyer] == 0) {
+            bombWalletData[buyer] =
+                (getBombRoundId() << _BITPOS_WALLET_ROUND_ID) |
+                ((price * amount) << _BITPOS_WALLET_TOTAL_SPEND) |
+                amount;
+        } else {
+            bombWalletData[buyer] +=
+                ((price * amount) << _BITPOS_WALLET_TOTAL_SPEND) |
+                amount;
+        }
 
-        if (roundSold >= bombRoundProduce) {
+        if (roundSold >= getBombRoundProduce()) {
             settleBombRound(price);
+            claimRefund(buyer);
         } else {
             bombRound += (uint256(1) << _BITPOS_BUYER_NUMBER) | amount;
         }
@@ -130,32 +148,38 @@ contract MOPNAuctionHouse is Multicall, Ownable {
         return bombRound >> _BITPOS_ROUNDID;
     }
 
+    function getBombRoundProduce() public view returns (uint256) {
+        return uint32(bombRound >> _BITPOS_ROUNDPRODUCE);
+    }
+
     function getBombRoundStartTimestamp() public view returns (uint32) {
         return uint32(bombRound >> _BITPOS_STARTTIMESTAMP);
     }
 
     function getBombRoundBuyerNumber() public view returns (uint256) {
-        return uint8(bombRound >> _BITPOS_BUYER_NUMBER);
+        return uint32(bombRound >> _BITPOS_BUYER_NUMBER);
     }
 
     function getBombRoundSold() public view returns (uint256) {
-        return uint8(bombRound);
+        return uint32(bombRound);
     }
 
-    function getBombBuyerAuctionAmount(
-        uint256 index
-    ) public view returns (uint8) {
-        return uint8(bombRoundBuyers[index]);
+    function getBombWalletAuctionAmount(
+        address wallet
+    ) public view returns (uint64) {
+        return uint64(bombWalletData[wallet]);
     }
 
-    function getBombBuyerTotalSpend(
-        uint256 index
+    function getBombWalletTotalSpend(
+        address wallet
     ) public view returns (uint256) {
-        return uint64(bombRoundBuyers[index] >> _BITPOS_BUYER_TOTAL_SPEND);
+        return uint64(bombWalletData[wallet] >> _BITPOS_WALLET_TOTAL_SPEND);
     }
 
-    function getBombBuyerWallet(uint256 index) public view returns (address) {
-        return address(uint160(bombRoundBuyers[index] >> _BITPOS_BUYER_WALLET));
+    function getBombWalletRoundId(
+        address wallet
+    ) public view returns (uint256) {
+        return uint64(bombWalletData[wallet] >> _BITPOS_WALLET_ROUND_ID);
     }
 
     /**
@@ -195,35 +219,46 @@ contract MOPNAuctionHouse is Multicall, Ownable {
     {
         roundId = getBombRoundId();
         price = getBombCurrentPrice();
-        amoutLeft = bombRoundProduce - getBombRoundSold();
+        amoutLeft = getBombRoundProduce() - getBombRoundSold();
         roundStartTime = getBombRoundStartTimestamp();
+    }
+
+    function getRefund(address wallet) public view returns (uint256 amount) {
+        if (getBombWalletRoundId(wallet) < getBombRoundId()) {
+            amount =
+                getBombWalletTotalSpend(wallet) -
+                (getBombWalletAuctionAmount(wallet) *
+                    bombRoundPrices[getBombWalletRoundId(wallet)]);
+        }
+    }
+
+    function claimRefund(address wallet) public {
+        if (getBombWalletRoundId(wallet) >= getBombRoundId()) {
+            return;
+        }
+
+        uint256 amount = getRefund(wallet);
+        if (amount > 0) {
+            IMOPNToken(governance.mtContract()).transfer(wallet, amount);
+        }
+        bombWalletData[wallet] = 0;
     }
 
     /**
      * @notice make the last round settlement
      */
     function settleBombRound(uint256 price) internal {
+        uint256 roundId = getBombRoundId();
         if (price > 0) {
-            IMOPNToken(governance.mtContract()).burn(price * bombRoundProduce);
-        }
-        for (uint256 i = 0; i < getBombRoundBuyerNumber(); i++) {
-            uint256 amount = getBombBuyerTotalSpend(i) -
-                (price * getBombBuyerAuctionAmount(i));
-            if (amount > 0) {
-                IMOPNToken(governance.mtContract()).transfer(
-                    getBombBuyerWallet(i),
-                    amount
-                );
-                emit RedeemAgio(
-                    getBombBuyerWallet(i),
-                    getBombRoundId(),
-                    amount
-                );
-            }
+            IMOPNToken(governance.mtContract()).burn(
+                price * getBombRoundProduce()
+            );
+            bombRoundPrices[roundId] = price;
         }
         bombRound =
-            (uint256(getBombRoundId() + 1) << _BITPOS_ROUNDID) |
-            (uint256(block.timestamp) << _BITPOS_STARTTIMESTAMP);
+            ((roundId + 1) << _BITPOS_ROUNDID) |
+            (uint256(block.timestamp) << _BITPOS_STARTTIMESTAMP) |
+            (bombCurrentProduce() << _BITPOS_ROUNDPRODUCE);
     }
 
     /**

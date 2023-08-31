@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract GoerliBAYC is ERC721, Ownable {
+contract GoerliBAYC is ERC721A, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721("GoerliBAYC", "GoerliBAYC") {}
+    constructor() ERC721A("GoerliBAYC", "GoerliBAYC") {}
 
     function safeMint(address to, uint256 amount) public {
         for (uint256 i = 0; i < amount; i++) {

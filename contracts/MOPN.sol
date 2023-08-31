@@ -117,7 +117,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
-    function BuffMOPNPointFinish() public onlyOwner {
+    function AdditionalMOPNPointFinish() public onlyOwner {
         require(AdditionalFinishSnapshot() == 0, "already finished");
         settlePerMOPNPointMinted();
         MiningDataExt += PerMOPNPointMinted() << 160;
@@ -174,8 +174,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 index
     ) public pure returns (bool) {
         unchecked {
-            uint256 mask = 1 << (index & 0xff);
-            return bitmap & mask != 0;
+            return bitmap & (1 << index) != 0;
         }
     }
 
@@ -184,10 +183,28 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 index
     ) public pure returns (uint256) {
         unchecked {
-            uint256 mask = 1 << (index & 0xff);
-            bitmap |= mask;
+            bitmap |= (1 << index);
             return bitmap;
         }
+    }
+
+    function createAccount(
+        address implementation,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId,
+        uint256 salt,
+        bytes calldata initData
+    ) external returns (address) {
+        return
+            IERC6551Registry(governance.ERC6551Registry()).createAccount(
+                implementation,
+                chainId,
+                tokenContract,
+                tokenId,
+                salt,
+                initData
+            );
     }
 
     /**
@@ -199,9 +216,45 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint32 LandId,
         address[] memory tileAccounts
     ) public {
+        address collectionAddress = getQualifiedAccountCollection(msg.sender);
+        _moveTo(
+            msg.sender,
+            collectionAddress,
+            tileCoordinate,
+            LandId,
+            tileAccounts
+        );
+    }
+
+    function moveToByOwner(
+        address account,
+        uint32 tileCoordinate,
+        uint32 LandId,
+        address[] memory tileAccounts
+    ) public {
+        require(
+            IMOPNERC6551Account(payable(account)).isOwner(msg.sender),
+            "not account owner"
+        );
+        address collectionAddress = getQualifiedAccountCollection(account);
+        _moveTo(
+            account,
+            collectionAddress,
+            tileCoordinate,
+            LandId,
+            tileAccounts
+        );
+    }
+
+    function _moveTo(
+        address account,
+        address collectionAddress,
+        uint32 tileCoordinate,
+        uint32 LandId,
+        address[] memory tileAccounts
+    ) internal {
         require(block.number >= MTStepStartBlock, "mopn is not open yet");
         TileMath.check(tileCoordinate);
-        address collectionAddress = getQualifiedAccountCollection(msg.sender);
 
         require(
             TileMath.distance(tileCoordinate, TileMath.LandCenterTile(LandId)) <
@@ -209,23 +262,27 @@ contract MOPN is IMOPN, Multicall, Ownable {
             "LandId error"
         );
         if (LandId > NextLandId()) {
-            uint256 nextLandId = IMOPNLand(governance.landContract())
-                .nextTokenId();
-            require(nextLandId > LandId, "Land Not Open");
             unchecked {
-                MiningDataExt += (nextLandId - NextLandId()) << 208;
+                MiningDataExt +=
+                    (IMOPNLand(governance.landContract()).nextTokenId() -
+                        NextLandId()) <<
+                    208;
             }
+            require(NextLandId() > LandId, "Land Not Open");
         }
 
-        uint256 mData = calcPerMOPNPointMinted();
-        uint256 cData = calcCollectionMT(collectionAddress, mData);
-        uint256 aData = calcAccountMT(msg.sender, cData);
+        settlePerMOPNPointMinted();
+        settleCollectionMT(collectionAddress);
+        settleAccountMT(account, collectionAddress);
 
         uint256 dstBitMap;
-        uint256 enemies;
 
         unchecked {
             if (tilesbitmap.get(tileCoordinate)) {
+                require(
+                    tileCoordinate == getAccountCoordinate(tileAccounts[0]),
+                    "tile accounts error"
+                );
                 address tileAccountCollection = getAccountCollection(
                     tileAccounts[0]
                 );
@@ -233,13 +290,13 @@ contract MOPN is IMOPN, Multicall, Ownable {
                     collectionAddress != tileAccountCollection,
                     "dst has ally"
                 );
-                enemies++;
-                mData = bombATile(
-                    msg.sender,
+
+                dstBitMap += 1 << 100;
+                bombATile(
+                    account,
                     tileCoordinate,
                     tileAccounts[0],
-                    tileAccountCollection,
-                    mData
+                    tileAccountCollection
                 );
             }
 
@@ -254,12 +311,12 @@ contract MOPN is IMOPN, Multicall, Ownable {
                             getAccountCoordinate(tileAccounts[i + 1]),
                         "tile accounts error"
                     );
-                    if (tileAccounts[i + 1] != msg.sender) {
+                    if (tileAccounts[i + 1] != account) {
                         address tileAccountCollection = getAccountCollection(
                             tileAccounts[i + 1]
                         );
                         if (tileAccountCollection == collectionAddress) {
-                            dstBitMap = set256bitmap(dstBitMap, 100);
+                            dstBitMap = set256bitmap(dstBitMap, 50);
                             uint256 k = i;
                             if (i < 5) {
                                 k++;
@@ -303,14 +360,13 @@ contract MOPN is IMOPN, Multicall, Ownable {
                                 }
                             }
                         } else {
-                            enemies++;
+                            dstBitMap += 1 << 100;
 
-                            mData = bombATile(
-                                msg.sender,
+                            bombATile(
+                                account,
                                 tileCoordinate,
                                 tileAccounts[i + 1],
-                                tileAccountCollection,
-                                mData
+                                tileAccountCollection
                             );
                         }
                     }
@@ -325,17 +381,17 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 }
             }
 
-            if (enemies > 0) {
-                governance.burnBomb(msg.sender, 1, enemies);
+            if ((dstBitMap >> 100) > 0) {
+                governance.burnBomb(msg.sender, 1, dstBitMap >> 100);
             }
 
             tileCoordinate -= 2;
         }
 
-        uint32 orgCoordinate = getAccountCoordinate(msg.sender);
+        uint32 orgCoordinate = getAccountCoordinate(account);
         uint256 collectionOnMapNum = getCollectionOnMapNum(collectionAddress);
 
-        if (!get256bitmap(dstBitMap, 100)) {
+        if (!get256bitmap(dstBitMap, 50)) {
             require(
                 collectionOnMapNum == 0 ||
                     (orgCoordinate > 0 && collectionOnMapNum == 1),
@@ -345,7 +401,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
         uint256 tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
         if (orgCoordinate > 0) {
-            emit AccountMove(msg.sender, LandId, orgCoordinate, tileCoordinate);
+            emit AccountMove(account, LandId, orgCoordinate, tileCoordinate);
             tilesbitmap.unset(orgCoordinate);
             uint256 orgMOPNPoint = TileMath.getTileMOPNPoint(orgCoordinate);
 
@@ -356,12 +412,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
                     tileMOPNPoint = orgMOPNPoint - tileMOPNPoint;
                 }
 
-                mData += tileMOPNPoint << 144;
-                cData += tileMOPNPoint << 176;
-
-                aData =
-                    aData -
-                    ((uint256(getAccountLandId(msg.sender)) << 192) |
+                MiningData += tileMOPNPoint << 144;
+                CollectionsData[collectionAddress] += tileMOPNPoint << 176;
+                AccountsData[account] =
+                    AccountsData[account] -
+                    ((uint256(getAccountLandId(account)) << 192) |
                         (uint256(orgCoordinate) << 160)) +
                     ((uint256(LandId) << 192) |
                         (uint256(tileCoordinate) << 160));
@@ -371,25 +426,24 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 collectionOnMapNum < MaxCollectionOnMapNum,
                 "collection on map nft number overflow"
             );
-            emit AccountJumpIn(msg.sender, LandId, tileCoordinate);
+            emit AccountJumpIn(account, LandId, tileCoordinate);
             unchecked {
-                mData +=
-                    (uint256(uint32(cData >> 224)) << 208) |
+                MiningData +=
+                    (getCollectionAdditionalMOPNPoint(collectionAddress) <<
+                        208) |
                     ((tileMOPNPoint +
-                        uint32(cData >> 224) +
-                        uint24(cData >> 200)) << 144);
+                        getCollectionNFTMOPNPoint(collectionAddress)) << 144);
 
-                cData += (tileMOPNPoint << 176) | (uint256(1) << 160);
+                CollectionsData[collectionAddress] +=
+                    (tileMOPNPoint << 176) |
+                    (uint256(1) << 160);
 
-                aData +=
+                AccountsData[account] +=
                     (uint256(LandId) << 192) |
                     (uint256(tileCoordinate) << 160);
             }
         }
 
-        MiningData = mData;
-        CollectionsData[collectionAddress] = cData;
-        AccountsData[msg.sender] = aData;
         tilesbitmap.set(tileCoordinate);
     }
 
@@ -397,9 +451,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address account,
         uint32 tileCoordinate,
         address tileAccount,
-        address tileAccountCollection,
-        uint256 mData
-    ) internal returns (uint256) {
+        address tileAccountCollection
+    ) internal {
         //remove tile account
         tilesbitmap.unset(tileCoordinate);
 
@@ -411,7 +464,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         );
 
         unchecked {
-            mData -=
+            MiningData -=
                 (getCollectionAdditionalMOPNPoint(tileAccountCollection) <<
                     208) |
                 ((accountOnMapMOPNPoint +
@@ -424,7 +477,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
             AccountsData[tileAccount] = uint160(AccountsData[tileAccount]);
         }
         emit BombUse(account, tileAccount, tileCoordinate);
-        return mData;
     }
 
     /**

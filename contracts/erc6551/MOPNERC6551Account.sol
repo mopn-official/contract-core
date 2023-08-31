@@ -168,59 +168,23 @@ contract MOPNERC6551Account is
 
     /// @dev Allows ERC-1155 tokens to be received. This function can be overriden.
     function onERC1155Received(
-        address operator,
         address,
-        uint256 id,
+        address,
         uint256,
-        bytes calldata data
-    ) public override returns (bytes4) {
-        if (
-            data.length > 0 &&
-            msg.sender == IMOPNGovernance(governance).bombContract() &&
-            id == 1 &&
-            isOwner(operator)
-        ) {
-            (
-                uint32 coordinate,
-                uint32 LandId,
-                address[] memory tileAccounts
-            ) = abi.decode(data, (uint32, uint32, address[]));
-            IMOPN(IMOPNGovernance(governance).mopnContract()).moveTo(
-                coordinate,
-                LandId,
-                tileAccounts
-            );
-        }
+        uint256,
+        bytes memory
+    ) public pure override returns (bytes4) {
         return IERC1155Receiver.onERC1155Received.selector;
     }
 
     /// @dev Allows ERC-1155 token batches to be received. This function can be overriden.
     function onERC1155BatchReceived(
-        address operator,
         address,
-        uint256[] memory ids,
+        address,
         uint256[] memory,
-        bytes memory data
-    ) public override returns (bytes4) {
-        for (uint256 i = 0; i < ids.length; i++) {
-            if (
-                ids[i] == 1 &&
-                data.length > 0 &&
-                msg.sender == IMOPNGovernance(governance).bombContract() &&
-                isOwner(operator)
-            ) {
-                (
-                    uint32 coordinate,
-                    uint32 LandId,
-                    address[] memory tileAccounts
-                ) = abi.decode(data, (uint32, uint32, address[]));
-                IMOPN(IMOPNGovernance(governance).mopnContract()).moveTo(
-                    coordinate,
-                    LandId,
-                    tileAccounts
-                );
-            }
-        }
+        uint256[] memory,
+        bytes memory
+    ) public pure override returns (bytes4) {
         return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 

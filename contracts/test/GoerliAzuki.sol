@@ -5,12 +5,12 @@ import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract GoerliCaptainz is ERC721A, Ownable {
+contract GoerliAzuki is ERC721A, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721A("GoerliCaptainz", "GoerliCaptainz") {}
+    constructor() ERC721A("GoerliAzuki", "GoerliAzuki") {}
 
     function safeMint(address to, uint256 amount) public {
         for (uint256 i = 0; i < amount; i++) {
@@ -23,7 +23,8 @@ contract GoerliCaptainz is ERC721A, Ownable {
         return _tokenIdCounter.current();
     }
 
-    string public baseURI = "https://captainz-api.memeland.com/metadata/";
+    string public baseURI =
+        "ipfs://QmZcH4YvBVVRJtdn4RdbaqgspFU8gH6P9vomDpBVpAL3u4/";
 
     function setBaseURI(string memory baseURI_) public onlyOwner {
         baseURI = baseURI_;
