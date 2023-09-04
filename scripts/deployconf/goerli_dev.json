@@ -17,8 +17,7 @@
         "MOPNToken",
         "MOPNPoint",
         "MOPNLandMetaDataRender",
-        "MOPNLand",
-        "MOPNTESTNFT"
+        "MOPNLand"
     ],
     "ERC6551Registry": {
         "address": "0x02101dfB77FDE026414827Fdc604ddAF224F0921",
@@ -41,7 +40,7 @@
         ]
     },
     "MOPNGovernance": {
-        "address": "0x2A02998301b8a0391c470226Fd1925BCCcE9EB29",
+        "address": "0xF8730C8b97FbEa1A19dd4b2D461D6370203Bb8Af",
         "verified": true,
         "attributesCheck": [
             {
@@ -92,14 +91,14 @@
         ]
     },
     "MOPNERC6551Account": {
-        "address": "0x4CD6514f0088191ee57D30cc3612bc3e2cA93583",
+        "address": "0x9e2A09F9cA95c98244E6975c2191e35C1D291Ec2",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNERC6551AccountProxy": {
-        "address": "0x678D64797817Cc818C7CEf2b9680899b77f62BF5",
+        "address": "0xed77605357ee048E4aC9D17D98f3acF557E81d73",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
@@ -107,14 +106,14 @@
         ]
     },
     "MOPNERC6551AccountHelper": {
-        "address": "0x886138c0DE2Aaf3aD25B471f1AA09B55f6972B50",
+        "address": "0x2A524d647004495f7768DD1ff79BBB4B914cCFd0",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNAuctionHouse": {
-        "address": "0xcb6f6DaBBF5b419eAF22614b91a826c62973a974",
+        "address": "0x6a882E07ef8a9CD79a3548a239e1De836De8F8Ac",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
@@ -123,7 +122,7 @@
         ]
     },
     "MOPN": {
-        "address": "0x111a74FA2B68DaF039a981112C627f90181c7B8E",
+        "address": "0xbCe159F83D7d8168820f5C8cB7dC8843c4ff0A88",
         "verified": true,
         "libraries": [
             "TileMath"
@@ -138,7 +137,7 @@
         ]
     },
     "MOPNData": {
-        "address": "0xf983519A4196E170D9e92fbB18B9b09b7B336534",
+        "address": "0xC132E53cfB3329eEdf583C6B2CB8eF060Bdfb024",
         "verified": true,
         "libraries": [
             "TileMath"
@@ -148,14 +147,14 @@
         ]
     },
     "MOPNBomb": {
-        "address": "0xbE5aFA46be4386e02E932308d8BC89BE16fb7d43",
+        "address": "0xD440c5f101D7821a80Bd457a45Ccb4a58853c5F0",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNToken": {
-        "address": "0x05241CFbef0646E91c3E89F1dd6219D7BA4bcF64",
+        "address": "0xA0a76aD2c03fBc5Cf5032bCfadDbd839f6F08265",
         "verified": true,
         "transOwnerTo": "MOPNGovernance",
         "constructparams": [
@@ -163,14 +162,14 @@
         ]
     },
     "MOPNPoint": {
-        "address": "0xFC59068cAef8fB9b65716d3477327aDDc4E13528",
+        "address": "0xbA4D8d89319FE24Fb2783C919a1D06698e3b4207",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNCollectionVault": {
-        "address": "0xdABc6522198e88ec8aA45802132917e1381c3829",
+        "address": "0xB5BD0395E7c96474d18b6d66113d64A3Cc6de4C5",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
@@ -217,15 +216,6 @@
         ],
         "constructparams": [
             "MOPNGovernance"
-        ]
-    },
-    "MOPNTESTNFT": {
-        "address": "0xdEa71568724007fFeF75fD2DC5fBc1858B5C7825",
-        "verified": true,
-        "constructparams": [
-            "MOPN Color Cat",
-            "MOPNMColorCat",
-            "https://tokenuriproxy.chainsync.network/mopntestnfts/5/"
         ]
     }
 }

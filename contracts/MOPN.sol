@@ -586,14 +586,14 @@ contract MOPN is IMOPN, Multicall, Ownable {
                         AdditionalFinishSnapshot_ -
                         collectionPerMOPNPointMinted;
                 }
-                uint256 onMapMOPNPoints = collectionOnMapNum *
-                    uint32(cData >> 176);
-                if (onMapMOPNPoints > 0) {
+
+                if (collectionOnMapNum > 0) {
                     uint256 collectionNFTMOPNPoints = collectionOnMapNum *
                         (uint32(cData >> 224) + uint24(cData >> 200));
 
                     uint256 amount = ((collectionPerMOPNPointMintedDiff *
-                        (onMapMOPNPoints + collectionNFTMOPNPoints)) * 5) / 100;
+                        (uint24(cData >> 176) + collectionNFTMOPNPoints)) * 5) /
+                        100;
 
                     if (collectionNFTMOPNPoints > 0) {
                         cData +=
@@ -926,14 +926,14 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function getCollectionAdditionalMOPNPoint(
         address collectionAddress
     ) public view returns (uint256) {
-        return uint24(CollectionsData[collectionAddress] >> 224);
+        return uint32(CollectionsData[collectionAddress] >> 224);
     }
 
     function getCollectionAdditionalMOPNPoints(
         address collectionAddress
     ) public view returns (uint256) {
         return
-            uint256(uint24(CollectionsData[collectionAddress] >> 224)) *
+            uint256(uint32(CollectionsData[collectionAddress] >> 224)) *
             getCollectionOnMapNum(collectionAddress);
     }
 
@@ -954,7 +954,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function getCollectionOnMapMOPNPoints(
         address collectionAddress
     ) public view returns (uint256) {
-        return uint32(CollectionsData[collectionAddress] >> 176);
+        return uint24(CollectionsData[collectionAddress] >> 176);
     }
 
     function getCollectionOnMapNum(

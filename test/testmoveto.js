@@ -724,10 +724,8 @@ describe("MOPN", function () {
   const getMoveToTilesAccounts = async (tileCoordinate) => {
     let tileaccounts = [];
     tileaccounts[0] = tiles[tileCoordinate] ? tiles[tileCoordinate] : hre.ethers.constants.AddressZero;
-    console.log(tileCoordinate);
     tileCoordinate++;
     for (let i = 0; i < 18; i++) {
-      console.log(tileCoordinate);
       tileaccounts[i + 1] = tiles[tileCoordinate] ? tiles[tileCoordinate] : hre.ethers.constants.AddressZero;
       if (i == 5) {
         tileCoordinate += 10001;
@@ -737,7 +735,6 @@ describe("MOPN", function () {
         tileCoordinate = MOPNMath.neighbor(tileCoordinate, Math.floor((i - 6) / 2));
       }
     }
-    console.log(tiles, tileaccounts);
     return tileaccounts;
   };
 

@@ -1,0 +1,56 @@
+{
+    "miner": {
+        "address": "0x033E9D810E58eF62B11aF80D33898a26E07c3552"
+    },
+    "nfts": [
+        {
+            "name": "GoerliAnarKey",
+            "symbol": "GoerliAnarKey",
+            "baseuri": "https://ipfs.io/ipfs/QmcgMPL2U4FGjGuSQfFf39iyjNjCqQ4rhi5GCLFpcxQKkQ/json/",
+            "uriext": ".json",
+            "address": ""
+        },
+        {
+            "name": "GoerliAzuki",
+            "symbol": "GoerliAzuki",
+            "baseuri": "ipfs://QmZcH4YvBVVRJtdn4RdbaqgspFU8gH6P9vomDpBVpAL3u4/",
+            "uriext": "",
+            "address": ""
+        },
+        {
+            "name": "GoerliBAYC",
+            "symbol": "GoerliBAYC",
+            "baseuri": "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/",
+            "uriext": "",
+            "address": ""
+        },
+        {
+            "name": "GoerliBlips",
+            "symbol": "GoerliBlips",
+            "baseuri": "ipfs://Qmc9sbvoA476ob1EsWKayEvekkUSodCFRvAMoDKQTBUsWK/",
+            "uriext": "",
+            "address": ""
+        },
+        {
+            "name": "GoerliCaptainz",
+            "symbol": "GoerliCaptainz",
+            "baseuri": "https://captainz-api.memeland.com/metadata/",
+            "uriext": "",
+            "address": ""
+        },
+        {
+            "name": "GoerliMAYC",
+            "symbol": "GoerliMAYC",
+            "baseuri": "https://boredapeyachtclub.com/api/mutants/",
+            "uriext": "",
+            "address": ""
+        },
+        {
+            "name": "GoerliPotatoz",
+            "symbol": "GoerliPotatoz",
+            "baseuri": "https://grow-api.memeland.com/token/metadata/",
+            "uriext": ".json",
+            "address": ""
+        }
+    ]
+}
