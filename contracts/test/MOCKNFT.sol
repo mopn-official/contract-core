@@ -33,6 +33,14 @@ contract MOCKNFT is ERC721A, Ownable {
         return baseURI;
     }
 
+    function setBaseURI(string memory baseURI_) public onlyOwner {
+        baseURI = baseURI_;
+    }
+
+    function setURIExt(string memory uriext_) public onlyOwner {
+        uriext = uriext_;
+    }
+
     function tokenURI(
         uint256 _tokenId
     ) public view override returns (string memory) {
