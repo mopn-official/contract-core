@@ -11,8 +11,8 @@ import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNLand.sol";
 import "./interfaces/IMOPNCollectionVault.sol";
-import "./libraries/TileMath.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -100,14 +100,14 @@ contract MOPN is IMOPN, Multicall, Ownable {
         MiningDataExt = (10 ** 14) << 112;
     }
 
-    function getGovernance() public view returns (address) {
+    function getGovernance() external view returns (address) {
         return address(governance);
     }
 
     function batchSetCollectionBuffMOPNPoints(
         address[] calldata collectionAddress,
         uint256[] calldata buffMOPNPoints
-    ) public onlyOwner {
+    ) external onlyOwner {
         require(
             collectionAddress.length == buffMOPNPoints.length,
             "params illegal"
@@ -117,7 +117,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
-    function AdditionalMOPNPointFinish() public onlyOwner {
+    function AdditionalMOPNPointFinish() external onlyOwner {
         require(AdditionalFinishSnapshot() == 0, "already finished");
         settlePerMOPNPointMinted();
         MiningDataExt += PerMOPNPointMinted() << 160;
@@ -155,39 +155,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return collectionAddress;
     }
 
-    uint32[] neighbors = [9999, 1, 10000, 9999, 1, 10000];
-
-    function neighbor(
-        uint32 tileCoordinate,
-        uint256 direction
-    ) public view returns (uint32) {
-        unchecked {
-            if (direction < 1 || direction > 3) {
-                return tileCoordinate + neighbors[direction];
-            }
-            return tileCoordinate - neighbors[direction];
-        }
-    }
-
-    function get256bitmap(
-        uint256 bitmap,
-        uint256 index
-    ) public pure returns (bool) {
-        unchecked {
-            return bitmap & (1 << index) != 0;
-        }
-    }
-
-    function set256bitmap(
-        uint256 bitmap,
-        uint256 index
-    ) public pure returns (uint256) {
-        unchecked {
-            bitmap |= (1 << index);
-            return bitmap;
-        }
-    }
-
     function createAccount(
         address implementation,
         uint256 chainId,
@@ -215,7 +182,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint32 tileCoordinate,
         uint32 LandId,
         address[] memory tileAccounts
-    ) public {
+    ) external {
         address collectionAddress = getQualifiedAccountCollection(msg.sender);
         _moveTo(
             msg.sender,
@@ -231,7 +198,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint32 tileCoordinate,
         uint32 LandId,
         address[] memory tileAccounts
-    ) public {
+    ) external {
         require(
             IMOPNERC6551Account(payable(account)).isOwner(msg.sender),
             "not account owner"
@@ -254,11 +221,10 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address[] memory tileAccounts
     ) internal {
         require(block.number >= MTStepStartBlock, "mopn is not open yet");
-        TileMath.check(tileCoordinate);
+        tilecheck(tileCoordinate);
 
         require(
-            TileMath.distance(tileCoordinate, TileMath.LandCenterTile(LandId)) <
-                6,
+            tiledistance(tileCoordinate, tileAtLandCenter(LandId)) < 6,
             "LandId error"
         );
         if (LandId > NextLandId()) {
@@ -352,12 +318,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
                                     (k + 3) > 17 ? (k - 9) : k + 3
                                 );
                             } else {
-                                if (k < 16) {
-                                    dstBitMap = set256bitmap(dstBitMap, k + 1);
-                                    dstBitMap = set256bitmap(dstBitMap, k + 2);
-                                } else if (k == 16) {
-                                    dstBitMap = set256bitmap(dstBitMap, 17);
-                                }
+                                dstBitMap = set256bitmap(dstBitMap, k + 1);
+                                dstBitMap = set256bitmap(dstBitMap, k + 2);
                             }
                         } else {
                             dstBitMap += 1 << 100;
@@ -375,9 +337,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 if (i == 5) {
                     tileCoordinate += 10001;
                 } else if (i < 5) {
-                    tileCoordinate = neighbor(tileCoordinate, i);
+                    tileCoordinate = tileneighbor(tileCoordinate, i);
                 } else {
-                    tileCoordinate = neighbor(tileCoordinate, (i - 6) / 2);
+                    tileCoordinate = tileneighbor(tileCoordinate, (i - 6) / 2);
                 }
             }
 
@@ -399,11 +361,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
             );
         }
 
-        uint256 tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
+        uint256 tileMOPNPoint = tilepoint(tileCoordinate);
         if (orgCoordinate > 0) {
             emit AccountMove(account, LandId, orgCoordinate, tileCoordinate);
             tilesbitmap.unset(orgCoordinate);
-            uint256 orgMOPNPoint = TileMath.getTileMOPNPoint(orgCoordinate);
+            uint256 orgMOPNPoint = tilepoint(orgCoordinate);
 
             unchecked {
                 if (tileMOPNPoint > orgMOPNPoint) {
@@ -459,9 +421,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         settleCollectionMT(tileAccountCollection);
         settleAccountMT(tileAccount, tileAccountCollection);
 
-        uint256 accountOnMapMOPNPoint = TileMath.getTileMOPNPoint(
-            tileCoordinate
-        );
+        uint256 accountOnMapMOPNPoint = tilepoint(tileCoordinate);
 
         unchecked {
             MiningData -=
@@ -638,7 +598,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     function claimCollectionMT(
         address collectionAddress
-    ) public returns (uint256 amount) {
+    ) external returns (uint256 amount) {
         settlePerMOPNPointMinted();
         settleCollectionMT(collectionAddress);
         amount = getCollectionSettledMT(collectionAddress);
@@ -659,7 +619,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     function settleCollectionMOPNPoint(
         address collectionAddress
-    ) public onlyCollectionVault(collectionAddress) {
+    ) external onlyCollectionVault(collectionAddress) {
         uint256 point = getCollectionMOPNPointFromStaking(collectionAddress);
         uint256 lastPoint = getCollectionMOPNPoint(collectionAddress);
         if (point != lastPoint) {
@@ -677,7 +637,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
-    function accountClaimAvailable(address account) public view returns (bool) {
+    function accountClaimAvailable(
+        address account
+    ) external view returns (bool) {
         return
             getAccountSettledMT(account) > 0 ||
             getAccountCoordinate(account) > 0;
@@ -698,7 +660,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
     ) public view returns (uint256 OnMapMOPNPoint) {
         uint32 coordinate = getAccountCoordinate(account);
         if (coordinate > 0) {
-            OnMapMOPNPoint = TileMath.getTileMOPNPoint(coordinate);
+            OnMapMOPNPoint = tilepoint(coordinate);
         }
     }
 
@@ -717,9 +679,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             if (accountPerMOPNPointMintedDiff > 0) {
                 uint32 coordinate = getAccountCoordinate(account);
                 if (coordinate > 0) {
-                    uint256 accountOnMapMOPNPoint = TileMath.getTileMOPNPoint(
-                        coordinate
-                    );
+                    uint256 accountOnMapMOPNPoint = tilepoint(coordinate);
                     uint256 accountPerCollectionNFTMintedDiff = uint48(
                         cData >> 112
                     ) - uint48(aData >> 112);
@@ -767,7 +727,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         );
     }
 
-    function batchsettleAccountMT(address[][] memory accounts) public {
+    function batchsettleAccountMT(address[][] memory accounts) external {
         settlePerMOPNPointMinted();
         address collectionAddress;
         for (uint256 i = 0; i < accounts.length; i++) {
@@ -791,7 +751,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
-    function batchClaimAccountMT(address[][] memory accounts) public {
+    function batchClaimAccountMT(address[][] memory accounts) external {
         settlePerMOPNPointMinted();
         uint256 amount;
         address collectionAddress;
@@ -818,7 +778,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         governance.mintMT(msg.sender, amount);
     }
 
-    function claimAccountMT(address account) public onlyMT returns (uint256) {
+    function claimAccountMT(address account) external onlyMT returns (uint256) {
         settlePerMOPNPointMinted();
         address collectionAddress = getAccountCollection(account);
         settleCollectionMT(collectionAddress);
@@ -850,7 +810,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address collectionAddress,
         uint256 price
     )
-        public
+        external
         onlyCollectionVault(collectionAddress)
         returns (uint256 oldNFTOfferCoefficient, uint256 newNFTOfferCoefficient)
     {
@@ -872,7 +832,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address collectionAddress,
         uint256 direction,
         uint256 amount
-    ) public onlyCollectionVault(collectionAddress) {
+    ) external onlyCollectionVault(collectionAddress) {
         if (direction > 0) {
             MiningDataExt += amount;
         } else {
@@ -1032,6 +992,125 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address account
     ) public view returns (uint256) {
         return uint64(AccountsData[account]);
+    }
+
+    uint32[] neighbors = [9999, 1, 10000, 9999, 1, 10000];
+
+    function tileneighbor(
+        uint32 tileCoordinate,
+        uint256 direction
+    ) public view returns (uint32) {
+        unchecked {
+            if (direction < 1 || direction > 3) {
+                return tileCoordinate + neighbors[direction];
+            }
+            return tileCoordinate - neighbors[direction];
+        }
+    }
+
+    function tilecheck(uint32 tileCoordinate) public pure {
+        tileCoordinate = tileCoordinate / 10000 + (tileCoordinate % 10000);
+        require(
+            3000 > tileCoordinate && tileCoordinate > 1000,
+            "coordinate  overflow"
+        );
+    }
+
+    function tilepoint(
+        uint32 tileCoordinate
+    ) public pure returns (uint256 tile) {
+        unchecked {
+            if ((tileCoordinate / 10000) % 10 == 0) {
+                if (tileCoordinate % 10 == 0) {
+                    return 1500;
+                }
+                return 500;
+            } else if (tileCoordinate % 10 == 0) {
+                return 500;
+            }
+            return 100;
+        }
+    }
+
+    function tiledistance(uint32 a, uint32 b) public pure returns (uint32 d) {
+        unchecked {
+            uint32 at = a / 10000;
+            uint32 bt = b / 10000;
+            d += at > bt ? at - bt : bt - at;
+            at = a % 10000;
+            bt = b % 10000;
+            d += at > bt ? at - bt : bt - at;
+            at = 3000 - a / 10000 - at;
+            bt = 3000 - b / 10000 - bt;
+            d += at > bt ? at - bt : bt - at;
+
+            return d / 2;
+        }
+    }
+
+    function tileAtLandCenter(uint256 LandId) public pure returns (uint32) {
+        if (LandId == 0) {
+            return 10001000;
+        }
+        unchecked {
+            uint256 n = (Math.sqrt(9 + 12 * LandId) - 3) / 6;
+            if ((3 * n * n + 3 * n) != LandId) {
+                n++;
+            }
+
+            uint256 startTile = 10001000 - n * 49989;
+            uint256 z = 3000 - startTile / 10000 - (startTile % 10000);
+
+            n--;
+            uint256 LandIdRingPos_ = LandId - (3 * n * n + 3 * n);
+            n++;
+
+            uint256 side = Math.ceilDiv(LandIdRingPos_, n);
+
+            uint256 sidepos = 0;
+            if (n > 1) {
+                sidepos = (LandIdRingPos_ - 1) % n;
+            }
+            if (side == 1) {
+                startTile = startTile + sidepos * 110000 - sidepos * 6;
+            } else if (side == 2) {
+                startTile = (2000 - z) * 10000 + (2000 - startTile / 10000);
+                startTile = startTile + sidepos * 49989;
+            } else if (side == 3) {
+                startTile = (startTile % 10000) * 10000 + z;
+                startTile = startTile - sidepos * 60005;
+            } else if (side == 4) {
+                startTile = 20002000 - startTile;
+                startTile = startTile - sidepos * 109994;
+            } else if (side == 5) {
+                startTile = z * 10000 + startTile / 10000;
+                startTile = startTile - sidepos * 49989;
+            } else if (side == 6) {
+                startTile = (2000 - (startTile % 10000)) * 10000 + (2000 - z);
+                startTile = startTile + sidepos * 60005;
+            }
+
+            return uint32(startTile);
+        }
+    }
+
+    function get256bitmap(
+        uint256 bitmap,
+        uint256 index
+    ) public pure returns (bool) {
+        unchecked {
+            return bitmap & (1 << index) != 0;
+        }
+    }
+
+    function set256bitmap(
+        uint256 bitmap,
+        uint256 index
+    ) public pure returns (uint256) {
+        unchecked {
+            bitmap |= (1 << index);
+            return bitmap;
+        }
     }
 
     modifier onlyCollectionVault(address collectionAddress) {

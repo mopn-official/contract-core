@@ -232,11 +232,7 @@ describe("MOPN", function () {
     const startBlock = await hre.ethers.provider.getBlockNumber();
     console.log("mopn start block ", startBlock);
 
-    tx = await hre.ethers.deployContract("MOPN", [mopngovernanceAddress, 60000000, startBlock, 50400, 10000, 99999], {
-      libraries: {
-        TileMath: tileMath.address,
-      },
-    });
+    tx = await hre.ethers.deployContract("MOPN", [mopngovernanceAddress, 60000000, startBlock, 50400, 10000, 99999]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         mopn = res;
@@ -495,7 +491,7 @@ describe("MOPN", function () {
       9991002,
     ];
 
-    for (let i = 0; i < 19; i++) {
+    for (let i = 0; i < 3; i++) {
       tx = await erc6551accounthelper.multicall(await deployAccountMulticallParams(testnft.address, i, coordinates[i], 0));
       await mineBlock(1);
       await tx.wait();

@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Create2.sol";
 
 import "./interfaces/IERC6551Registry.sol";
-import "./lib/ERC6551BytecodeLib.sol";
 
 contract ERC6551Registry is IERC6551Registry {
     error InitializationFailed();
@@ -17,7 +16,7 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 salt,
         bytes calldata initData
     ) external returns (address) {
-        bytes memory code = ERC6551BytecodeLib.getCreationCode(
+        bytes memory code = getCreationCode(
             implementation,
             chainId,
             tokenContract,
@@ -59,7 +58,7 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 salt
     ) external view returns (address) {
         bytes32 bytecodeHash = keccak256(
-            ERC6551BytecodeLib.getCreationCode(
+            getCreationCode(
                 implementation,
                 chainId,
                 tokenContract,
@@ -69,5 +68,21 @@ contract ERC6551Registry is IERC6551Registry {
         );
 
         return Create2.computeAddress(bytes32(salt), bytecodeHash);
+    }
+
+    function getCreationCode(
+        address implementation_,
+        uint256 chainId_,
+        address tokenContract_,
+        uint256 tokenId_,
+        uint256 salt_
+    ) internal pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                hex"3d60ad80600a3d3981f3363d3d373d3d3d363d73",
+                implementation_,
+                hex"5af43d82803e903d91602b57fd5bf3",
+                abi.encode(salt_, chainId_, tokenContract_, tokenId_)
+            );
     }
 }

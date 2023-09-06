@@ -232,11 +232,7 @@ describe("MOPN", function () {
     const startBlock = await hre.ethers.provider.getBlockNumber();
     console.log("mopn start block ", startBlock);
 
-    tx = await hre.ethers.deployContract("MOPN", [mopngovernanceAddress, 60000000, startBlock, 50400, 10000, 99999], {
-      libraries: {
-        TileMath: tileMath.address,
-      },
-    });
+    tx = await hre.ethers.deployContract("MOPN", [mopngovernanceAddress, 60000000, startBlock, 50400, 10000, 99999]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         mopn = res;
@@ -455,15 +451,11 @@ describe("MOPN", function () {
       9991003, 9991002, 10001003, 10001002, 10001001, 10011002, 10011001, 10001000,
     ];
 
-    tx = await erc6551accounthelper.multicall(await deployAccountMulticallParams(testnft1.address, 0, 10000997, 0));
-    await mineBlock(1);
-    await tx.wait();
+    await deployAccountBasic(testnft1.address, 0, 10000997, 0);
     await deploySimulatorAccount(testnft1.address, 0, 10000997, 0);
 
     for (let i = 0; i < 8; i++) {
-      tx = await erc6551accounthelper.multicall(await deployAccountMulticallParams(testnft.address, i, coordinates[i], 0));
-      await mineBlock(1);
-      await tx.wait();
+      await deployAccountMOPN(testnft.address, i, coordinates[i], 0);
       await deploySimulatorAccount(testnft.address, i, coordinates[i], 0);
     }
 
@@ -499,11 +491,8 @@ describe("MOPN", function () {
   it("test move", async function () {
     await loadFixture(deployAndSetInitialNFTS);
 
-    const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", accounts[7]);
-    const txmove = await accountContract.executeCall(
-      mopn.address,
-      0,
-      mopn.interface.encodeFunctionData("moveTo", [9991001, 0, await getMoveToTilesAccounts(9991001)])
+    const txmove = await mopn.moveToByOwner(
+      accounts[7], 9991001, 0, await getMoveToTilesAccounts(9991001)
     );
     await mineBlock(1);
     await txmove.wait();
@@ -653,7 +642,7 @@ describe("MOPN", function () {
     console.log(table.toString());
   };
 
-  const deployAccount = async (tokenContract, tokenId, coordinate, landId) => {
+  const deployAccountBasic = async (tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
       31337,
@@ -662,8 +651,40 @@ describe("MOPN", function () {
       0
     );
     accounts.push(account);
-    return await erc6551accounthelper.multicall([
-      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
+    let tx = await erc6551registry.createAccount(
+      erc6551accountproxy.address,
+      31337,
+      tokenContract,
+      tokenId,
+      0,
+      "0x"
+    );
+    mineBlock(1);
+    await tx.wait();
+
+    const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", account);
+    tx = await accountContract.executeCall(
+      mopn.address,
+      0,
+      mopn.interface.encodeFunctionData("moveTo", [coordinate, landId, await getMoveToTilesAccounts(coordinate)])
+    );
+    mineBlock(1);
+    await tx.wait();
+
+    tiles[coordinate] = account;
+  };
+
+  const deployAccountMOPN = async (tokenContract, tokenId, coordinate, landId) => {
+    const account = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      tokenContract,
+      tokenId,
+      0
+    );
+    accounts.push(account);
+    const tx = await mopn.multicall([
+      mopn.interface.encodeFunctionData("createAccount", [
         erc6551accountproxy.address,
         31337,
         tokenContract,
@@ -671,13 +692,14 @@ describe("MOPN", function () {
         0,
         "0x",
       ]),
-      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
-        account,
-        mopn.address,
-        0,
-        mopn.interface.encodeFunctionData("moveTo", [coordinate, landId]),
+      mopn.interface.encodeFunctionData("moveToByOwner", [
+        account, coordinate, landId, await getMoveToTilesAccounts(coordinate)
       ]),
     ]);
+    mineBlock(1);
+    await tx.wait();
+
+    tiles[coordinate] = account;
   };
 
   const deploySimulatorAccount = async (tokenContract, tokenId, coordinate, landId) => {
@@ -691,7 +713,7 @@ describe("MOPN", function () {
     await mopnsimulator.moveTo(account, tokenContract, coordinate);
   };
 
-  const deployAccountMulticallParams = async (tokenContract, tokenId, coordinate, landId) => {
+  const deployAccountHelperMulticallParams = async (tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
       31337,
@@ -739,7 +761,7 @@ describe("MOPN", function () {
   };
 
   const claimAccountsMT = async () => {
-    const tx = await mopn.batchClaimAccountMT([accounts.slice(0, 8), [accounts[8]]]);
+    const tx = await mopn.batchClaimAccountMT([[accounts[0]], accounts.slice(1, 8)]);
     await mineBlock(1);
     await tx.wait();
     await mopnsimulator.claimAccountsMT(owner.address, accounts);

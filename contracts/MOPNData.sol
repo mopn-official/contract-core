@@ -209,43 +209,25 @@ contract MOPNData is Multicall {
         uint32 LandId,
         address[] memory tileAccounts
     ) public view returns (uint256 amount) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
         uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
-
-        uint256 index;
-        for (uint256 i = 0; i <= 5; i++) {
-            if (i == 0) {
-                amount += calcLandCoordinateMT(
+        for (uint256 i; i < tileAccounts.length; i++) {
+            if (
+                TileMath.distance(
                     tileCoordinate,
-                    tileAccounts[index]
-                );
-                index++;
-            } else {
-                for (uint256 j = 0; j < 6; j++) {
-                    for (uint256 k = 0; k < i; k++) {
-                        amount += calcLandCoordinateMT(
-                            tileCoordinate,
-                            tileAccounts[index]
-                        );
-                        tileCoordinate = TileMath.neighbor(tileCoordinate, j);
-                        index++;
-                    }
-                }
+                    mopn.getAccountCoordinate(tileAccounts[i])
+                ) < 6
+            ) {
+                amount += calcLandAccountMT(tileAccounts[i]);
             }
-
-            tileCoordinate++;
         }
     }
 
-    function calcLandCoordinateMT(
-        uint32 coordinate,
+    function calcLandAccountMT(
         address account
     ) public view returns (uint256 amount) {
-        IMOPN mopn = IMOPN(governance.mopnContract());
         if (account != address(0)) {
-            require(
-                coordinate == mopn.getAccountCoordinate(account),
-                "tileAccount error"
-            );
+            IMOPN mopn = IMOPN(governance.mopnContract());
             uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() -
                 mopn.getAccountPerMOPNPointMinted(account);
 

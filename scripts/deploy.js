@@ -106,8 +106,8 @@ async function main() {
           );
           const updatetx = await eval(
             "contract." +
-              deployConf[contractName].attributesCheck[j].updateMethod +
-              "(...updateParams)"
+            deployConf[contractName].attributesCheck[j].updateMethod +
+            "(...updateParams)"
           );
           await updatetx.wait();
           console.log("update succeed");
