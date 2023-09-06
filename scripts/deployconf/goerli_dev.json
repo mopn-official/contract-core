@@ -169,7 +169,7 @@
         ]
     },
     "MOPNCollectionVault": {
-        "address": "0xB5BD0395E7c96474d18b6d66113d64A3Cc6de4C5",
+        "address": "0xe19C1CBcDd93979921CfD2CDc3bF1d65a5881af3",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"

@@ -8,9 +8,10 @@ import "../interfaces/IMOPN.sol";
 import "../interfaces/IMOPNGovernance.sol";
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "./lib/ERC6551AccountLib.sol";
 
@@ -28,6 +29,7 @@ error NotAuthorized();
 contract MOPNERC6551Account is
     IERC165,
     IERC1271,
+    IERC721Receiver,
     IERC1155Receiver,
     IMOPNERC6551Account
 {
@@ -173,7 +175,7 @@ contract MOPNERC6551Account is
         uint256,
         uint256,
         bytes memory
-    ) public pure override returns (bytes4) {
+    ) external pure override returns (bytes4) {
         return IERC1155Receiver.onERC1155Received.selector;
     }
 
@@ -184,8 +186,17 @@ contract MOPNERC6551Account is
         uint256[] memory,
         uint256[] memory,
         bytes memory
-    ) public pure override returns (bytes4) {
+    ) external pure override returns (bytes4) {
         return IERC1155Receiver.onERC1155BatchReceived.selector;
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 
     function getRentEndTime() public view returns (uint256) {

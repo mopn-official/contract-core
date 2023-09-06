@@ -108,6 +108,20 @@ contract MOPNCollectionVault is
         auction.currentPrice = getAuctionCurrentPrice();
     }
 
+    function MT2VAmountRealtime(
+        uint256 MTAmount,
+        bool onReceived
+    ) public view returns (uint256 VAmount) {
+        if (totalSupply() == 0) {
+            VAmount = MTAmount * 10 ** 12;
+        } else {
+            VAmount =
+                (totalSupply() * MTAmount) /
+                MTBalanceRealtime() -
+                (onReceived ? MTAmount : 0);
+        }
+    }
+
     function MT2VAmount(
         uint256 MTAmount,
         bool onReceived
@@ -120,6 +134,17 @@ contract MOPNCollectionVault is
                 (IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
                     address(this)
                 ) - (onReceived ? MTAmount : 0));
+        }
+    }
+
+    function V2MTAmountRealtime(
+        uint256 VAmount
+    ) public view returns (uint256 MTAmount) {
+        if (VAmount == totalSupply()) {
+            MTAmount = IMOPNToken(IMOPNGovernance(governance).mtContract())
+                .balanceOf(address(this));
+        } else {
+            MTAmount = (MTBalanceRealtime() * VAmount) / totalSupply();
         }
     }
 
@@ -156,17 +181,23 @@ contract MOPNCollectionVault is
     }
 
     function getNFTOfferPrice() public view returns (uint256) {
-        uint256 amount = IMOPNData(
-            IMOPNGovernance(governance).mopnDataContract()
-        ).calcCollectionSettledMT(CollectionVaultLib.collectionAddress()) +
-            IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
-                address(this)
-            );
+        uint256 amount = MTBalanceRealtime();
 
         return
             (amount *
                 IMOPN(IMOPNGovernance(governance).mopnContract())
                     .NFTOfferCoefficient()) / 10 ** 15;
+    }
+
+    function MTBalanceRealtime() public view returns (uint256 amount) {
+        amount =
+            IMOPNData(IMOPNGovernance(governance).mopnDataContract())
+                .calcCollectionSettledMT(
+                    CollectionVaultLib.collectionAddress()
+                ) +
+            IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
+                address(this)
+            );
     }
 
     function MTBalance() public view returns (uint256 balance) {
