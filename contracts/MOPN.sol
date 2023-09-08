@@ -370,18 +370,18 @@ contract MOPN is IMOPN, Multicall, Ownable {
             unchecked {
                 if (tileMOPNPoint > orgMOPNPoint) {
                     tileMOPNPoint -= orgMOPNPoint;
+                    MiningData += tileMOPNPoint << 144;
+                    CollectionsData[collectionAddress] += tileMOPNPoint << 176;
                 } else if (tileMOPNPoint < orgMOPNPoint) {
                     tileMOPNPoint = orgMOPNPoint - tileMOPNPoint;
+                    MiningData -= tileMOPNPoint << 144;
+                    CollectionsData[collectionAddress] -= tileMOPNPoint << 176;
                 }
 
-                MiningData += tileMOPNPoint << 144;
-                CollectionsData[collectionAddress] += tileMOPNPoint << 176;
                 AccountsData[account] =
-                    AccountsData[account] -
-                    ((uint256(getAccountLandId(account)) << 192) |
-                        (uint256(orgCoordinate) << 160)) +
                     ((uint256(LandId) << 192) |
-                        (uint256(tileCoordinate) << 160));
+                        (uint256(tileCoordinate) << 160)) |
+                    uint160(AccountsData[account]);
             }
         } else {
             require(
@@ -625,14 +625,20 @@ contract MOPN is IMOPN, Multicall, Ownable {
         if (point != lastPoint) {
             if (point > lastPoint) {
                 MiningData +=
-                    (point - lastPoint) *
-                    getCollectionOnMapNum(collectionAddress);
-                CollectionsData[collectionAddress] += point - lastPoint;
+                    ((point - lastPoint) *
+                        getCollectionOnMapNum(collectionAddress)) <<
+                    144;
+                CollectionsData[collectionAddress] +=
+                    (point - lastPoint) <<
+                    200;
             } else if (point < lastPoint) {
                 MiningData -=
-                    (lastPoint - point) *
-                    getCollectionOnMapNum(collectionAddress);
-                CollectionsData[collectionAddress] -= lastPoint - point;
+                    ((lastPoint - point) *
+                        getCollectionOnMapNum(collectionAddress)) <<
+                    144;
+                CollectionsData[collectionAddress] -=
+                    (lastPoint - point) <<
+                    200;
             }
         }
     }
