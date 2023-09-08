@@ -172,7 +172,7 @@ interface IMOPN {
         address collectionAddress
     ) external;
 
-    function claimAccountMT(address account) external returns (uint256);
+    function claimAccountMT(address account, address to) external;
 
     function changeTotalMTStaking(
         address collectionAddress,

@@ -3,11 +3,11 @@ pragma solidity ^0.8.19;
 
 import "hardhat/console.sol";
 
-import "./interfaces/IMOPNGovernance.sol";
+import "../interfaces/IMOPNGovernance.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
 import "@openzeppelin/contracts/proxy/Proxy.sol";
-import "./erc6551/lib/ERC6551AccountLib.sol";
+import "./lib/ERC6551AccountLib.sol";
 
 contract MOPNERC6551AccountProxy is Proxy, ERC1967Upgrade {
     address public immutable governance;

@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 import "hardhat/console.sol";
 
 import "./interfaces/IMOPNERC6551Account.sol";
+import "./interfaces/IERC6551AccountOwnerHosting.sol";
 import "../interfaces/IMOPN.sol";
 import "../interfaces/IMOPNGovernance.sol";
 
@@ -15,15 +16,6 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "./lib/ERC6551AccountLib.sol";
 
-interface IDelegationRegistry {
-    function checkDelegateForToken(
-        address delegate,
-        address vault,
-        address contract_,
-        uint256 tokenId
-    ) external view returns (bool);
-}
-
 error NotAuthorized();
 
 contract MOPNERC6551Account is
@@ -33,30 +25,22 @@ contract MOPNERC6551Account is
     IERC1155Receiver,
     IMOPNERC6551Account
 {
-    event AccountRent(address to, uint256 expiredAt);
+    event OwnerHostingSet(address ownerHosting, address oldOwnerHosting);
 
-    address private constant delegatecash =
-        0x00000000000076A84feF008CDAbe6409d2FE638B;
+    event OwnerTransfer(address ownerHosting, address to, uint256 endBlock);
 
     uint256 private _nonce;
 
     address private immutable governance;
 
-    /**
-     * @dev uint32 endtime + uint160 address
-     */
-    uint256 private rentData;
+    /// uint8 initialize + uint160 ownerHosting
+    uint256 public ownerHostingData;
 
-    mapping(address => uint256) private rentPermits;
+    address public immutable defaultOwnerHosting;
 
-    modifier onlyProxy() {
-        if (msg.sender != IMOPNGovernance(governance).ERC6551AccountHelper())
-            revert NotAuthorized();
-        _;
-    }
-
-    constructor(address governance_) {
+    constructor(address governance_, address defaultOwnerHosting_) {
         governance = governance_;
+        defaultOwnerHosting = defaultOwnerHosting_;
     }
 
     receive() external payable {}
@@ -78,7 +62,7 @@ contract MOPNERC6551Account is
         uint256 value,
         bytes calldata data,
         address msgsender
-    ) external payable onlyProxy returns (bytes memory result) {
+    ) external payable onlyHelper returns (bytes memory result) {
         require(isOwner(msgsender), "Not token owner");
 
         _incrementNonce();
@@ -92,6 +76,7 @@ contract MOPNERC6551Account is
         uint256 value,
         bytes calldata data
     ) internal returns (bytes memory result) {
+        require(to != ownerHosting(), "not allow low-level call ownerHosting");
         bool success;
         (success, result) = to.call{value: value}(data);
 
@@ -110,11 +95,19 @@ contract MOPNERC6551Account is
         return ERC6551AccountLib.token();
     }
 
-    function owner() public view returns (address) {
-        if (block.timestamp < getRentEndTime()) {
-            return getRentOwner();
-        }
-        return nftowner();
+    function ownerHosting() public view returns (address) {
+        if (ownerHostingData == 0) return defaultOwnerHosting;
+        return address(uint160(ownerHostingData));
+    }
+
+    function owner() public view returns (address owner_) {
+        address ownerHosting_ = ownerHosting();
+        if (ownerHosting_ != address(0))
+            owner_ = IERC6551AccountOwnerHosting(ownerHosting_).owner(
+                address(this)
+            );
+
+        if (owner_ == address(0)) owner_ = nftowner();
     }
 
     function nftowner() public view returns (address) {
@@ -128,14 +121,7 @@ contract MOPNERC6551Account is
     function isOwner(address caller) public view returns (bool) {
         if (caller == owner()) return true;
         if (caller == address(this)) return true;
-        (, address tokenContract, uint256 tokenId) = this.token();
-        return
-            IDelegationRegistry(delegatecash).checkDelegateForToken(
-                caller,
-                owner(),
-                tokenContract,
-                tokenId
-            );
+        return false;
     }
 
     function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
@@ -199,34 +185,30 @@ contract MOPNERC6551Account is
         return IERC721Receiver.onERC721Received.selector;
     }
 
-    function getRentEndTime() public view returns (uint256) {
-        return rentData >> 160;
-    }
-
-    function getRentOwner() public view returns (address) {
-        return address(uint160(rentData));
-    }
-
-    function rentPermit(address to, uint256 timeRange) public {
-        require(isOwner(msg.sender), "not token owner");
-
-        rentPermits[to] = timeRange;
-    }
-
-    function rentExecute(address to, uint256 timeRange) public {
-        if (
-            !isOwner(msg.sender) && rentPermits[msg.sender] != type(uint256).max
-        ) {
-            require(
-                rentPermits[msg.sender] >= timeRange,
-                "insufficient rent permits"
-            );
-            rentPermits[msg.sender] -= timeRange;
+    function setOwnerHosting(address ownerHosting_) public {
+        address nftowner_ = nftowner();
+        require(
+            msg.sender == nftowner_ ||
+                (msg.sender == IMOPNGovernance(governance).ERC6551Registry() &&
+                    tx.origin == nftowner_),
+            "not nft owner"
+        );
+        address oldOwnerHosting = ownerHosting();
+        if (oldOwnerHosting != address(0)) {
+            IERC6551AccountOwnerHosting(oldOwnerHosting).beforeRevokeHosting();
         }
-        rentData =
-            ((block.timestamp + timeRange) << 160) |
-            uint256(uint160(to));
+        ownerHostingData = (1 << 160) | uint256(uint160(ownerHosting_));
+        emit OwnerHostingSet(ownerHosting_, oldOwnerHosting);
+    }
 
-        emit AccountRent(to, block.timestamp + timeRange);
+    function hostingOwnerTransferNotify(address to, uint256 endBlock) public {
+        require(ownerHosting() == msg.sender, "hostingOwner mismatch");
+        emit OwnerTransfer(msg.sender, to, endBlock);
+    }
+
+    modifier onlyHelper() {
+        if (msg.sender != IMOPNGovernance(governance).ERC6551AccountHelper())
+            revert NotAuthorized();
+        _;
     }
 }

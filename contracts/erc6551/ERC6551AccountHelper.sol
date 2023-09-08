@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "./interfaces/IMOPNGovernance.sol";
-import "./erc6551/interfaces/IERC6551Registry.sol";
-import "./erc6551/interfaces/IMOPNERC6551Account.sol";
+import "../interfaces/IMOPNGovernance.sol";
+import "./interfaces/IERC6551Registry.sol";
+import "./interfaces/IMOPNERC6551Account.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MOPNERC6551AccountHelper is Multicall {

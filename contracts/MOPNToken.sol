@@ -95,10 +95,7 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
         uint256 realbalance = super.balanceOf(from);
         IMOPN mopn = IMOPN(governance.mopnContract());
         if (realbalance < amount && mopn.accountClaimAvailable(from)) {
-            uint256 claimed = mopn.claimAccountMT(from);
-            if (claimed > 0) {
-                _mint(from, claimed);
-            }
+            mopn.claimAccountMT(from, from);
         }
     }
 }

@@ -778,12 +778,21 @@ contract MOPN is IMOPN, Multicall, Ownable {
         governance.mintMT(msg.sender, amount);
     }
 
-    function claimAccountMT(address account) external onlyMT returns (uint256) {
+    function claimAccountMT(address account, address to) external {
         settlePerMOPNPointMinted();
         address collectionAddress = getAccountCollection(account);
         settleCollectionMT(collectionAddress);
         settleAccountMT(account, collectionAddress);
-        return _claimAccountMT(account);
+        uint256 amount = _claimAccountMT(account);
+        if (to == address(0) || to == account) {
+            governance.mintMT(account, amount);
+        } else {
+            require(
+                IMOPNERC6551Account(payable(account)).isOwner(to),
+                "claim dst is not owner"
+            );
+            governance.mintMT(to, amount);
+        }
     }
 
     function _claimAccountMT(

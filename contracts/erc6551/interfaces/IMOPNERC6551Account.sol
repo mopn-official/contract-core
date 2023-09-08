@@ -13,4 +13,13 @@ interface IMOPNERC6551Account is IERC6551Account {
     ) external payable returns (bytes memory);
 
     function isOwner(address caller) external view returns (bool);
+
+    function nftowner() external view returns (address);
+
+    function ownerHosting() external view returns (address);
+
+    function hostingOwnerTransferNotify(
+        address to,
+        uint256 blockRange
+    ) external;
 }
