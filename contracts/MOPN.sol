@@ -44,7 +44,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
     /**
      * @notice Mining Data
      * @dev This includes the following data:
-     * - uint48 TotalBuffMOPNPoints: bits 208-255
      * - uint64 TotalMOPNPoints: bits 144-207
      * - uint32 LastTickBlock: bits 112-143
      * - uint48 PerMOPNPointMinted: bits 64-111
@@ -53,15 +52,13 @@ contract MOPN is IMOPN, Multicall, Ownable {
     uint256 public MiningData;
 
     /// @notice MiningDataExt structure:
-    /// - uint16 nextLandId: bits 208-223
-    /// - uint48 AdditionalFinishSnapshot: bits 160-207
+    /// - uint16 nextLandId: bits 160-175
     /// - uint48 NFTOfferCoefficient: bits 112-159
     /// - uint48 TotalCollectionClaimed: bits 64-111
     /// - uint64 TotalMTStaking: bits 0-63
     uint256 public MiningDataExt;
 
     /// @notice CollectionData structure:
-    /// - uint32 AdditionalMOPNPoint: bits 224-255
     /// - uint24 CollectionMOPNPoint: bits 200-223
     /// - uint24 OnMapMOPNPoints: bits 176-199
     /// - uint16 OnMapNftNumber: bits 160-175
@@ -102,26 +99,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     function getGovernance() external view returns (address) {
         return address(governance);
-    }
-
-    function batchSetCollectionBuffMOPNPoints(
-        address[] calldata collectionAddress,
-        uint256[] calldata buffMOPNPoints
-    ) external onlyOwner {
-        require(
-            collectionAddress.length == buffMOPNPoints.length,
-            "params illegal"
-        );
-        for (uint256 i = 0; i < collectionAddress.length; i++) {
-            CollectionsData[collectionAddress[i]] = buffMOPNPoints[i] << 224;
-        }
-    }
-
-    function AdditionalMOPNPointFinish() external onlyOwner {
-        require(AdditionalFinishSnapshot() == 0, "already finished");
-        settlePerMOPNPointMinted();
-        MiningDataExt += PerMOPNPointMinted() << 160;
-        MiningData -= TotalBuffMOPNPoints() << 144;
     }
 
     function getQualifiedAccountCollection(
@@ -186,6 +163,36 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address collectionAddress = getQualifiedAccountCollection(msg.sender);
         _moveTo(
             msg.sender,
+            collectionAddress,
+            tileCoordinate,
+            LandId,
+            tileAccounts
+        );
+    }
+
+    function moveToNFT(
+        address collectionAddress,
+        uint256 tokenId,
+        uint32 tileCoordinate,
+        uint32 LandId,
+        address[] memory tileAccounts,
+        bytes calldata initData
+    ) external {
+        address account = IERC6551Registry(governance.ERC6551Registry())
+            .createAccount(
+                governance.ERC6551AccountProxy(),
+                block.chainid,
+                collectionAddress,
+                tokenId,
+                0,
+                initData
+            );
+        require(
+            IMOPNERC6551Account(payable(account)).isOwner(msg.sender),
+            "not account owner"
+        );
+        _moveTo(
+            account,
             collectionAddress,
             tileCoordinate,
             LandId,
@@ -391,10 +398,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
             emit AccountJumpIn(account, LandId, tileCoordinate);
             unchecked {
                 MiningData +=
-                    (getCollectionAdditionalMOPNPoint(collectionAddress) <<
-                        208) |
-                    ((tileMOPNPoint +
-                        getCollectionNFTMOPNPoint(collectionAddress)) << 144);
+                    (tileMOPNPoint +
+                        getCollectionMOPNPoint(collectionAddress)) <<
+                    144;
 
                 CollectionsData[collectionAddress] +=
                     (tileMOPNPoint << 176) |
@@ -424,11 +430,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 accountOnMapMOPNPoint = tilepoint(tileCoordinate);
 
         unchecked {
-            MiningData -=
-                (getCollectionAdditionalMOPNPoint(tileAccountCollection) <<
-                    208) |
-                ((accountOnMapMOPNPoint +
-                    getCollectionNFTMOPNPoint(tileAccountCollection)) << 144);
+            MiningData -= ((accountOnMapMOPNPoint +
+                getCollectionMOPNPoint(tileAccountCollection)) << 144);
 
             CollectionsData[tileAccountCollection] -=
                 (accountOnMapMOPNPoint << 176) |
@@ -534,32 +537,25 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 mData
     ) public returns (uint256 cData) {
         cData = CollectionsData[collectionAddress];
-        uint256 collectionPerMOPNPointMinted = uint48(cData >> 64);
         unchecked {
             uint256 collectionPerMOPNPointMintedDiff = uint48(mData >> 64) -
-                collectionPerMOPNPointMinted;
+                uint48(cData >> 64);
             if (collectionPerMOPNPointMintedDiff > 0) {
                 uint256 collectionOnMapNum = uint16(cData >> 160);
-                uint256 AdditionalFinishSnapshot_ = AdditionalFinishSnapshot();
-                if (AdditionalFinishSnapshot_ > collectionPerMOPNPointMinted) {
-                    collectionPerMOPNPointMintedDiff =
-                        AdditionalFinishSnapshot_ -
-                        collectionPerMOPNPointMinted;
-                }
 
                 if (collectionOnMapNum > 0) {
-                    uint256 collectionNFTMOPNPoints = collectionOnMapNum *
-                        (uint32(cData >> 224) + uint24(cData >> 200));
+                    uint256 collectionMOPNPoints = collectionOnMapNum *
+                        uint24(cData >> 200);
 
                     uint256 amount = ((collectionPerMOPNPointMintedDiff *
-                        (uint24(cData >> 176) + collectionNFTMOPNPoints)) * 5) /
+                        (uint24(cData >> 176) + collectionMOPNPoints)) * 5) /
                         100;
 
-                    if (collectionNFTMOPNPoints > 0) {
+                    if (collectionMOPNPoints > 0) {
                         cData +=
                             (((collectionPerMOPNPointMintedDiff *
-                                collectionNFTMOPNPoints) /
-                                collectionOnMapNum) << 112) |
+                                collectionMOPNPoints) / collectionOnMapNum) <<
+                                112) |
                             (collectionPerMOPNPointMintedDiff << 64) |
                             amount;
                     } else {
@@ -571,15 +567,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
                     emit CollectionMTMinted(collectionAddress, amount);
                 } else {
                     cData += collectionPerMOPNPointMintedDiff << 64;
-                }
-
-                if (AdditionalFinishSnapshot_ > collectionPerMOPNPointMinted) {
-                    uint256 buffMOPNPoint = getCollectionAdditionalMOPNPoint(
-                        collectionAddress
-                    );
-                    cData -= buffMOPNPoint << 224;
-                    CollectionsData[collectionAddress] = cData;
-                    cData = calcCollectionMT(collectionAddress, mData);
                 }
             }
         }
@@ -726,7 +713,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function settleAccountMT(
         address account,
         address collectionAddress
-    ) public {
+    ) internal {
         AccountsData[account] = calcAccountMT(
             account,
             CollectionsData[collectionAddress]
@@ -785,10 +772,13 @@ contract MOPN is IMOPN, Multicall, Ownable {
     }
 
     function claimAccountMT(address account, address to) external {
-        settlePerMOPNPointMinted();
-        address collectionAddress = getAccountCollection(account);
-        settleCollectionMT(collectionAddress);
-        settleAccountMT(account, collectionAddress);
+        if (getAccountCoordinate(account) > 0) {
+            settlePerMOPNPointMinted();
+            address collectionAddress = getAccountCollection(account);
+            settleCollectionMT(collectionAddress);
+            settleAccountMT(account, collectionAddress);
+        }
+
         uint256 amount = _claimAccountMT(account);
         if (to == address(0) || to == account) {
             governance.mintMT(account, amount);
@@ -898,20 +888,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
     }
 
     /// CollectionData
-    function getCollectionAdditionalMOPNPoint(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return uint32(CollectionsData[collectionAddress] >> 224);
-    }
-
-    function getCollectionAdditionalMOPNPoints(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return
-            uint256(uint32(CollectionsData[collectionAddress] >> 224)) *
-            getCollectionOnMapNum(collectionAddress);
-    }
-
     function getCollectionMOPNPoint(
         address collectionAddress
     ) public view returns (uint256) {
@@ -954,22 +930,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address collectionAddress
     ) public view returns (uint256) {
         return uint64(CollectionsData[collectionAddress]);
-    }
-
-    function getCollectionNFTMOPNPoint(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return
-            getCollectionMOPNPoint(collectionAddress) +
-            getCollectionAdditionalMOPNPoint(collectionAddress);
-    }
-
-    function getCollectionNFTMOPNPoints(
-        address collectionAddress
-    ) public view returns (uint256) {
-        return
-            getCollectionNFTMOPNPoint(collectionAddress) *
-            getCollectionOnMapNum(collectionAddress);
     }
 
     /// AccountData

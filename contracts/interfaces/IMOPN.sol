@@ -73,8 +73,6 @@ interface IMOPN {
 
     function MTTotalMinted() external view returns (uint256);
 
-    function AdditionalFinishSnapshot() external view returns (uint256);
-
     function NFTOfferCoefficient() external view returns (uint256);
 
     function TotalCollectionClaimed() external view returns (uint256);
@@ -87,11 +85,11 @@ interface IMOPN {
 
     function settlePerMOPNPointMinted() external;
 
-    function getCollectionMOPNPoints(
+    function getCollectionMOPNPoint(
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAdditionalMOPNPoints(
+    function getCollectionMOPNPoints(
         address collectionAddress
     ) external view returns (uint256);
 
@@ -99,15 +97,7 @@ interface IMOPN {
         address collectionAddress
     ) external view returns (uint256);
 
-    function getCollectionAdditionalMOPNPoint(
-        address collectionAddress
-    ) external view returns (uint256);
-
     function getCollectionOnMapNum(
-        address collectionAddress
-    ) external view returns (uint256);
-
-    function getCollectionMOPNPoint(
         address collectionAddress
     ) external view returns (uint256);
 
@@ -120,10 +110,6 @@ interface IMOPN {
     ) external view returns (uint256);
 
     function getCollectionSettledMT(
-        address collectionAddress
-    ) external view returns (uint256);
-
-    function getCollectionNFTMOPNPoints(
         address collectionAddress
     ) external view returns (uint256);
 
@@ -166,11 +152,6 @@ interface IMOPN {
     function getAccountSettledMT(
         address account
     ) external view returns (uint256);
-
-    function settleAccountMT(
-        address account,
-        address collectionAddress
-    ) external;
 
     function claimAccountMT(address account, address to) external;
 

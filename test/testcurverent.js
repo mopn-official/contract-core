@@ -168,7 +168,7 @@ describe("MOPN", function () {
     }))
     const mopngovernanceAddress = tx.address;
 
-    tx = await hre.ethers.deployContract("ERC6551AccountCurveRental", [mopngovernanceAddress, 216000]);
+    tx = await hre.ethers.deployContract("ERC6551AccountCurveRental", [mopngovernanceAddress]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         mopncurverent = res;
@@ -470,7 +470,12 @@ describe("MOPN", function () {
     await deploySimulatorAccount(testnft1.address, 0, 10000997, 0);
 
     for (let i = 0; i < 8; i++) {
-      await deployAccountMOPN(testnft.address, i, coordinates[i], 0);
+      if (i == 0) {
+        await deployAccountNFT(testnft.address, i, coordinates[i], 0);
+      } else {
+        await deployAccountNFT(testnft.address, i, coordinates[i], 0);
+      }
+
       await deploySimulatorAccount(testnft.address, i, coordinates[i], 0);
     }
 
@@ -518,6 +523,7 @@ describe("MOPN", function () {
 
     await avatarInfo();
     await collectionInfo();
+
   });
 
   // it("test stakingMT", async function () {
@@ -675,7 +681,7 @@ describe("MOPN", function () {
       tokenContract,
       tokenId,
       0,
-      "0x"
+      erc6551account.interface.encodeFunctionData("setOwnerHosting", [hre.ethers.constants.AddressZero]),
     );
     mineBlock(1);
     await tx.wait();
@@ -721,6 +727,29 @@ describe("MOPN", function () {
     tiles[coordinate] = account;
   };
 
+  const deployAccountNFT = async (tokenContract, tokenId, coordinate, landId) => {
+    const account = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      tokenContract,
+      tokenId,
+      0
+    );
+    accounts.push(account);
+    const tx = await mopn.moveToNFT(
+      tokenContract,
+      tokenId,
+      coordinate,
+      landId,
+      await getMoveToTilesAccounts(coordinate),
+      erc6551account.interface.encodeFunctionData("setOwnerHosting", [hre.ethers.constants.AddressZero]),
+    );
+    mineBlock(1);
+    await tx.wait();
+
+    tiles[coordinate] = account;
+  };
+
   const deployAccountCurveRent = async (tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
@@ -731,7 +760,8 @@ describe("MOPN", function () {
     );
     accounts.push(account);
     const tx = await mopncurverent.rentNFT(tokenContract,
-      tokenId, { value: 1 });
+      tokenId, 100000, { value: "1000000000000000000" });
+
     mineBlock(1);
     await tx.wait();
 

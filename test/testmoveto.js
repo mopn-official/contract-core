@@ -19,6 +19,7 @@ describe("MOPN", function () {
     mopnmt,
     mopnData,
     mopncollectionVault,
+    mopncurverent,
     mopnland,
     mopnlandMetaDataRender;
   let owner,
@@ -167,7 +168,20 @@ describe("MOPN", function () {
     }))
     const mopngovernanceAddress = tx.address;
 
-    tx = await hre.ethers.deployContract("MOPNERC6551Account", [mopngovernanceAddress]);
+    tx = await hre.ethers.deployContract("ERC6551AccountCurveRental", [mopngovernanceAddress, 216000]);
+    promises.push(new Promise((resolve, reject) => {
+      tx.deployed().then((res) => {
+        mopncurverent = res;
+        console.log("ERC6551AccountCurveRental", mopncurverent.address);
+        resolve();
+      }).catch((err) => {
+        console.error(err);
+        reject();
+      })
+    }))
+    const curverentAddress = tx.address;
+
+    tx = await hre.ethers.deployContract("MOPNERC6551Account", [mopngovernanceAddress, curverentAddress]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         erc6551account = res;
@@ -403,7 +417,8 @@ describe("MOPN", function () {
       mopnpoint.address,
       mopnland.address,
       mopnData.address,
-      mopncollectionVault.address
+      mopncollectionVault.address,
+      mopncurverent.address
     );
     promises.push(new Promise((resolve, reject) => {
       tx.wait().then(() => {

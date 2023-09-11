@@ -23,7 +23,7 @@ contract MOPNData is Multicall {
         address account;
         address contractAddress;
         uint256 tokenId;
-        uint256 BombBadge;
+        uint256 CollectionMOPNPoint;
         uint256 MTBalance;
         uint256 OnMapMOPNPoint;
         uint256 TotalMOPNPoint;
@@ -36,11 +36,9 @@ contract MOPNData is Multicall {
         uint256 OnMapNum;
         uint256 MTBalance;
         uint256 UnclaimMTBalance;
-        uint256 AdditionalMOPNPoints;
         uint256 CollectionMOPNPoints;
         uint256 OnMapMOPNPoints;
         uint256 CollectionMOPNPoint;
-        uint256 AdditionalMOPNPoint;
         uint256 PMTTotalSupply;
         IMOPNCollectionVault.NFTAuction NFTAuction;
     }
@@ -96,39 +94,21 @@ contract MOPNData is Multicall {
         uint256 perMOPNPointMinted = calcPerMOPNPointMinted();
         uint256 CollectionPerMOPNPointMinted = mopn
             .getCollectionPerMOPNPointMinted(collectionAddress);
-        uint256 AdditionalMOPNPoints = mopn.getCollectionAdditionalMOPNPoints(
-            collectionAddress
-        );
         uint256 CollectionMOPNPoints = mopn.getCollectionMOPNPoints(
             collectionAddress
         );
         uint256 OnMapMOPNPoints = mopn.getCollectionOnMapMOPNPoints(
             collectionAddress
         );
-        uint256 AdditionalFinishSnapshot = mopn.AdditionalFinishSnapshot();
 
         if (
             CollectionPerMOPNPointMinted < perMOPNPointMinted &&
             OnMapMOPNPoints > 0
         ) {
-            if (AdditionalMOPNPoints > 0 && AdditionalFinishSnapshot > 0) {
-                inbox +=
-                    (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
-                        (CollectionMOPNPoints -
-                            AdditionalMOPNPoints +
-                            OnMapMOPNPoints)) * 5) /
-                    100;
-                inbox +=
-                    (((AdditionalFinishSnapshot -
-                        CollectionPerMOPNPointMinted) * AdditionalMOPNPoints) *
-                        5) /
-                    100;
-            } else {
-                inbox +=
-                    (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
-                        (CollectionMOPNPoints + OnMapMOPNPoints)) * 5) /
-                    100;
-            }
+            inbox +=
+                (((perMOPNPointMinted - CollectionPerMOPNPointMinted) *
+                    (CollectionMOPNPoints + OnMapMOPNPoints)) * 5) /
+                100;
         }
     }
 
@@ -146,25 +126,11 @@ contract MOPNData is Multicall {
             uint256 CollectionPerMOPNPointMinted = mopn
                 .getCollectionPerMOPNPointMinted(collectionAddress);
             uint256 PerMOPNPointMinted = calcPerMOPNPointMinted();
-            uint256 AdditionalMOPNPoints = mopn
-                .getCollectionAdditionalMOPNPoints(collectionAddress);
-            uint256 AdditionalFinishSnapshot = mopn.AdditionalFinishSnapshot();
 
-            if (AdditionalMOPNPoints > 0 && AdditionalFinishSnapshot > 0) {
-                result +=
-                    ((PerMOPNPointMinted - CollectionPerMOPNPointMinted) *
-                        (CollectionMOPNPoints - AdditionalMOPNPoints)) /
-                    mopn.getCollectionOnMapNum(collectionAddress);
-                result +=
-                    ((AdditionalFinishSnapshot - CollectionPerMOPNPointMinted) *
-                        AdditionalMOPNPoints) /
-                    mopn.getCollectionOnMapNum(collectionAddress);
-            } else {
-                result +=
-                    ((PerMOPNPointMinted - CollectionPerMOPNPointMinted) *
-                        CollectionMOPNPoints) /
-                    mopn.getCollectionOnMapNum(collectionAddress);
-            }
+            result +=
+                ((PerMOPNPointMinted - CollectionPerMOPNPointMinted) *
+                    CollectionMOPNPoints) /
+                mopn.getCollectionOnMapNum(collectionAddress);
         }
     }
 
@@ -260,10 +226,8 @@ contract MOPNData is Multicall {
 
         accountData.tokenId = tokenId;
         accountData.contractAddress = collectionAddress;
-        accountData.BombBadge = IMOPNBomb(governance.bombContract()).balanceOf(
-            account,
-            2
-        );
+        accountData.CollectionMOPNPoint = IMOPN(governance.mopnContract())
+            .getCollectionMOPNPoint(collectionAddress);
         accountData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
             account
         );
@@ -358,12 +322,6 @@ contract MOPNData is Multicall {
             collectionAddress
         );
         cData.CollectionMOPNPoints = cData.CollectionMOPNPoint * cData.OnMapNum;
-        cData.AdditionalMOPNPoint = mopn.getCollectionAdditionalMOPNPoint(
-            collectionAddress
-        );
-        cData.AdditionalMOPNPoints = mopn.getCollectionAdditionalMOPNPoints(
-            collectionAddress
-        );
 
         if (cData.collectionVault != address(0)) {
             cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)

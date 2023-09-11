@@ -187,6 +187,7 @@ contract MOPNERC6551Account is
 
     function setOwnerHosting(address ownerHosting_) public {
         address nftowner_ = nftowner();
+        console.log("caller", msg.sender);
         require(
             msg.sender == nftowner_ ||
                 (msg.sender == IMOPNGovernance(governance).ERC6551Registry() &&
