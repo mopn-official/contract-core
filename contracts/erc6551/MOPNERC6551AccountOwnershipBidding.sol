@@ -43,11 +43,18 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
 
     mapping(address => BidData) public bidsData;
 
-    constructor(address governance_) {
+    address public protocolFeeDestination;
+
+    constructor(address governance_, address protocolFeeDestination_) {
         governance = IMOPNGovernance(governance_);
+        protocolFeeDestination = protocolFeeDestination_;
     }
 
-    function getRentData(address account) public view returns (BidData memory) {
+    function setFeeDestination(address _feeDestination) public onlyOwner {
+        protocolFeeDestination = _feeDestination;
+    }
+
+    function getBidData(address account) public view returns (BidData memory) {
         return bidsData[account];
     }
 
@@ -77,33 +84,33 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
         return collectionAddress;
     }
 
-    function rentNFT(
+    function bidNFTTo(
         address collectionAddress,
-        uint256 tokenId
-    ) external payable {
-        address account = IERC6551Registry(governance.ERC6551Registry())
-            .createAccount(
-                governance.ERC6551AccountProxy(),
-                block.chainid,
-                collectionAddress,
-                tokenId,
-                0,
-                ""
-            );
-        _rentAccount(account, collectionAddress);
-    }
-
-    function rentAccount(address account) external payable {
-        address collectionAddress = getQualifiedAccountCollection(account);
-        _rentAccount(account, collectionAddress);
-    }
-
-    function _rentAccount(address account, address collectionAddress) internal {
-        IMOPNERC6551Account a = IMOPNERC6551Account(payable(account));
-        require(
-            a.ownershipHostingType() == 1,
-            "account owner hosting mismatch"
+        uint256 tokenId,
+        address to
+    ) external payable returns (address account) {
+        account = IERC6551Registry(governance.ERC6551Registry()).createAccount(
+            governance.ERC6551AccountProxy(),
+            block.chainid,
+            collectionAddress,
+            tokenId,
+            0,
+            ""
         );
+        _bidAccount(account, collectionAddress, to);
+    }
+
+    function bidAccountTo(address account, address to) external payable {
+        address collectionAddress = getQualifiedAccountCollection(account);
+        _bidAccount(account, collectionAddress, to);
+    }
+
+    function _bidAccount(
+        address account,
+        address collectionAddress,
+        address bidder
+    ) internal {
+        IMOPNERC6551Account a = IMOPNERC6551Account(payable(account));
 
         uint256 minimalPrice = getMinimalCollectionBidPrice(collectionAddress);
         collectionBidData[collectionAddress] =
@@ -117,11 +124,73 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
 
         require(msg.value >= minimalPrice, "rent less than minimal price");
 
+        cancelPreviousBid(account);
+
+        BidData memory biddata;
+        biddata.startBlock = uint40(block.number);
+        biddata.rent = uint88(msg.value);
+
+        bidsData[account] = biddata;
+
+        a.ownerTransferTo(bidder, type(uint40).max);
+
+        emit AccountRent(account, biddata.startBlock, biddata.rent, bidder);
+    }
+
+    function getMimimalBidPrice(
+        address account,
+        address collectionAddress
+    ) public view returns (uint256 minimalPrice) {
+        minimalPrice = getMinimalCollectionBidPrice(collectionAddress);
+        uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(account);
+        if (accountMinimalPeriodPrice_ > minimalPrice) {
+            minimalPrice = accountMinimalPeriodPrice_;
+        }
+    }
+
+    function claimNFTOwnerIncome(address account) public nonReentrant {
+        uint256 nftownerincome = getSettledNFTOwnerIncome(account);
+        if (nftownerincome > 0) {
+            uint256 protocolFee = (nftownerincome * 5) / 100;
+            (bool success1, ) = protocolFeeDestination.call{value: protocolFee}(
+                ""
+            );
+
+            address nftowner = IMOPNERC6551Account(payable(account)).nftowner();
+            (bool success2, ) = nftowner.call{
+                value: nftownerincome - protocolFee
+            }("");
+            require(success1 && success2, "Failed to transfer rent");
+
+            bidsData[account].claimed += uint88(nftownerincome);
+
+            emit ClaimRent(account, uint88(nftownerincome), nftowner);
+        }
+    }
+
+    function cancelPreviousBid(address account) internal nonReentrant {
+        IMOPNERC6551Account a = IMOPNERC6551Account(payable(account));
         address owner_ = a.owner();
         IMOPN(governance.mopnContract()).claimAccountMT(account, owner_);
 
         if (bidsData[account].startBlock > 0) {
-            settleNFTOwnerIncome(account);
+            uint256 nftownerincome = getSettledNFTOwnerIncome(account);
+            if (nftownerincome > 0) {
+                uint256 protocolFee = (nftownerincome * 5) / 100;
+                (bool success1, ) = protocolFeeDestination.call{
+                    value: protocolFee
+                }("");
+
+                address nftowner = a.nftowner();
+                (bool success2, ) = nftowner.call{
+                    value: nftownerincome - protocolFee
+                }("");
+                require(success1 && success2, "Failed to transfer rent");
+
+                bidsData[account].claimed += uint88(nftownerincome);
+
+                emit ClaimRent(account, uint88(nftownerincome), nftowner);
+            }
 
             uint256 ownerrefund = bidsData[account].rent -
                 bidsData[account].claimed;
@@ -131,33 +200,6 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
 
                 emit ClaimRent(account, uint88(ownerrefund), owner_);
             }
-        }
-
-        BidData memory biddata;
-        biddata.startBlock = uint40(block.number);
-        biddata.rent = uint88(msg.value);
-
-        bidsData[account] = biddata;
-
-        a.ownerTransferTo(msg.sender, type(uint40).max);
-
-        emit AccountRent(account, biddata.startBlock, biddata.rent, msg.sender);
-    }
-
-    function settleNFTOwnerIncome(
-        address account
-    ) internal nonReentrant returns (uint256 nftownerincome) {
-        nftownerincome = getSettledNFTOwnerIncome(account);
-        if (nftownerincome > 0) {
-            IMOPNERC6551Account a = IMOPNERC6551Account(payable(account));
-
-            address nftowner = a.nftowner();
-            (bool success, ) = nftowner.call{value: nftownerincome}("");
-            require(success, "Failed to transfer rent");
-
-            bidsData[account].claimed += uint88(nftownerincome);
-
-            emit ClaimRent(account, uint88(nftownerincome), nftowner);
         }
     }
 
@@ -234,30 +276,18 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
     function cancelOwnershipBid() external {
         if (bidsData[msg.sender].startBlock > 0) {
             IMOPNERC6551Account a = IMOPNERC6551Account(payable(msg.sender));
-            settleNFTOwnerIncome(msg.sender);
-
-            address owner_ = a.owner();
-            IMOPN(governance.mopnContract()).claimAccountMT(msg.sender, owner_);
-
-            uint256 ownerrefund = bidsData[msg.sender].rent -
-                bidsData[msg.sender].claimed;
-            if (ownerrefund > 0) {
-                (bool success, ) = owner_.call{value: ownerrefund}("");
-                require(success, "Failed to transfer rent refund");
-
-                emit ClaimRent(msg.sender, uint88(ownerrefund), owner_);
-            }
+            cancelPreviousBid(msg.sender);
 
             BidData memory biddata;
             bidsData[msg.sender] = biddata;
 
-            a.ownerTransferTo(msg.sender, type(uint40).max);
+            a.ownerTransferTo(address(0), 0);
 
             emit AccountRent(
                 msg.sender,
                 biddata.startBlock,
                 biddata.rent,
-                msg.sender
+                address(0)
             );
         }
     }

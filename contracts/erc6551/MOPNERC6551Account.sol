@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "hardhat/console.sol";
 
 import "./interfaces/IMOPNERC6551Account.sol";
-import "./interfaces/IERC6551AccountOwnerHosting.sol";
+import "./interfaces/IMOPNERC6551AccountOwnershipBidding.sol";
 import "../interfaces/IMOPN.sol";
 import "../interfaces/IMOPNGovernance.sol";
 
@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "./lib/ERC6551AccountLib.sol";
 
@@ -23,7 +24,8 @@ contract MOPNERC6551Account is
     IERC1271,
     IERC721Receiver,
     IERC1155Receiver,
-    IMOPNERC6551Account
+    IMOPNERC6551Account,
+    Multicall
 {
     event OwnerHostingSet(uint8 ownerHostingType, uint8 oldOwnerHostingType);
 
@@ -205,16 +207,24 @@ contract MOPNERC6551Account is
     }
 
     function ownerTransferTo(address to, uint40 endBlock) public {
-        if (ownershipHostingType == 1) {
+        if (ownershipHostingType == 0) {
             require(msg.sender == ownershipBiddingContract, "not allowed");
+        } else if (ownershipHostingType == 1) {
+            require(msg.sender == nftowner(), "not allowed");
         } else if (ownershipHostingType == 2) {
             require(msg.sender == ownershipRentalContract, "not allowed");
         } else {
-            require(msg.sender == nftowner(), "not allowed");
+            require(false, "OwnershipHostingType not supported");
         }
         renter = to;
         rentEndBlock = endBlock;
         emit OwnerTransfer(to, endBlock);
+    }
+
+    function cancelOwnershipBid() external {
+        require(msg.sender == nftowner(), "not allowed");
+        IMOPNERC6551AccountOwnershipBidding(ownershipBiddingContract)
+            .cancelOwnershipBid();
     }
 
     modifier onlyHelper() {

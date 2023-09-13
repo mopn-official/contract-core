@@ -22,7 +22,7 @@ interface IMOPNGovernance {
 
     function mopnDataContract() external view returns (address);
 
-    function curveRentalContract() external view returns (address);
+    function ownershipBiddingContract() external view returns (address);
 
     function ERC6551Registry() external view returns (address);
 

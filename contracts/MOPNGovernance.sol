@@ -56,7 +56,7 @@ contract MOPNGovernance is Multicall, Ownable {
     address public landContract;
     address public mopnDataContract;
     address public mopnCollectionVaultContract;
-    address public curveRentalContract;
+    address public ownershipBiddingContract;
 
     function updateMOPNContracts(
         address auctionHouseContract_,
@@ -67,7 +67,7 @@ contract MOPNGovernance is Multicall, Ownable {
         address landContract_,
         address mopnDataContract_,
         address mopnCollectionVaultContract_,
-        address curverentalContract_
+        address ownershipBiddingContract_
     ) public onlyOwner {
         auctionHouseContract = auctionHouseContract_;
         mopnContract = mopnContract_;
@@ -77,7 +77,7 @@ contract MOPNGovernance is Multicall, Ownable {
         landContract = landContract_;
         mopnDataContract = mopnDataContract_;
         mopnCollectionVaultContract = mopnCollectionVaultContract_;
-        curveRentalContract = curverentalContract_;
+        ownershipBiddingContract = ownershipBiddingContract_;
     }
 
     function getDefault6551AccountImplementation()

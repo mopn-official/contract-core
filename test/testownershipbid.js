@@ -19,7 +19,7 @@ describe("MOPN", function () {
     mopnmt,
     mopnData,
     mopncollectionVault,
-    mopncurverent,
+    mopnownershipbid,
     mopnland,
     mopnlandMetaDataRender;
   let owner,
@@ -168,20 +168,20 @@ describe("MOPN", function () {
     }))
     const mopngovernanceAddress = tx.address;
 
-    tx = await hre.ethers.deployContract("ERC6551AccountCurveRental", [mopngovernanceAddress]);
+    tx = await hre.ethers.deployContract("MOPNERC6551AccountOwnershipBidding", [mopngovernanceAddress, owner1.address]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
-        mopncurverent = res;
-        console.log("ERC6551AccountCurveRental", mopncurverent.address);
+        mopnownershipbid = res;
+        console.log("MOPNERC6551AccountOwnershipBidding", mopnownershipbid.address);
         resolve();
       }).catch((err) => {
         console.error(err);
         reject();
       })
     }))
-    const curverentAddress = tx.address;
+    const ownershipbidAddress = tx.address;
 
-    tx = await hre.ethers.deployContract("MOPNERC6551Account", [mopngovernanceAddress, curverentAddress]);
+    tx = await hre.ethers.deployContract("MOPNERC6551Account", [mopngovernanceAddress, ownershipbidAddress, ownershipbidAddress]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         erc6551account = res;
@@ -418,7 +418,7 @@ describe("MOPN", function () {
       mopnland.address,
       mopnData.address,
       mopncollectionVault.address,
-      mopncurverent.address
+      mopnownershipbid.address
     );
     promises.push(new Promise((resolve, reject) => {
       tx.wait().then(() => {
@@ -479,7 +479,7 @@ describe("MOPN", function () {
       await deploySimulatorAccount(testnft.address, i, coordinates[i], 0);
     }
 
-    await deployAccountCurveRent(testnft1.address, 1, 10000996, 0);
+    await deployAccountOwnershipBidAndMove(testnft1.address, 1, 10000996, 0);
     await deploySimulatorAccount(testnft1.address, 1, 10000996, 0);
 
     await mineBlock(1);
@@ -509,6 +509,21 @@ describe("MOPN", function () {
 
     await claimAccountsMT();
     await showWalletBalance();
+
+    console.log("owner1 balance", await hre.ethers.provider.getBalance(owner1.address));
+    const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", accounts[9]);
+    const tx1 = await accountContract.multicall([
+      accountContract.interface.encodeFunctionData("cancelOwnershipBid"),
+      accountContract.interface.encodeFunctionData("setOwnershipHostingType", [1]),
+      accountContract.interface.encodeFunctionData("executeCall", [
+        mopn.address,
+        0,
+        mopn.interface.encodeFunctionData("moveTo", [10000995, 0, await getMoveToTilesAccounts(10000995)])]
+      )
+    ]);
+    mineBlock(1);
+    await tx1.wait();
+    console.log("owner1 balance", await hre.ethers.provider.getBalance(owner1.address));
   }
 
   it("test move", async function () {
@@ -681,7 +696,7 @@ describe("MOPN", function () {
       tokenContract,
       tokenId,
       0,
-      erc6551account.interface.encodeFunctionData("setOwnerHosting", [hre.ethers.constants.AddressZero]),
+      erc6551account.interface.encodeFunctionData("setOwnershipHostingType", [1]),
     );
     mineBlock(1);
     await tx.wait();
@@ -742,7 +757,7 @@ describe("MOPN", function () {
       coordinate,
       landId,
       await getMoveToTilesAccounts(coordinate),
-      erc6551account.interface.encodeFunctionData("setOwnerHosting", [hre.ethers.constants.AddressZero]),
+      erc6551account.interface.encodeFunctionData("setOwnershipHostingType", [1]),
     );
     mineBlock(1);
     await tx.wait();
@@ -750,7 +765,7 @@ describe("MOPN", function () {
     tiles[coordinate] = account;
   };
 
-  const deployAccountCurveRent = async (tokenContract, tokenId, coordinate, landId) => {
+  const deployAccountOwnershipBid = async (tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
       31337,
@@ -759,8 +774,8 @@ describe("MOPN", function () {
       0
     );
     accounts.push(account);
-    const tx = await mopncurverent.rentNFT(tokenContract,
-      tokenId, 100000, { value: "1000000000000000000" });
+    const tx = await mopnownershipbid.bidNFTTo(tokenContract,
+      tokenId, owner.address, { value: "1000000000000000000" });
 
     mineBlock(1);
     await tx.wait();
@@ -768,6 +783,28 @@ describe("MOPN", function () {
     const movetx = await mopn.moveToByOwner(account, coordinate, landId, await getMoveToTilesAccounts(coordinate));
     mineBlock(1);
     await movetx.wait();
+
+    tiles[coordinate] = account;
+  };
+
+  const deployAccountOwnershipBidAndMove = async (tokenContract, tokenId, coordinate, landId) => {
+    const account = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      tokenContract,
+      tokenId,
+      0
+    );
+    accounts.push(account);
+    console.log(account, "minimal bid price is", await mopnownershipbid.getMimimalBidPrice(account, tokenContract));
+    const tx = await erc6551accounthelper.connect(owner1).bidNFTAndProxyCall(
+      tokenContract, tokenId, mopn.address, 0,
+      mopn.interface.encodeFunctionData("moveTo", [coordinate, landId, await getMoveToTilesAccounts(coordinate)]),
+      { value: "1000000000000000000" }
+    );
+
+    mineBlock(1);
+    await tx.wait();
 
     tiles[coordinate] = account;
   };

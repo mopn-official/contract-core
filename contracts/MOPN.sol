@@ -132,25 +132,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return collectionAddress;
     }
 
-    function createAccount(
-        address implementation,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId,
-        uint256 salt,
-        bytes calldata initData
-    ) external returns (address) {
-        return
-            IERC6551Registry(governance.ERC6551Registry()).createAccount(
-                implementation,
-                chainId,
-                tokenContract,
-                tokenId,
-                salt,
-                initData
-            );
-    }
-
     /**
      * @notice an on map NFT move to a new tile
      * @param tileCoordinate move To coordinate

@@ -2,8 +2,10 @@
 pragma solidity ^0.8.13;
 
 import "../interfaces/IMOPNGovernance.sol";
+import "../interfaces/IMOPN.sol";
 import "./interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPNERC6551Account.sol";
+import "./interfaces/IMOPNERC6551AccountOwnershipBidding.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MOPNERC6551AccountHelper is Multicall {
@@ -67,13 +69,26 @@ contract MOPNERC6551AccountHelper is Multicall {
         return false;
     }
 
+    function bidNFTAndProxyCall(
+        address collectionAddress,
+        uint256 tokenId,
+        address to,
+        uint256 value,
+        bytes calldata data
+    ) external payable returns (bytes memory) {
+        address account = IMOPNERC6551AccountOwnershipBidding(
+            governance.ownershipBiddingContract()
+        ).bidNFTTo{value: msg.value}(collectionAddress, tokenId, msg.sender);
+        return proxyCall(account, to, value, data);
+    }
+
     /// @dev executes a low-level call against an account if the caller is authorized to make calls
     function proxyCall(
         address account,
         address to,
         uint256 value,
         bytes calldata data
-    ) external payable returns (bytes memory) {
+    ) public payable returns (bytes memory) {
         return
             IMOPNERC6551Account(payable(account)).executeProxyCall(
                 to,
