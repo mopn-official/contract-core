@@ -127,7 +127,7 @@
     },
     "MOPNAuctionHouse": {
         "address": "0x97f8e813bF4d605e03463Fe14D1fE8f8f6b025ab",
-        "verified": false,
+        "verified": true,
         "constructparams": [
             "MOPNGovernance",
             1691121600,
@@ -158,14 +158,14 @@
     },
     "MOPNBomb": {
         "address": "0x1F4409961337AeeD8871f3274364b33Ff836AC17",
-        "verified": false,
+        "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNToken": {
         "address": "0xC4Ae1A940ED38cF750549aee5Dfe36c663EB06f5",
-        "verified": false,
+        "verified": true,
         "transOwnerTo": "MOPNGovernance",
         "constructparams": [
             "MOPNGovernance"
@@ -173,7 +173,7 @@
     },
     "MOPNPoint": {
         "address": "0x2C05e0994d7d561d55f4Df82cE135524f8c28181",
-        "verified": false,
+        "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
