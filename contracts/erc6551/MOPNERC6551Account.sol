@@ -25,22 +25,32 @@ contract MOPNERC6551Account is
     IERC1155Receiver,
     IMOPNERC6551Account
 {
-    event OwnerHostingSet(address ownerHosting, address oldOwnerHosting);
+    event OwnerHostingSet(uint8 ownerHostingType, uint8 oldOwnerHostingType);
 
-    event OwnerTransfer(address ownerHosting, address to, uint256 endBlock);
+    event OwnerTransfer(address to, uint40 endBlock);
 
-    uint256 private _nonce;
+    address public immutable governance;
 
-    address private immutable governance;
+    address public immutable ownershipBiddingContract;
 
-    /// uint8 initialize + uint160 ownerHosting
-    uint256 public ownerHostingData;
+    address public immutable ownershipRentalContract;
 
-    address public immutable defaultOwnerHosting;
+    uint48 private _nonce;
 
-    constructor(address governance_, address defaultOwnerHosting_) {
+    uint8 public ownershipHostingType;
+
+    uint40 public rentEndBlock;
+
+    address public renter;
+
+    constructor(
+        address governance_,
+        address ownershipBiddingContract_,
+        address ownershipRentalContract_
+    ) {
         governance = governance_;
-        defaultOwnerHosting = defaultOwnerHosting_;
+        ownershipBiddingContract = ownershipBiddingContract_;
+        ownershipRentalContract = ownershipRentalContract_;
     }
 
     receive() external payable {}
@@ -76,7 +86,10 @@ contract MOPNERC6551Account is
         uint256 value,
         bytes calldata data
     ) internal returns (bytes memory result) {
-        require(to != ownerHosting(), "not allow low-level call ownerHosting");
+        require(
+            to != ownershipBiddingContract && to != ownershipRentalContract,
+            "not allow low-level call to rentHosting"
+        );
         bool success;
         (success, result) = to.call{value: value}(data);
 
@@ -95,19 +108,12 @@ contract MOPNERC6551Account is
         return ERC6551AccountLib.token();
     }
 
-    function ownerHosting() public view returns (address) {
-        if (ownerHostingData == 0) return defaultOwnerHosting;
-        return address(uint160(ownerHostingData));
-    }
+    function owner() public view returns (address) {
+        if (block.number < rentEndBlock) {
+            return renter;
+        }
 
-    function owner() public view returns (address owner_) {
-        address ownerHosting_ = ownerHosting();
-        if (ownerHosting_ != address(0))
-            owner_ = IERC6551AccountOwnerHosting(ownerHosting_).owner(
-                address(this)
-            );
-
-        if (owner_ == address(0)) owner_ = nftowner();
+        return nftowner();
     }
 
     function nftowner() public view returns (address) {
@@ -185,26 +191,30 @@ contract MOPNERC6551Account is
         return IERC721Receiver.onERC721Received.selector;
     }
 
-    function setOwnerHosting(address ownerHosting_) public {
+    function setOwnershipHostingType(uint8 ownershipHostingType_) public {
         address nftowner_ = nftowner();
-        console.log("caller", msg.sender);
         require(
             msg.sender == nftowner_ ||
                 (msg.sender == IMOPNGovernance(governance).ERC6551Registry() &&
                     tx.origin == nftowner_),
             "not nft owner"
         );
-        address oldOwnerHosting = ownerHosting();
-        if (oldOwnerHosting != address(0)) {
-            IERC6551AccountOwnerHosting(oldOwnerHosting).beforeRevokeHosting();
-        }
-        ownerHostingData = (1 << 160) | uint256(uint160(ownerHosting_));
-        emit OwnerHostingSet(ownerHosting_, oldOwnerHosting);
+        require(rentEndBlock < block.number, "rent not finish");
+        emit OwnerHostingSet(ownershipHostingType_, ownershipHostingType);
+        ownershipHostingType = ownershipHostingType_;
     }
 
-    function hostingOwnerTransferNotify(address to, uint256 endBlock) public {
-        require(ownerHosting() == msg.sender, "hostingOwner mismatch");
-        emit OwnerTransfer(msg.sender, to, endBlock);
+    function ownerTransferTo(address to, uint40 endBlock) public {
+        if (ownershipHostingType == 1) {
+            require(msg.sender == ownershipBiddingContract, "not allowed");
+        } else if (ownershipHostingType == 2) {
+            require(msg.sender == ownershipRentalContract, "not allowed");
+        } else {
+            require(msg.sender == nftowner(), "not allowed");
+        }
+        renter = to;
+        rentEndBlock = endBlock;
+        emit OwnerTransfer(to, endBlock);
     }
 
     modifier onlyHelper() {

@@ -16,10 +16,7 @@ interface IMOPNERC6551Account is IERC6551Account {
 
     function nftowner() external view returns (address);
 
-    function ownerHosting() external view returns (address);
+    function ownershipHostingType() external view returns (uint8);
 
-    function hostingOwnerTransferNotify(
-        address to,
-        uint256 blockRange
-    ) external;
+    function ownerTransferTo(address to, uint40 endBlock) external;
 }

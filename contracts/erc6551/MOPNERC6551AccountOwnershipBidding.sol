@@ -1,0 +1,264 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import "hardhat/console.sol";
+
+import "../interfaces/IMOPN.sol";
+import "../interfaces/IMOPNGovernance.sol";
+import "./interfaces/IMOPNERC6551Account.sol";
+import "./interfaces/IERC6551Registry.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
+contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
+    uint256 public constant defaultCollectionLastBidBlock = 1;
+    uint256 public constant defaultCollectionBidStartPrice = 10000000000000000;
+    uint256 public constant minimalCollectionBidPrice = 1000000000000;
+
+    IMOPNGovernance public immutable governance;
+
+    event AccountRent(
+        address indexed account,
+        uint40 startblock,
+        uint88 rent,
+        address renter
+    );
+
+    event ClaimRent(address indexed account, uint96 claimed, address receiver);
+
+    struct BidData {
+        uint40 startBlock;
+        uint88 rent;
+        uint88 claimed;
+    }
+
+    /**
+     * @notice collection Bid Data
+     * @dev This includes the following data:
+     * - uint40 lastBidBlock: bits 88-127
+     * - uint88 lastBidPrice: bits 0-87
+     */
+    mapping(address => uint256) public collectionBidData;
+
+    mapping(address => BidData) public bidsData;
+
+    constructor(address governance_) {
+        governance = IMOPNGovernance(governance_);
+    }
+
+    function getRentData(address account) public view returns (BidData memory) {
+        return bidsData[account];
+    }
+
+    function getQualifiedAccountCollection(
+        address account
+    ) public view returns (address) {
+        (
+            uint256 chainId,
+            address collectionAddress,
+            uint256 tokenId
+        ) = IMOPNERC6551Account(payable(account)).token();
+
+        require(chainId == block.chainid, "not support cross chain account");
+
+        require(
+            account ==
+                IERC6551Registry(governance.ERC6551Registry()).account(
+                    governance.ERC6551AccountProxy(),
+                    chainId,
+                    collectionAddress,
+                    tokenId,
+                    0
+                ),
+            "not a mopn Account Implementation"
+        );
+
+        return collectionAddress;
+    }
+
+    function rentNFT(
+        address collectionAddress,
+        uint256 tokenId
+    ) external payable {
+        address account = IERC6551Registry(governance.ERC6551Registry())
+            .createAccount(
+                governance.ERC6551AccountProxy(),
+                block.chainid,
+                collectionAddress,
+                tokenId,
+                0,
+                ""
+            );
+        _rentAccount(account, collectionAddress);
+    }
+
+    function rentAccount(address account) external payable {
+        address collectionAddress = getQualifiedAccountCollection(account);
+        _rentAccount(account, collectionAddress);
+    }
+
+    function _rentAccount(address account, address collectionAddress) internal {
+        IMOPNERC6551Account a = IMOPNERC6551Account(payable(account));
+        require(
+            a.ownershipHostingType() == 1,
+            "account owner hosting mismatch"
+        );
+
+        uint256 minimalPrice = getMinimalCollectionBidPrice(collectionAddress);
+        collectionBidData[collectionAddress] =
+            (block.number << 88) |
+            ((minimalPrice * 105) / 100);
+
+        uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(account);
+        if (accountMinimalPeriodPrice_ > minimalPrice) {
+            minimalPrice = accountMinimalPeriodPrice_;
+        }
+
+        require(msg.value >= minimalPrice, "rent less than minimal price");
+
+        address owner_ = a.owner();
+        IMOPN(governance.mopnContract()).claimAccountMT(account, owner_);
+
+        if (bidsData[account].startBlock > 0) {
+            settleNFTOwnerIncome(account);
+
+            uint256 ownerrefund = bidsData[account].rent -
+                bidsData[account].claimed;
+            if (ownerrefund > 0) {
+                (bool success, ) = owner_.call{value: ownerrefund}("");
+                require(success, "Failed to transfer rent refund");
+
+                emit ClaimRent(account, uint88(ownerrefund), owner_);
+            }
+        }
+
+        BidData memory biddata;
+        biddata.startBlock = uint40(block.number);
+        biddata.rent = uint88(msg.value);
+
+        bidsData[account] = biddata;
+
+        a.ownerTransferTo(msg.sender, type(uint40).max);
+
+        emit AccountRent(account, biddata.startBlock, biddata.rent, msg.sender);
+    }
+
+    function settleNFTOwnerIncome(
+        address account
+    ) internal nonReentrant returns (uint256 nftownerincome) {
+        nftownerincome = getSettledNFTOwnerIncome(account);
+        if (nftownerincome > 0) {
+            IMOPNERC6551Account a = IMOPNERC6551Account(payable(account));
+
+            address nftowner = a.nftowner();
+            (bool success, ) = nftowner.call{value: nftownerincome}("");
+            require(success, "Failed to transfer rent");
+
+            bidsData[account].claimed += uint88(nftownerincome);
+
+            emit ClaimRent(account, uint88(nftownerincome), nftowner);
+        }
+    }
+
+    function getSettledNFTOwnerIncome(
+        address account
+    ) public view returns (uint256 nftownerincome) {
+        BidData memory bidData = bidsData[account];
+        if (bidData.startBlock > 0) {
+            if ((bidData.startBlock + 100000) < block.number) {
+                nftownerincome =
+                    bidData.rent -
+                    ABDKMath64x64.mulu(
+                        ABDKMath64x64.pow(
+                            ABDKMath64x64.divu(99999, 100000),
+                            block.number - bidData.startBlock - 100000
+                        ),
+                        bidData.rent / 2
+                    );
+            } else {
+                nftownerincome =
+                    (bidData.rent * (block.number - bidData.startBlock)) /
+                    200000;
+            }
+
+            nftownerincome -= bidData.claimed;
+        }
+    }
+
+    function getMinimalAccountBidPrice(
+        address account
+    ) public view returns (uint256 price) {
+        BidData memory bidData = bidsData[account];
+        if (bidData.startBlock > 0) {
+            if ((bidData.startBlock + 100000) < block.number) {
+                price = ABDKMath64x64.mulu(
+                    ABDKMath64x64.pow(
+                        ABDKMath64x64.divu(99999, 100000),
+                        block.number - bidData.startBlock - 100000
+                    ),
+                    bidData.rent
+                );
+            } else {
+                price = bidData.rent;
+            }
+            price = (price * 110) / 100;
+        }
+    }
+
+    function getMinimalCollectionBidPrice(
+        address collectionAddress
+    ) public view returns (uint256 price) {
+        uint256 bidStartPrice;
+        uint256 lastBidBlock;
+        if (collectionBidData[collectionAddress] == 0) {
+            bidStartPrice = defaultCollectionBidStartPrice;
+            lastBidBlock = defaultCollectionLastBidBlock;
+        } else {
+            bidStartPrice = uint88(collectionBidData[collectionAddress]);
+            lastBidBlock = uint40(collectionBidData[collectionAddress] >> 88);
+        }
+
+        price = ABDKMath64x64.mulu(
+            ABDKMath64x64.pow(
+                ABDKMath64x64.divu(99, 100),
+                (block.number - lastBidBlock) / 5
+            ),
+            bidStartPrice
+        );
+        if (price < minimalCollectionBidPrice) {
+            price = minimalCollectionBidPrice;
+        }
+    }
+
+    function cancelOwnershipBid() external {
+        if (bidsData[msg.sender].startBlock > 0) {
+            IMOPNERC6551Account a = IMOPNERC6551Account(payable(msg.sender));
+            settleNFTOwnerIncome(msg.sender);
+
+            address owner_ = a.owner();
+            IMOPN(governance.mopnContract()).claimAccountMT(msg.sender, owner_);
+
+            uint256 ownerrefund = bidsData[msg.sender].rent -
+                bidsData[msg.sender].claimed;
+            if (ownerrefund > 0) {
+                (bool success, ) = owner_.call{value: ownerrefund}("");
+                require(success, "Failed to transfer rent refund");
+
+                emit ClaimRent(msg.sender, uint88(ownerrefund), owner_);
+            }
+
+            BidData memory biddata;
+            bidsData[msg.sender] = biddata;
+
+            a.ownerTransferTo(msg.sender, type(uint40).max);
+
+            emit AccountRent(
+                msg.sender,
+                biddata.startBlock,
+                biddata.rent,
+                msg.sender
+            );
+        }
+    }
+}
