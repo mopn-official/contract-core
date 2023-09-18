@@ -132,6 +132,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return collectionAddress;
     }
 
+    //@todo whitelist
+
     /**
      * @notice an on map NFT move to a new tile
      * @param tileCoordinate move To coordinate
@@ -599,7 +601,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 CollectionsData[collectionAddress] +=
                     (point - lastPoint) <<
                     200;
-            } else if (point < lastPoint) {
+            } else {
                 MiningData -=
                     ((lastPoint - point) *
                         getCollectionOnMapNum(collectionAddress)) <<
@@ -608,6 +610,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
                     (lastPoint - point) <<
                     200;
             }
+            emit CollectionPointChange(collectionAddress, point);
         }
     }
 

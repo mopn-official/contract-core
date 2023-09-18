@@ -21,23 +21,23 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
     event AccountRent(
         address indexed account,
         uint40 startblock,
-        uint88 rent,
+        uint104 rent,
         address renter
     );
 
-    event ClaimRent(address indexed account, uint96 claimed, address receiver);
+    event ClaimRent(address indexed account, uint104 claimed, address receiver);
 
     struct BidData {
         uint40 startBlock;
-        uint88 rent;
-        uint88 claimed;
+        uint104 rent;
+        uint104 claimed;
     }
 
     /**
      * @notice collection Bid Data
      * @dev This includes the following data:
-     * - uint40 lastBidBlock: bits 88-127
-     * - uint88 lastBidPrice: bits 0-87
+     * - uint40 lastBidBlock: bits 104-143
+     * - uint104 lastBidPrice: bits 0-103
      */
     mapping(address => uint256) public collectionBidData;
 
@@ -114,7 +114,7 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
 
         uint256 minimalPrice = getMinimalCollectionBidPrice(collectionAddress);
         collectionBidData[collectionAddress] =
-            (block.number << 88) |
+            (block.number << 104) |
             ((minimalPrice * 105) / 100);
 
         uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(account);
@@ -128,7 +128,7 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
 
         BidData memory biddata;
         biddata.startBlock = uint40(block.number);
-        biddata.rent = uint88(msg.value);
+        biddata.rent = uint104(msg.value);
 
         bidsData[account] = biddata;
 
@@ -149,6 +149,8 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
     }
 
     function claimNFTOwnerIncome(address account) public nonReentrant {
+        address nftowner = IMOPNERC6551Account(payable(account)).nftowner();
+        require(msg.sender == nftowner, "not nft owner");
         uint256 nftownerincome = getSettledNFTOwnerIncome(account);
         if (nftownerincome > 0) {
             uint256 protocolFee = (nftownerincome * 5) / 100;
@@ -156,15 +158,14 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
                 ""
             );
 
-            address nftowner = IMOPNERC6551Account(payable(account)).nftowner();
             (bool success2, ) = nftowner.call{
                 value: nftownerincome - protocolFee
             }("");
             require(success1 && success2, "Failed to transfer rent");
 
-            bidsData[account].claimed += uint88(nftownerincome);
+            bidsData[account].claimed += uint104(nftownerincome);
 
-            emit ClaimRent(account, uint88(nftownerincome), nftowner);
+            emit ClaimRent(account, uint104(nftownerincome), nftowner);
         }
     }
 
@@ -187,9 +188,9 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
                 }("");
                 require(success1 && success2, "Failed to transfer rent");
 
-                bidsData[account].claimed += uint88(nftownerincome);
+                bidsData[account].claimed += uint104(nftownerincome);
 
-                emit ClaimRent(account, uint88(nftownerincome), nftowner);
+                emit ClaimRent(account, uint104(nftownerincome), nftowner);
             }
 
             uint256 ownerrefund = bidsData[account].rent -
@@ -198,7 +199,7 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
                 (bool success, ) = owner_.call{value: ownerrefund}("");
                 require(success, "Failed to transfer rent refund");
 
-                emit ClaimRent(account, uint88(ownerrefund), owner_);
+                emit ClaimRent(account, uint104(ownerrefund), owner_);
             }
         }
     }
@@ -257,8 +258,8 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
             bidStartPrice = defaultCollectionBidStartPrice;
             lastBidBlock = defaultCollectionLastBidBlock;
         } else {
-            bidStartPrice = uint88(collectionBidData[collectionAddress]);
-            lastBidBlock = uint40(collectionBidData[collectionAddress] >> 88);
+            bidStartPrice = uint104(collectionBidData[collectionAddress]);
+            lastBidBlock = uint40(collectionBidData[collectionAddress] >> 104);
         }
 
         price = ABDKMath64x64.mulu(

@@ -40,6 +40,11 @@ interface IMOPN {
         uint32 tileCoordinate
     );
 
+    event CollectionPointChange(
+        address collectionAddress,
+        uint256 CollectionPoint
+    );
+
     event AccountMTMinted(address indexed account, uint256 amount);
 
     event CollectionMTMinted(address indexed collectionAddress, uint256 amount);
