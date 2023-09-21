@@ -119,7 +119,7 @@
         ]
     },
     "MOPNERC6551AccountHelper": {
-        "address": "0x205E04558A3685864b637e5647158C97306b1549",
+        "address": "0xF3E81284dD61157A1A3BCc794cbd659A242f7D82",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
