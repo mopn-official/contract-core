@@ -57,8 +57,8 @@ contract MOPNERC6551AccountHelper is Multicall {
         address tokenContract,
         uint256 tokenId,
         uint256 salt
-    ) external view returns (bool, address) {
-        address _account = computeAccount(
+    ) external view returns (bool exist, address _account) {
+        _account = computeAccount(
             implementation,
             chainId,
             tokenContract,
@@ -66,7 +66,7 @@ contract MOPNERC6551AccountHelper is Multicall {
             salt
         );
         if (_account.code.length != 0) return (true, _account);
-        return (false, address(0));
+        return (false, _account);
     }
 
     function bidNFTAndProxyCall(
