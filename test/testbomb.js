@@ -19,6 +19,7 @@ describe("MOPN", function () {
     mopnmt,
     mopnData,
     mopncollectionVault,
+    mopnownershipbid,
     mopnland,
     mopnlandMetaDataRender;
   let owner,
@@ -167,7 +168,20 @@ describe("MOPN", function () {
     }))
     const mopngovernanceAddress = tx.address;
 
-    tx = await hre.ethers.deployContract("MOPNERC6551Account", [mopngovernanceAddress]);
+    tx = await hre.ethers.deployContract("MOPNERC6551AccountOwnershipBidding", [mopngovernanceAddress, owner1.address, 1]);
+    promises.push(new Promise((resolve, reject) => {
+      tx.deployed().then((res) => {
+        mopnownershipbid = res;
+        console.log("MOPNERC6551AccountOwnershipBidding", mopnownershipbid.address);
+        resolve();
+      }).catch((err) => {
+        console.error(err);
+        reject();
+      })
+    }))
+    const ownershipbidAddress = tx.address;
+
+    tx = await hre.ethers.deployContract("MOPNERC6551Account", [mopngovernanceAddress, ownershipbidAddress, ownershipbidAddress]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         erc6551account = res;
@@ -209,12 +223,12 @@ describe("MOPN", function () {
       })
     }))
 
-    const unixTimeStamp = Math.floor(Date.now() / 1000) - 86000;
+    const unixTimeStamp = Math.floor(Date.now() / 1000) - 43000;
     console.log("auction start timestamp", unixTimeStamp);
 
     tx = await hre.ethers.deployContract("MOPNAuctionHouse", [
       mopngovernanceAddress,
-      unixTimeStamp,
+      50000,
       unixTimeStamp
     ]);
     promises.push(new Promise((resolve, reject) => {
@@ -403,7 +417,8 @@ describe("MOPN", function () {
       mopnpoint.address,
       mopnland.address,
       mopnData.address,
-      mopncollectionVault.address
+      mopncollectionVault.address,
+      mopnownershipbid.address
     );
     promises.push(new Promise((resolve, reject) => {
       tx.wait().then(() => {
@@ -537,38 +552,82 @@ describe("MOPN", function () {
     await mineBlock(1);
     await allowanceTx.wait();
 
-    console.log("getBombRoundProduce", await mopnauctionHouse.getBombRoundProduce());
+    console.log("getBombRound", await mopnauctionHouse.bombRound());
     console.log("getBombCurrentPrice", await mopnauctionHouse.getBombCurrentPrice());
 
-    const buybombtx = await mopnauctionHouse.buyBomb(10);
+    let buybombtx = await mopnauctionHouse.buyBomb(1);
     await mineBlock(1);
     await buybombtx.wait();
 
-    const buybombtx1 = await mopnauctionHouse.buyBomb(10);
+    console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    buybombtx = await mopnauctionHouse.buyBomb(1);
     await mineBlock(1);
-    await buybombtx1.wait();
+    await buybombtx.wait();
+
+    console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    // buybombtx = await mopnauctionHouse.buyBomb(1);
+    // await mineBlock(1);
+    // await buybombtx.wait();
+
+    // console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    // buybombtx = await mopnauctionHouse.buyBomb(1);
+    // await mineBlock(1);
+    // await buybombtx.wait();
+
+    // console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    // buybombtx = await mopnauctionHouse.buyBomb(1);
+    // await mineBlock(1);
+    // await buybombtx.wait();
+
+    // console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    // buybombtx = await mopnauctionHouse.buyBomb(1);
+    // await mineBlock(1);
+    // await buybombtx.wait();
+
+    // console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    // buybombtx = await mopnauctionHouse.buyBomb(1);
+    // await mineBlock(1);
+    // await buybombtx.wait();
+
+    // console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    // buybombtx = await mopnauctionHouse.buyBomb(1);
+    // await mineBlock(1);
+    // await buybombtx.wait();
+
+    // console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    // buybombtx = await mopnauctionHouse.buyBomb(1);
+    // await mineBlock(1);
+    // await buybombtx.wait();
+
+    // console.log("getBombRound", await mopnauctionHouse.bombRound());
+
+    // buybombtx = await mopnauctionHouse.buyBomb(1);
+    // await mineBlock(1);
+    // await buybombtx.wait();
+
+    // console.log("getBombRound", await mopnauctionHouse.bombRound());
 
     await avatarInfo();
     await collectionInfo();
 
     const account = await computeAccount(testnft1.address, 1);
 
-    tx = await mopn.multicall([
-      mopn.interface.encodeFunctionData("createAccount", [
-        erc6551accountproxy.address,
-        31337,
-        testnft1.address,
-        1,
-        0,
-        "0x"
-      ]),
-      mopn.interface.encodeFunctionData("moveToByOwner", [
-        account,
-        10001000,
-        0,
-        await getMoveToTilesAccounts(10001000)
-      ])
-    ]);
+    tx = await mopn.moveToNFT(
+      testnft1.address,
+      1,
+      10001000,
+      0,
+      await getMoveToTilesAccounts(10001000),
+      "0x"
+    );
     await mineBlock(1);
     await tx.wait();
 

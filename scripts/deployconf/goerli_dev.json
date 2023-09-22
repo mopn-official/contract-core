@@ -41,7 +41,7 @@
         ]
     },
     "MOPNGovernance": {
-        "address": "0x26Cf52331492dAfaE42B6665f96D44dF1E86389A",
+        "address": "0xa4f5C98E5C3DB0e13d5B655d3C7B45fb41D26F90",
         "verified": true,
         "attributesCheck": [
             {
@@ -94,15 +94,16 @@
         ]
     },
     "MOPNERC6551AccountOwnershipBidding": {
-        "address": "0x8812Abb74219D12Ef04fC404352A0b8E0Ef82d61",
+        "address": "0x980FfaE9Ae04EDc8993B74D4f9f809F80Ea52fA0",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
-            "0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4"
+            "0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4",
+            9737950
         ]
     },
     "MOPNERC6551Account": {
-        "address": "0x56F0454051021c759719C73297B285000e02498b",
+        "address": "0x2DA2ac26f903fb36f91D39E5C340Bc1A4DEE2a3c",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
@@ -111,7 +112,7 @@
         ]
     },
     "MOPNERC6551AccountProxy": {
-        "address": "0x837A842b8bE8361d618d636d35BB1E482f25B873",
+        "address": "0x8A537E29DEd69Eb9ECB1a8A325B640a037ce6a06",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
@@ -119,14 +120,14 @@
         ]
     },
     "MOPNERC6551AccountHelper": {
-        "address": "",
+        "address": "0x2fdeFcF519B579547F32F8233fc8d629E9061cB8",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNAuctionHouse": {
-        "address": "0x864C659CC675De20C95CA3CFEB5bc62BD3295a33",
+        "address": "0xFcB50061Ad224B69c5a152885B9929c725F978cc",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
@@ -135,7 +136,7 @@
         ]
     },
     "MOPN": {
-        "address": "0x37a8270c1527d5f37261B3CF219150fC10b11640",
+        "address": "0x39DC1EA55954A192DBaF32FBc99f4B453DA4D1d6",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
@@ -147,7 +148,7 @@
         ]
     },
     "MOPNData": {
-        "address": "0x6D7D884774Ec33873edDE8d0D61c0d9bB4dcEaC1",
+        "address": "0x2bBf178fcC7578cC4C44106C7a595943C431B942",
         "verified": true,
         "libraries": [
             "TileMath"
@@ -157,14 +158,14 @@
         ]
     },
     "MOPNBomb": {
-        "address": "0x9257F55079a9A5a8be214F86530922405c49ecb0",
+        "address": "0x26c1902f0cA9A172DB9275f307855B61F4E3654a",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNToken": {
-        "address": "0x6d100DF49532C913D5364AF24F8a663691f19461",
+        "address": "0xdCaB7154f0914D5d6E95Ae817d2c6f657eE2F53e",
         "verified": true,
         "transOwnerTo": "MOPNGovernance",
         "constructparams": [
@@ -172,14 +173,14 @@
         ]
     },
     "MOPNPoint": {
-        "address": "0x56fAe09122E0e665B21776Dedc2D1c327f987782",
+        "address": "0x2662F19dc0c7c239D8FACbd30d744443EcCC73dA",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNCollectionVault": {
-        "address": "0x96FBd0af214530e58D2121F4014cBC924300368C",
+        "address": "0x4b2641325304E15269cB0E33B73E43Bc53326f5a",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"

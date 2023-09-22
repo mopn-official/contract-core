@@ -109,6 +109,7 @@ async function main() {
             deployConf[contractName].attributesCheck[j].updateMethod +
             "(...updateParams)"
           );
+          console.log(updatetx.hash);
           await updatetx.wait();
           console.log("update succeed");
           saveConf(deployConf);

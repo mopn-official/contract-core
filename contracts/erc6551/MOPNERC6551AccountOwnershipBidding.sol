@@ -10,9 +10,14 @@ import "./interfaces/IERC6551Registry.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
-    uint256 public constant defaultCollectionLastBidBlock = 1;
+contract MOPNERC6551AccountOwnershipBidding is
+    Ownable,
+    ReentrancyGuard,
+    Multicall
+{
+    uint256 public immutable defaultCollectionLastBidBlock;
     uint256 public constant defaultCollectionBidStartPrice = 10000000000000000;
     uint256 public constant minimalCollectionBidPrice = 1000000000000;
 
@@ -45,9 +50,14 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
 
     address public protocolFeeDestination;
 
-    constructor(address governance_, address protocolFeeDestination_) {
+    constructor(
+        address governance_,
+        address protocolFeeDestination_,
+        uint256 defaultCollectionLastBidBlock_
+    ) {
         governance = IMOPNGovernance(governance_);
         protocolFeeDestination = protocolFeeDestination_;
+        defaultCollectionLastBidBlock = defaultCollectionLastBidBlock_;
     }
 
     function setFeeDestination(address _feeDestination) public onlyOwner {
@@ -115,7 +125,7 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
         uint256 minimalPrice = getMinimalCollectionBidPrice(collectionAddress);
         collectionBidData[collectionAddress] =
             (block.number << 104) |
-            ((minimalPrice * 105) / 100);
+            ((minimalPrice * 102) / 100);
 
         uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(account);
         if (accountMinimalPeriodPrice_ > minimalPrice) {
@@ -209,13 +219,13 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
     ) public view returns (uint256 nftownerincome) {
         BidData memory bidData = bidsData[account];
         if (bidData.startBlock > 0) {
-            if ((bidData.startBlock + 100000) < block.number) {
+            if ((bidData.startBlock + 200000) < block.number) {
                 nftownerincome =
                     bidData.rent -
                     ABDKMath64x64.mulu(
                         ABDKMath64x64.pow(
-                            ABDKMath64x64.divu(99999, 100000),
-                            block.number - bidData.startBlock - 100000
+                            ABDKMath64x64.divu(199999, 200000),
+                            block.number - bidData.startBlock - 200000
                         ),
                         bidData.rent / 2
                     );
@@ -234,11 +244,11 @@ contract MOPNERC6551AccountOwnershipBidding is Ownable, ReentrancyGuard {
     ) public view returns (uint256 price) {
         BidData memory bidData = bidsData[account];
         if (bidData.startBlock > 0) {
-            if ((bidData.startBlock + 100000) < block.number) {
+            if ((bidData.startBlock + 200000) < block.number) {
                 price = ABDKMath64x64.mulu(
                     ABDKMath64x64.pow(
-                        ABDKMath64x64.divu(99999, 100000),
-                        block.number - bidData.startBlock - 100000
+                        ABDKMath64x64.divu(199999, 200000),
+                        block.number - bidData.startBlock - 200000
                     ),
                     bidData.rent
                 );
