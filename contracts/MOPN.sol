@@ -280,33 +280,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
                                     dstBitMap = set256bitmap(dstBitMap, k);
                                     k++;
                                 }
-                                k = 6 + i * 2;
+                                k = 3 + i * 2;
 
-                                dstBitMap = set256bitmap(
-                                    dstBitMap,
-                                    (k - 3) < 6 ? 9 + k : k - 3
-                                );
-                                dstBitMap = set256bitmap(
-                                    dstBitMap,
-                                    (k - 2) < 6 ? 10 + k : k - 2
-                                );
-                                dstBitMap = set256bitmap(
-                                    dstBitMap,
-                                    (k - 1) < 6 ? 11 + k : k - 1
-                                );
-                                dstBitMap = set256bitmap(dstBitMap, k);
-                                dstBitMap = set256bitmap(
-                                    dstBitMap,
-                                    (k + 1) > 17 ? (k - 11) : k + 1
-                                );
-                                dstBitMap = set256bitmap(
-                                    dstBitMap,
-                                    (k + 2) > 17 ? (k - 10) : k + 2
-                                );
-                                dstBitMap = set256bitmap(
-                                    dstBitMap,
-                                    (k + 3) > 17 ? (k - 9) : k + 3
-                                );
+                                dstBitMap |= (127 << k);
                             } else {
                                 dstBitMap = set256bitmap(dstBitMap, k + 1);
                                 dstBitMap = set256bitmap(dstBitMap, k + 2);

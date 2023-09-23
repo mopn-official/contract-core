@@ -34,9 +34,9 @@ async function main() {
             constructparams[j] = deployConf[constructparams[j]].address;
           }
         }
-        contract = await Contract.deploy(...constructparams);
+        contract = await Contract.deploy(...constructparams, { gasPrice: 3000000000 });
       } else {
-        contract = await Contract.deploy();
+        contract = await Contract.deploy({ gasPrice: 3000000000 });
       }
 
       console.log(deployConf["blockScanUrl"] + "tx/" + contract.deployTransaction.hash);

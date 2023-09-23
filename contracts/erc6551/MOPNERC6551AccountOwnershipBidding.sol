@@ -23,6 +23,8 @@ contract MOPNERC6551AccountOwnershipBidding is
 
     IMOPNGovernance public immutable governance;
 
+    IERC6551Registry public immutable erc6551registry;
+
     event AccountRent(
         address indexed account,
         uint40 startblock,
@@ -52,10 +54,12 @@ contract MOPNERC6551AccountOwnershipBidding is
 
     constructor(
         address governance_,
+        address erc6551registry_,
         address protocolFeeDestination_,
         uint256 defaultCollectionLastBidBlock_
     ) {
         governance = IMOPNGovernance(governance_);
+        erc6551registry = IERC6551Registry(erc6551registry_);
         protocolFeeDestination = protocolFeeDestination_;
         defaultCollectionLastBidBlock = defaultCollectionLastBidBlock_;
     }
@@ -81,7 +85,7 @@ contract MOPNERC6551AccountOwnershipBidding is
 
         require(
             account ==
-                IERC6551Registry(governance.ERC6551Registry()).account(
+                erc6551registry.account(
                     governance.ERC6551AccountProxy(),
                     chainId,
                     collectionAddress,
@@ -99,7 +103,7 @@ contract MOPNERC6551AccountOwnershipBidding is
         uint256 tokenId,
         address to
     ) external payable returns (address account) {
-        account = IERC6551Registry(governance.ERC6551Registry()).createAccount(
+        account = erc6551registry.createAccount(
             governance.ERC6551AccountProxy(),
             block.chainid,
             collectionAddress,
@@ -107,55 +111,121 @@ contract MOPNERC6551AccountOwnershipBidding is
             0,
             ""
         );
-        _bidAccount(account, collectionAddress, to);
+        _bidAccountTo(account, collectionAddress, to);
     }
 
-    function bidAccountTo(address account, address to) external payable {
+    function bidAccountTo(address account, address to) public payable {
         address collectionAddress = getQualifiedAccountCollection(account);
-        _bidAccount(account, collectionAddress, to);
+        _bidAccountTo(account, collectionAddress, to);
+    }
+
+    function _bidAccountTo(
+        address account,
+        address collectionAddress,
+        address to
+    ) internal {
+        uint256 collectionMinimalPrice = getMinimalCollectionBidPrice(
+            collectionAddress
+        );
+
+        uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(account);
+        if (accountMinimalPeriodPrice_ > collectionMinimalPrice) {
+            require(
+                msg.value >= accountMinimalPeriodPrice_,
+                "rent less than minimal price"
+            );
+        } else {
+            require(
+                msg.value >= collectionMinimalPrice,
+                "rent less than minimal price"
+            );
+        }
+
+        _bidAccount(account, to, msg.value);
+
+        collectionBidData[collectionAddress] =
+            (block.number << 104) |
+            ((collectionMinimalPrice * 102) / 100);
+    }
+
+    function bidNFTsTo(
+        address[] memory collectionAddresses,
+        uint256[][] memory tokenIds,
+        uint256[] memory prices,
+        address to
+    ) public payable {
+        uint256 totalprice;
+        uint256 i;
+        for (i = 0; i < prices.length; i++) {
+            totalprice += prices[i];
+        }
+        require(msg.value >= totalprice, "total rent less than prices");
+        i = 0;
+        for (uint256 k = 0; k < collectionAddresses.length; k++) {
+            uint256 collectionMinimalPrice = getMinimalCollectionBidPrice(
+                collectionAddresses[k]
+            );
+            for (uint256 j = 0; j < tokenIds[k].length; j++) {
+                address account = erc6551registry.createAccount(
+                    governance.ERC6551AccountProxy(),
+                    block.chainid,
+                    collectionAddresses[k],
+                    tokenIds[k][j],
+                    0,
+                    ""
+                );
+                uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(
+                    account
+                );
+                if (accountMinimalPeriodPrice_ > collectionMinimalPrice) {
+                    require(
+                        prices[i] >= accountMinimalPeriodPrice_,
+                        "rent less than minimal price"
+                    );
+                } else {
+                    require(
+                        prices[i] >= collectionMinimalPrice,
+                        "rent less than minimal price"
+                    );
+                }
+
+                _bidAccount(account, to, prices[i]);
+
+                i++;
+                collectionMinimalPrice = (collectionMinimalPrice * 102) / 100;
+            }
+
+            collectionBidData[collectionAddresses[k]] =
+                (block.number << 104) |
+                collectionMinimalPrice;
+        }
+        if (msg.value > totalprice) {
+            (bool success, ) = msg.sender.call{value: msg.value - totalprice}(
+                ""
+            );
+            require(success, "Failed to transfer extra rent");
+        }
     }
 
     function _bidAccount(
         address account,
-        address collectionAddress,
-        address bidder
+        address bidder,
+        uint256 price
     ) internal {
-        IMOPNERC6551Account a = IMOPNERC6551Account(payable(account));
-
-        uint256 minimalPrice = getMinimalCollectionBidPrice(collectionAddress);
-        collectionBidData[collectionAddress] =
-            (block.number << 104) |
-            ((minimalPrice * 102) / 100);
-
-        uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(account);
-        if (accountMinimalPeriodPrice_ > minimalPrice) {
-            minimalPrice = accountMinimalPeriodPrice_;
-        }
-
-        require(msg.value >= minimalPrice, "rent less than minimal price");
-
         cancelPreviousBid(account);
 
         BidData memory biddata;
         biddata.startBlock = uint40(block.number);
-        biddata.rent = uint104(msg.value);
+        biddata.rent = uint104(price);
 
         bidsData[account] = biddata;
 
-        a.ownerTransferTo(bidder, type(uint40).max);
+        IMOPNERC6551Account(payable(account)).ownerTransferTo(
+            bidder,
+            type(uint40).max
+        );
 
         emit AccountRent(account, biddata.startBlock, biddata.rent, bidder);
-    }
-
-    function getMimimalBidPrice(
-        address account,
-        address collectionAddress
-    ) public view returns (uint256 minimalPrice) {
-        minimalPrice = getMinimalCollectionBidPrice(collectionAddress);
-        uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(account);
-        if (accountMinimalPeriodPrice_ > minimalPrice) {
-            minimalPrice = accountMinimalPeriodPrice_;
-        }
     }
 
     function claimNFTOwnerIncome(address account) public nonReentrant {
@@ -239,6 +309,17 @@ contract MOPNERC6551AccountOwnershipBidding is
         }
     }
 
+    function getMimimalBidPrice(
+        address account,
+        address collectionAddress
+    ) public view returns (uint256 minimalPrice) {
+        minimalPrice = getMinimalCollectionBidPrice(collectionAddress);
+        uint256 accountMinimalPeriodPrice_ = getMinimalAccountBidPrice(account);
+        if (accountMinimalPeriodPrice_ > minimalPrice) {
+            minimalPrice = accountMinimalPeriodPrice_;
+        }
+    }
+
     function getMinimalAccountBidPrice(
         address account
     ) public view returns (uint256 price) {
@@ -262,23 +343,25 @@ contract MOPNERC6551AccountOwnershipBidding is
     function getMinimalCollectionBidPrice(
         address collectionAddress
     ) public view returns (uint256 price) {
-        uint256 bidStartPrice;
         uint256 lastBidBlock;
         if (collectionBidData[collectionAddress] == 0) {
-            bidStartPrice = defaultCollectionBidStartPrice;
+            price = defaultCollectionBidStartPrice;
             lastBidBlock = defaultCollectionLastBidBlock;
         } else {
-            bidStartPrice = uint104(collectionBidData[collectionAddress]);
+            price = uint104(collectionBidData[collectionAddress]);
             lastBidBlock = uint40(collectionBidData[collectionAddress] >> 104);
         }
 
-        price = ABDKMath64x64.mulu(
-            ABDKMath64x64.pow(
-                ABDKMath64x64.divu(99, 100),
-                (block.number - lastBidBlock) / 5
-            ),
-            bidStartPrice
-        );
+        if (block.number > lastBidBlock) {
+            price = ABDKMath64x64.mulu(
+                ABDKMath64x64.pow(
+                    ABDKMath64x64.divu(99, 100),
+                    (block.number - lastBidBlock) / 5
+                ),
+                price
+            );
+        }
+
         if (price < minimalCollectionBidPrice) {
             price = minimalCollectionBidPrice;
         }

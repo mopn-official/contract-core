@@ -168,7 +168,7 @@ describe("MOPN", function () {
     }))
     const mopngovernanceAddress = tx.address;
 
-    tx = await hre.ethers.deployContract("MOPNERC6551AccountOwnershipBidding", [mopngovernanceAddress, owner1.address]);
+    tx = await hre.ethers.deployContract("MOPNERC6551AccountOwnershipBidding", [mopngovernanceAddress, erc6551registry.address, owner1.address, 1]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         mopnownershipbid = res;
@@ -466,9 +466,6 @@ describe("MOPN", function () {
       9991003, 9991002, 10001003, 10001002, 10001001, 10011002, 10011001, 10001000,
     ];
 
-    await deployAccountBasic(testnft1.address, 0, 10000997, 0);
-    await deploySimulatorAccount(testnft1.address, 0, 10000997, 0);
-
     for (let i = 0; i < 8; i++) {
       if (i == 0) {
         await deployAccountNFT(testnft.address, i, coordinates[i], 0);
@@ -479,8 +476,28 @@ describe("MOPN", function () {
       await deploySimulatorAccount(testnft.address, i, coordinates[i], 0);
     }
 
+    await deployAccountBasic(testnft1.address, 0, 10000997, 0);
+    await deploySimulatorAccount(testnft1.address, 0, 10000997, 0);
+
     await deployAccountOwnershipBidAndMove(testnft1.address, 1, 10000996, 0);
     await deploySimulatorAccount(testnft1.address, 1, 10000996, 0);
+
+    tx = await mopnownershipbid.bidNFTsTo(
+      [testnft.address],
+      [[0, 2]],
+      ["100000000000000000", "100000000000000000"],
+      owner.address, { value: "1000000000000000000" }
+    );
+    await mineBlock(1);
+    await tx.wait();
+
+    tx = await mopnownershipbid.bidNFTTo(
+      testnft.address,
+      1,
+      owner.address, { value: "10000000000000000" }
+    );
+    await mineBlock(1);
+    await tx.wait();
 
     await mineBlock(1);
 
@@ -696,7 +713,8 @@ describe("MOPN", function () {
       tokenContract,
       tokenId,
       0,
-      erc6551account.interface.encodeFunctionData("setOwnershipHostingType", [1]),
+      "0x"
+      //erc6551account.interface.encodeFunctionData("setOwnershipHostingType", [1]),
     );
     mineBlock(1);
     await tx.wait();
@@ -757,7 +775,8 @@ describe("MOPN", function () {
       coordinate,
       landId,
       await getMoveToTilesAccounts(coordinate),
-      erc6551account.interface.encodeFunctionData("setOwnershipHostingType", [1]),
+      "0x"
+      //erc6551account.interface.encodeFunctionData("setOwnershipHostingType", [1]),
     );
     mineBlock(1);
     await tx.wait();
@@ -800,7 +819,7 @@ describe("MOPN", function () {
     const tx = await erc6551accounthelper.connect(owner1).bidNFTAndProxyCall(
       tokenContract, tokenId, mopn.address, 0,
       mopn.interface.encodeFunctionData("moveTo", [coordinate, landId, await getMoveToTilesAccounts(coordinate)]),
-      { value: "1000000000000000000" }
+      { value: "10000000000000000" }
     );
 
     mineBlock(1);
