@@ -80,8 +80,8 @@ contract MOPNAuctionHouse is Multicall, Ownable {
 
     function bombCurrentProduce() public view returns (uint256 amount) {
         amount = (IMOPNLand(governance.landContract()).nextTokenId() - 1) / 10;
-        if (amount < 10) {
-            amount = 10;
+        if (amount < 1) {
+            amount = 1;
         }
     }
 
