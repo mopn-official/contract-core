@@ -20,9 +20,7 @@ contract MOPNLandMetaDataRender is ILandMetaDataRender {
 
     function constructTokenURI(
         uint256 LandId_
-    ) public view returns (string memory) {
-        IMOPN mopn = IMOPN(governance.mopnContract());
-
+    ) public pure returns (string memory) {
         uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
         uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
@@ -30,17 +28,8 @@ contract MOPNLandMetaDataRender is ILandMetaDataRender {
             tileCoordinate
         );
 
-        address[] memory collections = new address[](30);
-        address collection;
         uint256 COID;
         tileDatas[0].tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
-
-        // address tileAccount = mopn.getTileAccount(tileCoordinate);
-        // if (tileAccount != address(0)) {
-        //     collection = mopn.getAccountCollection(tileAccount);
-        //     COID++;
-        //     collections[COID] = collection;
-        // }
 
         if (COID > 0) {
             tileDatas[0].color = COID;

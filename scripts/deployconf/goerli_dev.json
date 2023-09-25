@@ -25,15 +25,15 @@
         "verified": true
     },
     "TileMath": {
-        "address": "0x440E8d256cA81a22C2686c4128Efc84ce5A25ef3",
+        "address": "",
         "verified": true
     },
     "NFTSVG": {
-        "address": "0x3237e671e2a67295191a6916D1617381f718E6B6",
+        "address": "",
         "verified": true
     },
     "NFTMetaData": {
-        "address": "0xDccC914bB340e4387Bf04e54354609B2262DE5AE",
+        "address": "",
         "verified": true,
         "libraries": [
             "TileMath",
@@ -41,7 +41,7 @@
         ]
     },
     "MOPNGovernance": {
-        "address": "0x354818A4A478A849AA1606594cC13Bdd523605BC",
+        "address": "",
         "verified": true,
         "attributesCheck": [
             {
@@ -94,17 +94,17 @@
         ]
     },
     "MOPNERC6551AccountOwnershipBidding": {
-        "address": "0x3785470c378230cA20029977bCA16c80E4c64D53",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
             "ERC6551Registry",
             "0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4",
-            9737950
+            9756235
         ]
     },
     "MOPNERC6551Account": {
-        "address": "0xeE06AE8D8B355F28806bDb69F9d748A2353B499D",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
@@ -113,7 +113,7 @@
         ]
     },
     "MOPNERC6551AccountProxy": {
-        "address": "0xed9Ed954E375cdB0C352E423fBf5EF86B512B735",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
@@ -121,35 +121,35 @@
         ]
     },
     "MOPNERC6551AccountHelper": {
-        "address": "0xCf2cccB106E2c31D0AcF6A7c69686219AcED23B2",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNAuctionHouse": {
-        "address": "0x1951BFEE41248B3BA43934Bc053E77CA2992Ea99",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
-            9555800,
-            1691121600
+            9756235,
+            1695636110
         ]
     },
     "MOPN": {
-        "address": "0x98103e7e70D50045095E8Bac09edA82a7B732b3F",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
             60000000,
-            9555800,
+            9756235,
             50400,
             10000,
             99999
         ]
     },
     "MOPNData": {
-        "address": "0x8E6c0A1f71f2Bc20Fb0CAB36a3cca8888D24B501",
+        "address": "",
         "verified": true,
         "libraries": [
             "TileMath"
@@ -159,14 +159,14 @@
         ]
     },
     "MOPNBomb": {
-        "address": "0xa25f243ee3Fb70a8E3843F71a5C7A5c9F6898849",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNToken": {
-        "address": "0x1860578c921FDd6032a8c32e394F9dd2cC29D469",
+        "address": "",
         "verified": true,
         "transOwnerTo": "MOPNGovernance",
         "constructparams": [
@@ -174,21 +174,21 @@
         ]
     },
     "MOPNPoint": {
-        "address": "0x559977Adb8A3C92fF9f1A8f304C4F8C49B3D76F2",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNCollectionVault": {
-        "address": "0x395A1BF2CE6335A8b1E653724Acc63B0dec09168",
+        "address": "",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
         ]
     },
     "MOPNLand": {
-        "address": "0x78ba99D86a32Ef89d9E573b49F4b9E74E22153e4",
+        "address": "",
         "verified": true,
         "attributesCheck": [
             {
@@ -211,16 +211,16 @@
             }
         ],
         "constructparams": [
-            1683828189,
-            "200000000000000",
+            1695636110,
+            "20000000000000000",
             1001,
-            "0x23D2D1089890F34d723f35d4B36Af35B75EaBF0b",
+            "0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4",
             "MOPNLandMetaDataRender",
             "MOPNAuctionHouse"
         ]
     },
     "MOPNLandMetaDataRender": {
-        "address": "0xB257d8793d6E6CFd9Dcc329A354FC863Cd159D52",
+        "address": "",
         "verified": true,
         "libraries": [
             "TileMath",
