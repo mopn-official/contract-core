@@ -37,13 +37,13 @@ contract MOPNERC6551Account is
 
     address public immutable ownershipRentalContract;
 
-    uint48 private _nonce;
-
     uint8 public ownershipHostingType;
 
     uint40 public rentEndBlock;
 
     address public renter;
+
+    uint256 public state;
 
     constructor(
         address governance_,
@@ -57,28 +57,28 @@ contract MOPNERC6551Account is
 
     receive() external payable {}
 
-    function executeCall(
-        address to,
-        uint256 value,
-        bytes calldata data
-    ) external payable returns (bytes memory result) {
-        require(isOwner(msg.sender), "Not token owner");
-
-        _incrementNonce();
-
-        return _call(to, value, data);
-    }
-
-    function executeProxyCall(
+    function execute(
         address to,
         uint256 value,
         bytes calldata data,
+        uint256 operation
+    ) external payable returns (bytes memory result) {
+        require(isOwner(msg.sender), "Not token owner");
+        require(operation == 0, "Only call operations are supported");
+        ++state;
+        return _call(to, value, data);
+    }
+
+    function executeProxy(
+        address to,
+        uint256 value,
+        bytes calldata data,
+        uint256 operation,
         address msgsender
     ) external payable onlyHelper returns (bytes memory result) {
         require(isOwner(msgsender), "Not token owner");
-
-        _incrementNonce();
-
+        require(operation == 0, "Only call operations are supported");
+        ++state;
         return _call(to, value, data);
     }
 
@@ -132,9 +132,23 @@ contract MOPNERC6551Account is
         return false;
     }
 
-    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external pure returns (bool) {
         return (interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IERC6551Account).interfaceId);
+            interfaceId == type(IERC6551Account).interfaceId ||
+            interfaceId == type(IERC6551Executable).interfaceId);
+    }
+
+    function isValidSigner(
+        address signer,
+        bytes calldata
+    ) external view returns (bytes4) {
+        if (isOwner(signer)) {
+            return IERC6551Account.isValidSigner.selector;
+        }
+
+        return bytes4(0);
     }
 
     function isValidSignature(
@@ -152,14 +166,6 @@ contract MOPNERC6551Account is
         }
 
         return "";
-    }
-
-    function nonce() external view override returns (uint256) {
-        return _nonce;
-    }
-
-    function _incrementNonce() internal {
-        _nonce++;
     }
 
     /// @dev Allows ERC-1155 tokens to be received. This function can be overriden.

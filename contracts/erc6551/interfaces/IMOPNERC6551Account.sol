@@ -2,17 +2,20 @@
 pragma solidity ^0.8.0;
 
 import "./IERC6551Account.sol";
+import "./IERC6551Executable.sol";
 
-/// @dev the ERC-165 identifier for this interface is `0xeff4d378`
-interface IMOPNERC6551Account is IERC6551Account {
-    function executeProxyCall(
+interface IMOPNERC6551Account is IERC6551Account, IERC6551Executable {
+    function executeProxy(
         address to,
         uint256 value,
         bytes calldata data,
+        uint256 operation,
         address msgsender
     ) external payable returns (bytes memory);
 
     function isOwner(address caller) external view returns (bool);
+
+    function owner() external view returns (address);
 
     function nftowner() external view returns (address);
 

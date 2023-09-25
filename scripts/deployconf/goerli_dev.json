@@ -128,11 +128,11 @@
         ]
     },
     "MOPNAuctionHouse": {
-        "address": "0xFB4ecF6005fA8af67C12Ec4f2DA027c53b0463D9",
+        "address": "0x1951BFEE41248B3BA43934Bc053E77CA2992Ea99",
         "verified": true,
         "constructparams": [
             "MOPNGovernance",
-            1691121600,
+            9555800,
             1691121600
         ]
     },

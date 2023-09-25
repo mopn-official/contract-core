@@ -79,7 +79,7 @@ contract MOPNERC6551AccountHelper is Multicall {
         address account = IMOPNERC6551AccountOwnershipBidding(
             governance.ownershipBiddingContract()
         ).bidNFTTo{value: msg.value}(collectionAddress, tokenId, msg.sender);
-        return proxyCall(account, to, value, data);
+        return proxyCall(account, to, value, data, 0);
     }
 
     /// @dev executes a low-level call against an account if the caller is authorized to make calls
@@ -87,13 +87,15 @@ contract MOPNERC6551AccountHelper is Multicall {
         address account,
         address to,
         uint256 value,
-        bytes calldata data
+        bytes calldata data,
+        uint256 operation
     ) public payable returns (bytes memory) {
         return
-            IMOPNERC6551Account(payable(account)).executeProxyCall(
+            IMOPNERC6551Account(payable(account)).executeProxy(
                 to,
                 value,
                 data,
+                operation,
                 msg.sender
             );
     }
