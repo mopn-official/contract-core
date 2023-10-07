@@ -71,7 +71,7 @@ contract MOPNAuctionHouse is Multicall, Ownable {
     ) {
         governance = IMOPNGovernance(governance_);
         bombRound.id = 1;
-        bombRound.produce = 10;
+        bombRound.produce = 1;
         bombRound.startblock = bombStartBlock;
         bombRound.reFundIndex = 4;
 

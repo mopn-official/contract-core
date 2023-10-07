@@ -79,11 +79,11 @@ contract MOPNERC6551AccountHelper is Multicall {
         address account = IMOPNERC6551AccountOwnershipBidding(
             governance.ownershipBiddingContract()
         ).bidNFTTo{value: msg.value}(collectionAddress, tokenId, msg.sender);
-        return proxyCall(account, to, value, data, 0);
+        return executeProxy(account, to, value, data, 0);
     }
 
     /// @dev executes a low-level call against an account if the caller is authorized to make calls
-    function proxyCall(
+    function executeProxy(
         address account,
         address to,
         uint256 value,

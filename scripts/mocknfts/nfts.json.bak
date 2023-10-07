@@ -1,0 +1,59 @@
+{
+    "factory": {
+        "address": "0x5C0B7b6A14AaE1c1eC6F1711D2613B117FB61D8e"
+    },
+    "implementation": {
+        "address": "0xe30626aE53215A5F4b1F56eF2226CD53114E99C9"
+    },
+    "nfts": [
+        {
+            "name": "GoerliAnarKey",
+            "symbol": "GoerliAnarKey",
+            "baseuri": "https://ipfs.io/ipfs/QmcgMPL2U4FGjGuSQfFf39iyjNjCqQ4rhi5GCLFpcxQKkQ/json/",
+            "uriext": ".json",
+            "address": "0x119E148893bF8Db2955688fE99B3D41aAb6937ed"
+        },
+        {
+            "name": "GoerliAzuki",
+            "symbol": "GoerliAzuki",
+            "baseuri": "ipfs://QmZcH4YvBVVRJtdn4RdbaqgspFU8gH6P9vomDpBVpAL3u4/",
+            "uriext": "",
+            "address": "0x0e9C6404B07ECf98358c2fE5Bc7B59a29B941dc0"
+        },
+        {
+            "name": "GoerliBAYC",
+            "symbol": "GoerliBAYC",
+            "baseuri": "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/",
+            "uriext": "",
+            "address": "0x99041b555631667d65D4fC9f9C7E54A94846d68f"
+        },
+        {
+            "name": "GoerliBlips",
+            "symbol": "GoerliBlips",
+            "baseuri": "ipfs://Qmc9sbvoA476ob1EsWKayEvekkUSodCFRvAMoDKQTBUsWK/",
+            "uriext": "",
+            "address": "0xC26A037679f2D2eb4e069E4183c199dADE548D1b"
+        },
+        {
+            "name": "GoerliCaptainz",
+            "symbol": "GoerliCaptainz",
+            "baseuri": "https://captainz-api.memeland.com/metadata/",
+            "uriext": ".json",
+            "address": "0xAbcFF211d7BDE60B021e95162613027301B134fB"
+        },
+        {
+            "name": "GoerliMAYC",
+            "symbol": "GoerliMAYC",
+            "baseuri": "https://boredapeyachtclub.com/api/mutants/",
+            "uriext": "",
+            "address": "0x7974174fBa053AFEb700bFBC228a1Fd1DcdcAff0"
+        },
+        {
+            "name": "GoerliPotatoz",
+            "symbol": "GoerliPotatoz",
+            "baseuri": "https://grow-api.memeland.com/token/metadata/",
+            "uriext": ".json",
+            "address": "0xe335fE227CbBB94D75A2F98D34b96ca90d65B7bC"
+        }
+    ]
+}

@@ -32,9 +32,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract MOPN is IMOPN, Multicall, Ownable {
     using BitMaps for BitMaps.BitMap;
 
-    uint256 public MTOutputPerBlock;
-    uint256 public MTStepStartBlock;
-
     uint256 public immutable MTReduceInterval;
     uint256 public immutable MaxCollectionOnMapNum;
     uint256 public immutable MaxCollectionMOPNPoint;
@@ -49,14 +46,38 @@ contract MOPN is IMOPN, Multicall, Ownable {
      * - uint48 PerMOPNPointMinted: bits 64-111
      * - uint64 MTTotalMinted: bits 0-63
      */
-    uint256 public MiningData;
+
+    /// uint256 public MiningData;
+
+    struct MiningDataStruct {
+        uint64 TotalMOPNPoints;
+        uint32 LastTickBlock;
+        uint48 PerMOPNPointMinted;
+        uint64 MTTotalMinted;
+    }
+
+    MiningDataStruct public MiningData;
 
     /// @notice MiningDataExt structure:
+    /// - uint8  whiteListSwitch: bits 176-183
     /// - uint16 nextLandId: bits 160-175
     /// - uint48 NFTOfferCoefficient: bits 112-159
     /// - uint48 TotalCollectionClaimed: bits 64-111
     /// - uint64 TotalMTStaking: bits 0-63
-    uint256 public MiningDataExt;
+
+    /// uint256 public MiningDataExt;
+
+    struct MiningDataExtStruct {
+        bool whiteListSwitch;
+        uint32 MTOutputPerBlock;
+        uint32 MTStepStartBlock;
+        uint16 nextLandId;
+        uint48 NFTOfferCoefficient;
+        uint48 TotalCollectionClaimed;
+        uint64 TotalMTStaking;
+    }
+
+    MiningDataExtStruct public MiningDataExt;
 
     /// @notice CollectionData structure:
     /// - uint24 CollectionMOPNPoint: bits 200-223
@@ -81,20 +102,20 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     constructor(
         address governance_,
-        uint256 MTOutputPerBlock_,
-        uint256 MTStepStartBlock_,
+        uint32 MTOutputPerBlock_,
+        uint32 MTStepStartBlock_,
         uint256 MTReduceInterval_,
         uint256 MaxCollectionOnMapNum_,
         uint256 MaxCollectionMOPNPoint_
     ) {
         governance = IMOPNGovernance(governance_);
-        MTOutputPerBlock = MTOutputPerBlock_;
-        MTStepStartBlock = MTStepStartBlock_;
         MTReduceInterval = MTReduceInterval_;
         MaxCollectionOnMapNum = MaxCollectionOnMapNum_;
         MaxCollectionMOPNPoint = MaxCollectionMOPNPoint_;
-        MiningData = MTStepStartBlock_ << 112;
-        MiningDataExt = (10 ** 14) << 112;
+        MiningData.LastTickBlock = MTStepStartBlock_;
+        MiningDataExt.MTOutputPerBlock = MTOutputPerBlock_;
+        MiningDataExt.MTStepStartBlock = MTStepStartBlock_;
+        MiningDataExt.NFTOfferCoefficient = 10 ** 14;
     }
 
     function getGovernance() external view returns (address) {
@@ -133,6 +154,10 @@ contract MOPN is IMOPN, Multicall, Ownable {
     }
 
     //@todo whitelist
+    function collectionWhiteListRegistry(
+        address collectionAddress,
+        bytes32[] memory proof
+    ) public {}
 
     /**
      * @notice an on map NFT move to a new tile
@@ -210,24 +235,33 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint32 LandId,
         address[] memory tileAccounts
     ) internal {
-        require(block.number >= MTStepStartBlock, "mopn is not open yet");
+        require(
+            block.number >= MiningDataExt.MTStepStartBlock,
+            "mopn is not open yet"
+        );
         tilecheck(tileCoordinate);
 
         require(
             tiledistance(tileCoordinate, tileAtLandCenter(LandId)) < 6,
             "LandId error"
         );
-        if (LandId > NextLandId()) {
+        if (LandId > MiningDataExt.nextLandId) {
             unchecked {
-                MiningDataExt +=
-                    (IMOPNLand(governance.landContract()).nextTokenId() -
-                        NextLandId()) <<
-                    208;
+                MiningDataExt.nextLandId = uint16(
+                    IMOPNLand(governance.landContract()).nextTokenId()
+                );
             }
-            require(NextLandId() > LandId, "Land Not Open");
+            require(MiningDataExt.nextLandId > LandId, "Land Not Open");
         }
 
         settlePerMOPNPointMinted();
+
+        if (MiningDataExt.whiteListSwitch) {
+            require(
+                CollectionsData[collectionAddress] > 0,
+                "collection not in white list"
+            );
+        }
         settleCollectionMT(collectionAddress);
         settleAccountMT(account, collectionAddress);
 
@@ -336,11 +370,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
             unchecked {
                 if (tileMOPNPoint > orgMOPNPoint) {
                     tileMOPNPoint -= orgMOPNPoint;
-                    MiningData += tileMOPNPoint << 144;
+                    MiningData.TotalMOPNPoints += uint64(tileMOPNPoint);
                     CollectionsData[collectionAddress] += tileMOPNPoint << 176;
                 } else if (tileMOPNPoint < orgMOPNPoint) {
                     tileMOPNPoint = orgMOPNPoint - tileMOPNPoint;
-                    MiningData -= tileMOPNPoint << 144;
+                    MiningData.TotalMOPNPoints -= uint64(tileMOPNPoint);
                     CollectionsData[collectionAddress] -= tileMOPNPoint << 176;
                 }
 
@@ -356,10 +390,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
             );
             emit AccountJumpIn(account, LandId, tileCoordinate);
             unchecked {
-                MiningData +=
-                    (tileMOPNPoint +
-                        getCollectionMOPNPoint(collectionAddress)) <<
-                    144;
+                MiningData.TotalMOPNPoints += uint64(
+                    tileMOPNPoint + getCollectionMOPNPoint(collectionAddress)
+                );
 
                 CollectionsData[collectionAddress] +=
                     (tileMOPNPoint << 176) |
@@ -389,8 +422,10 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 accountOnMapMOPNPoint = tilepoint(tileCoordinate);
 
         unchecked {
-            MiningData -= ((accountOnMapMOPNPoint +
-                getCollectionMOPNPoint(tileAccountCollection)) << 144);
+            MiningData.TotalMOPNPoints -= uint64(
+                (accountOnMapMOPNPoint +
+                    getCollectionMOPNPoint(tileAccountCollection))
+            );
 
             CollectionsData[tileAccountCollection] -=
                 (accountOnMapMOPNPoint << 176) |
@@ -410,42 +445,41 @@ contract MOPN is IMOPN, Multicall, Ownable {
     ) public view returns (uint256 MTPPB) {
         int128 reducePercentage = ABDKMath64x64.divu(997, 1000);
         int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, MTOutputPerBlock);
+        return ABDKMath64x64.mulu(reducePower, MiningDataExt.MTOutputPerBlock);
     }
 
     function currentMTPPB() public view returns (uint256 MTPPB) {
-        if (MTStepStartBlock > block.number) {
+        if (MiningDataExt.MTStepStartBlock > block.number) {
             return 0;
         }
         return currentMTPPB(MTReduceTimes());
     }
 
     function MTReduceTimes() public view returns (uint256) {
-        return (block.number - MTStepStartBlock) / MTReduceInterval;
+        return
+            (block.number - MiningDataExt.MTStepStartBlock) / MTReduceInterval;
     }
 
     function calcPerMOPNPointMinted() public returns (uint256 mData) {
-        mData = MiningData;
-        uint256 lastTickBlock = uint32(mData >> 112);
-        if (block.number > lastTickBlock) {
+        if (block.number > MiningData.LastTickBlock) {
             uint256 reduceTimes = MTReduceTimes();
-            uint256 totalMOPNPoints = uint64(mData >> 144);
             unchecked {
-                if (totalMOPNPoints > 0) {
+                if (MiningData.TotalMOPNPoints > 0) {
                     uint256 perMOPNPointMintDiff;
                     if (reduceTimes == 0) {
                         perMOPNPointMintDiff +=
-                            ((block.number - lastTickBlock) *
-                                MTOutputPerBlock) /
-                            totalMOPNPoints;
+                            ((block.number - MiningData.LastTickBlock) *
+                                MiningDataExt.MTOutputPerBlock) /
+                            MiningData.TotalMOPNPoints;
                     } else {
-                        uint256 nextReduceBlock = MTStepStartBlock +
-                            MTReduceInterval;
+                        uint256 nextReduceBlock = MiningDataExt
+                            .MTStepStartBlock + MTReduceInterval;
+                        uint256 lastTickBlock = MiningData.LastTickBlock;
                         for (uint256 i = 0; i <= reduceTimes; i++) {
                             perMOPNPointMintDiff +=
                                 ((nextReduceBlock - lastTickBlock) *
                                     currentMTPPB(i)) /
-                                totalMOPNPoints;
+                                MiningData.TotalMOPNPoints;
                             lastTickBlock = nextReduceBlock;
                             nextReduceBlock += MTReduceInterval;
                             if (nextReduceBlock > block.number) {
@@ -453,18 +487,24 @@ contract MOPN is IMOPN, Multicall, Ownable {
                             }
                         }
                     }
-                    mData +=
-                        ((block.number - uint32(mData >> 112)) << 112) |
-                        ((perMOPNPointMintDiff) << 64) |
-                        (perMOPNPointMintDiff * totalMOPNPoints);
-                } else {
-                    mData += (block.number - lastTickBlock) << 112;
+                    MiningData.PerMOPNPointMinted += uint48(
+                        perMOPNPointMintDiff
+                    );
+                    MiningData.MTTotalMinted += uint64(
+                        perMOPNPointMintDiff * MiningData.TotalMOPNPoints
+                    );
                 }
+
+                MiningData.LastTickBlock = uint32(block.number);
             }
 
             if (reduceTimes > 0) {
-                MTOutputPerBlock = currentMTPPB(reduceTimes);
-                MTStepStartBlock += reduceTimes * MTReduceInterval;
+                MiningDataExt.MTOutputPerBlock = uint32(
+                    currentMTPPB(reduceTimes)
+                );
+                MiningDataExt.MTStepStartBlock += uint32(
+                    reduceTimes * MTReduceInterval
+                );
             }
         }
     }
@@ -473,7 +513,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
      * @notice settle per mopn token allocation weight minted mopn token
      */
     function settlePerMOPNPointMinted() public {
-        MiningData = calcPerMOPNPointMinted();
+        calcPerMOPNPointMinted();
     }
 
     function getCollectionMOPNPointFromStaking(
@@ -492,13 +532,12 @@ contract MOPN is IMOPN, Multicall, Ownable {
     }
 
     function calcCollectionMT(
-        address collectionAddress,
-        uint256 mData
+        address collectionAddress
     ) public returns (uint256 cData) {
         cData = CollectionsData[collectionAddress];
         unchecked {
-            uint256 collectionPerMOPNPointMintedDiff = uint48(mData >> 64) -
-                uint48(cData >> 64);
+            uint256 collectionPerMOPNPointMintedDiff = MiningData
+                .PerMOPNPointMinted - uint48(cData >> 64);
             if (collectionPerMOPNPointMintedDiff > 0) {
                 uint256 collectionOnMapNum = uint16(cData >> 160);
 
@@ -537,8 +576,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
      */
     function settleCollectionMT(address collectionAddress) public {
         CollectionsData[collectionAddress] = calcCollectionMT(
-            collectionAddress,
-            MiningData
+            collectionAddress
         );
     }
 
@@ -559,7 +597,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
             }
             governance.mintMT(collectionVault, amount);
             CollectionsData[collectionAddress] -= amount;
-            MiningDataExt += (amount << 64) | amount;
+            MiningDataExt.TotalCollectionClaimed += uint48(amount);
+            MiningDataExt.TotalMTStaking += uint64(amount);
         }
     }
 
@@ -570,18 +609,18 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 lastPoint = getCollectionMOPNPoint(collectionAddress);
         if (point != lastPoint) {
             if (point > lastPoint) {
-                MiningData +=
-                    ((point - lastPoint) *
-                        getCollectionOnMapNum(collectionAddress)) <<
-                    144;
+                MiningData.TotalMOPNPoints += uint64(
+                    (point - lastPoint) *
+                        getCollectionOnMapNum(collectionAddress)
+                );
                 CollectionsData[collectionAddress] +=
                     (point - lastPoint) <<
                     200;
             } else {
-                MiningData -=
-                    ((lastPoint - point) *
-                        getCollectionOnMapNum(collectionAddress)) <<
-                    144;
+                MiningData.TotalMOPNPoints -= uint64(
+                    (lastPoint - point) *
+                        getCollectionOnMapNum(collectionAddress)
+                );
                 CollectionsData[collectionAddress] -=
                     (lastPoint - point) <<
                     200;
@@ -787,10 +826,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             ((totalMTStakingRealtime + 1000000 - price) *
                 oldNFTOfferCoefficient) /
             (totalMTStakingRealtime + 1000000);
-        MiningDataExt =
-            MiningDataExt -
-            (oldNFTOfferCoefficient << 112) +
-            (newNFTOfferCoefficient << 112);
+        MiningDataExt.NFTOfferCoefficient = uint48(newNFTOfferCoefficient);
     }
 
     function changeTotalMTStaking(
@@ -799,52 +835,56 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 amount
     ) external onlyCollectionVault(collectionAddress) {
         if (direction > 0) {
-            MiningDataExt += amount;
+            MiningDataExt.TotalMTStaking += uint64(amount);
         } else {
-            MiningDataExt -= amount;
+            MiningDataExt.TotalMTStaking -= uint64(amount);
         }
     }
 
     // MiningData
-    function TotalBuffMOPNPoints() public view returns (uint256) {
-        return uint48(MiningData >> 208);
-    }
-
     function TotalMOPNPoints() public view returns (uint256) {
-        return uint64(MiningData >> 144);
+        return MiningData.TotalMOPNPoints;
     }
 
     function LastTickBlock() public view returns (uint256) {
-        return uint32(MiningData >> 112);
+        return MiningData.LastTickBlock;
     }
 
     function PerMOPNPointMinted() public view returns (uint256) {
-        return uint48(MiningData >> 64);
+        return MiningData.PerMOPNPointMinted;
     }
 
     function MTTotalMinted() public view returns (uint256) {
-        return uint64(MiningData);
+        return MiningData.MTTotalMinted;
     }
 
     // MiningDataExt
-    function NextLandId() public view returns (uint256) {
-        return uint16(MiningDataExt >> 208);
+    function MTOutputPerBlock() external view returns (uint256) {
+        return MiningDataExt.MTOutputPerBlock;
     }
 
-    function AdditionalFinishSnapshot() public view returns (uint256) {
-        return uint48(MiningDataExt >> 160);
+    function MTStepStartBlock() external view returns (uint256) {
+        return MiningDataExt.MTStepStartBlock;
+    }
+
+    function WhiteListSwitch() public view returns (bool) {
+        return MiningDataExt.whiteListSwitch;
+    }
+
+    function NextLandId() public view returns (uint256) {
+        return MiningDataExt.nextLandId;
     }
 
     function NFTOfferCoefficient() public view returns (uint256) {
-        return uint48(MiningDataExt >> 112);
+        return MiningDataExt.NFTOfferCoefficient;
     }
 
     function TotalCollectionClaimed() public view returns (uint256) {
-        return uint48(MiningDataExt >> 64);
+        return MiningDataExt.TotalCollectionClaimed;
     }
 
     function TotalMTStaking() public view returns (uint256) {
-        return uint64(MiningDataExt);
+        return MiningDataExt.TotalMTStaking;
     }
 
     /// CollectionData

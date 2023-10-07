@@ -25,24 +25,27 @@
   },
   "homepage": "https://mopn.xyz",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.9.2",
+    "@openzeppelin/contracts": "^4.9.3",
+    "@openzeppelin/contracts-upgradeable": "^4.9.3",
     "@openzeppelin/merkle-tree": "^1.0.5",
     "abdk-libraries-solidity": "^3.2.0",
-    "axios": "^1.4.0",
+    "axios": "^1.5.1",
     "base64-sol": "^1.1.0",
     "cli-table3": "^0.6.3",
     "erc721a": "^4.2.3",
+    "hardhat-change-network": "^0.0.7",
     "ipfs-infura": "^1.1.9",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.9",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomiclabs/hardhat-ethers": "^2.2.3",
-    "chai": "^4.3.7",
+    "chai": "^4.3.8",
     "dotenv": "^16.3.1",
+    "erc721a-upgradeable": "^4.2.3",
     "ethers": "^5.7.2",
-    "hardhat": "^2.17.1",
+    "hardhat": "^2.17.3",
     "solidity-docgen": "0.6.0-beta.34"
   }
 }

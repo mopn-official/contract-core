@@ -1,32 +1,31 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.19;
 
-import "erc721a/contracts/ERC721A.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-interface IMOCKNFTMiner {
-    function registerCollection() external;
-}
-
-contract MOCKNFT is ERC721A, Ownable {
+contract MOCKNFT is ERC721AUpgradeable, OwnableUpgradeable {
     string public baseURI;
+    string public extURI;
 
-    string public uriext;
-
-    constructor(
-        address mocknftminer,
-        string memory name_,
-        string memory symbol_,
-        string memory baseuri_,
-        string memory uriext_
-    ) ERC721A(name_, symbol_) {
-        IMOCKNFTMiner(mocknftminer).registerCollection();
-        baseURI = baseuri_;
-        uriext = uriext_;
+    // Take note of the initializer modifiers.
+    // - `initializerERC721A` for `ERC721AUpgradeable`.
+    // - `initializer` for OpenZeppelin's `OwnableUpgradeable`.
+    function initialize(
+        string memory name,
+        string memory symbol,
+        string memory baseURI_,
+        string memory extURI_
+    ) public initializerERC721A initializer {
+        __ERC721A_init(name, symbol);
+        baseURI = baseURI_;
+        extURI = extURI_;
+        _transferOwnership(tx.origin);
     }
 
-    function safeMint(address to, uint256 amount) public {
-        _safeMint(to, amount);
+    function mint(uint256 quantity) external payable onlyOwner {
+        // `_mint`'s second argument now takes in a `quantity`, not a `tokenId`.
+        _mint(msg.sender, quantity);
     }
 
     function _baseURI() internal view override returns (string memory) {
@@ -37,13 +36,24 @@ contract MOCKNFT is ERC721A, Ownable {
         baseURI = baseURI_;
     }
 
-    function setURIExt(string memory uriext_) public onlyOwner {
-        uriext = uriext_;
+    function setExtURI(string memory extURI_) public onlyOwner {
+        extURI = extURI_;
     }
 
     function tokenURI(
         uint256 _tokenId
     ) public view override returns (string memory) {
-        return string.concat(super.tokenURI(_tokenId), uriext);
+        return string.concat(super.tokenURI(_tokenId), extURI);
+    }
+
+    function salt() internal view returns (uint256) {
+        bytes memory footer = new bytes(0x20);
+
+        assembly {
+            // copy 0x20 bytes from beginning of footer
+            extcodecopy(address(), add(footer, 0x20), 0x2d, 0x4d)
+        }
+
+        return abi.decode(footer, (uint256));
     }
 }

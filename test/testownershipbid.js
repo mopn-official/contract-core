@@ -532,10 +532,12 @@ describe("MOPN", function () {
     const tx1 = await accountContract.multicall([
       accountContract.interface.encodeFunctionData("cancelOwnershipBid"),
       accountContract.interface.encodeFunctionData("setOwnershipHostingType", [1]),
-      accountContract.interface.encodeFunctionData("executeCall", [
+      accountContract.interface.encodeFunctionData("execute", [
         mopn.address,
         0,
-        mopn.interface.encodeFunctionData("moveTo", [10000995, 0, await getMoveToTilesAccounts(10000995)])]
+        mopn.interface.encodeFunctionData("moveTo", [10000995, 0, await getMoveToTilesAccounts(10000995)]),
+        0
+      ],
       )
     ]);
     mineBlock(1);
@@ -720,10 +722,11 @@ describe("MOPN", function () {
     await tx.wait();
 
     const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", account);
-    tx = await accountContract.executeCall(
+    tx = await accountContract.execute(
       mopn.address,
       0,
-      mopn.interface.encodeFunctionData("moveTo", [coordinate, landId, await getMoveToTilesAccounts(coordinate)])
+      mopn.interface.encodeFunctionData("moveTo", [coordinate, landId, await getMoveToTilesAccounts(coordinate)]),
+      0
     );
     mineBlock(1);
     await tx.wait();

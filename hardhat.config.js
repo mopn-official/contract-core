@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("hardhat-change-network");
 require("solidity-docgen");
 const dotenv = require("dotenv");
 
