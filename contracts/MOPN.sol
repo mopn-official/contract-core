@@ -16,6 +16,7 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /*
 .___  ___.   ______   .______   .__   __. 
@@ -28,7 +29,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @title MOPN Contract
 /// @author Cyanface <cyanface@outlook.com>
-/// @dev This Contract's owner must transfer to Governance Contract once it's deployed
 contract MOPN is IMOPN, Multicall, Ownable {
     using BitMaps for BitMaps.BitMap;
 
@@ -36,18 +36,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
     uint256 public immutable MaxCollectionOnMapNum;
     uint256 public immutable MaxCollectionMOPNPoint;
 
+    bytes32 private whiteListRoot;
+
     BitMaps.BitMap private tilesbitmap;
-
-    /**
-     * @notice Mining Data
-     * @dev This includes the following data:
-     * - uint64 TotalMOPNPoints: bits 144-207
-     * - uint32 LastTickBlock: bits 112-143
-     * - uint48 PerMOPNPointMinted: bits 64-111
-     * - uint64 MTTotalMinted: bits 0-63
-     */
-
-    /// uint256 public MiningData;
 
     struct MiningDataStruct {
         uint64 TotalMOPNPoints;
@@ -57,15 +48,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
     }
 
     MiningDataStruct public MiningData;
-
-    /// @notice MiningDataExt structure:
-    /// - uint8  whiteListSwitch: bits 176-183
-    /// - uint16 nextLandId: bits 160-175
-    /// - uint48 NFTOfferCoefficient: bits 112-159
-    /// - uint48 TotalCollectionClaimed: bits 64-111
-    /// - uint64 TotalMTStaking: bits 0-63
-
-    /// uint256 public MiningDataExt;
 
     struct MiningDataExtStruct {
         bool whiteListSwitch;
@@ -113,6 +95,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         MaxCollectionOnMapNum = MaxCollectionOnMapNum_;
         MaxCollectionMOPNPoint = MaxCollectionMOPNPoint_;
         MiningData.LastTickBlock = MTStepStartBlock_;
+        MiningDataExt.whiteListSwitch = true;
         MiningDataExt.MTOutputPerBlock = MTOutputPerBlock_;
         MiningDataExt.MTStepStartBlock = MTStepStartBlock_;
         MiningDataExt.NFTOfferCoefficient = 10 ** 14;
@@ -120,6 +103,14 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     function getGovernance() external view returns (address) {
         return address(governance);
+    }
+
+    function whiteListSwitchChange(bool switchStatus) public onlyOwner {
+        MiningDataExt.whiteListSwitch = switchStatus;
+    }
+
+    function whiteListRootUpdate(bytes32 root) public onlyOwner {
+        whiteListRoot = root;
     }
 
     function getQualifiedAccountCollection(
@@ -153,11 +144,24 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return collectionAddress;
     }
 
-    //@todo whitelist
     function collectionWhiteListRegistry(
         address collectionAddress,
         bytes32[] memory proof
-    ) public {}
+    ) public {
+        bytes32 leaf = keccak256(
+            bytes.concat(keccak256(abi.encode(collectionAddress)))
+        );
+        require(
+            MerkleProof.verify(proof, whiteListRoot, leaf),
+            "Invalid proof"
+        );
+
+        if (CollectionsData[collectionAddress] == 0) {
+            CollectionsData[collectionAddress] =
+                uint256(MiningData.PerMOPNPointMinted) <<
+                64;
+        }
+    }
 
     /**
      * @notice an on map NFT move to a new tile
@@ -460,7 +464,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             (block.number - MiningDataExt.MTStepStartBlock) / MTReduceInterval;
     }
 
-    function calcPerMOPNPointMinted() public returns (uint256 mData) {
+    function settlePerMOPNPointMinted() public {
         if (block.number > MiningData.LastTickBlock) {
             uint256 reduceTimes = MTReduceTimes();
             unchecked {
@@ -507,13 +511,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 );
             }
         }
-    }
-
-    /**
-     * @notice settle per mopn token allocation weight minted mopn token
-     */
-    function settlePerMOPNPointMinted() public {
-        calcPerMOPNPointMinted();
     }
 
     function getCollectionMOPNPointFromStaking(

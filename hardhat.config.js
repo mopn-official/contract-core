@@ -35,10 +35,17 @@ module.exports = {
 
     goerli: {
       url: process.env.GOERLI_URL,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      chainId: 5,
+      etherscanHost: 'https://goerli.etherscan.io/',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [
+        process.env.PRIVATE_KEY,
+        process.env.PRIVATE_KEY_1,
+        process.env.PRIVATE_KEY_2
+      ] : [],
     },
     goerli_dev: {
       url: process.env.GOERLI_URL,
+      chainId: 5,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     sepolia: {
