@@ -27,7 +27,7 @@ async function getContractAddress(contractName) {
       console.error(error);
     }
   }
-
+  console.log(contractName, contractAddresses[contractName]);
   return contractAddresses[contractName];
 }
 
@@ -89,7 +89,7 @@ async function buybomb(amount) {
   const price = await auctionhouse.getBombCurrentPrice();
   const totalPrice = price * amount;
   const mopntoken = await getContractObj('MOPNToken');
-  const tx = await mopntoken.safeTransferFrom((await getCurrentAccount()).address, auctionhouse.address, totalPrice, ethers.utils.defaultAbiCoder.encode(["uint256", "uint256"], [1, amount]))
+  const tx = await mopntoken.connect(await getCurrentAccount()).safeTransferFrom((await getCurrentAccount()).address, auctionhouse.address, totalPrice, ethers.utils.defaultAbiCoder.encode(["uint256", "uint256"], [1, amount]))
   console.log("wallet", (await getCurrentAccount()).address, "buy", amount, "bombs at price", price, "with total price", totalPrice, "tx sent!");
   console.log(hre.network.config.etherscanHost + "tx/" + tx.hash);
   await tx.wait();
