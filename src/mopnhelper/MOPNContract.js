@@ -27,15 +27,20 @@ async function getContractAddress(contractName) {
       console.error(error);
     }
   }
-  console.log(contractName, contractAddresses[contractName]);
+  // console.log(contractName, contractAddresses[contractName]);
   return contractAddresses[contractName];
 }
 
-async function getContractObj(contractName) {
-  if (!contractObjs.hasOwnProperty(contractName)) {
-    contractObjs[contractName] = await ethers.getContractAt(contractName, await getContractAddress(contractName));
+async function getContractObj(contractName, address) {
+  if (address) {
+    return await ethers.getContractAt(contractName, address);
+  } else {
+    if (!contractObjs.hasOwnProperty(contractName)) {
+      contractObjs[contractName] = await ethers.getContractAt(contractName, await getContractAddress(contractName));
+    }
+    return contractObjs[contractName];
   }
-  return contractObjs[contractName];
+
 }
 
 async function moveTo(tokenContract, tokenId, coordinate) {
@@ -95,11 +100,81 @@ async function buybomb(amount) {
   await tx.wait();
 }
 
+async function stackMT(collectionAddress, amount) {
+  const mopntoken = await getContractObj('MOPNToken');
+  const governance = await getContractObj('MOPNGovernance');
+  let vaultAddress = await governance.getCollectionVault(collectionAddress);
+  let tx;
+  if (vaultAddress != ethers.constants.AddressZero) {
+    tx = await mopntoken.connect(await getCurrentAccount()).safeTransferFrom((await getCurrentAccount()).address, vaultAddress, amount, "0x");
+    console.log("wallet", (await getCurrentAccount()).address, "transfer", amount, "mopntoken to vault", vaultAddress, "for staking collection", collectionAddress, "tx sent!");
+  } else {
+    vaultAddress = await governance.computeCollectionVault(collectionAddress);
+    tx = await mopntoken.connect(await getCurrentAccount()).multicall([
+      mopntoken.interface.encodeFunctionData('createCollectionVault', [collectionAddress]),
+      mopntoken.interface.encodeFunctionData('safeTransferFrom', [
+        (await getCurrentAccount()).address,
+        vaultAddress,
+        amount,
+        "0x"
+      ])
+    ]);
+    console.log("wallet", (await getCurrentAccount()).address, "create vault", vaultAddress, "and transfer", amount, "mopntoken to it for staking collection", collectionAddress, "tx sent!");
+  }
+  console.log(hre.network.config.etherscanHost + "tx/" + tx.hash);
+  const receipt = await tx.wait();
+  const mopn = await getContractObj('MOPN');
+  const mopncollectionvault = await getContractObj('MOPNCollectionVault', vaultAddress);
+  for (log of receipt.logs) {
+    if (log.address == mopn.address) {
+      const event = mopn.interface.parseLog(log);
+      if (event.name == 'CollectionPointChange') {
+        console.log("Collection Point Change To", ethers.utils.formatUnits(event.args.CollectionPoint, 2));
+      }
+    } else if (log.address == mopncollectionvault.address) {
+      const event = mopncollectionvault.interface.parseLog(log);
+      if (event.name == 'MTDeposit') {
+        console.log("receive", ethers.utils.formatEther(event.args.VTAmount), "vtoken")
+      }
+    }
+  }
+}
+
+async function removeStakingMT(collectionAddress, amount) {
+  const governance = await getContractObj('MOPNGovernance');
+  let vaultAddress = await governance.getCollectionVault(collectionAddress);
+  if (vaultAddress == ethers.constants.AddressZero) {
+    console.log("collection vault not create yet");
+    return;
+  }
+
+  const collectionVault = await getContractObj('MOPNCollectionVault', vaultAddress);
+  const tx = await collectionVault.withdraw(amount);
+  console.log("wallet", (await getCurrentAccount()).address, "remove collection", collectionAddress, "staking with", amount, "vtoken from vault address", vaultAddress, "tx sent!");
+  const receipt = await tx.wait();
+  const mopn = await getContractObj('MOPN');
+  for (log of receipt.logs) {
+    if (log.address == collectionVault.address) {
+      const event = collectionVault.interface.parseLog(log);
+      if (event.name == 'MTWithdraw') {
+        console.log("receive", ethers.utils.formatUnits(event.args.MTAmount, 6), "mopn token");
+      }
+    } else if (log.address == mopn.address) {
+      const event = mopn.interface.parseLog(log);
+      if (event.name == 'CollectionPointChange') {
+        console.log("Collection Point Change To", ethers.utils.formatUnits(event.args.CollectionPoint, 2));
+      }
+    }
+  }
+}
+
 module.exports = {
   getContractAddress,
   getContractObj,
   moveTo,
   bidNFT,
   setCurrentAccount,
-  buybomb
+  buybomb,
+  stackMT,
+  removeStakingMT
 };
