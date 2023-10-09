@@ -12,27 +12,18 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MOPNERC6551AccountOwnershipBidding is
+contract MOPNERC6551AccountNonPermissionLend is
     Ownable,
     ReentrancyGuard,
     Multicall
 {
-    uint256 public immutable defaultCollectionLastBidBlock;
-    uint256 public constant defaultCollectionBidStartPrice = 10000000000000000;
-    uint256 public constant minimalCollectionBidPrice = 1000000000000;
-
     IMOPNGovernance public immutable governance;
 
     IERC6551Registry public immutable erc6551registry;
 
-    event AccountRent(
-        address indexed account,
-        uint40 startblock,
-        uint104 rent,
-        address renter
-    );
+    event AccountLend(address indexed account, address renter);
 
-    event ClaimRent(address indexed account, uint104 claimed, address receiver);
+    event ClaimBack(address indexed account, address operator);
 
     struct BidData {
         uint40 startBlock;

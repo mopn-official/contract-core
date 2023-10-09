@@ -33,8 +33,6 @@ contract MOPNERC6551Account is
 
     address public immutable governance;
 
-    address public immutable ownershipBiddingContract;
-
     address public immutable ownershipRentalContract;
 
     uint8 public ownershipHostingType;
@@ -45,13 +43,8 @@ contract MOPNERC6551Account is
 
     uint256 public state;
 
-    constructor(
-        address governance_,
-        address ownershipBiddingContract_,
-        address ownershipRentalContract_
-    ) {
+    constructor(address governance_, address ownershipRentalContract_) {
         governance = governance_;
-        ownershipBiddingContract = ownershipBiddingContract_;
         ownershipRentalContract = ownershipRentalContract_;
     }
 
@@ -89,7 +82,7 @@ contract MOPNERC6551Account is
         bytes calldata data
     ) internal returns (bytes memory result) {
         require(
-            to != ownershipBiddingContract && to != ownershipRentalContract,
+            to != ownershipRentalContract,
             "not allow low-level call to rentHosting"
         );
         bool success;
