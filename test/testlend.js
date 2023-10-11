@@ -19,7 +19,7 @@ describe("MOPN", function () {
     mopnmt,
     mopnData,
     mopncollectionVault,
-    mopnownershipbid,
+    mopnrental,
     mopnland,
     mopnlandMetaDataRender;
   let owner,
@@ -168,20 +168,59 @@ describe("MOPN", function () {
     }))
     const mopngovernanceAddress = tx.address;
 
-    tx = await hre.ethers.deployContract("MOPNERC6551AccountOwnershipBidding", [mopngovernanceAddress, erc6551registry.address, owner1.address, 1]);
+    tx = await hre.ethers.deployContract("MOPNBomb", [mopngovernanceAddress]);
     promises.push(new Promise((resolve, reject) => {
-      tx.deployed().then((res) => {
-        mopnownershipbid = res;
-        console.log("MOPNERC6551AccountOwnershipBidding", mopnownershipbid.address);
+      tx.deployed().then(async (res) => {
+        mopnbomb = res;
+        console.log("MOPNBomb", mopnbomb.address);
         resolve();
       }).catch((err) => {
         console.error(err);
         reject();
       })
     }))
-    const ownershipbidAddress = tx.address;
 
-    tx = await hre.ethers.deployContract("MOPNERC6551Account", [mopngovernanceAddress, ownershipbidAddress, ownershipbidAddress]);
+    tx = await hre.ethers.deployContract("MOPNPoint", [mopngovernanceAddress]);
+    promises.push(new Promise((resolve, reject) => {
+      tx.deployed().then(async (res) => {
+        mopnpoint = res;
+        console.log("MOPNPoint", mopnpoint.address);
+        resolve();
+      }).catch((err) => {
+        console.error(err);
+        reject();
+      })
+    }))
+
+    tx = await hre.ethers.deployContract("MOPNToken", [mopngovernanceAddress]);
+    promises.push(new Promise((resolve, reject) => {
+      tx.deployed().then(async (res) => {
+        mopnmt = res;
+        console.log("MOPNToken", mopnmt.address);
+        mtdecimals = await mopnmt.decimals();
+        console.log("mtdecimals", mtdecimals);
+        resolve();
+      }).catch((err) => {
+        console.error(err);
+        reject();
+      });
+    }));
+    const mopntokenAddress = tx.address;
+
+    tx = await hre.ethers.deployContract("MOPNRental", [mopntokenAddress, erc6551registry.address]);
+    promises.push(new Promise((resolve, reject) => {
+      tx.deployed().then((res) => {
+        mopnrental = res;
+        console.log("MOPNRental", mopnrental.address);
+        resolve();
+      }).catch((err) => {
+        console.error(err);
+        reject();
+      })
+    }))
+    const mopnrentalAddress = tx.address;
+
+    tx = await hre.ethers.deployContract("MOPNERC6551Account", [mopngovernanceAddress, mopnrentalAddress]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         erc6551account = res;
@@ -246,7 +285,7 @@ describe("MOPN", function () {
     const startBlock = await hre.ethers.provider.getBlockNumber();
     console.log("mopn start block ", startBlock);
 
-    tx = await hre.ethers.deployContract("MOPN", [mopngovernanceAddress, 60000000, startBlock, 50400, 10000, 99999]);
+    tx = await hre.ethers.deployContract("MOPN", [mopngovernanceAddress, 60000000, startBlock, 50400, 10000, 99999, false]);
     promises.push(new Promise((resolve, reject) => {
       tx.deployed().then((res) => {
         mopn = res;
@@ -323,44 +362,6 @@ describe("MOPN", function () {
       })
     }));
 
-    tx = await hre.ethers.deployContract("MOPNBomb", [mopngovernanceAddress]);
-    promises.push(new Promise((resolve, reject) => {
-      tx.deployed().then(async (res) => {
-        mopnbomb = res;
-        console.log("MOPNBomb", mopnbomb.address);
-        resolve();
-      }).catch((err) => {
-        console.error(err);
-        reject();
-      })
-    }))
-
-    tx = await hre.ethers.deployContract("MOPNPoint", [mopngovernanceAddress]);
-    promises.push(new Promise((resolve, reject) => {
-      tx.deployed().then(async (res) => {
-        mopnpoint = res;
-        console.log("MOPNPoint", mopnpoint.address);
-        resolve();
-      }).catch((err) => {
-        console.error(err);
-        reject();
-      })
-    }))
-
-    tx = await hre.ethers.deployContract("MOPNToken", [mopngovernanceAddress]);
-    promises.push(new Promise((resolve, reject) => {
-      tx.deployed().then(async (res) => {
-        mopnmt = res;
-        console.log("MOPNToken", mopnmt.address);
-        mtdecimals = await mopnmt.decimals();
-        console.log("mtdecimals", mtdecimals);
-        resolve();
-      }).catch((err) => {
-        console.error(err);
-        reject();
-      });
-    }));
-
     await mineBlock(1);
     await Promise.all(promises);
 
@@ -418,7 +419,7 @@ describe("MOPN", function () {
       mopnland.address,
       mopnData.address,
       mopncollectionVault.address,
-      mopnownershipbid.address
+      mopnrental.address
     );
     promises.push(new Promise((resolve, reject) => {
       tx.wait().then(() => {
@@ -479,25 +480,8 @@ describe("MOPN", function () {
     await deployAccountBasic(testnft1.address, 0, 10000997, 0);
     await deploySimulatorAccount(testnft1.address, 0, 10000997, 0);
 
-    await deployAccountOwnershipBidAndMove(testnft1.address, 1, 10000996, 0);
+    await deployAccountLend(testnft1.address, 1, 10000996, 0);
     await deploySimulatorAccount(testnft1.address, 1, 10000996, 0);
-
-    tx = await mopnownershipbid.bidNFTsTo(
-      [testnft.address],
-      [[0, 2]],
-      ["100000000000000000", "100000000000000000"],
-      owner.address, { value: "1000000000000000000" }
-    );
-    await mineBlock(1);
-    await tx.wait();
-
-    tx = await mopnownershipbid.bidNFTTo(
-      testnft.address,
-      1,
-      owner.address, { value: "10000000000000000" }
-    );
-    await mineBlock(1);
-    await tx.wait();
 
     await mineBlock(1);
 
@@ -527,22 +511,6 @@ describe("MOPN", function () {
     await claimAccountsMT();
     await showWalletBalance();
 
-    console.log("owner1 balance", await hre.ethers.provider.getBalance(owner1.address));
-    const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", accounts[9]);
-    const tx1 = await accountContract.multicall([
-      accountContract.interface.encodeFunctionData("cancelOwnershipBid"),
-      accountContract.interface.encodeFunctionData("setOwnershipHostingType", [1]),
-      accountContract.interface.encodeFunctionData("execute", [
-        mopn.address,
-        0,
-        mopn.interface.encodeFunctionData("moveTo", [10000995, 0, await getMoveToTilesAccounts(10000995)]),
-        0
-      ],
-      )
-    ]);
-    mineBlock(1);
-    await tx1.wait();
-    console.log("owner1 balance", await hre.ethers.provider.getBalance(owner1.address));
   }
 
   it("test move", async function () {
@@ -778,8 +746,7 @@ describe("MOPN", function () {
       coordinate,
       landId,
       await getMoveToTilesAccounts(coordinate),
-      "0x"
-      //erc6551account.interface.encodeFunctionData("setOwnershipHostingType", [1]),
+      erc6551account.interface.encodeFunctionData("setOwnershipMode", [1]),
     );
     mineBlock(1);
     await tx.wait();
@@ -787,7 +754,7 @@ describe("MOPN", function () {
     tiles[coordinate] = account;
   };
 
-  const deployAccountOwnershipBid = async (tokenContract, tokenId, coordinate, landId) => {
+  const deployAccountLend = async (tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
       31337,
@@ -796,35 +763,14 @@ describe("MOPN", function () {
       0
     );
     accounts.push(account);
-    const tx = await mopnownershipbid.bidNFTTo(tokenContract,
-      tokenId, owner.address, { value: "1000000000000000000" });
-
-    mineBlock(1);
-    await tx.wait();
-
-    const movetx = await mopn.moveToByOwner(account, coordinate, landId, await getMoveToTilesAccounts(coordinate));
-    mineBlock(1);
-    await movetx.wait();
-
-    tiles[coordinate] = account;
-  };
-
-  const deployAccountOwnershipBidAndMove = async (tokenContract, tokenId, coordinate, landId) => {
-    const account = await erc6551accounthelper.computeAccount(
-      erc6551accountproxy.address,
-      31337,
+    const tx = await mopn.moveToNFT(
       tokenContract,
       tokenId,
-      0
+      coordinate,
+      landId,
+      await getMoveToTilesAccounts(coordinate),
+      erc6551account.interface.encodeFunctionData("lend"),
     );
-    accounts.push(account);
-    console.log(account, "minimal bid price is", await mopnownershipbid.getMimimalBidPrice(account, tokenContract));
-    const tx = await erc6551accounthelper.connect(owner1).bidNFTAndProxyCall(
-      tokenContract, tokenId, mopn.address, 0,
-      mopn.interface.encodeFunctionData("moveTo", [coordinate, landId, await getMoveToTilesAccounts(coordinate)]),
-      { value: "10000000000000000" }
-    );
-
     mineBlock(1);
     await tx.wait();
 

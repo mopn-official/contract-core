@@ -19,7 +19,11 @@ interface IMOPNERC6551Account is IERC6551Account, IERC6551Executable {
 
     function nftowner() external view returns (address);
 
-    function ownershipHostingType() external view returns (uint8);
+    function ownershipMode() external view returns (uint8);
 
     function ownerTransferTo(address to, uint40 endBlock) external;
+
+    function renter() external view returns (address);
+
+    function rentEndBlock() external view returns (uint40);
 }

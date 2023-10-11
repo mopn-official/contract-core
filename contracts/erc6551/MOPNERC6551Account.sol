@@ -4,7 +4,6 @@ pragma solidity ^0.8.19;
 import "hardhat/console.sol";
 
 import "./interfaces/IMOPNERC6551Account.sol";
-import "./interfaces/IMOPNERC6551AccountOwnershipBidding.sol";
 import "../interfaces/IMOPN.sol";
 import "../interfaces/IMOPNGovernance.sol";
 
@@ -27,7 +26,7 @@ contract MOPNERC6551Account is
     IMOPNERC6551Account,
     Multicall
 {
-    event OwnerHostingSet(uint8 ownerHostingType, uint8 oldOwnerHostingType);
+    event OwnershipModeChange(uint8 ownershipMode, uint8 oldOwnershipMode);
 
     event OwnerTransfer(address to, uint40 endBlock);
 
@@ -35,7 +34,7 @@ contract MOPNERC6551Account is
 
     address public immutable ownershipRentalContract;
 
-    uint8 public ownershipHostingType;
+    uint8 public ownershipMode;
 
     uint40 public rentEndBlock;
 
@@ -192,7 +191,7 @@ contract MOPNERC6551Account is
         return IERC721Receiver.onERC721Received.selector;
     }
 
-    function setOwnershipHostingType(uint8 ownershipHostingType_) public {
+    function setOwnershipMode(uint8 ownershipMode_) public {
         address nftowner_ = nftowner();
         require(
             msg.sender == nftowner_ ||
@@ -200,30 +199,53 @@ contract MOPNERC6551Account is
                     tx.origin == nftowner_),
             "not nft owner"
         );
-        require(rentEndBlock < block.number, "rent not finish");
-        emit OwnerHostingSet(ownershipHostingType_, ownershipHostingType);
-        ownershipHostingType = ownershipHostingType_;
+        require(ownershipMode != ownershipMode_, "mode not change");
+        if (ownershipMode == 0) {
+            if (renter != address(0)) {
+                IMOPN(IMOPNGovernance(governance).mopnContract())
+                    .claimAccountMT(address(this), renter);
+            }
+        } else {
+            require(rentEndBlock < block.number, "rent not finish");
+        }
+
+        emit OwnershipModeChange(ownershipMode_, ownershipMode);
+        ownershipMode = ownershipMode_;
+        rentEndBlock = 0;
+        renter = address(0);
+    }
+
+    function lend() public {
+        require(ownershipMode == 0, "account not in lend mode");
+        require(
+            IMOPN(IMOPNGovernance(governance).mopnContract())
+                .getAccountCoordinate(address(this)) == 0,
+            "already lend to sb"
+        );
+        if (renter != address(0)) {
+            IMOPN(IMOPNGovernance(governance).mopnContract()).claimAccountMT(
+                address(this),
+                renter
+            );
+        }
+        renter = msg.sender == IMOPNGovernance(governance).ERC6551Registry()
+            ? tx.origin
+            : msg.sender;
+        rentEndBlock = type(uint40).max;
+        emit OwnerTransfer(renter, rentEndBlock);
     }
 
     function ownerTransferTo(address to, uint40 endBlock) public {
-        if (ownershipHostingType == 0) {
-            require(msg.sender == ownershipBiddingContract, "not allowed");
-        } else if (ownershipHostingType == 1) {
+        if (ownershipMode == 1) {
             require(msg.sender == nftowner(), "not allowed");
-        } else if (ownershipHostingType == 2) {
+        } else if (ownershipMode == 2) {
             require(msg.sender == ownershipRentalContract, "not allowed");
         } else {
-            require(false, "OwnershipHostingType not supported");
+            require(false, "OwnershipMode not supported transfer");
         }
         renter = to;
         rentEndBlock = endBlock;
         emit OwnerTransfer(to, endBlock);
-    }
-
-    function cancelOwnershipBid() external {
-        require(msg.sender == nftowner(), "not allowed");
-        IMOPNERC6551AccountOwnershipBidding(ownershipBiddingContract)
-            .cancelOwnershipBid();
     }
 
     modifier onlyHelper() {
