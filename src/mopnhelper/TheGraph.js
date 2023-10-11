@@ -62,7 +62,40 @@ async function getMoveToTilesAccounts(coordinate) {
   return tilesaccounts;
 }
 
+async function getCollectionOnMapAccounts(collection) {
+  let accounts = [];
+
+  const graphqlQuery = {
+    "operationName": "fetchCollectionOnMapAccounts",
+    "query": `query fetchCollectionOnMapAccounts($id: String!) {
+      collectionData(id: $id) {
+        accounts(where: {coordinate_not: null}){
+          id
+          coordinate{
+            id
+          }
+          tokenId
+        }
+      }
+    }`,
+    "variables": {
+      "id": collection
+    }
+  };
+  const accountsDatas = await fetchData(graphqlQuery);
+  for (let account of accountsDatas.data.collectionData.accounts) {
+    accounts.push({
+      "account": account.id,
+      "coordinate": account.coordinate.id,
+      "tokenId": accounts.tokenId
+    });
+  }
+
+  return accounts;
+}
+
 module.exports = {
   fetchData,
-  getMoveToTilesAccounts
+  getMoveToTilesAccounts,
+  getCollectionOnMapAccounts
 };
