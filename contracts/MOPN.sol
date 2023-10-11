@@ -88,14 +88,15 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint32 MTStepStartBlock_,
         uint256 MTReduceInterval_,
         uint256 MaxCollectionOnMapNum_,
-        uint256 MaxCollectionMOPNPoint_
+        uint256 MaxCollectionMOPNPoint_,
+        bool whiteListSwitch
     ) {
         governance = IMOPNGovernance(governance_);
         MTReduceInterval = MTReduceInterval_;
         MaxCollectionOnMapNum = MaxCollectionOnMapNum_;
         MaxCollectionMOPNPoint = MaxCollectionMOPNPoint_;
         MiningData.LastTickBlock = MTStepStartBlock_;
-        MiningDataExt.whiteListSwitch = true;
+        MiningDataExt.whiteListSwitch = whiteListSwitch;
         MiningDataExt.MTOutputPerBlock = MTOutputPerBlock_;
         MiningDataExt.MTStepStartBlock = MTStepStartBlock_;
         MiningDataExt.NFTOfferCoefficient = 10 ** 14;

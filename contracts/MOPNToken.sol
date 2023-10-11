@@ -21,6 +21,14 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
 
     IMOPNGovernance governance;
 
+    modifier onlyMOPNContract() {
+        require(
+            msg.sender == governance.auctionHouseContract(),
+            "MOPNToken: Only MOPN contract can call this function"
+        );
+        _;
+    }
+
     constructor(address governance_) ERC20("MOPN Token", "MT") {
         governance = IMOPNGovernance(governance_);
     }
@@ -31,6 +39,10 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
 
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
+    }
+
+    function mopnburn(address from, uint256 amount) public onlyMOPNContract {
+        _burn(from, amount);
     }
 
     function createCollectionVault(address collectionAddress) public {

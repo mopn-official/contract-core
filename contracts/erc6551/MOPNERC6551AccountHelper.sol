@@ -5,7 +5,6 @@ import "../interfaces/IMOPNGovernance.sol";
 import "../interfaces/IMOPN.sol";
 import "./interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPNERC6551Account.sol";
-import "./interfaces/IMOPNERC6551AccountOwnershipBidding.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MOPNERC6551AccountHelper is Multicall {
@@ -67,19 +66,6 @@ contract MOPNERC6551AccountHelper is Multicall {
         );
         if (_account.code.length != 0) return (true, _account);
         return (false, _account);
-    }
-
-    function bidNFTAndProxyCall(
-        address collectionAddress,
-        uint256 tokenId,
-        address to,
-        uint256 value,
-        bytes calldata data
-    ) external payable returns (bytes memory) {
-        address account = IMOPNERC6551AccountOwnershipBidding(
-            governance.ownershipBiddingContract()
-        ).bidNFTTo{value: msg.value}(collectionAddress, tokenId, msg.sender);
-        return executeProxy(account, to, value, data, 0);
     }
 
     /// @dev executes a low-level call against an account if the caller is authorized to make calls
