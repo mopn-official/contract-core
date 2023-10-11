@@ -131,9 +131,8 @@ contract MOPNCollectionVault is
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /
-                (IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
-                    address(this)
-                ) - (onReceived ? MTAmount : 0));
+                (IMOPNToken(IMOPNGovernance(governance).tokenContract())
+                    .balanceOf(address(this)) - (onReceived ? MTAmount : 0));
         }
     }
 
@@ -141,7 +140,7 @@ contract MOPNCollectionVault is
         uint256 VAmount
     ) public view returns (uint256 MTAmount) {
         if (VAmount == totalSupply()) {
-            MTAmount = IMOPNToken(IMOPNGovernance(governance).mtContract())
+            MTAmount = IMOPNToken(IMOPNGovernance(governance).tokenContract())
                 .balanceOf(address(this));
         } else {
             MTAmount = (MTBalanceRealtime() * VAmount) / totalSupply();
@@ -152,13 +151,12 @@ contract MOPNCollectionVault is
         uint256 VAmount
     ) public view returns (uint256 MTAmount) {
         if (VAmount == totalSupply()) {
-            MTAmount = IMOPNToken(IMOPNGovernance(governance).mtContract())
+            MTAmount = IMOPNToken(IMOPNGovernance(governance).tokenContract())
                 .balanceOf(address(this));
         } else {
             MTAmount =
-                (IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
-                    address(this)
-                ) * VAmount) /
+                (IMOPNToken(IMOPNGovernance(governance).tokenContract())
+                    .balanceOf(address(this)) * VAmount) /
                 totalSupply();
         }
     }
@@ -169,7 +167,7 @@ contract MOPNCollectionVault is
         mopn.claimCollectionMT(collectionAddress_);
         uint256 mtAmount = V2MTAmount(amount);
         require(mtAmount > 0, "zero to withdraw");
-        IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
+        IMOPNToken(IMOPNGovernance(governance).tokenContract()).transfer(
             msg.sender,
             mtAmount
         );
@@ -191,17 +189,17 @@ contract MOPNCollectionVault is
 
     function MTBalanceRealtime() public view returns (uint256 amount) {
         amount =
-            IMOPNData(IMOPNGovernance(governance).mopnDataContract())
+            IMOPNData(IMOPNGovernance(governance).dataContract())
                 .calcCollectionSettledMT(
                     CollectionVaultLib.collectionAddress()
                 ) +
-            IMOPNToken(IMOPNGovernance(governance).mtContract()).balanceOf(
+            IMOPNToken(IMOPNGovernance(governance).tokenContract()).balanceOf(
                 address(this)
             );
     }
 
     function MTBalance() public view returns (uint256 balance) {
-        balance = IMOPNToken(IMOPNGovernance(governance).mtContract())
+        balance = IMOPNToken(IMOPNGovernance(governance).tokenContract())
             .balanceOf(address(this));
         if (getOfferStatus() == 1) {
             balance += getOfferAcceptPrice();
@@ -223,10 +221,10 @@ contract MOPNCollectionVault is
         mopn.claimCollectionMT(collectionAddress_);
 
         uint256 offerPrice = (IMOPNToken(
-            IMOPNGovernance(governance).mtContract()
+            IMOPNGovernance(governance).tokenContract()
         ).balanceOf(address(this)) * mopn.NFTOfferCoefficient()) / 10 ** 15;
 
-        IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
+        IMOPNToken(IMOPNGovernance(governance).tokenContract()).transfer(
             msg.sender,
             offerPrice
         );
@@ -257,7 +255,7 @@ contract MOPNCollectionVault is
         bytes calldata data
     ) public returns (bytes4) {
         require(
-            msg.sender == IMOPNGovernance(governance).mtContract(),
+            msg.sender == IMOPNGovernance(governance).tokenContract(),
             "only accept mopn token"
         );
 
@@ -279,16 +277,14 @@ contract MOPNCollectionVault is
             NFTOfferData = 0;
 
             if (value > price) {
-                IMOPNToken(IMOPNGovernance(governance).mtContract()).transfer(
-                    from,
-                    value - price
-                );
+                IMOPNToken(IMOPNGovernance(governance).tokenContract())
+                    .transfer(from, value - price);
                 value = price;
             }
             uint256 burnAmount;
             if (price > 0) {
                 burnAmount = (price * 2) / 10;
-                IMOPNToken(IMOPNGovernance(governance).mtContract()).burn(
+                IMOPNToken(IMOPNGovernance(governance).tokenContract()).burn(
                     burnAmount
                 );
 

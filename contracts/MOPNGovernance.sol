@@ -48,36 +48,36 @@ contract MOPNGovernance is Multicall, Ownable {
         ERC6551AccountHelper = ERC6551AccountHelper_;
     }
 
-    address public auctionHouseContract;
     address public mopnContract;
     address public bombContract;
-    address public mtContract;
+    address public tokenContract;
     address public pointContract;
     address public landContract;
-    address public mopnDataContract;
-    address public mopnCollectionVaultContract;
-    address public ownershipBiddingContract;
+    address public dataContract;
+    address public collectionVaultContract;
+    address public rentalContract;
+    address public auctionHouseContract;
 
     function updateMOPNContracts(
         address auctionHouseContract_,
         address mopnContract_,
         address bombContract_,
-        address mtContract_,
+        address tokenContract_,
         address pointContract_,
         address landContract_,
-        address mopnDataContract_,
-        address mopnCollectionVaultContract_,
-        address ownershipBiddingContract_
+        address dataContract_,
+        address collectionVaultContract_,
+        address rentalContract_
     ) public onlyOwner {
         auctionHouseContract = auctionHouseContract_;
         mopnContract = mopnContract_;
         bombContract = bombContract_;
-        mtContract = mtContract_;
+        tokenContract = tokenContract_;
         pointContract = pointContract_;
         landContract = landContract_;
-        mopnDataContract = mopnDataContract_;
-        mopnCollectionVaultContract = mopnCollectionVaultContract_;
-        ownershipBiddingContract = ownershipBiddingContract_;
+        dataContract = dataContract_;
+        collectionVaultContract = collectionVaultContract_;
+        rentalContract = rentalContract_;
     }
 
     function getDefault6551AccountImplementation()
@@ -155,40 +155,6 @@ contract MOPNGovernance is Multicall, Ownable {
         return false;
     }
 
-    function mintMT(address to, uint256 amount) public onlyMOPN {
-        IMOPNToken(mtContract).mint(to, amount);
-    }
-
-    // Bomb
-    function mintBomb(
-        address to,
-        uint256 tokenId,
-        uint256 amount
-    ) public onlyAuctionHouse {
-        IMOPNBomb(bombContract).mint(to, tokenId, amount);
-    }
-
-    function burnBomb(
-        address from,
-        uint256 tokenId,
-        uint256 amount
-    ) public onlyMOPN {
-        IMOPNBomb(bombContract).burn(from, tokenId, amount);
-    }
-
-    modifier onlyAuctionHouse() {
-        require(msg.sender == auctionHouseContract, "not allowed");
-        _;
-    }
-
-    modifier onlyMOPN() {
-        require(
-            msg.sender == mopnContract || msg.sender == mopnDataContract,
-            "not allowed"
-        );
-        _;
-    }
-
     function createCollectionVault(
         address collectionAddress
     ) public returns (address) {
@@ -210,7 +176,7 @@ contract MOPNGovernance is Multicall, Ownable {
         address collectionAddress
     ) internal returns (address) {
         bytes memory code = CollectionVaultBytecodeLib.getCreationCode(
-            mopnCollectionVaultContract,
+            collectionVaultContract,
             collectionAddress,
             0
         );
@@ -239,7 +205,7 @@ contract MOPNGovernance is Multicall, Ownable {
         address collectionAddress
     ) public view returns (address) {
         bytes memory code = CollectionVaultBytecodeLib.getCreationCode(
-            mopnCollectionVaultContract,
+            collectionVaultContract,
             collectionAddress,
             0
         );

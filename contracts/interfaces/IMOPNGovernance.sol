@@ -2,27 +2,21 @@
 pragma solidity ^0.8.19;
 
 interface IMOPNGovernance {
-    function mintMT(address to, uint256 amount) external;
-
-    function mintBomb(address to, uint256 tokenId, uint256 amount) external;
-
-    function burnBomb(address from, uint256 tokenId, uint256 amount) external;
-
     function auctionHouseContract() external view returns (address);
 
     function mopnContract() external view returns (address);
 
     function bombContract() external view returns (address);
 
-    function mtContract() external view returns (address);
+    function tokenContract() external view returns (address);
 
     function pointContract() external view returns (address);
 
     function landContract() external view returns (address);
 
-    function mopnDataContract() external view returns (address);
+    function dataContract() external view returns (address);
 
-    function ownershipBiddingContract() external view returns (address);
+    function rentalContract() external view returns (address);
 
     function ERC6551Registry() external view returns (address);
 

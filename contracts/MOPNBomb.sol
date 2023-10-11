@@ -17,6 +17,15 @@ contract MOPNBomb is ERC1155, Multicall, Ownable {
 
     mapping(uint256 => string) private _uris;
 
+    modifier onlyMOPN() {
+        require(
+            msg.sender == governance.mopnContract() ||
+                msg.sender == governance.auctionHouseContract(),
+            "not allowed"
+        );
+        _;
+    }
+
     constructor(address governance_) ERC1155("") {
         name = "MOPN Bomb";
         symbol = "MOPNBOMB";
@@ -44,43 +53,11 @@ contract MOPNBomb is ERC1155, Multicall, Ownable {
         return _uris[tokenId_];
     }
 
-    function mint(
-        address to,
-        uint256 id,
-        uint256 amount
-    ) public onlyGovernance {
+    function mint(address to, uint256 id, uint256 amount) public onlyMOPN {
         _mint(to, id, amount, "");
     }
 
-    function burn(
-        address from,
-        uint256 id,
-        uint256 amount
-    ) public onlyGovernance {
+    function burn(address from, uint256 id, uint256 amount) public onlyMOPN {
         _burn(from, id, amount);
-    }
-
-    function createAccount(
-        address implementation,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId,
-        uint256 salt,
-        bytes calldata initData
-    ) external returns (address) {
-        return
-            IERC6551Registry(governance.ERC6551Registry()).createAccount(
-                implementation,
-                chainId,
-                tokenContract,
-                tokenId,
-                salt,
-                initData
-            );
-    }
-
-    modifier onlyGovernance() {
-        require(msg.sender == address(governance), "not allowed");
-        _;
     }
 }

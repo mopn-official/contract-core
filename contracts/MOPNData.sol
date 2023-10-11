@@ -228,9 +228,8 @@ contract MOPNData is Multicall {
         accountData.contractAddress = collectionAddress;
         accountData.CollectionMOPNPoint = IMOPN(governance.mopnContract())
             .getCollectionMOPNPoint(collectionAddress);
-        accountData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
-            account
-        );
+        accountData.MTBalance = IMOPNToken(governance.tokenContract())
+            .balanceOf(account);
         accountData.OnMapMOPNPoint = IMOPN(governance.mopnContract())
             .getAccountOnMapMOPNPoint(account);
         accountData.TotalMOPNPoint = IERC20(governance.pointContract())
@@ -291,7 +290,7 @@ contract MOPNData is Multicall {
     ) public view returns (uint256[] memory MTBalances) {
         MTBalances = new uint256[](accounts.length);
         for (uint256 i = 0; i < accounts.length; i++) {
-            MTBalances[i] = IMOPNToken(governance.mtContract()).balanceOf(
+            MTBalances[i] = IMOPNToken(governance.tokenContract()).balanceOf(
                 accounts[i]
             );
         }
@@ -310,7 +309,7 @@ contract MOPNData is Multicall {
         );
 
         cData.OnMapNum = mopn.getCollectionOnMapNum(collectionAddress);
-        cData.MTBalance = IMOPNToken(governance.mtContract()).balanceOf(
+        cData.MTBalance = IMOPNToken(governance.tokenContract()).balanceOf(
             governance.getCollectionVault(collectionAddress)
         );
         cData.UnclaimMTBalance = calcCollectionSettledMT(collectionAddress);

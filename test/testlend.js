@@ -267,7 +267,6 @@ describe("MOPN", function () {
 
     tx = await hre.ethers.deployContract("MOPNAuctionHouse", [
       mopngovernanceAddress,
-      unixTimeStamp,
       unixTimeStamp
     ]);
     promises.push(new Promise((resolve, reject) => {
@@ -399,17 +398,6 @@ describe("MOPN", function () {
       });
     }));
 
-    tx = await mopnmt.transferOwnership(mopngovernanceAddress);
-    promises.push(new Promise((resolve, reject) => {
-      tx.wait().then(() => {
-        console.log("mt owner transfered");
-        resolve();
-      }).catch((err) => {
-        console.error(err);
-        reject();
-      });
-    }));
-
     tx = await mopngovernance.updateMOPNContracts(
       mopnauctionHouse.address,
       mopn.address,
@@ -480,9 +468,6 @@ describe("MOPN", function () {
     await deployAccountBasic(testnft1.address, 0, 10000997, 0);
     await deploySimulatorAccount(testnft1.address, 0, 10000997, 0);
 
-    await deployAccountLend(testnft1.address, 1, 10000996, 0);
-    await deploySimulatorAccount(testnft1.address, 1, 10000996, 0);
-
     await mineBlock(1);
 
     await avatarInfo();
@@ -510,6 +495,9 @@ describe("MOPN", function () {
 
     await claimAccountsMT();
     await showWalletBalance();
+
+    await buyBombAnddeployAccountLend(1, testnft1.address, 1, 10000996, 0);
+    await deploySimulatorAccount(testnft1.address, 1, 10000996, 0);
 
   }
 
@@ -771,6 +759,33 @@ describe("MOPN", function () {
       await getMoveToTilesAccounts(coordinate),
       erc6551account.interface.encodeFunctionData("lend"),
     );
+    mineBlock(1);
+    await tx.wait();
+
+    tiles[coordinate] = account;
+  };
+
+  const buyBombAnddeployAccountLend = async (amount, tokenContract, tokenId, coordinate, landId) => {
+    const account = await erc6551accounthelper.computeAccount(
+      erc6551accountproxy.address,
+      31337,
+      tokenContract,
+      tokenId,
+      0
+    );
+    accounts.push(account);
+
+    const tx = await mopn.multicall([
+      mopn.interface.encodeFunctionData("buyBomb", [amount]),
+      mopn.interface.encodeFunctionData("moveToNFT", [
+        tokenContract,
+        tokenId,
+        coordinate,
+        landId,
+        await getMoveToTilesAccounts(coordinate),
+        erc6551account.interface.encodeFunctionData("lend"),
+      ]),
+    ]);
     mineBlock(1);
     await tx.wait();
 

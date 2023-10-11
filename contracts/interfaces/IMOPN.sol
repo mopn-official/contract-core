@@ -10,7 +10,7 @@ interface IMOPN {
      */
     event AccountJumpIn(
         address indexed account,
-        uint32 indexed LandId,
+        uint16 indexed LandId,
         uint32 tileCoordinate
     );
 
@@ -23,7 +23,7 @@ interface IMOPN {
      */
     event AccountMove(
         address indexed account,
-        uint32 indexed LandId,
+        uint16 indexed LandId,
         uint32 fromCoordinate,
         uint32 toCoordinate
     );
@@ -49,7 +49,7 @@ interface IMOPN {
 
     event CollectionMTMinted(address indexed collectionAddress, uint256 amount);
 
-    event LandHolderMTMinted(uint32 indexed LandId, uint256 amount);
+    event LandHolderMTMinted(uint16 indexed LandId, uint256 amount);
 
     function getQualifiedAccountCollection(
         address account
@@ -60,7 +60,7 @@ interface IMOPN {
      */
     function moveTo(
         uint32 tileCoordinate,
-        uint32 LandId,
+        uint16 LandId,
         address[] memory tileAccounts
     ) external;
 
@@ -83,6 +83,8 @@ interface IMOPN {
     function TotalCollectionClaimed() external view returns (uint256);
 
     function TotalMTStaking() external view returns (uint256);
+
+    function currentMTPPB() external view returns (uint256);
 
     function currentMTPPB(uint256 reduceTimes) external view returns (uint256);
 
@@ -120,7 +122,7 @@ interface IMOPN {
 
     function getCollectionMOPNPointFromStaking(
         address collectionAddress
-    ) external view returns (uint256);
+    ) external view returns (uint48);
 
     function settleCollectionMT(address collectionAddress) external;
 

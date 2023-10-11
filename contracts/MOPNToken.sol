@@ -8,10 +8,9 @@ import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNData.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MOPNToken is ERC20Burnable, Ownable, Multicall {
+contract MOPNToken is ERC20Burnable, Multicall {
     /**
      * @dev Magic value to be returned by ERC20Receiver upon successful reception of token(s)
      * @dev Equal to `bytes4(keccak256("onERC20Received(address,address,uint256,bytes)"))`,
@@ -21,9 +20,10 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
 
     IMOPNGovernance governance;
 
-    modifier onlyMOPNContract() {
+    modifier onlyMOPN() {
         require(
-            msg.sender == governance.auctionHouseContract(),
+            msg.sender == governance.mopnContract() ||
+                msg.sender == governance.auctionHouseContract(),
             "MOPNToken: Only MOPN contract can call this function"
         );
         _;
@@ -37,11 +37,11 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
         return 6;
     }
 
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) public onlyMOPN {
         _mint(to, amount);
     }
 
-    function mopnburn(address from, uint256 amount) public onlyMOPNContract {
+    function mopnburn(address from, uint256 amount) public onlyMOPN {
         _burn(from, amount);
     }
 
@@ -83,7 +83,7 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
         IMOPN mopn = IMOPN(governance.mopnContract());
         return
             mopn.MTTotalMinted() +
-            (IMOPNData(governance.mopnDataContract()).calcPerMOPNPointMinted() -
+            (IMOPNData(governance.dataContract()).calcPerMOPNPointMinted() -
                 mopn.PerMOPNPointMinted()) *
             mopn.TotalMOPNPoints();
     }
@@ -93,7 +93,7 @@ contract MOPNToken is ERC20Burnable, Ownable, Multicall {
     ) public view virtual override returns (uint256 balance) {
         balance = super.balanceOf(account);
         if (IMOPN(governance.mopnContract()).accountClaimAvailable(account)) {
-            balance += IMOPNData(governance.mopnDataContract()).calcAccountMT(
+            balance += IMOPNData(governance.dataContract()).calcAccountMT(
                 account
             );
         }
