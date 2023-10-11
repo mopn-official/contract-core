@@ -66,6 +66,29 @@ async function moveTo(tokenContract, tokenId, coordinate) {
   await tx.wait();
 }
 
+async function moveToWithTilesAccounts(tokenContract, tokenId, coordinate, tilesaccounts) {
+  const accounthelper = await getContractObj('MOPNERC6551AccountHelper');
+  const account = await accounthelper.checkAccountExist(
+    await getContractAddress('MOPNERC6551AccountProxy'),
+    hre.network.config.chainId,
+    tokenContract,
+    tokenId,
+    0
+  );
+  const mopn = await getContractObj('MOPN');
+  const landId = MOPNMath.getTileLandId(coordinate);
+  let tx;
+  if (account.exist) {
+    tx = await mopn.connect(await getCurrentAccount()).moveToByOwner(account._account, coordinate, landId, tilesaccounts);
+  } else {
+    tx = await mopn.connect(await getCurrentAccount()).moveToNFT(tokenContract, tokenId, coordinate, landId, tilesaccounts, "0x");
+  }
+
+  console.log("wallet", (await getCurrentAccount()).address, "move", tokenContract, tokenId, "account", account._account, "to", coordinate, "tx sent!");
+  console.log(hre.network.config.etherscanHost + "tx/" + tx.hash);
+  await tx.wait();
+}
+
 async function bidNFT(tokenContract, tokenId) {
   const accounthelper = await getContractObj('MOPNERC6551AccountHelper');
   const account = await accounthelper.checkAccountExist(
