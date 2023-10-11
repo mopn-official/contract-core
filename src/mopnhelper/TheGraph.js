@@ -87,7 +87,7 @@ async function getCollectionOnMapAccounts(collection) {
     accounts.push({
       "account": account.id,
       "coordinate": account.coordinate.id,
-      "tokenId": accounts.tokenId
+      "tokenId": account.tokenId
     });
   }
 
