@@ -62,6 +62,63 @@ async function getMoveToTilesAccounts(coordinate) {
   return tilesaccounts;
 }
 
+async function getMoveToTilesAccountsRich(coordinate) {
+  let tileaccounts = {};
+  let coordinates = [];
+  let tilesaccounts = [];
+
+  coordinates[0] = coordinate.toString();
+  coordinate++;
+  for (let i = 0; i < 18; i++) {
+    coordinates[i + 1] = coordinate.toString();
+    if (i == 5) {
+      coordinate += 10001;
+    } else if (i < 5) {
+      coordinate = MOPNMath.neighbor(coordinate, i);
+    } else {
+      coordinate = MOPNMath.neighbor(coordinate, Math.floor((i - 6) / 2));
+    }
+  }
+
+  const graphqlQuery = {
+    "operationName": "fetchCoordinates",
+    "query": `query fetchCoordinates($id_in: [String!]) {
+      coordinateDatas(where: {id_in: $id_in}) {
+        id
+        account {
+          id
+        }
+        ContractAddress
+      }
+    }`,
+    "variables": {
+      "id_in": coordinates
+    }
+  };
+  const coordinateDatas = await fetchData(graphqlQuery);
+  for (let coordinateData of coordinateDatas.data.coordinateDatas) {
+    if (coordinateData.account !== null) {
+      tileaccounts[coordinateData.id] = {
+        "account": coordinateData.account.id,
+        "collection": coordinateData.account.ContractAddress
+      };
+    }
+  }
+
+  coordinates.forEach(coordinate => {
+    if (tileaccounts[coordinate]) {
+      tilesaccounts.push(tileaccounts[coordinate]);
+    } else {
+      tilesaccounts.push({
+        "account": hre.ethers.constants.AddressZero,
+        "collection": hre.ethers.constants.AddressZero,
+      });
+    }
+  });
+
+  return tilesaccounts;
+}
+
 async function getCollectionOnMapAccounts(collection) {
   let accounts = [];
 
