@@ -87,8 +87,8 @@ async function getMoveToTilesAccountsRich(coordinate) {
         id
         account {
           id
+          ContractAddress
         }
-        ContractAddress
       }
     }`,
     "variables": {
@@ -154,5 +154,6 @@ async function getCollectionOnMapAccounts(collection) {
 module.exports = {
   fetchData,
   getMoveToTilesAccounts,
+  getMoveToTilesAccountsRich,
   getCollectionOnMapAccounts
 };
