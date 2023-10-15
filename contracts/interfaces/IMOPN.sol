@@ -2,6 +2,24 @@
 pragma solidity ^0.8.19;
 
 interface IMOPN {
+    struct CollectionDataStruct {
+        uint48 CollectionMOPNPoint;
+        uint48 OnMapMOPNPoints;
+        uint16 OnMapNftNumber;
+        uint48 PerCollectionNFTMinted;
+        uint48 PerMOPNPointMinted;
+        uint48 SettledMT;
+    }
+
+    struct AccountDataStruct {
+        uint16 LandId;
+        uint32 Coordinate;
+        uint48 PerCollectionNFTMinted;
+        uint48 PerMOPNPointMinted;
+        uint48 SettledMT;
+        uint48 NFTOWnerSettledMT;
+    }
+
     /**
      * @notice This event emit when an avatar jump into the map
      * @param account account wallet address
@@ -51,10 +69,6 @@ interface IMOPN {
 
     event LandHolderMTMinted(uint16 indexed LandId, uint256 amount);
 
-    function getQualifiedAccountCollection(
-        address account
-    ) external view returns (address);
-
     /**
      * @notice an on map avatar move to a new tile
      */
@@ -64,25 +78,25 @@ interface IMOPN {
         address[] memory tileAccounts
     ) external;
 
-    function MTOutputPerBlock() external view returns (uint256);
+    function MTOutputPerBlock() external view returns (uint32);
 
-    function MTStepStartBlock() external view returns (uint256);
+    function MTStepStartBlock() external view returns (uint32);
 
     function MTReduceInterval() external view returns (uint256);
 
-    function TotalMOPNPoints() external view returns (uint256);
+    function TotalMOPNPoints() external view returns (uint48);
 
-    function LastTickBlock() external view returns (uint256);
+    function LastTickBlock() external view returns (uint32);
 
-    function PerMOPNPointMinted() external view returns (uint256);
+    function PerMOPNPointMinted() external view returns (uint48);
 
-    function MTTotalMinted() external view returns (uint256);
+    function MTTotalMinted() external view returns (uint64);
 
-    function NFTOfferCoefficient() external view returns (uint256);
+    function NFTOfferCoefficient() external view returns (uint48);
 
-    function TotalCollectionClaimed() external view returns (uint256);
+    function TotalCollectionClaimed() external view returns (uint48);
 
-    function TotalMTStaking() external view returns (uint256);
+    function TotalMTStaking() external view returns (uint64);
 
     function currentMTPPB() external view returns (uint256);
 
@@ -92,33 +106,9 @@ interface IMOPN {
 
     function settlePerMOPNPointMinted() external;
 
-    function getCollectionMOPNPoint(
+    function getCollectionData(
         address collectionAddress
-    ) external view returns (uint256);
-
-    function getCollectionMOPNPoints(
-        address collectionAddress
-    ) external view returns (uint256);
-
-    function getCollectionOnMapMOPNPoints(
-        address collectionAddress
-    ) external view returns (uint256);
-
-    function getCollectionOnMapNum(
-        address collectionAddress
-    ) external view returns (uint256);
-
-    function getCollectionPerMOPNPointMinted(
-        address collectionAddress
-    ) external view returns (uint256);
-
-    function getPerCollectionNFTMinted(
-        address collectionAddress
-    ) external view returns (uint256);
-
-    function getCollectionSettledMT(
-        address collectionAddress
-    ) external view returns (uint256);
+    ) external view returns (CollectionDataStruct memory);
 
     function getCollectionMOPNPointFromStaking(
         address collectionAddress
@@ -126,9 +116,7 @@ interface IMOPN {
 
     function settleCollectionMT(address collectionAddress) external;
 
-    function claimCollectionMT(
-        address collectionAddress
-    ) external returns (uint256);
+    function claimCollectionMT(address collectionAddress) external;
 
     function settleCollectionMOPNPoint(address collectionAddress) external;
 
@@ -136,29 +124,17 @@ interface IMOPN {
         address account
     ) external view returns (bool);
 
+    function getAccountData(
+        address account
+    ) external view returns (AccountDataStruct memory);
+
     function getAccountCollection(
         address account
     ) external view returns (address collectionAddress);
 
     function getAccountOnMapMOPNPoint(
         address account
-    ) external view returns (uint256);
-
-    function getAccountCoordinate(
-        address account
-    ) external view returns (uint32);
-
-    function getAccountPerCollectionNFTMinted(
-        address account
-    ) external view returns (uint256);
-
-    function getAccountPerMOPNPointMinted(
-        address account
-    ) external view returns (uint256);
-
-    function getAccountSettledMT(
-        address account
-    ) external view returns (uint256);
+    ) external view returns (uint256 OnMapMOPNPoint);
 
     function claimAccountMT(address account, address to) external;
 

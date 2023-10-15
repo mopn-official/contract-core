@@ -219,7 +219,7 @@ contract MOPNERC6551Account is
         require(ownershipMode == 0, "account not in lend mode");
         require(
             IMOPN(IMOPNGovernance(governance).mopnContract())
-                .getAccountCoordinate(address(this)) == 0,
+                .getAccountOnMapMOPNPoint(address(this)) == 0,
             "already lend to sb"
         );
         if (renter != address(0)) {

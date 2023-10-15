@@ -31,11 +31,14 @@ contract MOPNPoint is ERC20 {
         address account
     ) public view virtual override returns (uint256 balance) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        if (mopn.getAccountCoordinate(account) > 0) {
+        IMOPN.AccountDataStruct memory mopnAccountData = mopn.getAccountData(
+            account
+        );
+        if (mopnAccountData.Coordinate > 0) {
             balance += mopn.getAccountOnMapMOPNPoint(account);
-            balance += mopn.getCollectionMOPNPoint(
-                mopn.getAccountCollection(account)
-            );
+            IMOPN.CollectionDataStruct memory collectionData = mopn
+                .getCollectionData(mopn.getAccountCollection(account));
+            balance += collectionData.CollectionMOPNPoint;
         }
     }
 

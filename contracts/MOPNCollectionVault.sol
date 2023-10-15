@@ -26,15 +26,10 @@ contract MOPNCollectionVault is
 {
     address public immutable governance;
 
-    /**
-     * @notice NFTOfferData
-     * Bits Layouts:
-     *  - [0..7] OfferStatus 0 offering 1 auctioning
-     *  - [8..39] Auction Start Timestamp
-     *  - [40..103] Offer Accept Price
-     *  - [104..255] Auction tokenId
-     */
-    uint256 public NFTOfferData;
+    uint8 OfferStatus;
+    uint32 AuctionStartTimestamp;
+    uint64 OfferAcceptPrice;
+    uint256 AuctionTokenId;
 
     constructor(address governance_) ERC20("MOPN VToken", "MVT") {
         governance = governance_;
@@ -59,24 +54,12 @@ contract MOPNCollectionVault is
         return "MVT";
     }
 
+    function decimals() public view virtual override returns (uint8) {
+        return 6;
+    }
+
     function collectionAddress() public view returns (address) {
         return CollectionVaultLib.collectionAddress();
-    }
-
-    function getOfferStatus() public view returns (uint256) {
-        return uint8(NFTOfferData);
-    }
-
-    function getAuctionStartTimestamp() public view returns (uint256) {
-        return uint32(NFTOfferData >> 8);
-    }
-
-    function getOfferAcceptPrice() public view returns (uint256) {
-        return uint64(NFTOfferData >> 40);
-    }
-
-    function getAuctionTokenId() public view returns (uint256) {
-        return NFTOfferData >> 104;
     }
 
     /**
@@ -84,12 +67,9 @@ contract MOPNCollectionVault is
      * @return price current auction price
      */
     function getAuctionCurrentPrice() public view returns (uint256) {
-        if (getOfferStatus() == 0) return 0;
+        if (OfferStatus == 0) return 0;
 
-        return
-            getAuctionPrice(
-                (block.timestamp - getAuctionStartTimestamp()) / 60
-            );
+        return getAuctionPrice((block.timestamp - AuctionStartTimestamp) / 60);
     }
 
     function getAuctionPrice(
@@ -97,14 +77,14 @@ contract MOPNCollectionVault is
     ) public view returns (uint256) {
         int128 reducePercentage = ABDKMath64x64.divu(99, 100);
         int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, getOfferAcceptPrice() * 10);
+        return ABDKMath64x64.mulu(reducePower, OfferAcceptPrice * 10);
     }
 
     function getAuctionInfo() public view returns (NFTAuction memory auction) {
-        auction.offerStatus = getOfferStatus();
-        auction.startTimestamp = getAuctionStartTimestamp();
-        auction.offerAcceptPrice = getOfferAcceptPrice();
-        auction.tokenId = getAuctionTokenId();
+        auction.offerStatus = OfferStatus;
+        auction.startTimestamp = AuctionStartTimestamp;
+        auction.offerAcceptPrice = OfferAcceptPrice;
+        auction.tokenId = AuctionTokenId;
         auction.currentPrice = getAuctionCurrentPrice();
     }
 
@@ -113,7 +93,7 @@ contract MOPNCollectionVault is
         bool onReceived
     ) public view returns (uint256 VAmount) {
         if (totalSupply() == 0) {
-            VAmount = MTAmount * 10 ** 12;
+            VAmount = MTAmount;
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /
@@ -127,7 +107,7 @@ contract MOPNCollectionVault is
         bool onReceived
     ) public view returns (uint256 VAmount) {
         if (totalSupply() == 0) {
-            VAmount = MTAmount * 10 ** 12;
+            VAmount = MTAmount;
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /
@@ -201,13 +181,10 @@ contract MOPNCollectionVault is
     function MTBalance() public view returns (uint256 balance) {
         balance = IMOPNToken(IMOPNGovernance(governance).tokenContract())
             .balanceOf(address(this));
-        if (getOfferStatus() == 1) {
-            balance += getOfferAcceptPrice();
-        }
     }
 
     function acceptNFTOffer(uint256 tokenId) public {
-        require(getOfferStatus() == 0, "last offer auction not finish");
+        require(OfferStatus == 0, "last offer auction not finish");
         address collectionAddress_ = CollectionVaultLib.collectionAddress();
         IERC721(collectionAddress_).safeTransferFrom(
             msg.sender,
@@ -229,13 +206,14 @@ contract MOPNCollectionVault is
             offerPrice
         );
 
-        NFTOfferData =
-            (tokenId << 104) |
-            (offerPrice << 40) |
-            (block.timestamp << 8) |
-            uint256(1);
+        AuctionTokenId = tokenId;
+        OfferAcceptPrice = uint64(offerPrice);
+        AuctionStartTimestamp = uint32(block.timestamp);
+        OfferStatus = 1;
 
         mopn.settleCollectionMOPNPoint(collectionAddress_);
+        mopn.changeTotalMTStaking(collectionAddress_, 0, offerPrice);
+
         (uint256 oldNFTOfferCoefficient, uint256 newNFTOfferCoefficient) = mopn
             .NFTOfferAccept(collectionAddress_, offerPrice);
 
@@ -264,17 +242,15 @@ contract MOPNCollectionVault is
         address collectionAddress_ = CollectionVaultLib.collectionAddress();
 
         if (bytes32(data) == keccak256("acceptAuctionBid")) {
-            require(getOfferStatus() == 1, "auction not exist");
+            require(OfferStatus == 1, "auction not exist");
 
-            uint256 startTimestamp = getAuctionStartTimestamp();
-            require(block.timestamp >= startTimestamp, "auction not start");
+            require(
+                block.timestamp >= AuctionStartTimestamp,
+                "auction not start"
+            );
 
             uint256 price = getAuctionCurrentPrice();
             require(value >= price, "MOPNToken not enough");
-
-            uint256 offerAcceptPrice = getOfferAcceptPrice();
-            uint256 tokenId = getAuctionTokenId();
-            NFTOfferData = 0;
 
             if (value > price) {
                 IMOPNToken(IMOPNGovernance(governance).tokenContract())
@@ -283,7 +259,7 @@ contract MOPNCollectionVault is
             }
             uint256 burnAmount;
             if (price > 0) {
-                burnAmount = (price * 2) / 10;
+                burnAmount = price / 20;
                 IMOPNToken(IMOPNGovernance(governance).tokenContract()).burn(
                     burnAmount
                 );
@@ -293,35 +269,27 @@ contract MOPNCollectionVault is
 
             mopn.claimCollectionMT(collectionAddress_);
             mopn.settleCollectionMOPNPoint(collectionAddress_);
-
-            if (price > offerAcceptPrice) {
-                mopn.changeTotalMTStaking(
-                    collectionAddress_,
-                    1,
-                    price - offerAcceptPrice
-                );
-            } else if (price < offerAcceptPrice) {
-                mopn.changeTotalMTStaking(
-                    collectionAddress_,
-                    0,
-                    offerAcceptPrice - price
-                );
-            }
+            mopn.changeTotalMTStaking(collectionAddress_, 1, price);
 
             IERC721(collectionAddress_).safeTransferFrom(
                 address(this),
                 from,
-                tokenId,
+                AuctionTokenId,
                 "0x"
             );
 
-            emit NFTAuctionAccept(from, tokenId, price + burnAmount);
+            emit NFTAuctionAccept(from, AuctionTokenId, price + burnAmount);
+
+            OfferStatus = 0;
+            AuctionTokenId = 0;
+            AuctionStartTimestamp = 0;
+            OfferAcceptPrice = 0;
         } else {
-            require(value >= 1000000000, "minimum staking value is 1000");
-            require(getOfferStatus() == 0, "no staking during auction");
+            require(OfferStatus == 0, "no staking during auction");
             mopn.claimCollectionMT(collectionAddress_);
 
             uint256 vtokenAmount = MT2VAmount(value, true);
+            require(vtokenAmount > 0, "need more mt to get at least 1 vtoken");
             _mint(from, vtokenAmount);
             mopn.settleCollectionMOPNPoint(collectionAddress_);
             mopn.changeTotalMTStaking(collectionAddress_, 1, value);
