@@ -92,11 +92,7 @@ contract MOPNToken is ERC20Burnable, Multicall {
         address account
     ) public view virtual override returns (uint256 balance) {
         balance = super.balanceOf(account);
-        if (IMOPN(governance.mopnContract()).accountClaimAvailable(account)) {
-            balance += IMOPNData(governance.dataContract()).calcAccountMT(
-                account
-            );
-        }
+        balance += IMOPNData(governance.dataContract()).calcAccountMT(account);
     }
 
     function _beforeTokenTransfer(
@@ -106,8 +102,12 @@ contract MOPNToken is ERC20Burnable, Multicall {
     ) internal virtual override {
         uint256 realbalance = super.balanceOf(from);
         IMOPN mopn = IMOPN(governance.mopnContract());
-        if (realbalance < amount && mopn.accountClaimAvailable(from)) {
-            mopn.claimAccountMT(from, from);
+        IMOPN.AccountDataStruct memory accountData = mopn.getAccountData(from);
+        if (
+            accountData.PerMOPNPointMinted > 0 &&
+            (accountData.AgentPlacer != address(0) || realbalance < amount)
+        ) {
+            mopn.claimAccountMTTo(from, from);
         }
     }
 }

@@ -214,16 +214,9 @@ contract MOPNCollectionVault is
         mopn.settleCollectionMOPNPoint(collectionAddress_);
         mopn.changeTotalMTStaking(collectionAddress_, 0, offerPrice);
 
-        (uint256 oldNFTOfferCoefficient, uint256 newNFTOfferCoefficient) = mopn
-            .NFTOfferAccept(collectionAddress_, offerPrice);
+        mopn.NFTOfferAccept(collectionAddress_, offerPrice);
 
-        emit NFTOfferAccept(
-            msg.sender,
-            tokenId,
-            offerPrice,
-            oldNFTOfferCoefficient,
-            newNFTOfferCoefficient
-        );
+        emit NFTOfferAccept(msg.sender, tokenId, offerPrice);
     }
 
     function onERC20Received(

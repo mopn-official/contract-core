@@ -6,43 +6,14 @@ import "hardhat/console.sol";
 import "./erc6551/interfaces/IMOPNERC6551Account.sol";
 import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
-import "./interfaces/IMOPNCollectionVault.sol";
 import "./libraries/TileMath.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MOPNData is Multicall {
-    struct NFTParams {
-        address collectionAddress;
-        uint256 tokenId;
-    }
-
-    struct AccountDataOutput {
-        address account;
-        address contractAddress;
-        uint256 tokenId;
-        uint256 CollectionMOPNPoint;
-        uint256 MTBalance;
-        uint256 OnMapMOPNPoint;
-        uint256 TotalMOPNPoint;
-        uint32 tileCoordinate;
-    }
-
-    struct CollectionDataOutput {
-        address contractAddress;
-        address collectionVault;
-        uint256 OnMapNum;
-        uint256 MTBalance;
-        uint256 UnclaimMTBalance;
-        uint256 CollectionMOPNPoints;
-        uint256 OnMapMOPNPoints;
-        uint256 CollectionMOPNPoint;
-        uint256 PMTTotalSupply;
-        IMOPNCollectionVault.NFTAuction NFTAuction;
-    }
-
+contract MOPNData is IMOPNData, Multicall {
     IMOPNGovernance public governance;
 
     constructor(address governance_) {
@@ -155,7 +126,7 @@ contract MOPNData is Multicall {
                 ((AccountPerMOPNPointMintedDiff * AccountOnMapMOPNPoint) * 90) /
                 100;
             uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(
-                    mopn.getAccountCollection(account)
+                    getAccountCollection(account)
                 ) - accountData.PerCollectionNFTMinted;
 
             if (AccountPerCollectionNFTMintedDiff > 0) {
@@ -202,7 +173,7 @@ contract MOPNData is Multicall {
                 accountData.PerMOPNPointMinted;
 
             if (AccountPerMOPNPointMintedDiff > 0) {
-                address collectionAddress = mopn.getAccountCollection(account);
+                address collectionAddress = getAccountCollection(account);
                 uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(
                         collectionAddress
                     ) - accountData.PerCollectionNFTMinted;
@@ -218,6 +189,12 @@ contract MOPNData is Multicall {
                 }
             }
         }
+    }
+
+    function getAccountCollection(
+        address account
+    ) public view returns (address collectionAddress) {
+        (, collectionAddress, ) = IMOPNERC6551Account(payable(account)).token();
     }
 
     function getAccountData(

@@ -106,10 +106,10 @@ async function main() {
           );
           const updatetx = await eval(
             "contract." +
-            deployConf[contractName].attributesCheck[j].updateMethod +
-            "(...updateParams)"
+              deployConf[contractName].attributesCheck[j].updateMethod +
+              "(...updateParams)"
           );
-          console.log(updatetx.hash);
+          console.log(deployConf["blockScanUrl"] + updatetx.hash);
           await updatetx.wait();
           console.log("update succeed");
           saveConf(deployConf);

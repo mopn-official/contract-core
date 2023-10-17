@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 interface IMOPN {
     struct CollectionDataStruct {
-        uint48 CollectionMOPNPoint;
+        uint24 CollectionMOPNPoint;
         uint48 OnMapMOPNPoints;
         uint16 OnMapNftNumber;
         uint48 PerCollectionNFTMinted;
@@ -12,12 +12,12 @@ interface IMOPN {
     }
 
     struct AccountDataStruct {
+        address AgentPlacer;
         uint16 LandId;
-        uint32 Coordinate;
-        uint48 PerCollectionNFTMinted;
+        uint24 Coordinate;
         uint48 PerMOPNPointMinted;
         uint48 SettledMT;
-        uint48 NFTOWnerSettledMT;
+        uint48 PerCollectionNFTMinted;
     }
 
     /**
@@ -29,7 +29,8 @@ interface IMOPN {
     event AccountJumpIn(
         address indexed account,
         uint16 indexed LandId,
-        uint32 tileCoordinate
+        uint24 tileCoordinate,
+        address agentPlacer
     );
 
     /**
@@ -42,8 +43,8 @@ interface IMOPN {
     event AccountMove(
         address indexed account,
         uint16 indexed LandId,
-        uint32 fromCoordinate,
-        uint32 toCoordinate
+        uint24 fromCoordinate,
+        uint24 toCoordinate
     );
 
     /**
@@ -55,7 +56,7 @@ interface IMOPN {
     event BombUse(
         address indexed account,
         address victim,
-        uint32 tileCoordinate
+        uint24 tileCoordinate
     );
 
     event CollectionPointChange(
@@ -68,15 +69,6 @@ interface IMOPN {
     event CollectionMTMinted(address indexed collectionAddress, uint256 amount);
 
     event LandHolderMTMinted(uint16 indexed LandId, uint256 amount);
-
-    /**
-     * @notice an on map avatar move to a new tile
-     */
-    function moveTo(
-        uint32 tileCoordinate,
-        uint16 LandId,
-        address[] memory tileAccounts
-    ) external;
 
     function MTOutputPerBlock() external view returns (uint32);
 
@@ -112,7 +104,7 @@ interface IMOPN {
 
     function getCollectionMOPNPointFromStaking(
         address collectionAddress
-    ) external view returns (uint48);
+    ) external view returns (uint24);
 
     function settleCollectionMT(address collectionAddress) external;
 
@@ -120,23 +112,17 @@ interface IMOPN {
 
     function settleCollectionMOPNPoint(address collectionAddress) external;
 
-    function accountClaimAvailable(
-        address account
-    ) external view returns (bool);
-
     function getAccountData(
         address account
     ) external view returns (AccountDataStruct memory);
-
-    function getAccountCollection(
-        address account
-    ) external view returns (address collectionAddress);
 
     function getAccountOnMapMOPNPoint(
         address account
     ) external view returns (uint256 OnMapMOPNPoint);
 
-    function claimAccountMT(address account, address to) external;
+    function claimAccountMT(address account) external;
+
+    function claimAccountMTTo(address account, address to) external;
 
     function changeTotalMTStaking(
         address collectionAddress,
@@ -144,8 +130,5 @@ interface IMOPN {
         uint256 amount
     ) external;
 
-    function NFTOfferAccept(
-        address collectionAddress,
-        uint256 price
-    ) external returns (uint256, uint256);
+    function NFTOfferAccept(address collectionAddress, uint256 price) external;
 }

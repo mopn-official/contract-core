@@ -327,6 +327,16 @@ async function removeStakingMT(collectionAddress, amount) {
   }
 }
 
+async function getAccountNFTOwner(account) {
+  const accountContract = await getContractObj("MOPNERC6551Account", account);
+  return await accountContract.nftowner();
+}
+
+async function getAccountNFTInfo(account) {
+  const accountContract = await getContractObj("MOPNERC6551Account", account);
+  return await accountContract.token();
+}
+
 module.exports = {
   getContractAddress,
   getContractObj,
@@ -336,4 +346,6 @@ module.exports = {
   buybomb,
   stackMT,
   removeStakingMT,
+  getAccountNFTOwner,
+  getAccountNFTInfo,
 };

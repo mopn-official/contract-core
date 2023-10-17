@@ -15,9 +15,7 @@ interface IMOPNCollectionVault is IERC20 {
     event NFTOfferAccept(
         address indexed operator,
         uint256 tokenId,
-        uint256 price,
-        uint256 oldNFTOfferCoefficient,
-        uint256 newNFTOfferCoefficient
+        uint256 price
     );
 
     event NFTAuctionAccept(

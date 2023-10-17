@@ -21,17 +21,16 @@ describe("MOPN", function () {
     mopnrental,
     mopnland,
     mopnlandMetaDataRender;
-  let owner,
-    owner1,
+  let owners,
     mtdecimals,
     accounts = [],
     collections = [],
     tiles = {};
 
   it("deploy one time contracts and params", async function () {
-    [owner, owner1] = await hre.ethers.getSigners();
-    console.log("owner", owner.address);
-    console.log("owner1", owner1.address);
+    owners = await hre.ethers.getSigners();
+    console.log("owner", owners[0].address);
+    console.log("owner1", owners[1].address);
 
     let promises = [];
 
@@ -144,12 +143,12 @@ describe("MOPN", function () {
 
     promises = [];
 
-    tx = await testnft.safeMint(owner.address, 20);
+    tx = await testnft.safeMint(owners[0].address, 20);
     promises.push(
       new Promise((resolve, reject) => {
         tx.wait()
           .then(() => {
-            console.log("mint 20", testnft.address, "nft to", owner.address);
+            console.log("mint 20", testnft.address, "nft to", owners[0].address);
             resolve();
           })
           .catch((err) => {
@@ -158,12 +157,12 @@ describe("MOPN", function () {
           });
       })
     );
-    tx = await testnft1.safeMint(owner.address, 20);
+    tx = await testnft1.safeMint(owners[0].address, 20);
     promises.push(
       new Promise((resolve, reject) => {
         tx.wait()
           .then(() => {
-            console.log("mint 20", testnft1.address, "nft to", owner.address);
+            console.log("mint 20", testnft1.address, "nft to", owners[0].address);
             resolve();
           })
           .catch((err) => {
@@ -431,7 +430,7 @@ describe("MOPN", function () {
       unixTimeStamp,
       200000000000000,
       1001,
-      owner.address,
+      owners[0].address,
       mopnlandMetaDataRenderAddress,
       mopnauctionHouseAddress,
     ]);
@@ -573,16 +572,20 @@ describe("MOPN", function () {
     }
 
     await deployAccountBasic(testnft1.address, 0, 10000997, 0);
+    await deployAccountAndMoveTo(testnft1.address, 1, 10000996, 0);
 
-    await mineBlock(210);
+    await mineBlock(10000);
 
     await avatarInfo();
     await collectionInfo();
 
     await claimAccountsMT();
+
+    await avatarInfo();
+    await collectionInfo();
     await showWalletBalance();
 
-    //await buyBombAnddeployAccountLend(1, testnft1.address, 1, 10000996, 0);
+    await buyBombAnddeployAccount(1, testnft1.address, 2, 10000995, 0);
   }
 
   it("test stakingMT", async function () {
@@ -603,7 +606,7 @@ describe("MOPN", function () {
 
     console.log("stake 10000MT to vault1");
     const tx2 = await mopnmt.safeTransferFrom(
-      owner.address,
+      owners[0].address,
       vault1.address,
       hre.ethers.BigNumber.from("10000000000"),
       "0x"
@@ -637,7 +640,7 @@ describe("MOPN", function () {
     // await tx6.wait();
     // console.log("vault1 auction info", await vault1.getAuctionInfo());
 
-    const vault1vtbalance = await vault1.balanceOf(owner.address);
+    const vault1vtbalance = await vault1.balanceOf(owners[0].address);
     console.log("vault1 vt balance", vault1vtbalance);
     console.log("vault1 mt balance", await mopnmt.balanceOf(vault1.address));
     const tx7 = await vault1.withdraw(vault1vtbalance - 1);
@@ -740,6 +743,7 @@ describe("MOPN", function () {
       mopn.address,
       0,
       mopn.interface.encodeFunctionData("moveTo", [
+        account,
         coordinate,
         landId,
         await getMoveToTilesAccounts(coordinate),
@@ -751,7 +755,7 @@ describe("MOPN", function () {
     tiles[coordinate] = account;
   };
 
-  const deployAccountMOPN = async (tokenContract, tokenId, coordinate, landId) => {
+  const deployAccountAndMoveTo = async (tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
       31337,
@@ -760,23 +764,19 @@ describe("MOPN", function () {
       0
     );
     accounts.push(account);
-    const tx = await mopn.multicall([
-      mopn.interface.encodeFunctionData("createAccount", [
-        erc6551accountproxy.address,
-        31337,
-        tokenContract,
-        tokenId,
-        0,
-        "0x",
-        //erc6551account.interface.encodeFunctionData("setOwnerHosting", [hre.ethers.constants.AddressZero]),
-      ]),
-      mopn.interface.encodeFunctionData("moveToByOwner", [
-        account,
-        coordinate,
-        landId,
-        await getMoveToTilesAccounts(coordinate),
-      ]),
-    ]);
+    let tx = await erc6551registry.createAccount(
+      erc6551accountproxy.address,
+      31337,
+      tokenContract,
+      tokenId,
+      0,
+      "0x"
+    );
+    await tx.wait();
+
+    tx = await mopn
+      .connect(owners[1])
+      .moveTo(account, coordinate, landId, await getMoveToTilesAccounts(coordinate));
     await tx.wait();
 
     tiles[coordinate] = account;
@@ -797,14 +797,14 @@ describe("MOPN", function () {
       coordinate,
       landId,
       await getMoveToTilesAccounts(coordinate),
-      erc6551account.interface.encodeFunctionData("setOwnershipMode", [1])
+      "0x"
     );
     await tx.wait();
 
     tiles[coordinate] = account;
   };
 
-  const deployAccountLend = async (tokenContract, tokenId, coordinate, landId) => {
+  const buyBombAnddeployAccount = async (amount, tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
       erc6551accountproxy.address,
       31337,
@@ -813,34 +813,8 @@ describe("MOPN", function () {
       0
     );
     accounts.push(account);
-    const tx = await mopn.moveToNFT(
-      tokenContract,
-      tokenId,
-      coordinate,
-      landId,
-      await getMoveToTilesAccounts(coordinate),
-      erc6551account.interface.encodeFunctionData("lend")
-    );
-    await tx.wait();
 
-    tiles[coordinate] = account;
-  };
-
-  const buyBombAnddeployAccountLend = async (
-    amount,
-    tokenContract,
-    tokenId,
-    coordinate,
-    landId
-  ) => {
-    const account = await erc6551accounthelper.computeAccount(
-      erc6551accountproxy.address,
-      31337,
-      tokenContract,
-      tokenId,
-      0
-    );
-    accounts.push(account);
+    console.log("bomb price", await mopnauctionHouse.getBombCurrentPrice());
 
     const tx = await mopn.multicall([
       mopn.interface.encodeFunctionData("buyBomb", [amount]),
@@ -850,46 +824,12 @@ describe("MOPN", function () {
         coordinate,
         landId,
         await getMoveToTilesAccounts(coordinate),
-        erc6551account.interface.encodeFunctionData("lend"),
+        "0x",
       ]),
     ]);
     await tx.wait();
 
     tiles[coordinate] = account;
-  };
-
-  const deployAccountHelperMulticallParams = async (tokenContract, tokenId, coordinate, landId) => {
-    const account = await erc6551accounthelper.computeAccount(
-      erc6551accountproxy.address,
-      31337,
-      tokenContract,
-      tokenId,
-      0
-    );
-    accounts.push(account);
-
-    const res = [
-      erc6551accounthelper.interface.encodeFunctionData("createAccount", [
-        erc6551accountproxy.address,
-        31337,
-        tokenContract,
-        tokenId,
-        0,
-        "0x",
-      ]),
-      erc6551accounthelper.interface.encodeFunctionData("proxyCall", [
-        account,
-        mopn.address,
-        0,
-        mopn.interface.encodeFunctionData("moveTo", [
-          coordinate,
-          landId,
-          await getMoveToTilesAccounts(coordinate),
-        ]),
-      ]),
-    ];
-    tiles[coordinate] = account;
-    return res;
   };
 
   const getMoveToTilesAccounts = async (tileCoordinate) => {
@@ -914,7 +854,8 @@ describe("MOPN", function () {
   };
 
   const claimAccountsMT = async () => {
-    const tx = await mopn.batchClaimAccountMT([[accounts[0]], accounts.slice(1, 8)]);
+    console.log([accounts.slice(0, 8), accounts.slice(8, 10)]);
+    const tx = await mopn.batchClaimAccountMT([accounts.slice(0, 8), accounts.slice(8, 10)]);
     await tx.wait();
   };
 
@@ -924,6 +865,16 @@ describe("MOPN", function () {
   };
 
   const showWalletBalance = async () => {
-    console.log("hardhat wallet balance", (await mopnmt.balanceOf(owner.address)).toString());
+    let table = new Table({
+      head: ["Account", "address", "balance"],
+    });
+    for (let i = 0; i < owners.length; i++) {
+      table.push([
+        "owner" + i,
+        owners[i].address,
+        (await mopnmt.balanceOf(owners[i].address)).toString(),
+      ]);
+    }
+    console.log(table.toString());
   };
 });

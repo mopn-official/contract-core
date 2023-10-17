@@ -200,14 +200,7 @@ contract MOPNERC6551Account is
             "not nft owner"
         );
         require(ownershipMode != ownershipMode_, "mode not change");
-        if (ownershipMode == 0) {
-            if (renter != address(0)) {
-                IMOPN(IMOPNGovernance(governance).mopnContract())
-                    .claimAccountMT(address(this), renter);
-            }
-        } else {
-            require(rentEndBlock < block.number, "rent not finish");
-        }
+        require(rentEndBlock < block.number, "rent not finish");
 
         emit OwnershipModeChange(ownershipMode_, ownershipMode);
         ownershipMode = ownershipMode_;
@@ -215,30 +208,10 @@ contract MOPNERC6551Account is
         renter = address(0);
     }
 
-    function lend() public {
-        require(ownershipMode == 0, "account not in lend mode");
-        require(
-            IMOPN(IMOPNGovernance(governance).mopnContract())
-                .getAccountOnMapMOPNPoint(address(this)) == 0,
-            "already lend to sb"
-        );
-        if (renter != address(0)) {
-            IMOPN(IMOPNGovernance(governance).mopnContract()).claimAccountMT(
-                address(this),
-                renter
-            );
-        }
-        renter = msg.sender == IMOPNGovernance(governance).ERC6551Registry()
-            ? tx.origin
-            : msg.sender;
-        rentEndBlock = type(uint40).max;
-        emit OwnerTransfer(renter, rentEndBlock);
-    }
-
     function ownerTransferTo(address to, uint40 endBlock) public {
-        if (ownershipMode == 1) {
+        if (ownershipMode == 0) {
             require(msg.sender == nftowner(), "not allowed");
-        } else if (ownershipMode == 2) {
+        } else if (ownershipMode == 1) {
             require(msg.sender == ownershipRentalContract, "not allowed");
         } else {
             require(false, "OwnershipMode not supported transfer");
