@@ -116,6 +116,10 @@ interface IMOPN {
         address account
     ) external view returns (AccountDataStruct memory);
 
+    function getAccountCollection(
+        address account
+    ) external view returns (address collectionAddress);
+
     function getAccountOnMapMOPNPoint(
         address account
     ) external view returns (uint256 OnMapMOPNPoint);

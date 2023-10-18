@@ -134,7 +134,7 @@
             50400,
             10000,
             99999,
-            true
+            false
         ]
     },
     "MOPNData": {
@@ -170,7 +170,7 @@
         ]
     },
     "MOPNPoint": {
-        "address": "0xd25B897D9c1Ce4e25d4909afa79Ab8c8aFa810db",
+        "address": "0x39fbbe09061bae90D525813D424156d548250d61",
         "verified": true,
         "constructparams": [
             "MOPNGovernance"
