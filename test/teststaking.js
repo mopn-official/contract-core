@@ -571,21 +571,28 @@ describe("MOPN", function () {
       }
     }
 
-    await deployAccountBasic(testnft1.address, 0, 10000997, 0);
-    await deployAccountAndMoveTo(testnft1.address, 1, 10000996, 0);
+    await deployAccountNFT(testnft1.address, 0, 10000997, 0);
+    await deployAccountNFT(testnft1.address, 1, 10000996, 0);
+
+    await avatarInfo();
+    await collectionInfo();
 
     await mineBlock(10000);
 
     await avatarInfo();
     await collectionInfo();
 
-    await claimAccountsMT();
+    await claimNFTsMT();
 
     await avatarInfo();
     await collectionInfo();
     await showWalletBalance();
 
-    await buyBombAnddeployAccount(1, testnft1.address, 2, 10000995, 0);
+    await buyBombAnddeployAccount(1, testnft1.address, 2, 10000998, 0);
+
+    await avatarInfo();
+    await collectionInfo();
+    await showWalletBalance();
   }
 
   it("test stakingMT", async function () {
@@ -629,16 +636,16 @@ describe("MOPN", function () {
     await showWalletBalance();
     await collectionInfo();
 
-    // console.log("vault1 auction info", await vault1.getAuctionInfo());
-    // console.log("vault1 auction price", await vault1.getAuctionCurrentPrice());
-    // const tx6 = await mopnmt.safeTransferFrom(
-    //   owner.address,
-    //   vault1.address,
-    //   await vault1.getAuctionCurrentPrice(),
-    //   hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("acceptAuctionBid"))
-    // );
-    // await tx6.wait();
-    // console.log("vault1 auction info", await vault1.getAuctionInfo());
+    console.log("vault1 auction info", await vault1.getAuctionInfo());
+    console.log("vault1 auction price", await vault1.getAuctionCurrentPrice());
+    const tx6 = await mopnmt.safeTransferFrom(
+      owners[0].address,
+      vault1.address,
+      await vault1.getAuctionCurrentPrice(),
+      hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("acceptAuctionBid"))
+    );
+    await tx6.wait();
+    console.log("vault1 auction info", await vault1.getAuctionInfo());
 
     const vault1vtbalance = await vault1.balanceOf(owners[0].address);
     console.log("vault1 vt balance", vault1vtbalance);
@@ -674,17 +681,25 @@ describe("MOPN", function () {
     // console.log("vault2 mt balance", await mopnmt.balanceOf(vault2.address));
     // const tx7 = await vault2.withdraw(vault2pmtbalance - 1);
     // await tx7.wait();
+
+    mineBlock(100);
+
+    await claimAccountsMT();
+
+    await avatarInfo();
+    await collectionInfo();
+    await showWalletBalance();
   });
 
   const avatarInfo = async () => {
     let table = new Table({
-      head: ["Account", "coordinate", "balance"],
+      head: ["Account", "AgentPlacer", "coordinate", "balance"],
     });
 
     for (const account of accounts) {
       const hbalance = await mopnmt.balanceOf(account);
       const accountData = await mopn.getAccountData(account);
-      table.push([account, await accountData.Coordinate, hbalance.toString()]);
+      table.push([account, accountData.AgentPlacer, accountData.Coordinate, hbalance.toString()]);
     }
 
     console.log("hardhat TotalMOPNPoint", (await mopn.TotalMOPNPoints()).toString());
@@ -774,9 +789,7 @@ describe("MOPN", function () {
     );
     await tx.wait();
 
-    tx = await mopn
-      .connect(owners[1])
-      .moveTo(account, coordinate, landId, await getMoveToTilesAccounts(coordinate));
+    tx = await mopn.moveTo(account, coordinate, landId, await getMoveToTilesAccounts(coordinate));
     await tx.wait();
 
     tiles[coordinate] = account;
@@ -791,14 +804,16 @@ describe("MOPN", function () {
       0
     );
     accounts.push(account);
-    const tx = await mopn.moveToNFT(
-      tokenContract,
-      tokenId,
-      coordinate,
-      landId,
-      await getMoveToTilesAccounts(coordinate),
-      "0x"
-    );
+    const tx = await mopn
+      .connect(owners[1])
+      .moveToNFT(
+        tokenContract,
+        tokenId,
+        coordinate,
+        landId,
+        await getMoveToTilesAccounts(coordinate),
+        "0x"
+      );
     await tx.wait();
 
     tiles[coordinate] = account;
@@ -814,9 +829,32 @@ describe("MOPN", function () {
     );
     accounts.push(account);
 
-    console.log("bomb price", await mopnauctionHouse.getBombCurrentPrice());
+    const bombprice = await mopnauctionHouse.getBombCurrentPrice();
+    console.log("bomb price", bombprice);
 
-    const tx = await mopn.multicall([
+    let tx;
+    //  tx = await mopnauctionHouse.buyBomb(1);
+    // await tx.wait();
+
+    // tx = await mopnmt.safeTransferFrom(
+    //   owners[0].address,
+    //   mopnauctionHouse.address,
+    //   bombprice,
+    //   hre.ethers.utils.solidityPack(["uint256", "uint256"], [1, 1])
+    // );
+    // await tx.wait();
+
+    // tx = await mopn.moveToNFT(
+    //   tokenContract,
+    //   tokenId,
+    //   coordinate,
+    //   landId,
+    //   await getMoveToTilesAccounts(coordinate),
+    //   "0x"
+    // );
+    // await tx.wait();
+
+    tx = await mopn.multicall([
       mopn.interface.encodeFunctionData("buyBomb", [amount]),
       mopn.interface.encodeFunctionData("moveToNFT", [
         tokenContract,
@@ -853,9 +891,24 @@ describe("MOPN", function () {
     return tileaccounts;
   };
 
+  const claimAccountMT = async (number) => {
+    console.log("claim accounts", [accounts.slice(0, number)]);
+    const tx = await mopn.batchClaimAccountMT([accounts.slice(0, number)]);
+    await tx.wait();
+  };
+
   const claimAccountsMT = async () => {
-    console.log([accounts.slice(0, 8), accounts.slice(8, 10)]);
+    console.log("claim accounts", [accounts.slice(0, 8), accounts.slice(8, 10)]);
     const tx = await mopn.batchClaimAccountMT([accounts.slice(0, 8), accounts.slice(8, 10)]);
+    await tx.wait();
+  };
+
+  const claimNFTsMT = async () => {
+    console.log("claim nfts", collections);
+    const tx = await mopn.batchClaimNFTMT(collections, [
+      [0, 1, 2, 3, 4, 5, 6, 7],
+      [0, 1, 2],
+    ]);
     await tx.wait();
   };
 

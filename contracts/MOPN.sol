@@ -59,7 +59,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     mapping(uint16 => address) public LandAccounts;
 
-    IMOPNGovernance public governance;
+    IMOPNGovernance public immutable governance;
 
     modifier onlyCollectionVault(address collectionAddress) {
         require(
@@ -651,8 +651,10 @@ contract MOPN is IMOPN, Multicall, Ownable {
         IMOPNToken mt = IMOPNToken(governance.tokenContract());
         for (uint256 i = 0; i < accounts.length; i++) {
             for (uint256 k = 0; k < accounts[i].length; k++) {
-                if (k == 0)
+                if (k == 0) {
                     settleCollectionMT(getAccountCollection(accounts[i][k]));
+                }
+
                 if (
                     IMOPNERC6551Account(payable(accounts[i][k])).isOwner(
                         msg.sender

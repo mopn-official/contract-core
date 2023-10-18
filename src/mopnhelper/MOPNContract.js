@@ -63,76 +63,33 @@ async function moveTo(tokenContract, tokenId, coordinate) {
   let tx;
   if (account.exist) {
     const accountContract = await getContractObj("MOPNERC6551Account", account._account);
-    if ((await accountContract.ownershipMode()) == 0) {
-      if (await accountContract.isOwner((await getCurrentAccount()).address)) {
-        tx = await mopn
-          .connect(await getCurrentAccount())
-          .moveToByOwner(
-            account._account,
-            coordinate,
-            landId,
-            await TheGraph.getMoveToTilesAccounts(coordinate)
-          );
-      } else if ((await mopn.getAccountOnMapMOPNPoint(account._account)) == 0) {
-        tx = await accountContract
-          .connect(await getCurrentAccount())
-          .multicall([
-            accountContract.interface.encodeFunctionData("lend"),
-            accountContract.interface.encodeFunctionData("execute", [
-              mopn.address,
-              0,
-              mopn.interface.encodeFunctionData("moveToByOwner", [
-                account._account,
-                coordinate,
-                landId,
-                await TheGraph.getMoveToTilesAccounts(coordinate),
-              ]),
-              0,
-            ]),
-          ]);
-      } else {
-        console.log("account is using by other user");
-        return;
-      }
-    } else {
+    if (
+      (await accountContract.isOwner((await getCurrentAccount()).address)) ||
+      (await mopn.getAccountOnMapMOPNPoint(account._account)) == 0
+    ) {
       tx = await mopn
         .connect(await getCurrentAccount())
-        .moveToByOwner(
+        .moveTo(
           account._account,
           coordinate,
           landId,
           await TheGraph.getMoveToTilesAccounts(coordinate)
         );
+    } else {
+      console.log("account is placed");
+      return;
     }
   } else {
-    const erc721Contract = await getContractObj("IERC721", tokenContract);
-    if ((await erc721Contract.ownerOf(tokenId)) == (await getCurrentAccount()).address) {
-      tx = await mopn
-        .connect(await getCurrentAccount())
-        .moveToNFT(
-          tokenContract,
-          tokenId,
-          coordinate,
-          landId,
-          await TheGraph.getMoveToTilesAccounts(coordinate),
-          (
-            await ethers.getContractFactory("MOPNERC6551Account")
-          ).interface.encodeFunctionData("setOwnershipMode", [1])
-        );
-    } else {
-      tx = await mopn
-        .connect(await getCurrentAccount())
-        .moveToNFT(
-          tokenContract,
-          tokenId,
-          coordinate,
-          landId,
-          await TheGraph.getMoveToTilesAccounts(coordinate),
-          (
-            await ethers.getContractFactory("MOPNERC6551Account")
-          ).interface.encodeFunctionData("lend")
-        );
-    }
+    tx = await mopn
+      .connect(await getCurrentAccount())
+      .moveToNFT(
+        tokenContract,
+        tokenId,
+        coordinate,
+        landId,
+        await TheGraph.getMoveToTilesAccounts(coordinate),
+        "0x"
+      );
   }
 
   console.log(
@@ -164,9 +121,18 @@ async function moveToWithTilesAccounts(tokenContract, tokenId, coordinate, tiles
   const landId = MOPNMath.getTileLandId(coordinate);
   let tx;
   if (account.exist) {
-    tx = await mopn
-      .connect(await getCurrentAccount())
-      .moveToByOwner(account._account, coordinate, landId, tilesaccounts);
+    const accountContract = await getContractObj("MOPNERC6551Account", account._account);
+    if (
+      (await accountContract.isOwner((await getCurrentAccount()).address)) ||
+      (await mopn.getAccountOnMapMOPNPoint(account._account)) == 0
+    ) {
+      tx = await mopn
+        .connect(await getCurrentAccount())
+        .moveTo(account._account, coordinate, landId, tilesaccounts);
+    } else {
+      console.log("account is placed");
+      return;
+    }
   } else {
     tx = await mopn
       .connect(await getCurrentAccount())
