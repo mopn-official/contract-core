@@ -201,7 +201,7 @@ contract MOPNData is IMOPNData, Multicall {
         address account
     ) public view returns (AccountDataOutput memory accountData) {
         accountData.account = account;
-        (, address collectionAddress, uint256 tokenId) = IERC6551Account(
+        (, address collectionAddress, uint256 tokenId) = IMOPNERC6551Account(
             payable(account)
         ).token();
 
@@ -215,6 +215,8 @@ contract MOPNData is IMOPNData, Multicall {
         IMOPN.CollectionDataStruct memory collectionData = mopn
             .getCollectionData(collectionAddress);
 
+        accountData.AgentPlacer = mopnAccountData.AgentPlacer;
+        accountData.owner = IMOPNERC6551Account(payable(account)).owner();
         accountData.CollectionMOPNPoint = collectionData.CollectionMOPNPoint;
         accountData.MTBalance = IMOPNToken(governance.tokenContract())
             .balanceOf(account);

@@ -1,5 +1,9 @@
 const centerTiles = require("./data/LandCenterTiles.json");
 
+function RungNumLands(ringNum) {
+  return 3 * ringNum * ringNum + 3 * ringNum;
+}
+
 function LandRingNum(LandId) {
   let n = Math.floor((Math.sqrt(9 + 12 * (LandId - 1)) - 3) / 6);
   if (3 * n * n + 3 * n == LandId) {
@@ -165,42 +169,6 @@ function checkLandIdOpen(LandId, avatarNum) {
     return false;
   }
   return true;
-}
-
-function COIDToColor(COID) {
-  let h = 0,
-    s = 0,
-    l = 0;
-
-  let i = 5,
-    batch = 4096,
-    k = 0,
-    v = 0,
-    step = 4096,
-    ht = 0,
-    st = 0,
-    lt = 0;
-
-  while (true) {
-    if (COID < step) {
-      COID = (COID % 40) * Math.floor(batch / 40) + Math.floor(COID / 40);
-      k = 2 ** (i - 1);
-      v = COID - (step - batch);
-      ht = Math.floor(v / (k * k));
-      h = Math.round((360 / k) * (ht + 0.5));
-      v = v - ht * (k * k);
-      st = Math.floor(v / k);
-      s = 100 - Math.round((45 / k) * (st + 0.5));
-      lt = v - st * k;
-      l = 50 + Math.floor((30 / k) * (lt + 0.5));
-      break;
-    }
-    batch = 8 ** i;
-    step += batch;
-    i++;
-  }
-
-  return `hsl(${h},${s}%,${l}%)`;
 }
 
 function getCoordinateMapDiff(startCoordinate, endCoordinate, xrange) {
@@ -372,6 +340,7 @@ function getCoordinateByRange(startCoordinate, width, height) {
 }
 
 module.exports = {
+  RungNumLands,
   LandRingNum,
   LandRingPos,
   LandRingStartCenterTile,
@@ -384,6 +353,6 @@ module.exports = {
   coordinateIntToArr,
   coordinateIntToXY,
   coordinateXYToInt,
-  COIDToColor,
+  getLandTiles,
   getCoordinateMapDiff,
 };

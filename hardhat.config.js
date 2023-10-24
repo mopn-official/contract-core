@@ -23,6 +23,12 @@ module.exports = {
     //     interval: 0
     //   }
     // },
+    hardhat: {
+      forking: {
+        url: process.env.MAINNET_URL,
+        blockNumber: 18411781,
+      },
+    },
     localhost: {
       url: `http://127.0.0.1:7545`,
       chainId: 1337,

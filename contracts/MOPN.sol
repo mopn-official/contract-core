@@ -50,8 +50,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
     uint16 public nextLandId;
     uint48 public NFTOfferCoefficient;
     uint48 public TotalCollectionClaimed;
+    uint48 public whiteListOffTotalMOPNPoint;
 
-    bool public whiteListSwitch;
+    //total uint bits of above
 
     mapping(address => CollectionDataStruct) public CDs;
 
@@ -81,14 +82,14 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 MTReduceInterval_,
         uint256 MaxCollectionOnMapNum_,
         uint24 MaxCollectionMOPNPoint_,
-        bool whiteListSwitch_
+        uint48 whiteListOffTotalMOPNPoint_
     ) {
         governance = IMOPNGovernance(governance_);
         MTReduceInterval = MTReduceInterval_;
         MaxCollectionOnMapNum = MaxCollectionOnMapNum_;
         MaxCollectionMOPNPoint = MaxCollectionMOPNPoint_;
         LastTickBlock = MTStepStartBlock_;
-        whiteListSwitch = whiteListSwitch_;
+        whiteListOffTotalMOPNPoint = whiteListOffTotalMOPNPoint_;
         MTOutputPerBlock = MTOutputPerBlock_;
         MTStepStartBlock = MTStepStartBlock_;
         NFTOfferCoefficient = 10 ** 13;
@@ -98,10 +99,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return address(governance);
     }
 
-    function whiteListSwitchChange(bool switchStatus) public onlyOwner {
-        whiteListSwitch = switchStatus;
-    }
-
     function whiteListRootUpdate(bytes32 root) public onlyOwner {
         whiteListRoot = root;
     }
@@ -109,20 +106,24 @@ contract MOPN is IMOPN, Multicall, Ownable {
     function checkAccountQualification(
         address account
     ) public view returns (address collectionAddress) {
-        uint256 chainId;
-        uint256 tokenId;
-        (chainId, collectionAddress, tokenId) = IMOPNERC6551Account(
-            payable(account)
-        ).token();
-        if (ADs[account].PerMOPNPointMinted == 0) {
-            require(
-                chainId == block.chainid,
-                "not support cross chain account"
-            );
-            require(
-                account == computeMOPNAccount(collectionAddress, tokenId),
-                "not a mopn Account Implementation"
-            );
+        try IMOPNERC6551Account(payable(account)).token() returns (
+            uint256 chainId,
+            address collectionAddress_,
+            uint256 tokenId
+        ) {
+            if (ADs[account].PerMOPNPointMinted == 0) {
+                require(
+                    chainId == block.chainid,
+                    "not support cross chain account"
+                );
+                require(
+                    account == computeMOPNAccount(collectionAddress, tokenId),
+                    "not a mopn Account Implementation"
+                );
+            }
+            collectionAddress = collectionAddress_;
+        } catch (bytes memory) {
+            require(false, "account error");
         }
     }
 
@@ -142,10 +143,17 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     function collectionWhiteListRegistry(
         address collectionAddress,
+        uint48 OpenTotalMOPNPoint,
         bytes32[] memory proof
     ) public {
+        require(
+            OpenTotalMOPNPoint > TotalMOPNPoints,
+            "your collection is not open yet"
+        );
         bytes32 leaf = keccak256(
-            bytes.concat(keccak256(abi.encode(collectionAddress)))
+            bytes.concat(
+                keccak256(abi.encode(collectionAddress, OpenTotalMOPNPoint))
+            )
         );
         require(
             MerkleProof.verify(proof, whiteListRoot, leaf),
@@ -216,11 +224,16 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address[] memory tileAccounts,
         address collectionAddress
     ) internal {
-        bool isOwner = IMOPNERC6551Account(payable(account)).isOwner(
-            msg.sender
-        );
-        if (ADs[account].Coordinate > 0) {
-            require(isOwner, "not account owner");
+        bool isOwner;
+        try IMOPNERC6551Account(payable(account)).isOwner(msg.sender) returns (
+            bool isOwner_
+        ) {
+            isOwner = isOwner_;
+            if (ADs[account].Coordinate > 0) {
+                require(isOwner, "not account owner");
+            }
+        } catch (bytes memory) {
+            require(false, "account owner error");
         }
 
         require(block.number >= MTStepStartBlock, "mopn is not open yet");
@@ -239,7 +252,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
             require(nextLandId > LandId, "Land Not Open");
         }
 
-        if (whiteListSwitch) {
+        if (whiteListOffTotalMOPNPoint > TotalMOPNPoints) {
             require(
                 CDs[collectionAddress].PerMOPNPointMinted > 0,
                 "collection not register white list"

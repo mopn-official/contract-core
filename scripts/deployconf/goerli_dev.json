@@ -138,7 +138,7 @@
         ]
     },
     "MOPNData": {
-        "address": "0x4439eba06dC2eFf9054557D7CCD85523ae9bC67d",
+        "address": "0xde03598755d56Ec46BDf8CedEf3Fc00cc5913b7F",
         "verified": true,
         "libraries": [
             "TileMath"

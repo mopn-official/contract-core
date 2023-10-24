@@ -18,6 +18,8 @@ interface IMOPNData {
         uint256 OnMapMOPNPoint;
         uint256 TotalMOPNPoint;
         uint32 tileCoordinate;
+        address owner;
+        address AgentPlacer;
     }
 
     struct CollectionDataOutput {

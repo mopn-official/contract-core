@@ -18,6 +18,12 @@ import "./lib/ERC6551AccountLib.sol";
 
 error NotAuthorized();
 
+interface ICryptoPunks {
+    function punkIndexToAddress(
+        uint index
+    ) external view returns (address owner);
+}
+
 contract MOPNERC6551Account is
     IERC165,
     IERC1271,
@@ -115,7 +121,11 @@ contract MOPNERC6551Account is
             .token();
         if (chainId != block.chainid) return address(0);
 
-        return IERC721(tokenContract).ownerOf(tokenId);
+        if (tokenContract == 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB) {
+            return ICryptoPunks(tokenContract).punkIndexToAddress(tokenId);
+        } else {
+            return IERC721(tokenContract).ownerOf(tokenId);
+        }
     }
 
     function isOwner(address caller) public view returns (bool) {

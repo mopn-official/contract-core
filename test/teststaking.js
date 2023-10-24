@@ -582,7 +582,7 @@ describe("MOPN", function () {
     await avatarInfo();
     await collectionInfo();
 
-    await claimNFTsMT();
+    await claimAccountsMT();
 
     await avatarInfo();
     await collectionInfo();

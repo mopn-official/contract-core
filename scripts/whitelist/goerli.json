@@ -1,0 +1,1134 @@
+[
+    {
+        "name": "BoredApeYachtClub",
+        "collectionAddress": "0xE42ed16454334e7D6df77f7ac9664944fdA10650",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0xb2d29dca9febe5eb45a3943ba1f02ba2c04f08c57dce106d26cddb9e1d2736af",
+            "0xe062662ad077e27f85e9799d58d13fcd5247dbcab9cc76e773dfd2c9b32cfad3",
+            "0x11fb0f3dfe316e1d69e82c478770361d0481202e8f17078ff228459a3be9d724",
+            "0xa9110f19d669d7173b0514aeadaad06fc7d146e4b659bfa861569188ced92535",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "MutantApeYachtClub",
+        "collectionAddress": "0x862103D55799Ec660c5119d2F20a1954fE08577A",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0x40022497220a3bcea30dd9e41491827e8838ce4036b1b62e953acd5ab8418d83",
+            "0x435a1848c1f60e26b5b1a8cff9b66c714cbb3091975b392a73936cb9f76f1267",
+            "0x5c09d981e18492bba76dda459138ae63251513eaa80fc3c8f55199e40c8120e4",
+            "0xfc0da031a40519354f303fb50188d61a21dbc139d2054c41f65ac889f89d8796",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "MineablePunks",
+        "collectionAddress": "0x4103a80dB505e0B2a6a5A023a8901eBF28aF49F6",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0x4a36da1c1e16d686444347c4aee5eb97f960e5ffcd1a0c1ed17c6789795d3093",
+            "0xdcffc808d9c0436907585a98473c4d81b03a79499cfb156776bf12b15a5432e4",
+            "0xecb7a0ad79e28580053ea655ab6d6f092afb00bcd7a85d8c65d2cd11912ea384",
+            "0x21bfda398290f9bd06771efd0c73a4b6d9dde270374c0c1752ed43263c815508",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Dreadfulz",
+        "collectionAddress": "0x447039c456413b06601a046eE53AdD52e170A55B",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0x346e3dad54e0bb7889592ca53ab70e3990f43385523262a9282a7f038880ba60",
+            "0x55e7abb55a7891e43cf346604ac6e4e412b4d8bc705b26a9bf0e17ab29ca5d53",
+            "0xdc7227d71d36e1c0d179344b56f130bbbbad6f4f740a4c5f94c56ccdffd52512",
+            "0xfc0da031a40519354f303fb50188d61a21dbc139d2054c41f65ac889f89d8796",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "DeGods",
+        "collectionAddress": "0x7254bb03366D612049B7996b03885C861439772e",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0xe8f4c8759cb16ea16fff321ee9dee36aea046a27784e2174f33253e9df676cbe",
+            "0xea6f0bbb8ececcebd85157ecf9fa08983ac1a763bf461e6b78140d0aaf34df89",
+            "0xed05e056a1a13897400b75056ea62cd79aaa8189dcd34200ae63e5b781302d72",
+            "0xdba9781f380b7e19f8a804d5b8e864e68af04a13883165af0e322fcf2070c6f4",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Milady",
+        "collectionAddress": "0xB4d1548AF218101eFB39EFEcB8D68A13365dC1d6",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0x2015dff8ccb46e6b38d53929ca80ff34012b9e434ebfe84c287e3cbd738ef587",
+            "0x22494da4b9c9ce5c45f1801c2aad8e9a54d553ca1453492dabd98f4b8396bdd4",
+            "0xdc7227d71d36e1c0d179344b56f130bbbbad6f4f740a4c5f94c56ccdffd52512",
+            "0xfc0da031a40519354f303fb50188d61a21dbc139d2054c41f65ac889f89d8796",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "PudgyPenguins",
+        "collectionAddress": "0xc533a51f7638972DE54b67aBf16646c52A35b07F",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0x186901903aeef2ebd22672acd19562630a15253129599feff3c5c567887f5dc8",
+            "0x22494da4b9c9ce5c45f1801c2aad8e9a54d553ca1453492dabd98f4b8396bdd4",
+            "0xdc7227d71d36e1c0d179344b56f130bbbbad6f4f740a4c5f94c56ccdffd52512",
+            "0xfc0da031a40519354f303fb50188d61a21dbc139d2054c41f65ac889f89d8796",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Azuki",
+        "collectionAddress": "0x016Db4C041bA5025F71148765491717Fc82f82d8",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0xc1f663e50f998d609c80c9e92fab51c8079464aac70bd4b1fd0441186ba62463",
+            "0x0993b6e45352fc4ee86456b53f301f554a89d7ee3c4a9a67dfe91316d6d581c7",
+            "0x96445c6d18776b38bf6449f1d9236c2f6fe4a3197d396ca6b9318d9895f58c26",
+            "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Nouns",
+        "collectionAddress": "0xA44c27Ab2c09809462096F95A6c257B9475138BA",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0x3795c7aaff9ee5464594b3ba33d567a4907830a34a40a3a55b109bc758354329",
+            "0x55e7abb55a7891e43cf346604ac6e4e412b4d8bc705b26a9bf0e17ab29ca5d53",
+            "0xdc7227d71d36e1c0d179344b56f130bbbbad6f4f740a4c5f94c56ccdffd52512",
+            "0xfc0da031a40519354f303fb50188d61a21dbc139d2054c41f65ac889f89d8796",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Captainz",
+        "collectionAddress": "0xCF7C393546F9E26E0AEFf31e92F0a4886329a6f5",
+        "opentotalmopnpoint": 0,
+        "merkleProof": [
+            "0x631f13bd61b8b8d0f42a32a33a8ca51a0cf926bc0504df9e28b904b88f6fb2f1",
+            "0x8300a98cfeaa4bfe063e98e3d58d5a6165be011655f2aa6c560942878c5b3a67",
+            "0x495b88f3515b76f6281221d71134eadc0e6c5bfcf9b2c088462388410adfadf9",
+            "0x1f9a6cf32923c1b4bf443aea37e57bb5a4f80fa2f5f852735bb857b01d5af85f",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Sugartown Oras",
+        "collectionAddress": "0xFdbadeC66D89A236b0E24395Dba73Ffc5C591BE2",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x0d964066e6ff6d3cdd2aab5cdc84f2b067fcae0a75800b1715e90271c40f8707",
+            "0x8a653bd6399415a5780b9bbe616600b821db7a147128bde2a915d5d7e403e0f4",
+            "0xd7ff4d7ef578052acd622a1f7065210a4b4710a4bac6529038ea228eb530ca41",
+            "0xf4de821d8c851ecd77bce1dd6182c33eceeaadf10c4d4adc9b1f54b75893ee7d",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "BoredApeKennelClub",
+        "collectionAddress": "0x0a7Da33B4373D6fc552095A2EEb9fA3F8a2b417E",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x4784c89ae7353cda40ed4570659cbed26e4cdcdeb6739fa834ffb13370973141",
+            "0x86c27a175163963afda9bd15451f5e08080ac454983f38aa9755047b852872f9",
+            "0x5c09d981e18492bba76dda459138ae63251513eaa80fc3c8f55199e40c8120e4",
+            "0xfc0da031a40519354f303fb50188d61a21dbc139d2054c41f65ac889f89d8796",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Wrapped Cryptopunks",
+        "collectionAddress": "0x796C8Ac4622a84DCF117Ce28B92c5f4Aeb7C0452",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xc697d4d7672d390ba9583e91de8688493b628bd04cd5cd3d795a91bd3eb9515c",
+            "0x40ea2e7a736bf32908c423fef0144d15bad093850bb7d6da67f48f418ca4da62",
+            "0x96445c6d18776b38bf6449f1d9236c2f6fe4a3197d396ca6b9318d9895f58c26",
+            "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Nakamigos",
+        "collectionAddress": "0xACbE856299aE18b9feB2F6fA5c4f4a5A1FB3bE55",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x04073735b038fcc2be512f5defbd792a47dedc89bc4bdeec5332efa21ee73338",
+            "0xf95b80a5b64b362d98b08c7ac060c08211d95e28424af0fb3c562dd291b54d19",
+            "0x67de35a61933798b4b146f085613573affb77bdf099ccc07dadab4fcc30c98fb",
+            "0xf4de821d8c851ecd77bce1dd6182c33eceeaadf10c4d4adc9b1f54b75893ee7d",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "CloneX",
+        "collectionAddress": "0xe30Bf695Af7f9B65F591bC9d9B934d60A52625FF",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x93d2284380f2b5f1df41d5dd977dbfbb306684e15d7a7635d944100e6932d675",
+            "0x8dd30fdcaaeb995ea9bf0a5325f85d558d91e5ac8ed2b300ed79e1e5f8e93301",
+            "0x8e44f86a04441aeda006005ce6f662c9308dc9d1965f4c7e4f56ce7fe9b9d37c",
+            "0xd7332baa46cba5b4f358fc841c6f7bed4750866ec31c31b6340d486f628f260c",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Otherdeed Expanded",
+        "collectionAddress": "0xbbab05Aa18C3BC34b129D528461060D632671384",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xcce3b2a2d89e630d3045425ce3ffeff98ee9bb08855625143681e8f9a38f19fc",
+            "0xc4f068eaa573e3b358f0855f495dda2acd449e605744660bd1bb17486f1925e3",
+            "0x619612f2b8e9dba92fe208e67dd97553865345141dfb5d90a982f31d53dfcc1f",
+            "0xc3f8a28c39662434ff0a35550eec3026c0bf4a9c694d1455cd297ca90ed190c5",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Opepen Edition",
+        "collectionAddress": "0x9b94d6fF31eBA2f92D1715640FCF7c799D270a09",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x54c35d995211242a6a636ccfd07ddfac432dcd67122eb5ca1d34b85eec6ed3e5",
+            "0x88f7cf44e082d26494944b29276b56699e653cdf1ac44f9aa88ecd0daf95f0c2",
+            "0x14bcae665895f5d789292cc1d127b606278223146b0668b16a0d64921f1baa64",
+            "0x21bfda398290f9bd06771efd0c73a4b6d9dde270374c0c1752ed43263c815508",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "0N1 Force",
+        "collectionAddress": "0x34A08AC41031D82c8f47C83705913BccCA18465b",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x4ed7a34f3d5619952bf8d017ac92609f1b5df8875b294e64673db03dc39005d1",
+            "0xcf19332ab089c98af237fc57795726c4406bbd5251ccb6d0bb04de4eaf68fe82",
+            "0x14bcae665895f5d789292cc1d127b606278223146b0668b16a0d64921f1baa64",
+            "0x21bfda398290f9bd06771efd0c73a4b6d9dde270374c0c1752ed43263c815508",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "TEST NFT",
+        "collectionAddress": "0x2bbD4fF5cEb9225C236b01C941153507aAF643F3",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x9410cb284b8362e0cb471d5eb8f2796a4b6da9d729fc73caabce88d6ba7520c5",
+            "0x8dd30fdcaaeb995ea9bf0a5325f85d558d91e5ac8ed2b300ed79e1e5f8e93301",
+            "0x8e44f86a04441aeda006005ce6f662c9308dc9d1965f4c7e4f56ce7fe9b9d37c",
+            "0xd7332baa46cba5b4f358fc841c6f7bed4750866ec31c31b6340d486f628f260c",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "CLOAKS",
+        "collectionAddress": "0xeCf71d14D3D4b33e4DE0983D6Ea6Aae6E88252cB",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x59ddfbae44fe1a052d832ec4bef3490d8561d8760d3dd080bec5e3db7193d847",
+            "0x2e136e871d8dc7a11b7f80701eacabcbe2faf3081e0cb4baf30f170cec4eb014",
+            "0x25e0d0be9c6a7ceff2de51feb7120fcfd663480849ad0ff7e30a73803e9313fc",
+            "0x1f9a6cf32923c1b4bf443aea37e57bb5a4f80fa2f5f852735bb857b01d5af85f",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Winds of Yawanawa by Yawanawa and Refik Anadol",
+        "collectionAddress": "0x3652c077c343E57b56094e4Bb24a644E838D0710",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x7cf28b950e9bf77f2651aa9906a0fd82f132bc38cf5c2e8f29c29bee485f90c0",
+            "0xab650170bc1764630211423c1e6b53a0dae48956f4460a21145b9348201e71bc",
+            "0x29eeea0d98ca435c4581a8f71db42bd92d74b0d3991333298c752d9689eaceb1",
+            "0xd7332baa46cba5b4f358fc841c6f7bed4750866ec31c31b6340d486f628f260c",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Nouns",
+        "collectionAddress": "0x8A347fF6aF8Df0F4059A9CCA7655779Bd3d76EdD",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xa514302159ffe8977b2093d96fcf39d6ab1dde2226ed8e784c99ebadf03c33e6",
+            "0x649f95661418e034ed81b159e2860b788a2a08d98b975d19ba0a277a92d7fa7d",
+            "0xb949255009bf3677b2ea2fac99775e87dd929ac54cb3246685319d752cbd7176",
+            "0xa9110f19d669d7173b0514aeadaad06fc7d146e4b659bfa861569188ced92535",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Vessel",
+        "collectionAddress": "0x814b251e5d666D36D3eb482666ea6f0fA6622A71",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x7940fe889a5bb86cc7569fb911a093bbe1849c5f450fc436555ee6fbbd2528b1",
+            "0x2436dfc4506f21bba8988f109042bb4c04649d40e9fb13540002dd205101d6dd",
+            "0xaf6dade6fd3f34e7436999ff968b1bd08fca8354aace3e03f61af21d47135e88",
+            "0xbf98e948f0eee1061a38ec4805c2b65bf0f9084855108529c268ef534539762a",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Otherdeed",
+        "collectionAddress": "0xe5814d90B1061b48C2CAfCAc6f0c3CCAce4bB43A",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x72c462247e2c1341dbd580a22e212e6baff4760cd2b4e6dbab291e900bb9a171",
+            "0x2436dfc4506f21bba8988f109042bb4c04649d40e9fb13540002dd205101d6dd",
+            "0xaf6dade6fd3f34e7436999ff968b1bd08fca8354aace3e03f61af21d47135e88",
+            "0xbf98e948f0eee1061a38ec4805c2b65bf0f9084855108529c268ef534539762a",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Elemental",
+        "collectionAddress": "0xc56D3227FDe5D25C2C6485F2ad841E213a89d6b6",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x40615bfe86a169e061a2e5adae376a53934822f8ba855cb43e6e4220443e19bc",
+            "0x435a1848c1f60e26b5b1a8cff9b66c714cbb3091975b392a73936cb9f76f1267",
+            "0x5c09d981e18492bba76dda459138ae63251513eaa80fc3c8f55199e40c8120e4",
+            "0xfc0da031a40519354f303fb50188d61a21dbc139d2054c41f65ac889f89d8796",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Art Blocks",
+        "collectionAddress": "0xD5aB46131aEe959034b24Ac0C613c9B69Af4a044",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x4d2d5d7b05466dbc635476ebe1a26d9c348c3583513733de80dc4cda2dcd2a9c",
+            "0xdcffc808d9c0436907585a98473c4d81b03a79499cfb156776bf12b15a5432e4",
+            "0xecb7a0ad79e28580053ea655ab6d6f092afb00bcd7a85d8c65d2cd11912ea384",
+            "0x21bfda398290f9bd06771efd0c73a4b6d9dde270374c0c1752ed43263c815508",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Blips",
+        "collectionAddress": "0x659342Bc00d14ac000539f8625139a0D453d0093",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x95de43f4298638039cbdc18ff0bc9fbefd6a94b8b0501342011466e4939ca9c4",
+            "0x667ddc8d20a7625838b1587a7710b1c26ce68425c2ad1d97f54aa0a5a6c95d5d",
+            "0x8e44f86a04441aeda006005ce6f662c9308dc9d1965f4c7e4f56ce7fe9b9d37c",
+            "0xd7332baa46cba5b4f358fc841c6f7bed4750866ec31c31b6340d486f628f260c",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Doodles",
+        "collectionAddress": "0xd0736adFC5A5FdF7E04eF14f45668794b9fA58EB",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x14d47f573e37f8bc2e1c027008e086defd2bef78d98a772d78e4e8a6fa7f78c8",
+            "0x8a653bd6399415a5780b9bbe616600b821db7a147128bde2a915d5d7e403e0f4",
+            "0xd7ff4d7ef578052acd622a1f7065210a4b4710a4bac6529038ea228eb530ca41",
+            "0xf4de821d8c851ecd77bce1dd6182c33eceeaadf10c4d4adc9b1f54b75893ee7d",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "More Loot",
+        "collectionAddress": "0xE24307A12A7948038b58bd22B39bA6552db6aB83",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x68810cacb1b3107b40e42a7b5ab20059d7ddcdc61537d110725c2f585df1f69c",
+            "0x49d24a3af5fd7e209b5f4c5a621867ab619d62e611031e292e4a284974e7529a",
+            "0x1f970f430dcb9e786d9e09c746f761b6be19e1e129c0d2066084c825d8b40130",
+            "0xbf98e948f0eee1061a38ec4805c2b65bf0f9084855108529c268ef534539762a",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "LilPudgys",
+        "collectionAddress": "0xAC5469b9aB303c19dB6E56C54Fe3a0bf8c6eBeD5",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x0a3f27ae5610b187f126e5ab53636dc8ea2d445b7ca471d1a8624056779506a3",
+            "0x2b2d0cfded3d4a3121ef57b690016d2cda4184b2f80d052c4d44a5bf10f5f100",
+            "0xd7ff4d7ef578052acd622a1f7065210a4b4710a4bac6529038ea228eb530ca41",
+            "0xf4de821d8c851ecd77bce1dd6182c33eceeaadf10c4d4adc9b1f54b75893ee7d",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Koda",
+        "collectionAddress": "0x7c13F9Da085d6578d493D1380CB382afDfD78322",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xc67e2dc4b30c76efe1e9455a8b7b6a605b5f97206e0d5872cbb4135448e157a0",
+            "0x40ea2e7a736bf32908c423fef0144d15bad093850bb7d6da67f48f418ca4da62",
+            "0x96445c6d18776b38bf6449f1d9236c2f6fe4a3197d396ca6b9318d9895f58c26",
+            "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Potatoz",
+        "collectionAddress": "0x7245831436FfAcC640DF519acE8ACfb51Fbe1097",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xb2bda29bf6dc3063bca74a04d9724fd43455407c1937ce2a7d3a37daa596a35b",
+            "0x3a9aa5bc4e68ebc0a1262559f19b09225f28af4da0de9daa007b66a8fd61d3b3",
+            "0xb949255009bf3677b2ea2fac99775e87dd929ac54cb3246685319d752cbd7176",
+            "0xa9110f19d669d7173b0514aeadaad06fc7d146e4b659bfa861569188ced92535",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Yogapetz",
+        "collectionAddress": "0x45fDB1F7581Dfbb31C2fdD29e5b5656424805D35",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x65ffe86db7f962619e53c8812c171927fc00a21617dcba4608d294f6d30d1292",
+            "0x0fd53dcff525ea57c38def51e5301f62c610cb3b668f7b1acb59658261c709c8",
+            "0x1f970f430dcb9e786d9e09c746f761b6be19e1e129c0d2066084c825d8b40130",
+            "0xbf98e948f0eee1061a38ec4805c2b65bf0f9084855108529c268ef534539762a",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Metakeys DAO",
+        "collectionAddress": "0x29a7F08bC5D28dE516cdcC277E859467E31bFDDb",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xb45558ebbc2e3fa8f8c5e2a602d503922d020bafa2687f63eb1d01007e5fa56d",
+            "0xc0994372d178c65b4810edea01ee51e06dff6d4fef8a5864dd7b437eb4e97f85",
+            "0x11fb0f3dfe316e1d69e82c478770361d0481202e8f17078ff228459a3be9d724",
+            "0xa9110f19d669d7173b0514aeadaad06fc7d146e4b659bfa861569188ced92535",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Mittaria Genesis",
+        "collectionAddress": "0xa923598A337a18a1aFcAC457f3C84595216A5Cb0",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xbd2c38a862295597453b3ceb3047e2aa55a86f446c21f0e7960892bf11649a6b",
+            "0x22cf731187739997c77956545bcfe88d31b8766ec1e04e4573bf835df5e13714",
+            "0xaa6deb37f3e8a38ec5894b09fcb9399c979c0000fc934c224df24a983d82c944",
+            "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "AnarKey",
+        "collectionAddress": "0x4EFbc33Ce54709Bee7b07729e809953102005A45",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xdc2660d11bc62844928c71ce26772ac411355be9186f26e9596c6073372a9fde",
+            "0xbdf6f87cbcef2f9dac09d8b4cadbfacda3a07109ea982ab7917ba53a901384dd",
+            "0xe660b16d575a62512aa3d4ece3774766bc65d705b026fad910e9986d0e0e2c7e",
+            "0xc3f8a28c39662434ff0a35550eec3026c0bf4a9c694d1455cd297ca90ed190c5",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "MysteryBean",
+        "collectionAddress": "0xBe9da5C444F1B754c0509DdFf85Ff0E77337c0f4",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x4a1586b577139157fdf0ee5e87f1d983c3b8ace8a8b5577870d3540069644398",
+            "0x86850950aa70c72255be46c9132e39952801bd2d9c235cb08cef1fb5635e48a8",
+            "0xecb7a0ad79e28580053ea655ab6d6f092afb00bcd7a85d8c65d2cd11912ea384",
+            "0x21bfda398290f9bd06771efd0c73a4b6d9dde270374c0c1752ed43263c815508",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "HV-MTL",
+        "collectionAddress": "0x9E4Bc27cBC3F372e4195A9Eb4b5d68FF13A02a24",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x826347642559663f3a0b7a43feb33b9085321404b5c9ff60205f3370a99b9bff",
+            "0x5d3c59249d0fe4c1c20a350fd5ecb07705f1048b8d6410867483bcd6221d3f9c",
+            "0x29eeea0d98ca435c4581a8f71db42bd92d74b0d3991333298c752d9689eaceb1",
+            "0xd7332baa46cba5b4f358fc841c6f7bed4750866ec31c31b6340d486f628f260c",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "V1 Cryptopunks (Wrapped)",
+        "collectionAddress": "0x6828bfBe99E027DfC289b26F78a5bf818e4183c2",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xd9eecfd97841f76df1831a7f1cbb8d401b252ccccb4545621e54ba701d4ae8fe",
+            "0xc2e59a662a0a9265d32ffaeffa81ee94864fbd2f830288a5921e2d06b8f844b7",
+            "0xe660b16d575a62512aa3d4ece3774766bc65d705b026fad910e9986d0e0e2c7e",
+            "0xc3f8a28c39662434ff0a35550eec3026c0bf4a9c694d1455cd297ca90ed190c5",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Terraforms",
+        "collectionAddress": "0x1d6245ae5e7A4C2C48dd2Cbd2b64657CDE108e55",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x0375c1169c880d60f326819c52b34bdaed8b0f3cbec210468ade4a03498de5cc",
+            "0xdef0500a813f6b9c82b43b97a96b87751243eb4a2c7c82a8e78ed74af5e5405b",
+            "0x67de35a61933798b4b146f085613573affb77bdf099ccc07dadab4fcc30c98fb",
+            "0xf4de821d8c851ecd77bce1dd6182c33eceeaadf10c4d4adc9b1f54b75893ee7d",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "G Tag",
+        "collectionAddress": "0xC22D0F3D2c109557d2aFd15fF559c2dB118c7111",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x03a0f045c2fc2b12ecde5d9c9c319d2b2e2244fbdff4fac464094b115c652c5e",
+            "0xdef0500a813f6b9c82b43b97a96b87751243eb4a2c7c82a8e78ed74af5e5405b",
+            "0x67de35a61933798b4b146f085613573affb77bdf099ccc07dadab4fcc30c98fb",
+            "0xf4de821d8c851ecd77bce1dd6182c33eceeaadf10c4d4adc9b1f54b75893ee7d",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Beanz",
+        "collectionAddress": "0x05340eB287870Df755C4BE95f6A5179fE67BDDea",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x5c4c28b3fb41de1616ede86672d39878639aa6b5915513c55706e6d9fb293925",
+            "0x7bcdf66b7047838b34485952e616e9a48aa81034491551f7619120b712633348",
+            "0x25e0d0be9c6a7ceff2de51feb7120fcfd663480849ad0ff7e30a73803e9313fc",
+            "0x1f9a6cf32923c1b4bf443aea37e57bb5a4f80fa2f5f852735bb857b01d5af85f",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Meebits",
+        "collectionAddress": "0xFbd356E4e8175454f5bD7ED18b2546d50d3E19fC",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xba2bb1be59f8493619b8785205cd86f0d6c7710e7ed3c16bf9d94dc974ab0e0f",
+            "0x22cf731187739997c77956545bcfe88d31b8766ec1e04e4573bf835df5e13714",
+            "0xaa6deb37f3e8a38ec5894b09fcb9399c979c0000fc934c224df24a983d82c944",
+            "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Sproto Gremlins",
+        "collectionAddress": "0x19303e0e9D302efB14f66FfD90dc03d1fd490657",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xa594577124a1cbfd4e155f28f07ef979c3d2eb286b3b9f11277fae7ada11c6bc",
+            "0x649f95661418e034ed81b159e2860b788a2a08d98b975d19ba0a277a92d7fa7d",
+            "0xb949255009bf3677b2ea2fac99775e87dd929ac54cb3246685319d752cbd7176",
+            "0xa9110f19d669d7173b0514aeadaad06fc7d146e4b659bfa861569188ced92535",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "MemeWhales",
+        "collectionAddress": "0x243bA396CAb775fFDe0949F0E59ba6BC27462a18",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x603e5008f048b421065f40839374216f8f45a8a67cb6a6fa1580186115f2ce4d",
+            "0xb0513fd83d8e8e86b04aa425b8d6d94fe6e0b43cf437ddffb4448a737e293916",
+            "0x495b88f3515b76f6281221d71134eadc0e6c5bfcf9b2c088462388410adfadf9",
+            "0x1f9a6cf32923c1b4bf443aea37e57bb5a4f80fa2f5f852735bb857b01d5af85f",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Super Creators - Gen Z",
+        "collectionAddress": "0xb8452135a00E378119F3d56B33CE9ea86d0ABecC",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x49437ed8d2e2e80237fb3011fb31f13f7a5363f1cffdfe9d106ccbd13b88d68b",
+            "0x86850950aa70c72255be46c9132e39952801bd2d9c235cb08cef1fb5635e48a8",
+            "0xecb7a0ad79e28580053ea655ab6d6f092afb00bcd7a85d8c65d2cd11912ea384",
+            "0x21bfda398290f9bd06771efd0c73a4b6d9dde270374c0c1752ed43263c815508",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "TOPIA Worlds",
+        "collectionAddress": "0x0AaC9E7673e0e034b7a2C2E70f9f4F9D55aD468f",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x594ae4fd7218bed52216eb4f1294a15e8ee6583916a2f79d027719c88528e6f0",
+            "0x88f7cf44e082d26494944b29276b56699e653cdf1ac44f9aa88ecd0daf95f0c2",
+            "0x14bcae665895f5d789292cc1d127b606278223146b0668b16a0d64921f1baa64",
+            "0x21bfda398290f9bd06771efd0c73a4b6d9dde270374c0c1752ed43263c815508",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "AOI Engine",
+        "collectionAddress": "0x69C2A7deC94714b2b6226a096c6498219Ba5908c",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xcb21a63533dec417983451bea26d5230f9683944bcd9a260631d8ccfab0ed401",
+            "0xc4f068eaa573e3b358f0855f495dda2acd449e605744660bd1bb17486f1925e3",
+            "0x619612f2b8e9dba92fe208e67dd97553865345141dfb5d90a982f31d53dfcc1f",
+            "0xc3f8a28c39662434ff0a35550eec3026c0bf4a9c694d1455cd297ca90ed190c5",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Kanpai Pandas",
+        "collectionAddress": "0xD35f108aeFF8aA8AA8e006825248A9ec0fCB1481",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0x08a0337ffa94ace99de5392a48efd49d7ccc3a8bde963f4a975e6106be32c7a3",
+            "0x2b2d0cfded3d4a3121ef57b690016d2cda4184b2f80d052c4d44a5bf10f5f100",
+            "0xd7ff4d7ef578052acd622a1f7065210a4b4710a4bac6529038ea228eb530ca41",
+            "0xf4de821d8c851ecd77bce1dd6182c33eceeaadf10c4d4adc9b1f54b75893ee7d",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "VeeFriends",
+        "collectionAddress": "0xE69c1C27Dbb9F1974D30F7355F3aEd38dAb26551",
+        "opentotalmopnpoint": 1000,
+        "merkleProof": [
+            "0xf72ae072b199b10b39a538452f0b88464923455ef3c1322defd136d6111627be",
+            "0x1556a0118c892c0fce29c5f2b298f519a3fd08c6ba9ba9275c5ca43b4f238462",
+            "0x0cfd84e54d5d286a376666ebf7960ffa63f2c042528b7bb259af20588b6ae13c",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Kubz",
+        "collectionAddress": "0xBc5AB6b7342137dbedFB5CA35627664A7857b588",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xc1df2b4e7d7e6f83c873b13f7a5dd8210fcaa1326c55d4703f1b12098889b89f",
+            "0x9a5d34fd9855d3852c97be49592b198c0f4a45f09b2a7a4642560dc45c54d11c",
+            "0xaa6deb37f3e8a38ec5894b09fcb9399c979c0000fc934c224df24a983d82c944",
+            "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Art Blocks",
+        "collectionAddress": "0x0DA399221Dd53CfD8D3a49B7Abb4e04Cf62a27BA",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xbd5dec875d67a7b7b209bef75369a3185aea8b7fa43e7e9929cc380a3dcf3345",
+            "0x9a5d34fd9855d3852c97be49592b198c0f4a45f09b2a7a4642560dc45c54d11c",
+            "0xaa6deb37f3e8a38ec5894b09fcb9399c979c0000fc934c224df24a983d82c944",
+            "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Checks",
+        "collectionAddress": "0x50c811bF54033fA2DBB8B8D9307Ef2A546245912",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xf288f247cdd4c8ac124323a685271107a5db61a62a483dd7ee5f33a55bd4a514",
+            "0x24b5df55ae71635ed18718fe6c4f09c0aa8a0f292a6dbee484c18fb1a1f1dc4c",
+            "0x0cfd84e54d5d286a376666ebf7960ffa63f2c042528b7bb259af20588b6ae13c",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Metal Tools Access Pass",
+        "collectionAddress": "0x7f008B55C0C2cB58d6cad490B8879D235ef3Cab2",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xc30fa649baa5ccdfc3b37c4fa598ec869e87fa1780589402618e646b2c39abcf",
+            "0x0993b6e45352fc4ee86456b53f301f554a89d7ee3c4a9a67dfe91316d6d581c7",
+            "0x96445c6d18776b38bf6449f1d9236c2f6fe4a3197d396ca6b9318d9895f58c26",
+            "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Sothebys Gen Art",
+        "collectionAddress": "0xA7Bd72f13f0cB6622dfef4b7662deE7e3b6eb665",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xb6a6f0455980b908fb7279cdd1a446740bc663e7ca5c1826a11b11d2c36fa7be",
+            "0xc0994372d178c65b4810edea01ee51e06dff6d4fef8a5864dd7b437eb4e97f85",
+            "0x11fb0f3dfe316e1d69e82c478770361d0481202e8f17078ff228459a3be9d724",
+            "0xa9110f19d669d7173b0514aeadaad06fc7d146e4b659bfa861569188ced92535",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Parallel Avatars",
+        "collectionAddress": "0xB03CB2618317b9F68dc5670f987D25c6D0a4C27B",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xe275aa8898ec7b43cedd82dc615317ebb09f4caf200f33e24a243347ca2a9404",
+            "0xc65669f984a354abff54f1ceae85d8700b9230d6b2e9bbecbceae1aa78faa626",
+            "0xdce520ab72afab55a1f8d5c7260b5e0aaf9f4ee93c8c6512e4b087fe53299f83",
+            "0xdba9781f380b7e19f8a804d5b8e864e68af04a13883165af0e322fcf2070c6f4",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Crazy Frens",
+        "collectionAddress": "0x4938283b4EEd1c0266Cdf6aB2805D1fA1AE5d10c",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x59a24bb80e45d581b282ed63170a98fa2c0612c901ff7cde6f1bd9b78c976555",
+            "0x2e136e871d8dc7a11b7f80701eacabcbe2faf3081e0cb4baf30f170cec4eb014",
+            "0x25e0d0be9c6a7ceff2de51feb7120fcfd663480849ad0ff7e30a73803e9313fc",
+            "0x1f9a6cf32923c1b4bf443aea37e57bb5a4f80fa2f5f852735bb857b01d5af85f",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Checks",
+        "collectionAddress": "0xb3ECfc0D2234b45CeD4A947470865c778093Fcfd",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xee2e824872fcfdfd4532933d61822875ef3f1586db007db320c404d371145287",
+            "0x4f382b5c0282aa51dbbaf606aae616bfeae01109943b19f4580e07a55c428461",
+            "0xed05e056a1a13897400b75056ea62cd79aaa8189dcd34200ae63e5b781302d72",
+            "0xdba9781f380b7e19f8a804d5b8e864e68af04a13883165af0e322fcf2070c6f4",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Matr1x 2061",
+        "collectionAddress": "0x3dF3fFFbA9782286EB0e3CA1AD7B12EEd0489749",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x46fbbf19a5f0ca0f591ef5a913277abe6a7d1bb3e844201fde6f9b9b27030f73",
+            "0x86c27a175163963afda9bd15451f5e08080ac454983f38aa9755047b852872f9",
+            "0x5c09d981e18492bba76dda459138ae63251513eaa80fc3c8f55199e40c8120e4",
+            "0xfc0da031a40519354f303fb50188d61a21dbc139d2054c41f65ac889f89d8796",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Pixelmon",
+        "collectionAddress": "0x8b1299966daF5f77487bed92B5De3025d1Ca0751",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xd94556389f8a15932f03aa39ed7aabe99fd33e4e8480072b2a627ac8947c817c",
+            "0x8063f945009a18b0ca38344148b1e831d5a066dc5fba50e830dfcdec2ebefac4",
+            "0x619612f2b8e9dba92fe208e67dd97553865345141dfb5d90a982f31d53dfcc1f",
+            "0xc3f8a28c39662434ff0a35550eec3026c0bf4a9c694d1455cd297ca90ed190c5",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Cool Cats",
+        "collectionAddress": "0x18F2A38D57168363DfF87DFC4185bF612B8934c3",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xe8f098d860533b38ead2204c79c9785243e9806467dd7ca663d402ac2b9bce98",
+            "0xea6f0bbb8ececcebd85157ecf9fa08983ac1a763bf461e6b78140d0aaf34df89",
+            "0xed05e056a1a13897400b75056ea62cd79aaa8189dcd34200ae63e5b781302d72",
+            "0xdba9781f380b7e19f8a804d5b8e864e68af04a13883165af0e322fcf2070c6f4",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Women Unite - 10k Assemble",
+        "collectionAddress": "0xB7cC81bc703EEB8B697c0E4bBEa2431872909383",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x614cb86a04e01da78c6c9baa8437dd335110f717fd5a38499051e0d122295560",
+            "0xb0513fd83d8e8e86b04aa425b8d6d94fe6e0b43cf437ddffb4448a737e293916",
+            "0x495b88f3515b76f6281221d71134eadc0e6c5bfcf9b2c088462388410adfadf9",
+            "0x1f9a6cf32923c1b4bf443aea37e57bb5a4f80fa2f5f852735bb857b01d5af85f",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "beef brothko",
+        "collectionAddress": "0x50314a491bf8e029fA1F9ff73257c56BA9a70E97",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x5cead7b63de04c6c610a89ee83893ccb69060642e4733456af357eb99707ccac",
+            "0x7bcdf66b7047838b34485952e616e9a48aa81034491551f7619120b712633348",
+            "0x25e0d0be9c6a7ceff2de51feb7120fcfd663480849ad0ff7e30a73803e9313fc",
+            "0x1f9a6cf32923c1b4bf443aea37e57bb5a4f80fa2f5f852735bb857b01d5af85f",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "OnChainMonkey",
+        "collectionAddress": "0xDaeB125F4093Eedf88Aa8BAcC34b0EDbCc938d4b",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x72941efb80e99a6ee99631cd19597058e9b51fa5320d283bc5dd8c89d989b462",
+            "0x71ce6536bf3eea5b0f88997cc4dcbafcf0b3b3905407be904353ff48b7e7141b",
+            "0xaf6dade6fd3f34e7436999ff968b1bd08fca8354aace3e03f61af21d47135e88",
+            "0xbf98e948f0eee1061a38ec4805c2b65bf0f9084855108529c268ef534539762a",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "TRIS",
+        "collectionAddress": "0x872E963C79FA1Fb0C94bA5Fd17A759fCa3B89026",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xf0faa3e7a0817e1575e5e223ac9e2c2444e0a639aabe87c9a732a9f0dbf2be65",
+            "0x24b5df55ae71635ed18718fe6c4f09c0aa8a0f292a6dbee484c18fb1a1f1dc4c",
+            "0x0cfd84e54d5d286a376666ebf7960ffa63f2c042528b7bb259af20588b6ae13c",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "KILLABEARS",
+        "collectionAddress": "0x55A92c4F7763ad4aF67Ff48D84fB6Db059e3245A",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x5019ba0cd5b811e1a5b3d02859a1599910eab0462eb033e37909429753daa9ee",
+            "0xcf19332ab089c98af237fc57795726c4406bbd5251ccb6d0bb04de4eaf68fe82",
+            "0x14bcae665895f5d789292cc1d127b606278223146b0668b16a0d64921f1baa64",
+            "0x21bfda398290f9bd06771efd0c73a4b6d9dde270374c0c1752ed43263c815508",
+            "0x492a3aedf0a72628469ad7a094c0be0579bd181758e79e64fdce1b0aad3bd37b",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Creepz by OVERLORD",
+        "collectionAddress": "0xf591F6d2A61749cD9402C1072F373305EcfE3430",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x663242f9d16a01f4afe6d8127f867490b3c221d0a40bb8c978390db9d41ce3e1",
+            "0x0fd53dcff525ea57c38def51e5301f62c610cb3b668f7b1acb59658261c709c8",
+            "0x1f970f430dcb9e786d9e09c746f761b6be19e1e129c0d2066084c825d8b40130",
+            "0xbf98e948f0eee1061a38ec4805c2b65bf0f9084855108529c268ef534539762a",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Velocity Pass",
+        "collectionAddress": "0x9137CB75b354128f81eE01fe4679DF242725F2b7",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xdb14871d536e50ca8afb2ec4f4508f57ec4a470a8f5399febab596e9ebc76466",
+            "0xc2e59a662a0a9265d32ffaeffa81ee94864fbd2f830288a5921e2d06b8f844b7",
+            "0xe660b16d575a62512aa3d4ece3774766bc65d705b026fad910e9986d0e0e2c7e",
+            "0xc3f8a28c39662434ff0a35550eec3026c0bf4a9c694d1455cd297ca90ed190c5",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "My Pet Hooligan",
+        "collectionAddress": "0xdB61441f81d9FbeDCa498aFC8978570874367125",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x8db0519d50cee62b27bae3fcdf3597c9cca521c5e6851e50a2bc1040146953e2",
+            "0x5d3c59249d0fe4c1c20a350fd5ecb07705f1048b8d6410867483bcd6221d3f9c",
+            "0x29eeea0d98ca435c4581a8f71db42bd92d74b0d3991333298c752d9689eaceb1",
+            "0xd7332baa46cba5b4f358fc841c6f7bed4750866ec31c31b6340d486f628f260c",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "MonsterMyCity",
+        "collectionAddress": "0xB566AE16815A357dCF3189E7Caee53dd6BAE97F2",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xe766e06a4fe32b481d78e1a94a6033f2ccf95f13b2c7bb0f8705a80880de8c83",
+            "0x3da04383f1677b592c3fac00bd86855acb9c1b84951bb3dc16adb946cc96fd63",
+            "0xdce520ab72afab55a1f8d5c7260b5e0aaf9f4ee93c8c6512e4b087fe53299f83",
+            "0xdba9781f380b7e19f8a804d5b8e864e68af04a13883165af0e322fcf2070c6f4",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Bonkler",
+        "collectionAddress": "0x93d94c2dD1437aeB870C267D4DfB3D35dB10003F",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xe24c77b3ea9365bd481ea72f62eab50db2e986e076a46e57b2b880d557d8d20a",
+            "0xbdf6f87cbcef2f9dac09d8b4cadbfacda3a07109ea982ab7917ba53a901384dd",
+            "0xe660b16d575a62512aa3d4ece3774766bc65d705b026fad910e9986d0e0e2c7e",
+            "0xc3f8a28c39662434ff0a35550eec3026c0bf4a9c694d1455cd297ca90ed190c5",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "The Grapes",
+        "collectionAddress": "0xda8D4eC5118b7B3cbE48c69f0583470B42fbd6B8",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xfc1077993a6bb5155c831019fea8aac629b29f26deea43b95c1b77ae123f1345",
+            "0x1556a0118c892c0fce29c5f2b298f519a3fd08c6ba9ba9275c5ca43b4f238462",
+            "0x0cfd84e54d5d286a376666ebf7960ffa63f2c042528b7bb259af20588b6ae13c",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "a KID called BEAST",
+        "collectionAddress": "0x0C17Ba46e1E7286C84C688E2aE800AE2C149f549",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x06a88c368dfdb08040eb0eb2e1a0ddf58cc1a543de52e9639a9eb6fdec31b31b",
+            "0xf95b80a5b64b362d98b08c7ac060c08211d95e28424af0fb3c562dd291b54d19",
+            "0x67de35a61933798b4b146f085613573affb77bdf099ccc07dadab4fcc30c98fb",
+            "0xf4de821d8c851ecd77bce1dd6182c33eceeaadf10c4d4adc9b1f54b75893ee7d",
+            "0xd8fc384e05ba4daa7ed071b25edb548ace2344d79b7f45986ea8b4c99c50e1a2",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "LACMACLV5WilliamMapan",
+        "collectionAddress": "0x1e87F5fE8D3DdC2cacFFD83F793C7c2c5F0d28C1",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xa25802e77d03d5188a0b554b7dc64540140d737524c3e3670c702037da0db9d9",
+            "0x667ddc8d20a7625838b1587a7710b1c26ce68425c2ad1d97f54aa0a5a6c95d5d",
+            "0x8e44f86a04441aeda006005ce6f662c9308dc9d1965f4c7e4f56ce7fe9b9d37c",
+            "0xd7332baa46cba5b4f358fc841c6f7bed4750866ec31c31b6340d486f628f260c",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "World Of Women",
+        "collectionAddress": "0x3e0A709aB1fcC275B0490F4b96373Cd830Ff63B8",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x6f8a58c5d16b04212806a57de3688085f6a6fd939f98bf6561e7f40d87c7e91e",
+            "0x71ce6536bf3eea5b0f88997cc4dcbafcf0b3b3905407be904353ff48b7e7141b",
+            "0xaf6dade6fd3f34e7436999ff968b1bd08fca8354aace3e03f61af21d47135e88",
+            "0xbf98e948f0eee1061a38ec4805c2b65bf0f9084855108529c268ef534539762a",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Neo Tokyo Citizen V2",
+        "collectionAddress": "0x1Cdd03CFE0c692e46BEF658bc221B1963AcD3D10",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x630f3fa0459a4e1a5bc4475cda5727eca7448742e7441971e9d41dae3131791d",
+            "0x8300a98cfeaa4bfe063e98e3d58d5a6165be011655f2aa6c560942878c5b3a67",
+            "0x495b88f3515b76f6281221d71134eadc0e6c5bfcf9b2c088462388410adfadf9",
+            "0x1f9a6cf32923c1b4bf443aea37e57bb5a4f80fa2f5f852735bb857b01d5af85f",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "JERKS",
+        "collectionAddress": "0x4FD26E56C16b50523Addb908443047EAaE235102",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xea6ac515fb6fc57e9bb8529b77c91d9464347ef80f1e1833dc17a4119beb8433",
+            "0x4f382b5c0282aa51dbbaf606aae616bfeae01109943b19f4580e07a55c428461",
+            "0xed05e056a1a13897400b75056ea62cd79aaa8189dcd34200ae63e5b781302d72",
+            "0xdba9781f380b7e19f8a804d5b8e864e68af04a13883165af0e322fcf2070c6f4",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Rektguy",
+        "collectionAddress": "0xe229b24a71877Dda9bCbdf78E2E665524429d5Bc",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xd7e1831566d76342dd023ff0729e1f860127af568160eab4f418eb83ac1db2e8",
+            "0x8063f945009a18b0ca38344148b1e831d5a066dc5fba50e830dfcdec2ebefac4",
+            "0x619612f2b8e9dba92fe208e67dd97553865345141dfb5d90a982f31d53dfcc1f",
+            "0xc3f8a28c39662434ff0a35550eec3026c0bf4a9c694d1455cd297ca90ed190c5",
+            "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Outside Yacht Club",
+        "collectionAddress": "0x72BD3Aa13b918ffef665982EA0CcE005d22A45B8",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x66676379b1d5e59bd1c16fc8213b13b3e66399fc05f4f118287ee8d2326754e6",
+            "0x49d24a3af5fd7e209b5f4c5a621867ab619d62e611031e292e4a284974e7529a",
+            "0x1f970f430dcb9e786d9e09c746f761b6be19e1e129c0d2066084c825d8b40130",
+            "0xbf98e948f0eee1061a38ec4805c2b65bf0f9084855108529c268ef534539762a",
+            "0xe6d2ad502712480e7d5b507c2e1a5d943ac274261bf558d0e30fff80af846bfa",
+            "0xf2cd7315ed245cd556eb88ffd89d6a2b54267931636b0d530e2020c15608e253",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Mocaverse",
+        "collectionAddress": "0xD02A3a67d80A7FBe4f5E8d51e1F1e7935bA859D4",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xe578456ca5a3d4cd2c459dbd089cef7f622e39b55143134a82d0cfd0dae26878",
+            "0x3da04383f1677b592c3fac00bd86855acb9c1b84951bb3dc16adb946cc96fd63",
+            "0xdce520ab72afab55a1f8d5c7260b5e0aaf9f4ee93c8c6512e4b087fe53299f83",
+            "0xdba9781f380b7e19f8a804d5b8e864e68af04a13883165af0e322fcf2070c6f4",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Apes Together Strong",
+        "collectionAddress": "0x579906a509391a6BF891bc5e125f65aC0FcEb9f9",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xe51bd1daf85cd89523caf7bb7ebd8703e2443718b632c0a600364b22eff8ad3f",
+            "0xc65669f984a354abff54f1ceae85d8700b9230d6b2e9bbecbceae1aa78faa626",
+            "0xdce520ab72afab55a1f8d5c7260b5e0aaf9f4ee93c8c6512e4b087fe53299f83",
+            "0xdba9781f380b7e19f8a804d5b8e864e68af04a13883165af0e322fcf2070c6f4",
+            "0xec1e451c1393127830900eb3a87cfa59e6ce17881f4110e0f86a08ec5fbf5ffe",
+            "0xf7ebc1131bf9d9012f39662004863981fbe9d6949d1d086656311e452aac1e43"
+        ]
+    },
+    {
+        "name": "Art Blocks",
+        "collectionAddress": "0x2F995BdBf338dA5E2a5B5289E15D8187Cb07063b",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0x81f5aa8707ecece1e5dfa1f136e5ea14948c52ec2affe54a7962a1199b19df59",
+            "0xab650170bc1764630211423c1e6b53a0dae48956f4460a21145b9348201e71bc",
+            "0x29eeea0d98ca435c4581a8f71db42bd92d74b0d3991333298c752d9689eaceb1",
+            "0xd7332baa46cba5b4f358fc841c6f7bed4750866ec31c31b6340d486f628f260c",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "BlockGames Dice",
+        "collectionAddress": "0xE7f7c8A7775ee75E2DD3800C1681D140A88Fb808",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xb43aa925b81971690e6845f457521d4bd5c8a6a0a5c83fde2edc6543fd397ff9",
+            "0xe062662ad077e27f85e9799d58d13fcd5247dbcab9cc76e773dfd2c9b32cfad3",
+            "0x11fb0f3dfe316e1d69e82c478770361d0481202e8f17078ff228459a3be9d724",
+            "0xa9110f19d669d7173b0514aeadaad06fc7d146e4b659bfa861569188ced92535",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    },
+    {
+        "name": "Taciturn-robot",
+        "collectionAddress": "0xC85a0a00a7709a3BDc2875c71dAdDa55591d084E",
+        "opentotalmopnpoint": 3000,
+        "merkleProof": [
+            "0xac9d0b7892ea78eed4258bc1d0c0f424ed44243c5949167c5e4a0aa16fb3ce6e",
+            "0x3a9aa5bc4e68ebc0a1262559f19b09225f28af4da0de9daa007b66a8fd61d3b3",
+            "0xb949255009bf3677b2ea2fac99775e87dd929ac54cb3246685319d752cbd7176",
+            "0xa9110f19d669d7173b0514aeadaad06fc7d146e4b659bfa861569188ced92535",
+            "0x62b662cbc250dc84687e9a8be1f4d15d885a6df62675608460740d820e44a2ae",
+            "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57"
+        ]
+    }
+]
