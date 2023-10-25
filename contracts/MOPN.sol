@@ -82,7 +82,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         uint256 MTReduceInterval_,
         uint256 MaxCollectionOnMapNum_,
         uint24 MaxCollectionMOPNPoint_,
-        uint48 whiteListOffTotalMOPNPoint_
+        uint48 whiteListOffTotalMOPNPoint_,
+        bytes32 whiteListRoot_
     ) {
         governance = IMOPNGovernance(governance_);
         MTReduceInterval = MTReduceInterval_;
@@ -93,6 +94,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         MTOutputPerBlock = MTOutputPerBlock_;
         MTStepStartBlock = MTStepStartBlock_;
         NFTOfferCoefficient = 10 ** 13;
+        whiteListRoot = whiteListRoot_;
+        PerMOPNPointMinted = 1;
     }
 
     function getGovernance() external view returns (address) {
@@ -147,7 +150,7 @@ contract MOPN is IMOPN, Multicall, Ownable {
         bytes32[] memory proof
     ) public {
         require(
-            OpenTotalMOPNPoint > TotalMOPNPoints,
+            OpenTotalMOPNPoint <= TotalMOPNPoints,
             "your collection is not open yet"
         );
         bytes32 leaf = keccak256(
@@ -253,6 +256,10 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
 
         if (whiteListOffTotalMOPNPoint > TotalMOPNPoints) {
+            console.log(
+                collectionAddress,
+                CDs[collectionAddress].PerMOPNPointMinted
+            );
             require(
                 CDs[collectionAddress].PerMOPNPointMinted > 0,
                 "collection not register white list"
