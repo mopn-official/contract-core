@@ -6,6 +6,8 @@ async function main() {
 
   const mocknfts = loadMockNFTs();
 
+  const mintablemocknfts = loadMintableMockNFTs();
+
   const whitlist = [];
   let i = 1;
   for (const key in mocknfts.collections) {
@@ -19,6 +21,17 @@ async function main() {
     } else if (i > 10) {
       collection.opentotalmopnpoint = 1000;
     }
+    whitlist.push(collection);
+    i++;
+  }
+
+  i = 1;
+  for (const key in mintablemocknfts.collections) {
+    let collection = {
+      name: mintablemocknfts.collections[key].name,
+      collectionAddress: mintablemocknfts.collections[key].collectionAddress,
+      opentotalmopnpoint: 0,
+    };
     whitlist.push(collection);
     i++;
   }
@@ -51,6 +64,19 @@ function loadMockNFTs() {
 
   if (!deployConf) {
     console.log("no mock nfts");
+    console.error(error);
+    process.exitCode = 1;
+    return;
+  }
+
+  return deployConf;
+}
+
+function loadMintableMockNFTs() {
+  const deployConf = JSON.parse(fs.readFileSync("./scripts/mocknfts/mintablenfts.json"));
+
+  if (!deployConf) {
+    console.log("no mintable mock nfts");
     console.error(error);
     process.exitCode = 1;
     return;
