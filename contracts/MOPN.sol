@@ -256,10 +256,6 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
 
         if (whiteListOffTotalMOPNPoint > TotalMOPNPoints) {
-            console.log(
-                collectionAddress,
-                CDs[collectionAddress].PerMOPNPointMinted
-            );
             require(
                 CDs[collectionAddress].PerMOPNPointMinted > 0,
                 "collection not register white list"

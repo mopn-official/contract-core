@@ -1,14 +1,12 @@
 const { ethers, config } = require("hardhat");
 const fs = require("fs");
-const axios = require('axios');
-const path = require('path');
-
+const axios = require("axios");
+const path = require("path");
 
 async function main() {
-
   const deployConf = loadConf();
 
-  let contractName, Contract, contract, mocknftfactroy, mocknftimplementation;
+  let contractName, Contract, contract, mocknftfactroy, mocknftimplementation, mocknftproxy;
 
   console.log("deploy start");
   if (deployConf.factory.address != "") {
@@ -25,7 +23,10 @@ async function main() {
   }
 
   if (deployConf.implementation.address != "") {
-    mocknftimplementation = await ethers.getContractAt("MOCKNFT", deployConf.implementation.address);
+    mocknftimplementation = await ethers.getContractAt(
+      "MOCKNFT",
+      deployConf.implementation.address
+    );
     console.log("MOCKNFT:", mocknftimplementation.address, " deployed.");
   } else {
     const MOCKNFT = await ethers.getContractFactory("MOCKNFT");
@@ -37,14 +38,30 @@ async function main() {
     saveConf(deployConf);
   }
 
+  if (deployConf.proxy.address != "") {
+    mocknftproxy = await ethers.getContractAt("MOCKNFTProxy", deployConf.proxy.address);
+    console.log("MOCKNFTProxy:", mocknftproxy.address, " deployed.");
+  } else {
+    const MOCKNFTProxy = await ethers.getContractFactory("MOCKNFTProxy");
+    mocknftproxy = await MOCKNFTProxy.deploy(mocknftimplementation.address);
+    console.log("https://goerli.etherscan.io/tx/" + mocknftproxy.deployTransaction.hash);
+    await mocknftproxy.deployed();
+    console.log("MOCKNFTProxy:", mocknftproxy.address, " deployed.");
+    deployConf.proxy.address = mocknftproxy.address;
+    saveConf(deployConf);
+  }
+
   const options = {
-    method: 'GET',
-    url: 'https://api.simplehash.com/api/v0/nfts/collections/top_v2?chains=ethereum&time_period=30d&limit=100',
-    headers: { accept: 'application/json', 'X-API-KEY': 'cyanface_sk_f89ad03f-b89e-4a04-844b-ed8a5ee227c7_5uv3aqj1zrnjzpcu' }
+    method: "GET",
+    url: "https://api.simplehash.com/api/v0/nfts/collections/top_v2?chains=ethereum&time_period=30d&limit=100",
+    headers: {
+      accept: "application/json",
+      "X-API-KEY": "cyanface_sk_f89ad03f-b89e-4a04-844b-ed8a5ee227c7_5uv3aqj1zrnjzpcu",
+    },
   };
 
-  const provider = new ethers.providers.JsonRpcProvider(config.networks['mainnet'].url);
-  const wallet = new ethers.Wallet(config.networks['mainnet'].accounts[0], provider);
+  const provider = new ethers.providers.JsonRpcProvider(config.networks["mainnet"].url);
+  const wallet = new ethers.Wallet(config.networks["mainnet"].accounts[0], provider);
 
   const blocknumber = await provider.getBlockNumber();
 
@@ -55,20 +72,46 @@ async function main() {
     .then(async function (response) {
       for (collection of response.data.collections) {
         if (collection.collection_details.top_contracts.length == 1) {
-          const mainnetAddress = collection.collection_details.top_contracts[0].replace("ethereum.", "");
+          const mainnetAddress = collection.collection_details.top_contracts[0].replace(
+            "ethereum.",
+            ""
+          );
           if (deployConf.collections[mainnetAddress]) {
-            console.log(mainnetAddress, "deployed collectionAddress is", deployConf.collections[mainnetAddress].collectionAddress);
-            const contract = await ethers.getContractAt("MOCKNFT", deployConf.collections[mainnetAddress].collectionAddress);
+            console.log(
+              mainnetAddress,
+              "deployed collectionAddress is",
+              deployConf.collections[mainnetAddress].collectionAddress
+            );
+            const contract = await ethers.getContractAt(
+              "MOCKNFT",
+              deployConf.collections[mainnetAddress].collectionAddress
+            );
             const baseURI = await contract.baseURI();
             const extURI = await contract.extURI();
             if (baseURI != deployConf.collections[mainnetAddress].baseURI) {
-              console.log("update", mainnetAddress, deployConf.collections[mainnetAddress].collectionAddress, "baseURI from", baseURI, "to", deployConf.collections[mainnetAddress].baseURI);
+              console.log(
+                "update",
+                mainnetAddress,
+                deployConf.collections[mainnetAddress].collectionAddress,
+                "baseURI from",
+                baseURI,
+                "to",
+                deployConf.collections[mainnetAddress].baseURI
+              );
               const tx = await contract.setBaseURI(deployConf.collections[mainnetAddress].baseURI);
               await tx.wait();
               console.log("done");
             }
             if (extURI != deployConf.collections[mainnetAddress].extURI) {
-              console.log("update", mainnetAddress, deployConf.collections[mainnetAddress].collectionAddress, "extURI from", extURI, "to", deployConf.collections[mainnetAddress].extURI);
+              console.log(
+                "update",
+                mainnetAddress,
+                deployConf.collections[mainnetAddress].collectionAddress,
+                "extURI from",
+                extURI,
+                "to",
+                deployConf.collections[mainnetAddress].extURI
+              );
               const tx = await contract.setExtURI(deployConf.collections[collectionAddress].extURI);
               await tx.wait();
               console.log("done");
@@ -82,34 +125,51 @@ async function main() {
             //   await tx.wait();
             //   console.log("done");
             // }
-            if (!deployConf.collections[mainnetAddress].image_url && collection.collection_details.image_url) {
-              deployConf.collections[mainnetAddress].image_url = collection.collection_details.image_url;
+            if (
+              !deployConf.collections[mainnetAddress].image_url &&
+              collection.collection_details.image_url
+            ) {
+              deployConf.collections[mainnetAddress].image_url =
+                collection.collection_details.image_url;
               saveConf(deployConf);
               console.log("save image url", collection.collection_details.image_url);
             }
-
           } else {
             const contract = await ethers.getContractAt("IERC721Metadata", mainnetAddress, wallet);
             try {
-              const is721 = await contract.supportsInterface('0x80ac58cd');
+              const is721 = await contract.supportsInterface("0x80ac58cd");
               if (is721) {
-                const transfers = await contract.queryFilter('Transfer', blocknumber - 3600, blocknumber);
+                const transfers = await contract.queryFilter(
+                  "Transfer",
+                  blocknumber - 3600,
+                  blocknumber
+                );
                 if (transfers.length > 0) {
                   const transfer = transfers.pop();
                   const tokenURI = await contract.tokenURI(transfer.args.tokenId);
                   if (tokenURI.length > 255) continue;
                   const pathinfo = path.parse(tokenURI);
-                  const baseURI = pathinfo.dir + '/';
+                  const baseURI = pathinfo.dir + "/";
                   const extURI = pathinfo.ext;
                   const name = await contract.name();
                   const symbol = await contract.symbol();
-                  console.log(deployConf.collectionnumber, mainnetAddress, name, symbol, baseURI, extURI);
+                  console.log(
+                    deployConf.collectionnumber,
+                    mainnetAddress,
+                    name,
+                    symbol,
+                    baseURI,
+                    extURI
+                  );
 
                   const tx = await mocknftfactroy.createNewMockCollection(
                     mocknftimplementation.address,
                     deployConf.collectionnumber,
-                    mocknftimplementation.interface.encodeFunctionData('initialize', [
-                      name, symbol, baseURI, extURI
+                    mocknftimplementation.interface.encodeFunctionData("initialize", [
+                      name,
+                      symbol,
+                      baseURI,
+                      extURI,
                     ])
                   );
                   console.log("https://goerli.etherscan.io/tx/" + tx.hash);
@@ -125,13 +185,13 @@ async function main() {
                   }
                   deployConf.collectionnumber++;
                   deployConf.collections[mainnetAddress] = {
-                    "mainnetAddress": mainnetAddress,
-                    'collectionAddress': deployedAddress,
-                    'name': name,
-                    'symbol': symbol,
-                    'baseURI': baseURI,
-                    'extURI': extURI,
-                    "tokenURIexample": tokenURI
+                    mainnetAddress: mainnetAddress,
+                    collectionAddress: deployedAddress,
+                    name: name,
+                    symbol: symbol,
+                    baseURI: baseURI,
+                    extURI: extURI,
+                    tokenURIexample: tokenURI,
                   };
                   saveConf(deployConf);
                 }
@@ -164,15 +224,14 @@ async function main() {
   // }
   console.log("deploy finish");
 
-
   console.log("begin verify contracts on goerliscan");
   try {
     let verifyData = {
-      address: mocknftfactroy.address
+      address: mocknftfactroy.address,
     };
     await hre.run("verify:verify", verifyData);
     verifyData = {
-      address: mocknftimplementation.address
+      address: mocknftimplementation.address,
     };
     await hre.run("verify:verify", verifyData);
   } catch (e) {
@@ -190,9 +249,7 @@ async function main() {
 }
 
 function loadConf() {
-  const deployConf = JSON.parse(
-    fs.readFileSync("./scripts/mocknfts/nfts.json")
-  );
+  const deployConf = JSON.parse(fs.readFileSync("./scripts/mocknfts/nfts.json"));
 
   if (!deployConf) {
     console.log("no deploy config");

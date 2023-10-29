@@ -20,18 +20,11 @@ contract MOPNAuctionHouse is Multicall {
 
     event BombSold(address indexed buyer, uint256 amount, uint256 price);
 
-    uint256 public immutable landPrice = 1000000000000;
+    uint256 public constant landPrice = 1000000000000;
 
-    /**
-     * @dev last active round's start timestamp
-     * @notice uint64 roundId + uint32 startTimestamp
-     *  Bits Layout:
-     *  - [0..31]      `start timestamp`
-     *  - [32..95]     `round Id`
-     */
-    uint256 public landRound;
+    uint32 public landRoundStartBlock;
 
-    uint256 private constant _BITPOS_LAND_ROUNDID = 32;
+    uint64 public landRoundId;
 
     event LandSold(address indexed buyer, uint256 price);
 
@@ -44,9 +37,10 @@ contract MOPNAuctionHouse is Multicall {
         _;
     }
 
-    constructor(address governance_, uint256 landStartTimestamp) {
+    constructor(address governance_, uint32 landStartBlock) {
         governance = IMOPNGovernance(governance_);
-        landRound = (uint256(1) << _BITPOS_LAND_ROUNDID) | landStartTimestamp;
+        landRoundStartBlock = landStartBlock;
+        landRoundId = 1;
     }
 
     /**
@@ -99,11 +93,11 @@ contract MOPNAuctionHouse is Multicall {
      * @return roundId round Id
      */
     function getLandRoundId() public view returns (uint64) {
-        return uint64(landRound >> _BITPOS_LAND_ROUNDID);
+        return landRoundId;
     }
 
-    function getLandRoundStartTimestamp() public view returns (uint32) {
-        return uint32(landRound);
+    function getLandRoundStartBlock() public view returns (uint32) {
+        return landRoundStartBlock;
     }
 
     /**
@@ -125,18 +119,14 @@ contract MOPNAuctionHouse is Multicall {
     }
 
     function _buyLand(address buyer, uint256 price) internal {
-        uint256 roundStartTimestamp = getLandRoundStartTimestamp();
-        require(block.timestamp >= roundStartTimestamp, "auction not start");
-
-        uint64 roundId = getLandRoundId();
+        require(block.number >= landRoundStartBlock, "auction not start");
 
         IMOPNLand(governance.landContract()).auctionMint(buyer, 1);
 
         emit LandSold(buyer, price);
 
-        landRound =
-            (uint256(roundId + 1) << _BITPOS_LAND_ROUNDID) |
-            block.timestamp;
+        landRoundId++;
+        landRoundStartBlock = uint32(block.number);
     }
 
     /**
@@ -144,11 +134,10 @@ contract MOPNAuctionHouse is Multicall {
      * @return price current auction price
      */
     function getLandCurrentPrice() public view returns (uint256) {
-        uint256 roundStartTimestamp = getLandRoundStartTimestamp();
-        if (roundStartTimestamp == 0 || roundStartTimestamp > block.timestamp) {
-            roundStartTimestamp = block.timestamp;
+        if (landRoundStartBlock >= block.number) {
+            return landPrice;
         }
-        return getLandPrice((block.timestamp - roundStartTimestamp) / 60);
+        return getLandPrice((block.number - landRoundStartBlock) / 5);
     }
 
     function getLandPrice(uint256 reduceTimes) public pure returns (uint256) {
@@ -169,7 +158,7 @@ contract MOPNAuctionHouse is Multicall {
     {
         roundId = getLandRoundId();
         price = getLandCurrentPrice();
-        startTimestamp = getLandRoundStartTimestamp();
+        startTimestamp = landRoundStartBlock;
     }
 
     function onERC20Received(

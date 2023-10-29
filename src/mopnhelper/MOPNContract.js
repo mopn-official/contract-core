@@ -293,6 +293,36 @@ async function removeStakingMT(collectionAddress, amount) {
   }
 }
 
+async function buyLandByMT() {
+  const auctionhouse = await getContractObj("MOPNAuctionHouse");
+  const price = await auctionhouse.getLandCurrentPrice();
+  const tx = await auctionhouse.buyLand();
+  console.log(
+    "wallet",
+    (await getCurrentAccount()).address,
+    "buy land at price",
+    price,
+    "tx sent!"
+  );
+  console.log(hre.network.config.etherscanHost + "tx/" + tx.hash);
+  await tx.wait();
+}
+
+async function buyLandByETH(amount) {
+  const mopnland = await getContractObj("MOPNLand");
+  const price = await mopnland.ethMintTotalPrice(amount);
+  const tx = await mopnland.ethMint(amount, { value: price });
+  console.log(
+    "wallet",
+    (await getCurrentAccount()).address,
+    "buy " + amount + " land with total price",
+    price,
+    "tx sent!"
+  );
+  console.log(hre.network.config.etherscanHost + "tx/" + tx.hash);
+  await tx.wait();
+}
+
 async function getAccountNFTOwner(account) {
   const accountContract = await getContractObj("MOPNERC6551Account", account);
   return await accountContract.nftowner();
@@ -312,6 +342,8 @@ module.exports = {
   buybomb,
   stackMT,
   removeStakingMT,
+  buyLandByMT,
+  buyLandByETH,
   getAccountNFTOwner,
   getAccountNFTInfo,
 };

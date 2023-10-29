@@ -2,11 +2,15 @@
 pragma solidity ^0.8.19;
 
 import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract MOCKNFT is ERC721AUpgradeable, OwnableUpgradeable {
+contract MOCKNFT is ERC721AUpgradeable {
     string public baseURI;
     string public extURI;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner(), "only owner");
+        _;
+    }
 
     // Take note of the initializer modifiers.
     // - `initializerERC721A` for `ERC721AUpgradeable`.
@@ -16,15 +20,14 @@ contract MOCKNFT is ERC721AUpgradeable, OwnableUpgradeable {
         string memory symbol,
         string memory baseURI_,
         string memory extURI_
-    ) public initializerERC721A initializer {
+    ) public initializerERC721A {
         __ERC721A_init(name, symbol);
         baseURI = baseURI_;
         extURI = extURI_;
-        _transferOwnership(tx.origin);
     }
 
-    function mint(uint256 quantity) external payable onlyOwner {
-        // `_mint`'s second argument now takes in a `quantity`, not a `tokenId`.
+    function mint(uint256 quantity) external {
+        require(_numberMinted(msg.sender) <= 10, "wallet mint limit reached");
         _mint(msg.sender, quantity);
     }
 
@@ -44,6 +47,17 @@ contract MOCKNFT is ERC721AUpgradeable, OwnableUpgradeable {
         uint256 _tokenId
     ) public view override returns (string memory) {
         return string.concat(super.tokenURI(_tokenId), extURI);
+    }
+
+    function owner() internal view returns (address) {
+        bytes memory footer = new bytes(0x20);
+
+        assembly {
+            // copy 0x20 bytes from end of footer
+            extcodecopy(address(), add(footer, 0x20), 0x4d, 0x6d)
+        }
+
+        return abi.decode(footer, (address));
     }
 
     function salt() internal view returns (uint256) {
