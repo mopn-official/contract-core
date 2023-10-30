@@ -285,6 +285,19 @@ contract MOPNData is IMOPNData, Multicall {
         }
     }
 
+    function getWalletStakingMTs(
+        address[] memory collections
+    ) public view returns (uint256 amount) {
+        for (uint256 i = 0; i < collections.length; i++) {
+            address collectionVault = governance.getCollectionVault(
+                collections[i]
+            );
+            amount += IMOPNCollectionVault(collectionVault).V2MTAmountRealtime(
+                IMOPNCollectionVault(collectionVault).balanceOf(msg.sender)
+            );
+        }
+    }
+
     /**
      * get collection contract, on map num, avatar num etc from IGovernance.
      */

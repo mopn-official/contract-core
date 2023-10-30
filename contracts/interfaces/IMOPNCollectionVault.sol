@@ -41,4 +41,8 @@ interface IMOPNCollectionVault is IERC20 {
     function MTBalance() external view returns (uint256 balance);
 
     function collectionAddress() external view returns (address);
+
+    function V2MTAmountRealtime(
+        uint256 VAmount
+    ) external view returns (uint256 MTAmount);
 }

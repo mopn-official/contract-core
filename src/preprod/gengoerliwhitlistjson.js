@@ -25,16 +25,16 @@ async function main() {
     i++;
   }
 
-  i = 1;
-  for (const key in mintablemocknfts.collections) {
-    let collection = {
-      name: mintablemocknfts.collections[key].name,
-      collectionAddress: mintablemocknfts.collections[key].collectionAddress,
-      opentotalmopnpoint: 0,
-    };
-    whitlist.push(collection);
-    i++;
-  }
+  // i = 1;
+  // for (const key in mintablemocknfts.collections) {
+  //   let collection = {
+  //     name: mintablemocknfts.collections[key].name,
+  //     collectionAddress: mintablemocknfts.collections[key].collectionAddress,
+  //     opentotalmopnpoint: 0,
+  //   };
+  //   whitlist.push(collection);
+  //   i++;
+  // }
 
   const whitelistTree = [];
   for (const collection of whitlist) {

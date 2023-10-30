@@ -26,7 +26,7 @@ module.exports = {
     hardhat: {
       forking: {
         url: process.env.GOERLI_URL,
-        blockNumber: 9922222,
+        blockNumber: 9956585,
       },
     },
     localhost: {

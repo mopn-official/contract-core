@@ -17,6 +17,8 @@ async function main() {
   // }
 
   console.log(MOPNMath.LandRingNum(7));
+
+  await MOPNContract.mintMockNFTs("0x1fE6879DCDdfC5b1c1Fa19bf42FD3D85fFF282e4", 5);
 }
 
 main().catch((error) => {

@@ -93,7 +93,7 @@ contract MOPNCollectionVault is
         bool onReceived
     ) public view returns (uint256 VAmount) {
         if (totalSupply() == 0) {
-            VAmount = MTAmount;
+            VAmount = MTBalanceRealtime();
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /
@@ -106,13 +106,15 @@ contract MOPNCollectionVault is
         uint256 MTAmount,
         bool onReceived
     ) public view returns (uint256 VAmount) {
+        uint256 balance = IMOPNToken(
+            IMOPNGovernance(governance).tokenContract()
+        ).balanceOf(address(this));
         if (totalSupply() == 0) {
-            VAmount = MTAmount;
+            VAmount = balance;
         } else {
             VAmount =
                 (totalSupply() * MTAmount) /
-                (IMOPNToken(IMOPNGovernance(governance).tokenContract())
-                    .balanceOf(address(this)) - (onReceived ? MTAmount : 0));
+                (balance - (onReceived ? MTAmount : 0));
         }
     }
 
@@ -120,8 +122,7 @@ contract MOPNCollectionVault is
         uint256 VAmount
     ) public view returns (uint256 MTAmount) {
         if (VAmount == totalSupply()) {
-            MTAmount = IMOPNToken(IMOPNGovernance(governance).tokenContract())
-                .balanceOf(address(this));
+            MTAmount = MTBalanceRealtime();
         } else {
             MTAmount = (MTBalanceRealtime() * VAmount) / totalSupply();
         }

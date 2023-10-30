@@ -39,15 +39,14 @@ async function main() {
         contract = await Contract.deploy({ gasPrice: 3000000000 });
       }
 
-      console.log(deployConf["blockScanUrl"] + "tx/" + contract.deployTransaction.hash);
-      await contract.deployed();
-      deployConf[contractName].address = contract.address;
+      await contract.waitForDeployment();
+      deployConf[contractName].address = await contract.getAddress();
       deployConf[contractName].verified = false;
-      console.log(contractName, ":", contract.address, " deployed.");
+      console.log(contractName, ":", await contract.getAddress(), " deployed.");
       saveConf(deployConf);
     } else {
       contract = await ethers.getContractAt(contractName, deployConf[contractName].address);
-      console.log(contractName, ":", contract.address, " exist. No need to deploy");
+      console.log(contractName, ":", await contract.getAddress(), " exist. No need to deploy");
     }
   }
   console.log("deploy finish");

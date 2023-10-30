@@ -323,6 +323,93 @@ async function buyLandByETH(amount) {
   await tx.wait();
 }
 
+async function mintMockNFTs(contract, amount) {
+  const mocknft = await getContractObj("MOCKNFT", contract);
+  const tx = await mocknft.mint(amount);
+  console.log(
+    "wallet",
+    (await getCurrentAccount()).address,
+    "mint " + amount + " mock " + (await mocknft.name()) + " nfts",
+    "tx sent!"
+  );
+  console.log(hre.network.config.etherscanHost + "tx/" + tx.hash);
+  await tx.wait();
+}
+
+async function rentNFT_acceptOffer(tokenContract, tokenId, offererIndex, ownerIndex) {
+  const ERC6551Registry = await getContractObj("ERC6551Registry");
+  const MOPNLand = await getContractObj("MOPNLand");
+  const MOPNRental = await getContractObj("MOPNRental");
+  const MOPNToken = await getContractObj("MOPNToken");
+  setCurrentAccount(offererIndex);
+  const offerer = await getCurrentAccount();
+  await MOPNToken.connect(offerer).approve(await MOPNRental.getAddress(), "1000000");
+  const account = await ERC6551Registry.account(
+    await getContractAddress("MOPNERC6551AccountProxy"),
+    hre.network.config.chainId,
+    tokenContract,
+    tokenId,
+    0
+  );
+  const offerOrder = {
+    orderType: 1, // 1 for OFFER
+    orderId: Math.floor(Date.now() / 1000),
+    owner: await offerer.getAddress(),
+    nftToken: tokenContract,
+    implementation: await getContractAddress("MOPNERC6551AccountProxy"),
+    account: account,
+    quantity: 1,
+    price: "1000",
+    minDuration: "100",
+    maxDuration: "86400",
+    expiry: (Math.floor(Date.now() / 1000) + 60 * 60 * 24).toString(),
+    feeRate: "25",
+    feeReceiver: await MOPNLand.ADDR_TREASURY(),
+    salt: "0",
+  };
+  const signature = await createSignature(await MOPNRental.getAddress(), offerOrder, offerer);
+  setCurrentAccount(ownerIndex);
+  const owner = await getCurrentAccount();
+  await MOPNRental.connect(owner).acceptOffer(offerOrder, 100, [account], "1000000", signature);
+}
+
+async function rentNFT_rentFromList(tokenContract, tokenId, ownerIndex, renterIndex) {
+  const ERC6551Registry = await getContractObj("ERC6551Registry");
+  const MOPNLand = await getContractObj("MOPNLand");
+  const MOPNRental = await getContractObj("MOPNRental");
+  const MOPNToken = await getContractObj("MOPNToken");
+  setCurrentAccount(ownerIndex);
+  const owner = await getCurrentAccount();
+  const account = await ERC6551Registry.account(
+    await getContractAddress("MOPNERC6551AccountProxy"),
+    hre.network.config.chainId,
+    tokenContract,
+    tokenId,
+    0
+  );
+  listOrder = {
+    orderType: "0", // 0 for LIST
+    orderId: Math.floor(Date.now() / 1000),
+    owner: await owner.getAddress(),
+    nftToken: tokenContract,
+    implementation: await getContractAddress("MOPNERC6551AccountProxy"),
+    account: account,
+    quantity: "1",
+    price: "1000",
+    minDuration: "100",
+    maxDuration: "86400",
+    expiry: (Math.floor(Date.now() / 1000) + 60 * 60 * 24).toString(),
+    feeRate: "25",
+    feeReceiver: await MOPNLand.ADDR_TREASURY(),
+    salt: "0",
+  };
+  const signature = await createSignature(await MOPNRental.getAddress(), listOrder, owner);
+  setCurrentAccount(renterIndex);
+  const renter = await getCurrentAccount();
+  await MOPNToken.connect(offerer).approve(await MOPNRental.getAddress(), "1000000");
+  await MOPNRental.connect(renter).rentFromList(listOrder, 100, signature);
+}
+
 async function getAccountNFTOwner(account) {
   const accountContract = await getContractObj("MOPNERC6551Account", account);
   return await accountContract.nftowner();
@@ -344,6 +431,9 @@ module.exports = {
   removeStakingMT,
   buyLandByMT,
   buyLandByETH,
+  mintMockNFTs,
+  rentNFT_acceptOffer,
+  rentNFT_rentFromList,
   getAccountNFTOwner,
   getAccountNFTInfo,
 };
