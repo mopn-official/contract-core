@@ -1,5 +1,5 @@
 const MOPNContract = require("./MOPNContract");
-const MOPNMath = require("../simulator/MOPNMath");
+const TheGraph = require("../simulator/TheGraph");
 
 async function main() {
   // MOPNContract.setCurrentAccount(1);
@@ -16,13 +16,32 @@ async function main() {
   //   console.log(await MOPNContract.getAccountNFTInfo(account));
   // }
 
-  // console.log(MOPNMath.LandRingNum(7));
+  console.log(MOPNMath.LandRingNum(7));
 
-  // await MOPNContract.mintMockNFTs("0x1fE6879DCDdfC5b1c1Fa19bf42FD3D85fFF282e4", 5);
+  await MOPNContract.mintMockNFTs("0x1fE6879DCDdfC5b1c1Fa19bf42FD3D85fFF282e4", 5);
+}
 
-  console.log(
-    await MOPNContract.getMockNFTTokenUri("0x25B63766fAeF35Ef72ec4ACFc776c80001A4eeb4", 1)
-  );
+async function getCollectionOnMapData(collection) {
+  const centerCoordinate = {
+    "0xD7ea10E5D7CA72AF25b6502A7919d0cDBBC16A3E": 10001000,
+  };
+
+  const accounts = await TheGraph.getCollectionOnMapAccounts(collection);
+  const coordinates = [];
+  const tokenIds = [];
+  for (const account of accounts) {
+    coordinates.push(account.coordinate);
+    tokenIds.push(account.tokenId);
+  }
+  return {
+    center: centerCoordinate[collection],
+    coordinates: coordinates,
+    tokenIds: tokenIds,
+  };
+}
+
+async function getCollectionNextMoveGrid(collection) {
+  [center, coodinates, tokenIds] = await getCollectionOnMapData(collection);
 }
 
 main().catch((error) => {
