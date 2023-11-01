@@ -56,7 +56,7 @@ async function getMoveToTilesAccounts(coordinate) {
     if (tileaccounts[coordinate]) {
       tilesaccounts.push(tileaccounts[coordinate]);
     } else {
-      tilesaccounts.push(hre.ethers.constants.AddressZero);
+      tilesaccounts.push(ZeroAddress);
     }
   });
 
@@ -120,6 +120,50 @@ async function getMoveToTilesAccountsRich(coordinate) {
   return tilesaccounts;
 }
 
+async function getTilesAccountsRich(coordinates) {
+  let tileaccounts = {};
+  let tilesaccounts = [];
+  const graphqlQuery = {
+    operationName: "fetchCoordinates",
+    query: `query fetchCoordinates($id_in: [String!]) {
+      coordinateDatas(where: {id_in: $id_in}) {
+        id
+        account {
+          id
+          ContractAddress
+        }
+      }
+    }`,
+    variables: {
+      id_in: coordinates,
+    },
+  };
+  const coordinateDatas = await fetchData(graphqlQuery);
+  for (let coordinateData of coordinateDatas.data.coordinateDatas) {
+    if (coordinateData.account !== null) {
+      tileaccounts[coordinateData.id] = {
+        coordinate: coordinateData.id,
+        account: coordinateData.account.id,
+        collection: coordinateData.account.ContractAddress,
+      };
+    }
+  }
+
+  coordinates.forEach((coordinate) => {
+    if (tileaccounts[coordinate]) {
+      tilesaccounts.push(tileaccounts[coordinate]);
+    } else {
+      tilesaccounts.push({
+        coordinate: coordinate,
+        account: ZeroAddress,
+        collection: ZeroAddress,
+      });
+    }
+  });
+
+  return tilesaccounts;
+}
+
 async function getCollectionOnMapAccounts(collection) {
   let accounts = [];
 
@@ -156,5 +200,6 @@ module.exports = {
   fetchData,
   getMoveToTilesAccounts,
   getMoveToTilesAccountsRich,
+  getTilesAccountsRich,
   getCollectionOnMapAccounts,
 };
