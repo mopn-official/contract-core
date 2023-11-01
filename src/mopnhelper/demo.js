@@ -1,5 +1,6 @@
 const MOPNContract = require("./MOPNContract");
 const MOPNMath = require("../simulator/MOPNMath");
+const TheGraph = require("../mopnhelper/TheGraph");
 
 async function main() {
   // MOPNContract.setCurrentAccount(1);
@@ -20,8 +21,12 @@ async function main() {
 
   // await MOPNContract.mintMockNFTs("0x1fE6879DCDdfC5b1c1Fa19bf42FD3D85fFF282e4", 5);
 
+  // console.log(
+  //   await MOPNContract.getMockNFTTokenUri("0x25B63766fAeF35Ef72ec4ACFc776c80001A4eeb4", 1)
+  // );
+
   console.log(
-    await MOPNContract.getMockNFTTokenUri("0x25B63766fAeF35Ef72ec4ACFc776c80001A4eeb4", 1)
+    await TheGraph.getCollectionOnMapAccounts("0x90ccfad2c1dc253285e379a0050a503d1a5abcee")
   );
 }
 

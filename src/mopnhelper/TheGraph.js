@@ -1,13 +1,14 @@
-const axios = require('axios');
+const axios = require("axios");
 const MOPNMath = require("../simulator/MOPNMath");
+const { ZeroAddress } = require("ethers");
 
-const endpoint = 'https://api.thegraph.com/subgraphs/name/cyanface/mopn-' + hre.network.name;
+const endpoint = "https://api.thegraph.com/subgraphs/name/cyanface/mopn-" + hre.network.name;
 
 async function fetchData(graphqlQuery) {
   const response = await axios({
     url: endpoint,
-    method: 'post',
-    data: graphqlQuery
+    method: "post",
+    data: graphqlQuery,
   });
   return response.data;
 }
@@ -31,8 +32,8 @@ async function getMoveToTilesAccounts(coordinate) {
   }
 
   const graphqlQuery = {
-    "operationName": "fetchCoordinates",
-    "query": `query fetchCoordinates($id_in: [String!]) {
+    operationName: "fetchCoordinates",
+    query: `query fetchCoordinates($id_in: [String!]) {
       coordinateDatas(where: {id_in: $id_in}) {
         id
         account {
@@ -40,9 +41,9 @@ async function getMoveToTilesAccounts(coordinate) {
         }
       }
     }`,
-    "variables": {
-      "id_in": coordinates
-    }
+    variables: {
+      id_in: coordinates,
+    },
   };
   const coordinateDatas = await fetchData(graphqlQuery);
   for (let coordinateData of coordinateDatas.data.coordinateDatas) {
@@ -51,7 +52,7 @@ async function getMoveToTilesAccounts(coordinate) {
     }
   }
 
-  coordinates.forEach(coordinate => {
+  coordinates.forEach((coordinate) => {
     if (tileaccounts[coordinate]) {
       tilesaccounts.push(tileaccounts[coordinate]);
     } else {
@@ -81,8 +82,8 @@ async function getMoveToTilesAccountsRich(coordinate) {
   }
 
   const graphqlQuery = {
-    "operationName": "fetchCoordinates",
-    "query": `query fetchCoordinates($id_in: [String!]) {
+    operationName: "fetchCoordinates",
+    query: `query fetchCoordinates($id_in: [String!]) {
       coordinateDatas(where: {id_in: $id_in}) {
         id
         account {
@@ -91,27 +92,27 @@ async function getMoveToTilesAccountsRich(coordinate) {
         }
       }
     }`,
-    "variables": {
-      "id_in": coordinates
-    }
+    variables: {
+      id_in: coordinates,
+    },
   };
   const coordinateDatas = await fetchData(graphqlQuery);
   for (let coordinateData of coordinateDatas.data.coordinateDatas) {
     if (coordinateData.account !== null) {
       tileaccounts[coordinateData.id] = {
-        "account": coordinateData.account.id,
-        "collection": coordinateData.account.ContractAddress
+        account: coordinateData.account.id,
+        collection: coordinateData.account.ContractAddress,
       };
     }
   }
 
-  coordinates.forEach(coordinate => {
+  coordinates.forEach((coordinate) => {
     if (tileaccounts[coordinate]) {
       tilesaccounts.push(tileaccounts[coordinate]);
     } else {
       tilesaccounts.push({
-        "account": hre.ethers.constants.AddressZero,
-        "collection": hre.ethers.constants.AddressZero,
+        account: ZeroAddress,
+        collection: ZeroAddress,
       });
     }
   });
@@ -123,8 +124,8 @@ async function getCollectionOnMapAccounts(collection) {
   let accounts = [];
 
   const graphqlQuery = {
-    "operationName": "fetchCollectionOnMapAccounts",
-    "query": `query fetchCollectionOnMapAccounts($id: String!) {
+    operationName: "fetchCollectionOnMapAccounts",
+    query: `query fetchCollectionOnMapAccounts($id: String!) {
       collectionData(id: $id) {
         accounts(where: {coordinate_not: null}){
           id
@@ -135,16 +136,16 @@ async function getCollectionOnMapAccounts(collection) {
         }
       }
     }`,
-    "variables": {
-      "id": collection
-    }
+    variables: {
+      id: collection,
+    },
   };
   const accountsDatas = await fetchData(graphqlQuery);
   for (let account of accountsDatas.data.collectionData.accounts) {
     accounts.push({
-      "account": account.id,
-      "coordinate": account.coordinate.id,
-      "tokenId": account.tokenId
+      account: account.id,
+      coordinate: account.coordinate.id,
+      tokenId: account.tokenId,
     });
   }
 
@@ -155,5 +156,5 @@ module.exports = {
   fetchData,
   getMoveToTilesAccounts,
   getMoveToTilesAccountsRich,
-  getCollectionOnMapAccounts
+  getCollectionOnMapAccounts,
 };
