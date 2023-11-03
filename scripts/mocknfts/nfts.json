@@ -28,15 +28,6 @@
             "extURI": "",
             "image_url": "https://lh3.googleusercontent.com/z33Y-z7aURg8ZLwuukYoKmeC7zQW4suCNEljTK27tqdy632Yd3AHMuA5KZauhadoQJITR0YMsnnx517feAstoGc3kIuM14Jo2A"
         },
-        "0x595a8974c1473717c4b5d456350cd594d9bda687": {
-            "mainnetAddress": "0x595a8974c1473717c4b5d456350cd594d9bda687",
-            "collectionAddress": "0xBF1d81AD6181e20e8e2a8FbBE2C6aB01c9786809",
-            "name": "MineablePunks",
-            "symbol": "MPUNKS",
-            "baseURI": "https://api.mpunks.org/metadata/",
-            "extURI": "",
-            "image_url": "https://lh3.googleusercontent.com/KUoL2dVtRThsoUpHRI29JQO_rZDBvucE53llXYihsgL6PGsDr3U29FX6n_bp_kouXAFfKmX2apAI0Ee8Hf9PEiJ4W3pqUfw7uw"
-        },
         "0x81ae0be3a8044772d04f32398bac1e1b4b215aa8": {
             "mainnetAddress": "0x81ae0be3a8044772d04f32398bac1e1b4b215aa8",
             "collectionAddress": "0x472370609253EB7f9036f898eEC5fC9DADE40a6A",
@@ -81,15 +72,6 @@
             "baseURI": "ipfs://QmZcH4YvBVVRJtdn4RdbaqgspFU8gH6P9vomDpBVpAL3u4/",
             "extURI": "",
             "image_url": "https://lh3.googleusercontent.com/HTfDnsQfaqpkdPB0OITH5RSoAHKTUDYsB03S2jaClYMbnhhoTIB7u4Ln8QU01OvkJky1Tm1s6DsQtZMDqZcZ-zpy9lizOahrHA"
-        },
-        "0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03": {
-            "mainnetAddress": "0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03",
-            "collectionAddress": "0x25B63766fAeF35Ef72ec4ACFc776c80001A4eeb4",
-            "name": "Nouns",
-            "symbol": "NOUN",
-            "baseURI": "",
-            "extURI": "",
-            "image_url": "https://lh3.googleusercontent.com/jQw9PyHUQQNXvluvolIjDUr41PL5iChuKqSApV7eJ91aIQd0lpMyedjHMXZRm2x2t9RAe-oO_Af3pFCyTRU_Q60Zbo8lhUVSCHs2"
         },
         "0x769272677fab02575e84945f03eca517acc544cc": {
             "mainnetAddress": "0x769272677fab02575e84945f03eca517acc544cc",

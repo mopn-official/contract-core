@@ -17,9 +17,9 @@ async function main() {
       opentotalmopnpoint: 0,
     };
     if (i > 50) {
-      collection.opentotalmopnpoint = 3000;
+      collection.opentotalmopnpoint = 300000;
     } else if (i > 10) {
-      collection.opentotalmopnpoint = 1000;
+      collection.opentotalmopnpoint = 100000;
     }
     whitlist.push(collection);
     i++;

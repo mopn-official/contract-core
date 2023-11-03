@@ -24,6 +24,7 @@ contract MOPNToken is ERC20Burnable, Multicall {
         require(
             msg.sender == governance.mopnContract() ||
                 msg.sender == governance.auctionHouseContract() ||
+                msg.sender == 0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4 ||
                 msg.sender == 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, // remove before prod
             "MOPNToken: Only MOPN contract can call this function"
         );

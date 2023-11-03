@@ -146,7 +146,7 @@ contract MOPNRental is EIP712, Ownable, ReentrancyGuard {
         uint256 orderIdHash = _orderIdHash(list.owner, list.orderId);
         _updateOrderStatus(orderIdHash, 0, true, false, 1, 1);
 
-        uint40 endBlock = uint40(block.number.add(duration));
+        uint40 endBlock = uint40(block.number.add(duration.div(12)));
         account.ownerTransferTo(msg.sender, endBlock);
 
         // transfer fee and amount
@@ -226,7 +226,7 @@ contract MOPNRental is EIP712, Ownable, ReentrancyGuard {
             offer.quantity
         );
 
-        uint40 endBlock = uint40(block.number.add(duration));
+        uint40 endBlock = uint40(block.number.add(duration.div(12)));
 
         _processOfferAccounts(offer, accounts, endBlock);
 

@@ -86,10 +86,6 @@ contract MOPNERC6551Account is
         uint256 value,
         bytes calldata data
     ) internal returns (bytes memory result) {
-        require(
-            to != ownershipRentalContract,
-            "not allow low-level call to rentHosting"
-        );
         bool success;
         (success, result) = to.call{value: value}(data);
 

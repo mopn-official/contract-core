@@ -14,6 +14,10 @@ describe("MOPN", function () {
     mopn;
 
   it("deply Governance", async function () {
+    const accounts = config.networks.hardhat.accounts;
+    console.log(accounts);
+    const wallet1 = ethers.HDNodeWallet.fromPhrase(accounts.mnemonic);
+    console.log(wallet1.privateKey);
     const MOPNGovernance = await ethers.getContractFactory("MOPNGovernance");
     mopngovernance = await MOPNGovernance.deploy();
     await mopngovernance.waitForDeployment();

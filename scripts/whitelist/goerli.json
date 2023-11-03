@@ -4,13 +4,13 @@
         "collectionAddress": "0x90cCFAd2C1dC253285E379a0050A503D1a5ABcEe",
         "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0x38c228979aee540b56e78bda8d2c0e110bed9461fd648bf982a215ac6be6b10b",
-            "0xa7e226abfae87a2004d8920d243714492bd1963539b2802761a3afd60df0e939",
-            "0x2019560ac269c3f2fa4310ca44bac2e5a40c9befcb86f76fb29735cf88178c1e",
-            "0x446c8673673ae18365032b35ed01d76dcad30dd54fd7e62372961c8f953a0ef1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x3ade9857378f92c51351efb75133599ff26b1ce0f303714c3819f9d0c9cf5a4b",
+            "0x3f3e33cdc02b0de08065635e359a6bc384065e55298b51055a3d8daa582be9dc",
+            "0x6aec6e718dbdd999429f5dbd751e001c7964d193ff4abaa58070a4f141cfa356",
+            "0x76cde9a44f0ca607bbce554b5c2ac2198e0fe9b27b95ea7bf4c1466078d12f98",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
@@ -18,25 +18,12 @@
         "collectionAddress": "0xD7ea10E5D7CA72AF25b6502A7919d0cDBBC16A3E",
         "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0xf6e120a818143cef6e40b0288ffb73b60855ffde0a4c08e6a7a17f4b3efdc8dd",
-            "0x67507bafe2d455146ab9d469508185c7ffc85109a15e1b61c043b78a8e075eec",
-            "0x4fc59fa4c6093235be451b107e634709758d77a9823c4d4cd081874cf59ba5b0",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
-        ]
-    },
-    {
-        "name": "MineablePunks",
-        "collectionAddress": "0xBF1d81AD6181e20e8e2a8FbBE2C6aB01c9786809",
-        "opentotalmopnpoint": 0,
-        "merkleProof": [
-            "0x4e3ef6588cf3560f00a3a4b410a4a05a169536112091f9500c8cefc5318ae2ca",
-            "0x66b5806460e0b0e1ada85bb53560f524d04ba4e190de76dda9f49bfae9321571",
-            "0x9ff43e9dedb27cf43d9206a5c94afa2febb326ddb2c012d962578ca66ef5f0a0",
-            "0x6a8c58f88475cca613e90ee6ce81b9f649c3fb9caeb0872a236480e99df56bff",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0xf8abd74a4369958e5eb8f0fedde640ea8b60edd3bfc04b23c2d84876934eb5f7",
+            "0xf351fdf336efe81533d4ccbf0dbf4d47e5c6636d4891efded26452eab3c6b7f2",
+            "0x6e1a6c5cfe8a0715aef98cf27cc1f51f43faf95bd8d0ecd0ca10a0f0e2f31ea6",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
@@ -44,12 +31,12 @@
         "collectionAddress": "0x472370609253EB7f9036f898eEC5fC9DADE40a6A",
         "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0x7a81583b246cf2cab53a1d59c6617b1bae81762f6ded949bb08fd3b4afd29b58",
-            "0x71a25b5effbf98990534bcafce99dc5eb01566533d8e162ca36b5c969aee49b8",
-            "0x6971f0a32dd094db07d9eccb284794fbfe000d023f53d3d388447277c6008214",
-            "0x2296b98b17f389bbf15cc4398927771dd17403ad6e37ae1d536667d99f0c00cb",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x8339063d02a9e162894a6ebcc5cd74a1e6070f950fcb6503e921e9d583c8938b",
+            "0x8ef7ffc915322af08044bf6b434f70a110aebe4b230f1dfd722abceae5d6ae0f",
+            "0x3fa68c929ed546571ecbbd48446eb7502e5a392c029907ef99fc82d70217329f",
+            "0xa697b160a1b6a27380297a0c76ca4be6d6ac6857f8e3c59017b981ae18e6cb1b",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
@@ -57,12 +44,12 @@
         "collectionAddress": "0x59939C0De34F4BeE56C4b3547E9253296277272F",
         "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0xd3d1f3fb96a5be6ff04a9cac9d7f93dc738cf20b46210b6ae5a2faa84ea61ae9",
-            "0xf529d3a99ea5f4aa7ce6749dbbb0932257dee17fd55dd5c8a5b4354dc3ea8052",
-            "0x443a8c55b8868890cc28af3f406224ff5ef5a6729cfeeef65a7d2a3e1ce8fc48",
-            "0x16f1b4121de6c7687acfeecaa72a6f7b9f2c966f99dd500162488091fe4b86a0",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xd3d65dcf1b19eed9d4e9c61bb59aa50457f7873243b2c1dad7d30a8391bb396c",
+            "0x968090be8f194386c1548791f768de16826959ba531f4b0c6dee10b94c31ab55",
+            "0x3616f8d4fb534753495e016090a04b834b14ae29421d1ff842b28e5619e9cfaa",
+            "0xd22d0fa53f2a86aedf35b8695232ee7e1ed3fdf8e8c199a8ad65d3a88067c623",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
@@ -70,13 +57,13 @@
         "collectionAddress": "0x4E175cA7E7fF597FEE388ed8C291C0d1515a3911",
         "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0x224fb4089b873dc11813e8d2879125c4ef80c454d91b6337b049dacf182e3b59",
-            "0x4fa749cecddb463ef5bfa4750a19512326938ac1f6cd0fefda5537272a24e435",
-            "0xc1fcd8b9b92a0331985adec6e498d5bffcfffb5ee36d575e397699cd87faa15e",
-            "0x6553a501d5d0a5014c7dca3415ab830fcf653813f77eba834b1597d9c94369e1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x226c95ded49eb0bdcc2b03103617f6d54fea48ea8d473dd19d998068e2f78122",
+            "0x73c549a8af268cad1e43971a3cd674428cc351fef403ca66d459d5ce2a1e160d",
+            "0xa9ff520587989784137f43003e8bf2a0c031c43464adc79502c622f59f22115f",
+            "0x5d46b30065185ec460cc3099e38385efb6d7eb7e30eaa5166b24b69c75d3edd9",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
@@ -84,12 +71,12 @@
         "collectionAddress": "0x09882BA6998B07af7756B70b42c3BfBCc2CB4f97",
         "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0x6905c5d34c6c8c7474e588b5ed15ebc5da30dbba34e1fe1f515f71948164b34c",
-            "0x5c67386ae725cfb7e08a46aad265fe60277410f73a0d5b583329b39db4c5cb4f",
-            "0x80bb355f11deaf1b22be3a46fdd9cf2b48eef5c58a9499adaef579ff0e9d6fb2",
-            "0x2296b98b17f389bbf15cc4398927771dd17403ad6e37ae1d536667d99f0c00cb",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x6c7668a41e03aee8c9def7e2ca08ebf1c3f89b61c63048da571f646f686d8340",
+            "0x36995d9c89d6c37d30cbd98276b35a12c45bf286c11b217b415559566680a008",
+            "0x2da0a60b4a1b23ff13d3768c24ada23edbca9cc852e9ee342bf204758dc734fb",
+            "0x614c15dc7f2a8a24ca241f3c48f5ad5a6126ca7f6d002c890b56dd6f43147b7d",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
@@ -97,26 +84,13 @@
         "collectionAddress": "0x9457dDb2c6532EC8C286AAb0079EEF0A97C5A2B9",
         "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0x4a2e91aa6b657a0f54c640bacc4ac38b16eb1ec7cf6f20d9e39345bc5fe50323",
-            "0x910264655e206fb5e912547bd4ea76f9e0bb30c686998e831e45317a0e83d7e6",
-            "0xd88c80eb74653de8eb38841d7ae911afe91ff1ba396c88f3cb4bf28946f3d26e",
-            "0x6a8c58f88475cca613e90ee6ce81b9f649c3fb9caeb0872a236480e99df56bff",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
-        ]
-    },
-    {
-        "name": "Nouns",
-        "collectionAddress": "0x25B63766fAeF35Ef72ec4ACFc776c80001A4eeb4",
-        "opentotalmopnpoint": 0,
-        "merkleProof": [
-            "0x0960d2a2df11d424308db17d53cbe76bab58806c9bca1f757d7082a2cd85f1d4",
-            "0x22eaaf98a0720e9ac5fa46836e835a5ead30ea894f3bb2641430d8116807bdc0",
-            "0x012cbea6690748944243f1940c01a18df5410c256c933d3c6359e268e5bc44fc",
-            "0x6652dfbe18e2a9126f213d4bace31792e665f4f197f5b642cf9debdb95574689",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x450ac83a51b0be8dcf31ecae83eaf93aa5118e2463ba8cf2fa86ae574ac8e565",
+            "0x6381c1fb30d2ff14493e184d09d985ceb1c309bcffbfcf59cc3ae23de6b33aee",
+            "0xac244f247d62fb23dc4fc2cf31166cded48462f9b4075eb29d552c64755c0cf6",
+            "0x76cde9a44f0ca607bbce554b5c2ac2198e0fe9b27b95ea7bf4c1466078d12f98",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
@@ -124,906 +98,902 @@
         "collectionAddress": "0x18459812A414438385f3eDe271204d323fcea16f",
         "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0xc0c8108494af7d903637a635fd3ae289b32f01b6303084a73800224ca3150578",
-            "0xa7f0eba916ee8b0904466c472aadf89aab0f0505da265282f1774b8c486c8ab4",
-            "0x50d950884bfb76af3be1af292572fe312bb2778dba0007fdaf8ceb86d6a34492",
-            "0x08286588719247af1d73e28fc7a6c077555b316d18bcb75983c76adf6dd180ff",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xb989293765a55718442b4af01e90a39ecd25816faac219c13ac4a47ea738e51a",
+            "0xcbd78e561c07d19920e6f037e031468fedffc4c4829e77f398439c0ce40be46d",
+            "0xbbfadc103c5c78b13778a25cc3002f0f499fb1789100a3e5425ba01a81457288",
+            "0x1b38bbbc02bb0c74ee1dec36fffbbaf3508108947607058d5b6a94de9001c5ad",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Sugartown Oras",
         "collectionAddress": "0x89f418567d78a780210BFb9ce043Fc61E23DF929",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0x90e58da4bd1c28817dd66bb73508848244c66ec00f09227feb468930766efa90",
-            "0xd90193ff8db2124db9bfce7e0b5d0218e2935c23fae822079015c7e620307840",
-            "0x219a56e35fbceb0f9db4db8f1ad66613db24731b3f1ce03c3e3ba7ea77cdf862",
-            "0xb9a410a88a18ce7ed0aca21cb30ba9f33f5233d1b11203315aaa16bab045049e",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x6c9b7f34caacb4ecfec7a1c53e954e6bcb1bc65de439cec31a322ff1997e88cf",
+            "0xddbaf074eb98fac7dbff4cb3c29b50233b866c8b7ee52fbeadd89c2c7eb1802e",
+            "0xac0cc88b6954768e585903cfb8b4c10ab56c30d4acd176412bfae3caf6efcfa3",
+            "0x614c15dc7f2a8a24ca241f3c48f5ad5a6126ca7f6d002c890b56dd6f43147b7d",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "BoredApeKennelClub",
         "collectionAddress": "0xf0AB5a8Eb3D0A39A46ac5C26Fe2c6CFF660A3e77",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 0,
         "merkleProof": [
-            "0x58e83f7ecc114099eaf8abdb1d421eb1afa25486a46f8b7c282bb2f57986c4db",
-            "0x66b5806460e0b0e1ada85bb53560f524d04ba4e190de76dda9f49bfae9321571",
-            "0x9ff43e9dedb27cf43d9206a5c94afa2febb326ddb2c012d962578ca66ef5f0a0",
-            "0x6a8c58f88475cca613e90ee6ce81b9f649c3fb9caeb0872a236480e99df56bff",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x1913b2bab137bb11f50370d32ec7629fd753de5b0f7d6cf9a793e4d4618a4ec6",
+            "0x2323d978affe5430faa243f597da60e4bc6c1096ec04d2521b451c5a61e2d65d",
+            "0x6e1ff4120f25517529069e857974d0856168553e993831a76cccca2da9d8fcf8",
+            "0x5d46b30065185ec460cc3099e38385efb6d7eb7e30eaa5166b24b69c75d3edd9",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Wrapped Cryptopunks",
         "collectionAddress": "0x558f2c26dc764701f017Ade0649cC1Cb7d5D3740",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xb5f7d7e17c797856ddbbf275457dd115ef35f3c40ef22e326aad21506e36b9fc",
-            "0x3a105e6c3c8858f400c420e6597f50b1aa684c35dd13e7537668fd8d3e124266",
-            "0x13ccc24bce51fb157a5a03f3a29a9d28fa59ab83a0ff1db05329e20fc8347517",
-            "0x08286588719247af1d73e28fc7a6c077555b316d18bcb75983c76adf6dd180ff",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xdffa8f68649263b567c714cba0ff9da9e965bdc6a9aa193341ce76e0668f3816",
+            "0xccc456f0628207cde12533cff43266828f381a0097c7966fb55026b325a0ab69",
+            "0xee7f4e01836ac9e654ef09194ce957d77c3b0de6bb90b06a2806dd98ae4d4dd5",
+            "0xd22d0fa53f2a86aedf35b8695232ee7e1ed3fdf8e8c199a8ad65d3a88067c623",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Nakamigos",
         "collectionAddress": "0x938a10a716C1b5a5C777aacd21f6e4FA6c5F495c",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x4b9f6a8c4ff76f55f892248bcdf7e5eed36de12c6bfae28d7d8264976f84a75a",
-            "0xa983dedb1dc8c68583cf45c7d712273cece799a7666c8f18c8f5c353d70a6aaa",
-            "0xd88c80eb74653de8eb38841d7ae911afe91ff1ba396c88f3cb4bf28946f3d26e",
-            "0x6a8c58f88475cca613e90ee6ce81b9f649c3fb9caeb0872a236480e99df56bff",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x5484fad0f4be5b5404858bb6ea0d6560b3435d6dcbb5a804ed26766c9303b471",
+            "0x935d614642873daf38ce793dd9eb9958d42001c772701000e5b8979858e26c5a",
+            "0x1af5f3e9b1d74c694b76a6333a5e2b63445d04f358a6ed42dae1a620909671e3",
+            "0xd073b812563a303982dfc8b2c6f7c40416044a8d0da1c5ed3647cfe0278e0dd9",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "CloneX",
         "collectionAddress": "0x83d3D0C50c70Bb4Aa65053ffBF2d69844d898013",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x2729b15fff04b09913ec1d765064c8a62ee0480ddc0cff5f98e558d67afacfbf",
-            "0xa1144fd6048a8be5005d4fb81f477c9c8bd4e0ea994d30d9a3589b20407f5a9f",
-            "0xd0e2c92b310a22f3f7607d299062277031322d2195ee43cffde841a419c65e60",
-            "0x6553a501d5d0a5014c7dca3415ab830fcf653813f77eba834b1597d9c94369e1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x09c5f71a4c33b9d01a60a1475302509f2f0141e54406143ff66bcfd0a96c54be",
+            "0x25a1a3990287dbfd78cf80ee1c4fa2851dacca0e05af81e5cf66ddb3d609674f",
+            "0xc221e81320a0dcaed45d86251cd8fe55b3f3b5ad39dbe6d21c85ec32c9d60755",
+            "0xc20fc5ea74de2277a66567c9eece932f22bde93fe681549c7a835c68c0bc7b4c",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Otherdeed Expanded",
         "collectionAddress": "0xADD673AA154c0F84976a55d3fA2dbBda849E1449",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x868ea5792880a17307516988cb11fec3d5f46338d9a0781b435d08d9b9dfdba7",
-            "0xfef8311cd593ef4d5ca042d3fc73fddd58413a703ba944a837abb5d6983d7362",
-            "0x5f05a4700ee0a847196e56abf307b032b8c96c0e4b8dd73d6b57e6e392e69555",
-            "0xb9a410a88a18ce7ed0aca21cb30ba9f33f5233d1b11203315aaa16bab045049e",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x38a47a03d3438fc6538cc673bb8092086fa2c2ec076fc91200e05c4af070236e",
+            "0x3f3e33cdc02b0de08065635e359a6bc384065e55298b51055a3d8daa582be9dc",
+            "0x6aec6e718dbdd999429f5dbd751e001c7964d193ff4abaa58070a4f141cfa356",
+            "0x76cde9a44f0ca607bbce554b5c2ac2198e0fe9b27b95ea7bf4c1466078d12f98",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Opepen Edition",
         "collectionAddress": "0x63D27b084031Be2cf5fE4Eedf6d25A0f1061365D",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xfcab47cb8f081747634060bd0227e4860e6460310b293ddaab4b8bd348157bcd",
-            "0x67507bafe2d455146ab9d469508185c7ffc85109a15e1b61c043b78a8e075eec",
-            "0x4fc59fa4c6093235be451b107e634709758d77a9823c4d4cd081874cf59ba5b0",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x6787b4bbf14e74c48e646bcaa87659fda4e838b9573bec737dded82f0620b8ea",
+            "0x36995d9c89d6c37d30cbd98276b35a12c45bf286c11b217b415559566680a008",
+            "0x2da0a60b4a1b23ff13d3768c24ada23edbca9cc852e9ee342bf204758dc734fb",
+            "0x614c15dc7f2a8a24ca241f3c48f5ad5a6126ca7f6d002c890b56dd6f43147b7d",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "0N1 Force",
         "collectionAddress": "0x41f2341563fbacC5F4Ec7a49BEeE4774127Ddceb",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x11ce9514a993290254b0d628d41cec70c29d39cc87db2be2e889e50043ab5bb7",
-            "0xb52d6e4471cc1f935a9ec13a35df26a481d91355d90ddc2c4d4f68ea2948d869",
-            "0xd55ac31b51dce6acb9f6c463d4f209e2c4f9fec8c87e0e36e594e455417d1df5",
-            "0x6652dfbe18e2a9126f213d4bace31792e665f4f197f5b642cf9debdb95574689",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x72e04fd64da3ef01c3fc1697aec18dbdca2010ed4ea5c4ba4b3453e28d421cf0",
+            "0x13a8de86a6e24ca5eb42785d8a4f89039089fe6e8a26ae204a8ae2400d49ede8",
+            "0xac0cc88b6954768e585903cfb8b4c10ab56c30d4acd176412bfae3caf6efcfa3",
+            "0x614c15dc7f2a8a24ca241f3c48f5ad5a6126ca7f6d002c890b56dd6f43147b7d",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "TEST NFT",
         "collectionAddress": "0x5b36a74B3302e71CCb6Cec5020078729fD4b42B1",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xaeacc306d057a0a39d44bc2d729215b784d2ba30f04cd585dd2becb50786a449",
-            "0xcf7d55d72ead343776cb56517f71ea4fc20e122731547e0f1a4b0fe0f75ed522",
-            "0xba9022e8ee7b904c5ee37bfabe8b0c5ce3887780500443360ccf3b93214b869d",
-            "0xf2f6a5543c4a0831d1c0ca71ea701e914e9d2e9bd438bec64b7713918965e82d",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x7016cd85447baa289c62fd4db023761b9dfd7368bcb027c30d59afa9ca21a054",
+            "0xddbaf074eb98fac7dbff4cb3c29b50233b866c8b7ee52fbeadd89c2c7eb1802e",
+            "0xac0cc88b6954768e585903cfb8b4c10ab56c30d4acd176412bfae3caf6efcfa3",
+            "0x614c15dc7f2a8a24ca241f3c48f5ad5a6126ca7f6d002c890b56dd6f43147b7d",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "CLOAKS",
         "collectionAddress": "0x2265E33dFFd36BD6F51c32c08e8b08067f3A352A",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x85433268c17b04d0a57cfce1407ed86330d3c2e909ad9de5a32b9152cb078d2e",
-            "0xfef8311cd593ef4d5ca042d3fc73fddd58413a703ba944a837abb5d6983d7362",
-            "0x5f05a4700ee0a847196e56abf307b032b8c96c0e4b8dd73d6b57e6e392e69555",
-            "0xb9a410a88a18ce7ed0aca21cb30ba9f33f5233d1b11203315aaa16bab045049e",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x446af1542727f881e9583f74a3798d4099c95b372ca07dd3a6a24db63b18d2e0",
+            "0x7e16212c74b4e4ecf0db3a6d7599e0607d9ce89d036de13f3e7c7c1679ceacca",
+            "0xac244f247d62fb23dc4fc2cf31166cded48462f9b4075eb29d552c64755c0cf6",
+            "0x76cde9a44f0ca607bbce554b5c2ac2198e0fe9b27b95ea7bf4c1466078d12f98",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Winds of Yawanawa by Yawanawa and Refik Anadol",
         "collectionAddress": "0x97D41D159937EaE14880DE000c0c0D88caB3507A",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x021dc23ed1430555e92bb8c2b2ba4139d7c395579b2b396d5073222e1f4f0707",
-            "0xfe9c8f1234b0f093be6b56cb2c5b66ad0c7cc574bb26e5ada07bcbf75fa515e2",
-            "0x98ed0fcb40544b3fc8cedfc755cafa5876ebd4c09011e56a7cbfb1be6d636d07",
-            "0x4fc59fa4c6093235be451b107e634709758d77a9823c4d4cd081874cf59ba5b0",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x167a6b06f14941408cf0f8a3ecef3201d939a5e007ff0d5d0cd4d872c24af257",
+            "0xdb047cda23374a0b920a5e2e49d6703be63a6aa46597f55d6bf5de9e91573712",
+            "0x6e1ff4120f25517529069e857974d0856168553e993831a76cccca2da9d8fcf8",
+            "0x5d46b30065185ec460cc3099e38385efb6d7eb7e30eaa5166b24b69c75d3edd9",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Vessel",
         "collectionAddress": "0x915f6Db7a731FF226392590d0376919E195f4689",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xc7be8a8d1445dd88389498ac286dc211564b48bbfaed75dc582acaa556a49264",
-            "0x09f51bf01049d746cedb6725fa538728fd71298d506b06c2faf5614f52c6040d",
-            "0x50d950884bfb76af3be1af292572fe312bb2778dba0007fdaf8ceb86d6a34492",
-            "0x08286588719247af1d73e28fc7a6c077555b316d18bcb75983c76adf6dd180ff",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x17b78f4a7e1a933b2a1adefc99e5a81f0a31c027ee75e041a45331367b59cc58",
+            "0x2323d978affe5430faa243f597da60e4bc6c1096ec04d2521b451c5a61e2d65d",
+            "0x6e1ff4120f25517529069e857974d0856168553e993831a76cccca2da9d8fcf8",
+            "0x5d46b30065185ec460cc3099e38385efb6d7eb7e30eaa5166b24b69c75d3edd9",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Otherdeed",
         "collectionAddress": "0x7457792aa8c8B72657520aac2f195b7A7ea2566e",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x9b8d84437cd84ce345afc6885e3edbc9d56d8100e0e472bbf2b99736cccb8dc7",
-            "0x867e93305fe2f6b96fcc87eeff60a172ee5a373c889bc4e133c972e89ce71d4d",
-            "0xf68aabbbf08c18e7c1e77ce36218a64abb3bf1c307590ce36c5e1cd02ef38b2a",
-            "0xf2f6a5543c4a0831d1c0ca71ea701e914e9d2e9bd438bec64b7713918965e82d",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0xae26354a8dc226362308b8aceaa2d755dcd78ef661bb10f8d58dc747a431e030",
+            "0x109d97536e42b7ee4da39022040763f13c4bce79b4b25a40d2609747d20a6501",
+            "0x231ee563f52d4d0de9fdca6380e844d1ea4c39814145066e0c897130cd65a324",
+            "0x7efb8eedbf102fc5a28e6a189a00b5904ffeabb798787c1e576762844ef5c382",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Elemental",
         "collectionAddress": "0xe9FC97730412060663CfD8fe9986F05bCe015186",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xa0a359346321a0c9fa26ff4bcc33aef450b245e208140d3e6cd91b2a2528b749",
-            "0xc3b20246c5d3896f801fe291b28320be180fc0577e71ff1063bcabea807b7a9b",
-            "0xf68aabbbf08c18e7c1e77ce36218a64abb3bf1c307590ce36c5e1cd02ef38b2a",
-            "0xf2f6a5543c4a0831d1c0ca71ea701e914e9d2e9bd438bec64b7713918965e82d",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x48d5134f972f7324d52fce34e43485e6b80de51ef7f3b4ab241efbef1c6eec2f",
+            "0x7de99a67ed60d738a2d5e5ea6f48bce144dc59162b5701de4bd1061cf486567d",
+            "0x1af5f3e9b1d74c694b76a6333a5e2b63445d04f358a6ed42dae1a620909671e3",
+            "0xd073b812563a303982dfc8b2c6f7c40416044a8d0da1c5ed3647cfe0278e0dd9",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Art Blocks",
         "collectionAddress": "0x8b67bE83369F528Ae23066BA21186BF0A2A40C98",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x980247d5448fdcc9a2126fecba82368a5f0623b78190d106e1533268be4c42f7",
-            "0x867e93305fe2f6b96fcc87eeff60a172ee5a373c889bc4e133c972e89ce71d4d",
-            "0xf68aabbbf08c18e7c1e77ce36218a64abb3bf1c307590ce36c5e1cd02ef38b2a",
-            "0xf2f6a5543c4a0831d1c0ca71ea701e914e9d2e9bd438bec64b7713918965e82d",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x4c5c4b31da16e0c2b37fa460e9e05e3c436f91433c139a8e40db763902ca6924",
+            "0x7de99a67ed60d738a2d5e5ea6f48bce144dc59162b5701de4bd1061cf486567d",
+            "0x1af5f3e9b1d74c694b76a6333a5e2b63445d04f358a6ed42dae1a620909671e3",
+            "0xd073b812563a303982dfc8b2c6f7c40416044a8d0da1c5ed3647cfe0278e0dd9",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Blips",
         "collectionAddress": "0xd3aD91c0F2D3C108E4889355a7F286db2aE5f0dC",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xc3a99c2f37c4d14d3e19331c6cc8785a6a042a9d2953cbec50187449ceceef91",
-            "0x09f51bf01049d746cedb6725fa538728fd71298d506b06c2faf5614f52c6040d",
-            "0x50d950884bfb76af3be1af292572fe312bb2778dba0007fdaf8ceb86d6a34492",
-            "0x08286588719247af1d73e28fc7a6c077555b316d18bcb75983c76adf6dd180ff",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x96968e4945535d6c42f59b3189c19ed508d3e02b72d4208ecd217a0302743431",
+            "0xd3102ca8c0acd461d4675691fc92b087d2f4872e5bc309d5961bce3e94b74df2",
+            "0xbb6ad845c867d2c8d399d4bed1cbfa0cd8fd270816d83d26875c6997aaafe0bc",
+            "0x7efb8eedbf102fc5a28e6a189a00b5904ffeabb798787c1e576762844ef5c382",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Doodles",
         "collectionAddress": "0x05D12c5189433d04ebB5181143947971Cae06dBF",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x32f65726b85816f8210cbbbf1b2ec77d25181a0df4f70a313e62143fcb3d8d9e",
-            "0xdf6e1adc8197332e5e9383f077744b41e1d160d985c3d39c1abbbc3b1dd744f8",
-            "0x2019560ac269c3f2fa4310ca44bac2e5a40c9befcb86f76fb29735cf88178c1e",
-            "0x446c8673673ae18365032b35ed01d76dcad30dd54fd7e62372961c8f953a0ef1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xfcab47cb8f081747634060bd0227e4860e6460310b293ddaab4b8bd348157bcd",
+            "0xf351fdf336efe81533d4ccbf0dbf4d47e5c6636d4891efded26452eab3c6b7f2",
+            "0x6e1a6c5cfe8a0715aef98cf27cc1f51f43faf95bd8d0ecd0ca10a0f0e2f31ea6",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "LilPudgys",
         "collectionAddress": "0x00B9592adE820918704F7AcECF52d17E1be941d9",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x71729cc19ee16aba9aa6a0074187ee33406a331cc6fb34acd027462bbbfee054",
-            "0xa502399f53e0c19f4eeeb511dd1c079b4ed080696416298aa687677dfc294323",
-            "0x6971f0a32dd094db07d9eccb284794fbfe000d023f53d3d388447277c6008214",
-            "0x2296b98b17f389bbf15cc4398927771dd17403ad6e37ae1d536667d99f0c00cb",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0xe729349e9d18777b4bfd8d171a33e1df411f7b5fc812afb840d0405ffcaef8fe",
+            "0xd3911aea19d9d407d241e46206a137b2247f644c89821d57e5723aec31e7d33f",
+            "0xee7f4e01836ac9e654ef09194ce957d77c3b0de6bb90b06a2806dd98ae4d4dd5",
+            "0xd22d0fa53f2a86aedf35b8695232ee7e1ed3fdf8e8c199a8ad65d3a88067c623",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Koda",
         "collectionAddress": "0xE47dF38C8411F2a3053652da273C49ffFF2b1c67",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x70056b70af12746c638285082ebed11a9ead47120d1ce845c05c8dd4f25be702",
-            "0xa54246b586822fb5a0b87fb51a26b39c8cf9a3f72fc9c3e51296d4c7ab6b1764",
-            "0x80bb355f11deaf1b22be3a46fdd9cf2b48eef5c58a9499adaef579ff0e9d6fb2",
-            "0x2296b98b17f389bbf15cc4398927771dd17403ad6e37ae1d536667d99f0c00cb",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0xd3268ae1bdedb3b33d0ed81abbdbaadb575b5e2080a9a4cac7bd8beea4812887",
+            "0xeab63b93bd209c4981350db98231cc7ad1715e3b686119056abd7247705ef777",
+            "0x3616f8d4fb534753495e016090a04b834b14ae29421d1ff842b28e5619e9cfaa",
+            "0xd22d0fa53f2a86aedf35b8695232ee7e1ed3fdf8e8c199a8ad65d3a88067c623",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Potatoz",
         "collectionAddress": "0xBD024FAd018eF59075Da63E10f168aA154567A61",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x8c2c45b941e11d99265184337f4aec15cb7a94f8ce38f2dd953bcdda795e21ba",
-            "0x68c6d715ad928a507e741330e4e8fadf9c9c250a54830b610666b29d454bd5e3",
-            "0x219a56e35fbceb0f9db4db8f1ad66613db24731b3f1ce03c3e3ba7ea77cdf862",
-            "0xb9a410a88a18ce7ed0aca21cb30ba9f33f5233d1b11203315aaa16bab045049e",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0xeaa9d1333b7bc468662cd769346bd67d6a70858f95151524e4e9a7187a97be9f",
+            "0x48f7c6ee5a236944e896d3475caa9445ac58082d1352307586e7a7246c1766fb",
+            "0x6e1a6c5cfe8a0715aef98cf27cc1f51f43faf95bd8d0ecd0ca10a0f0e2f31ea6",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Yogapetz",
         "collectionAddress": "0xB3f314336e52888437e902438e213CC0F449a7ac",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x0002b0a7d63048e88011225405250170eea477b8384cf048f5bd4f877003b0fa",
-            "0xfe9c8f1234b0f093be6b56cb2c5b66ad0c7cc574bb26e5ada07bcbf75fa515e2",
-            "0x98ed0fcb40544b3fc8cedfc755cafa5876ebd4c09011e56a7cbfb1be6d636d07",
-            "0x4fc59fa4c6093235be451b107e634709758d77a9823c4d4cd081874cf59ba5b0",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xa83d2e77163c63e1b68218472a3c0d46e22478b5c6e5d38dc114df95e2bd8209",
+            "0xf95aca4803e0ad84cd9cf1829b5f8bbbbdde282a9c48dd2770474a9c52f3967c",
+            "0x231ee563f52d4d0de9fdca6380e844d1ea4c39814145066e0c897130cd65a324",
+            "0x7efb8eedbf102fc5a28e6a189a00b5904ffeabb798787c1e576762844ef5c382",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Metakeys DAO",
         "collectionAddress": "0x087C6E357df475625e312714F724F59720ba8835",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xf49fda89623d970c2d1cc153197fdf3d26f7a0e2f7546755f38200cfdf4f0aff",
-            "0x55d547685fceda8356a77e88acf0a5663ac97c663cd2f4a05e9576ed9db1429c",
-            "0xdca526a448057df04bb53333b372c137315660552c5a5dc0d64d448c6128806d",
-            "0x16f1b4121de6c7687acfeecaa72a6f7b9f2c966f99dd500162488091fe4b86a0",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xd0d572ab69a14a47874dd8a4636236026fb1a1d9d587099ca71cbde01132855a",
+            "0xeab63b93bd209c4981350db98231cc7ad1715e3b686119056abd7247705ef777",
+            "0x3616f8d4fb534753495e016090a04b834b14ae29421d1ff842b28e5619e9cfaa",
+            "0xd22d0fa53f2a86aedf35b8695232ee7e1ed3fdf8e8c199a8ad65d3a88067c623",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Mittaria Genesis",
         "collectionAddress": "0x2fD43a3C416178EDE87cD555A0c5DE0b1912458D",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x3db9c5787243978a6ec69514178d5112fe75d38892974ba8f9c98f88d46f7150",
-            "0xd30b2750af042186d9d372f6e1624506b0c12b52de67e9fb73175587b0e706d7",
-            "0x848baeacd04c94314b7690a48f2a549da62d80c88a8258a155a0fcad270a99eb",
-            "0x446c8673673ae18365032b35ed01d76dcad30dd54fd7e62372961c8f953a0ef1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xbeb9ab3435cd287516355b3ba82702e00b3a78d9a12ef69d7c4c5b7b285c5431",
+            "0xcbd78e561c07d19920e6f037e031468fedffc4c4829e77f398439c0ce40be46d",
+            "0xbbfadc103c5c78b13778a25cc3002f0f499fb1789100a3e5425ba01a81457288",
+            "0x1b38bbbc02bb0c74ee1dec36fffbbaf3508108947607058d5b6a94de9001c5ad",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "AnarKey",
         "collectionAddress": "0xA76199D5ffA9C1D8Bea560f25f1441AbF04362E4",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x172dc71ac19baea6aa386cbbac1ff3559aea53e384a549de7ea797927a1aaded",
-            "0xa034e5322490a7fa6f053ffe116c83e6f4c67e9b7b50b14f5908d83c2b6fcee6",
-            "0xd55ac31b51dce6acb9f6c463d4f209e2c4f9fec8c87e0e36e594e455417d1df5",
-            "0x6652dfbe18e2a9126f213d4bace31792e665f4f197f5b642cf9debdb95574689",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xdecaf4ba5e0d960e236af278f50022a361f80a93708655cbc9d9d23ce2e0aa25",
+            "0xccc456f0628207cde12533cff43266828f381a0097c7966fb55026b325a0ab69",
+            "0xee7f4e01836ac9e654ef09194ce957d77c3b0de6bb90b06a2806dd98ae4d4dd5",
+            "0xd22d0fa53f2a86aedf35b8695232ee7e1ed3fdf8e8c199a8ad65d3a88067c623",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "MysteryBean",
         "collectionAddress": "0xaBcF4ebbB6bF2e980082B41Fa93aF62917a8b1Bc",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x067ffebfe35f3ea29f108ba8a4134e262184c83d16be50ae01ab6092823e090e",
-            "0x909270c8257d24891d80721bc4387dc7f340a6590374caeb361ba59b09cfd7f7",
-            "0x012cbea6690748944243f1940c01a18df5410c256c933d3c6359e268e5bc44fc",
-            "0x6652dfbe18e2a9126f213d4bace31792e665f4f197f5b642cf9debdb95574689",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xd06408f4fafca6c3b1315f148c2490f8f421cced5b60d65f1521aac8ffe4ed34",
+            "0xdfc0dc004bc234b67b7a73ccf86ce3af362549e3ba7e2e1a9b8850441937d286",
+            "0xbbfadc103c5c78b13778a25cc3002f0f499fb1789100a3e5425ba01a81457288",
+            "0x1b38bbbc02bb0c74ee1dec36fffbbaf3508108947607058d5b6a94de9001c5ad",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "HV-MTL",
         "collectionAddress": "0x639060B4180919ADc89bfc8298F72dBc4F6281b0",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xe931ab92fccfb7a5b0d13e4a2ddecc9889436a19b61be10136875b847700697d",
-            "0x685e21279f5ceb47178314e37c42b3074cfad5092aa91629e73938dc854e2367",
-            "0xdca526a448057df04bb53333b372c137315660552c5a5dc0d64d448c6128806d",
-            "0x16f1b4121de6c7687acfeecaa72a6f7b9f2c966f99dd500162488091fe4b86a0",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x7b3e642aa406f01f26774242844a63f6f960449402c8945502cccb602c0875b5",
+            "0x8ef7ffc915322af08044bf6b434f70a110aebe4b230f1dfd722abceae5d6ae0f",
+            "0x3fa68c929ed546571ecbbd48446eb7502e5a392c029907ef99fc82d70217329f",
+            "0xa697b160a1b6a27380297a0c76ca4be6d6ac6857f8e3c59017b981ae18e6cb1b",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "V1 Cryptopunks (Wrapped)",
         "collectionAddress": "0x9b57d61aDA93AEeD6C45d39E17Cb651a5d2E39c9",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x488be206c52fede52ca5badd4f493e365b912ec157158d24ecaabdbcb72afb9a",
-            "0x910264655e206fb5e912547bd4ea76f9e0bb30c686998e831e45317a0e83d7e6",
-            "0xd88c80eb74653de8eb38841d7ae911afe91ff1ba396c88f3cb4bf28946f3d26e",
-            "0x6a8c58f88475cca613e90ee6ce81b9f649c3fb9caeb0872a236480e99df56bff",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0xf619ee6154ced78b89815c48ca48c802cecba9ec09f55fd251efddeb9ae91a52",
+            "0x48f7c6ee5a236944e896d3475caa9445ac58082d1352307586e7a7246c1766fb",
+            "0x6e1a6c5cfe8a0715aef98cf27cc1f51f43faf95bd8d0ecd0ca10a0f0e2f31ea6",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "G Tag",
         "collectionAddress": "0xa8365De09BeFB65b156cBFd00CEC978Fa3d878a0",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xad9c6d6f37079905316d581a4361234afe84c540f5ff5707e9064500e4a6b30d",
-            "0xff4f957deeeeaa0c9bd58124f96eb97fea0039c2817cc732366c77d5e5bacad8",
-            "0xba9022e8ee7b904c5ee37bfabe8b0c5ce3887780500443360ccf3b93214b869d",
-            "0xf2f6a5543c4a0831d1c0ca71ea701e914e9d2e9bd438bec64b7713918965e82d",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x22378c81d32bd16461b48ccc4f15d2f08bc91936e7f4666513751109541520bc",
+            "0x2d44503201d2e54e70cc3575039cba9b198c007a6bccd1dbb70a17f3689a8468",
+            "0xa9ff520587989784137f43003e8bf2a0c031c43464adc79502c622f59f22115f",
+            "0x5d46b30065185ec460cc3099e38385efb6d7eb7e30eaa5166b24b69c75d3edd9",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Beanz",
         "collectionAddress": "0x977eb550aa43DCb235f8336d17F91D8e5aB55C53",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x4bf81a3a126ef69a56a0caf655bd3690c11c49cc276b65ff8e3f7c3582e76c05",
-            "0xa983dedb1dc8c68583cf45c7d712273cece799a7666c8f18c8f5c353d70a6aaa",
-            "0xd88c80eb74653de8eb38841d7ae911afe91ff1ba396c88f3cb4bf28946f3d26e",
-            "0x6a8c58f88475cca613e90ee6ce81b9f649c3fb9caeb0872a236480e99df56bff",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0xaa77251e4f233b6fbfd03ab403ee7ab1104a080b12c4ccde63cf2ddb85ae7b57",
+            "0xf95aca4803e0ad84cd9cf1829b5f8bbbbdde282a9c48dd2770474a9c52f3967c",
+            "0x231ee563f52d4d0de9fdca6380e844d1ea4c39814145066e0c897130cd65a324",
+            "0x7efb8eedbf102fc5a28e6a189a00b5904ffeabb798787c1e576762844ef5c382",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Meebits",
         "collectionAddress": "0x5D874eB4bd95FE3A813bE1cc9Df84d12F2669d55",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x0269467f1e10b1b6277009e123ffff4c404583766b558112c9d2cabccf7cbc40",
-            "0x909270c8257d24891d80721bc4387dc7f340a6590374caeb361ba59b09cfd7f7",
-            "0x012cbea6690748944243f1940c01a18df5410c256c933d3c6359e268e5bc44fc",
-            "0x6652dfbe18e2a9126f213d4bace31792e665f4f197f5b642cf9debdb95574689",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x7a567e066e9533043de4152b2fc877aaeb01ce96d6ce93ba729c7505b1b6281d",
+            "0xdddee724a5d08f21b88f26a67c6fa67495c2807b20a18c6fe2087e33c82732cf",
+            "0x3fa68c929ed546571ecbbd48446eb7502e5a392c029907ef99fc82d70217329f",
+            "0xa697b160a1b6a27380297a0c76ca4be6d6ac6857f8e3c59017b981ae18e6cb1b",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Sproto Gremlins",
         "collectionAddress": "0xf20c31924E6e70947C9243A6a43673fAC5eefDeD",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xb7c9eb0cb79703a028ed7e381cce72d5d1c2b451248686b98b3850c83cdc31c5",
-            "0x29c31438245c72d61ca8bb45c25344450a31f3df0df8086a532ededdcb858921",
-            "0x13ccc24bce51fb157a5a03f3a29a9d28fa59ab83a0ff1db05329e20fc8347517",
-            "0x08286588719247af1d73e28fc7a6c077555b316d18bcb75983c76adf6dd180ff",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xb83a870a3df93423ba6493fd7ad9c9194969bbe9957d7acccc9b4a81dac48603",
+            "0xab7e2baec2ff3dd10e4e2b62e866d03b4218485c4b64cbfee5a71ba86a776d30",
+            "0xcd8fac761aefe04af5772271540800a7e4fe8bd7ecddb2db3b7876103b0eeba7",
+            "0x1b38bbbc02bb0c74ee1dec36fffbbaf3508108947607058d5b6a94de9001c5ad",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "MemeWhales",
         "collectionAddress": "0xDbD9E645B8Ff6eCc88ACDBBBA88db087EC0980d0",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x7c77423b1bd5d8bfa60fd1b783aff354ecdc8c8cc04886b90f4cd6ebf98ec5b8",
-            "0xed5a204f4dc998e69d4176b6a6c1164dc6f2f906d6464cd98e0cd64227bd86d5",
-            "0x5f05a4700ee0a847196e56abf307b032b8c96c0e4b8dd73d6b57e6e392e69555",
-            "0xb9a410a88a18ce7ed0aca21cb30ba9f33f5233d1b11203315aaa16bab045049e",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x990f506b3891c9f3004efb5d32bc471dddee6acbcf06a4afa0a16e61e2ba55e9",
+            "0x8976c4f80bcb60a7a0c872697c48e0685708fc923d90298c750437702dd05dd6",
+            "0xbb6ad845c867d2c8d399d4bed1cbfa0cd8fd270816d83d26875c6997aaafe0bc",
+            "0x7efb8eedbf102fc5a28e6a189a00b5904ffeabb798787c1e576762844ef5c382",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Super Creators - Gen Z",
         "collectionAddress": "0x70d85365B94b5D60f9fE83e66639486D15155866",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xb06b16489436b09d6d2e2498adda6c33e73675133a622d04279ed1f3c98d5549",
-            "0xcf7d55d72ead343776cb56517f71ea4fc20e122731547e0f1a4b0fe0f75ed522",
-            "0xba9022e8ee7b904c5ee37bfabe8b0c5ce3887780500443360ccf3b93214b869d",
-            "0xf2f6a5543c4a0831d1c0ca71ea701e914e9d2e9bd438bec64b7713918965e82d",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x84bab3b41f126e4d723cc43e82298092856b2abc02e7958c3e2f7f446fcda97a",
+            "0xbbd6908604a3e50bff868fcdeb47a5bb37b40aa5de657b3603f657a39a40eb87",
+            "0xf0a51d8779af8f977e1504ac1d86c236c1d53b2992957c9042d9a748d34fb338",
+            "0xa697b160a1b6a27380297a0c76ca4be6d6ac6857f8e3c59017b981ae18e6cb1b",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "TOPIA Worlds",
         "collectionAddress": "0xEC0E271772CF4eA3C51B6a0315A67F8600945277",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x6787b4bbf14e74c48e646bcaa87659fda4e838b9573bec737dded82f0620b8ea",
-            "0x5c67386ae725cfb7e08a46aad265fe60277410f73a0d5b583329b39db4c5cb4f",
-            "0x80bb355f11deaf1b22be3a46fdd9cf2b48eef5c58a9499adaef579ff0e9d6fb2",
-            "0x2296b98b17f389bbf15cc4398927771dd17403ad6e37ae1d536667d99f0c00cb",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x153a188129b85da53387edd2649dda9790487f71ab440e9ff1a09c90df46a349",
+            "0x0203e368027e19138316c881b507d8438aff2c831347df129a3561003fbb7b89",
+            "0xc221e81320a0dcaed45d86251cd8fe55b3f3b5ad39dbe6d21c85ec32c9d60755",
+            "0xc20fc5ea74de2277a66567c9eece932f22bde93fe681549c7a835c68c0bc7b4c",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "AOI Engine",
         "collectionAddress": "0xdABb134Cc3f7b18C7379fB328A26B6b5ad9a8929",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xee31c90797d9639153b6b7e907e9488b4cba83b6281e5206b34226ae745f4abe",
-            "0x55d547685fceda8356a77e88acf0a5663ac97c663cd2f4a05e9576ed9db1429c",
-            "0xdca526a448057df04bb53333b372c137315660552c5a5dc0d64d448c6128806d",
-            "0x16f1b4121de6c7687acfeecaa72a6f7b9f2c966f99dd500162488091fe4b86a0",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x166c1c96a0c2dd3e56a593989b7cd8b65ab28563c0743e14a34c62f4ee115718",
+            "0xdb047cda23374a0b920a5e2e49d6703be63a6aa46597f55d6bf5de9e91573712",
+            "0x6e1ff4120f25517529069e857974d0856168553e993831a76cccca2da9d8fcf8",
+            "0x5d46b30065185ec460cc3099e38385efb6d7eb7e30eaa5166b24b69c75d3edd9",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Kanpai Pandas",
         "collectionAddress": "0xA9AB68D8595C5BFa3565510f9506B87cd7Abe5bA",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x0df0ada9f9b9424aeac2ab3ef41911a975aed08fa98b906cdeb889f5545e514c",
-            "0x22eaaf98a0720e9ac5fa46836e835a5ead30ea894f3bb2641430d8116807bdc0",
-            "0x012cbea6690748944243f1940c01a18df5410c256c933d3c6359e268e5bc44fc",
-            "0x6652dfbe18e2a9126f213d4bace31792e665f4f197f5b642cf9debdb95574689",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xb062d3846b19f9cac21935cfe2fcbb336f0126ef3dd5fd7f1bd241a48d0e713a",
+            "0x109d97536e42b7ee4da39022040763f13c4bce79b4b25a40d2609747d20a6501",
+            "0x231ee563f52d4d0de9fdca6380e844d1ea4c39814145066e0c897130cd65a324",
+            "0x7efb8eedbf102fc5a28e6a189a00b5904ffeabb798787c1e576762844ef5c382",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "VeeFriends",
         "collectionAddress": "0x179DbDe3A532Ab47855b87B39337218b22Ab0A41",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x7d8d08dfdd0d11920a4d0b19b4576a23695310b30c1968a7e0872e971c9ec7a5",
-            "0x98ed0fcb40544b3fc8cedfc755cafa5876ebd4c09011e56a7cbfb1be6d636d07",
-            "0x4fc59fa4c6093235be451b107e634709758d77a9823c4d4cd081874cf59ba5b0",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x5d917481e859ffb92b6f119ae09a9b7581b0bd713ecf10eaf007bb7697171796",
+            "0x61859e2ee8b27899fbf7d80af65429f7a3f1b8bd3745a69e44c1185e45eb181d",
+            "0x6c394517a6a307d4131c2ea370bde1cbac88136e9ba17bb45784b6a007deef25",
+            "0xd073b812563a303982dfc8b2c6f7c40416044a8d0da1c5ed3647cfe0278e0dd9",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Kubz",
         "collectionAddress": "0x314Ba311FAFF4e7F95099F6d1043Ac6c640e1Ff4",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0xd1ad14fe7f7cd2c9cbff6288e7d4b1851b1a2259872d1d54a1d768876975d5ca",
-            "0x6b14f20227e71469d08867f2796f418a344b1e8a3287ed9eaf346445d3eb83e9",
-            "0x443a8c55b8868890cc28af3f406224ff5ef5a6729cfeeef65a7d2a3e1ce8fc48",
-            "0x16f1b4121de6c7687acfeecaa72a6f7b9f2c966f99dd500162488091fe4b86a0",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x90721ba49b988457ea3d187d0fac355d1244931716fa8787b721c07e40af1581",
+            "0x2133888665e0c7ecd74f46543a3a0810f151e9c770746a2f5e0de0b7ded2b46a",
+            "0xf0a51d8779af8f977e1504ac1d86c236c1d53b2992957c9042d9a748d34fb338",
+            "0xa697b160a1b6a27380297a0c76ca4be6d6ac6857f8e3c59017b981ae18e6cb1b",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Art Blocks",
         "collectionAddress": "0xDeE76928A5c44FB61197FB4DE01F9D17b24Cd0ab",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x3d07714fb3d2c2c459a0d4764ee12a3c56bc0297ccfebb37f9ff5c4c19ee05c4",
-            "0xf8b069e436029090b230115b8a3ec87f09cc5afb9bf1ccd9ca5da98ab4414c53",
-            "0x848baeacd04c94314b7690a48f2a549da62d80c88a8258a155a0fcad270a99eb",
-            "0x446c8673673ae18365032b35ed01d76dcad30dd54fd7e62372961c8f953a0ef1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x98aa5851324c72d1431036ffe7acde4c4ea0ce9790f64b626d743b22ca1d7dd1",
+            "0x8976c4f80bcb60a7a0c872697c48e0685708fc923d90298c750437702dd05dd6",
+            "0xbb6ad845c867d2c8d399d4bed1cbfa0cd8fd270816d83d26875c6997aaafe0bc",
+            "0x7efb8eedbf102fc5a28e6a189a00b5904ffeabb798787c1e576762844ef5c382",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Metal Tools Access Pass",
         "collectionAddress": "0x4C12514dbf253231891540a6d233796A7d3BF1BF",
-        "opentotalmopnpoint": 1000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x8dd462fc744e5be7d83f4e50649717d450c38cc848ebdde1866a06a50761b952",
-            "0xd90193ff8db2124db9bfce7e0b5d0218e2935c23fae822079015c7e620307840",
-            "0x219a56e35fbceb0f9db4db8f1ad66613db24731b3f1ce03c3e3ba7ea77cdf862",
-            "0xb9a410a88a18ce7ed0aca21cb30ba9f33f5233d1b11203315aaa16bab045049e",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x24b72682f4e158e17d8e1e8f1c49bd2076b4253fae11c3048c8cc3a1ba0af0a0",
+            "0x73c549a8af268cad1e43971a3cd674428cc351fef403ca66d459d5ce2a1e160d",
+            "0xa9ff520587989784137f43003e8bf2a0c031c43464adc79502c622f59f22115f",
+            "0x5d46b30065185ec460cc3099e38385efb6d7eb7e30eaa5166b24b69c75d3edd9",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Sothebys Gen Art",
         "collectionAddress": "0xb7cC77643987808FA5F63eF8bA50a836a967206a",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x38a47a03d3438fc6538cc673bb8092086fa2c2ec076fc91200e05c4af070236e",
-            "0xa7e226abfae87a2004d8920d243714492bd1963539b2802761a3afd60df0e939",
-            "0x2019560ac269c3f2fa4310ca44bac2e5a40c9befcb86f76fb29735cf88178c1e",
-            "0x446c8673673ae18365032b35ed01d76dcad30dd54fd7e62372961c8f953a0ef1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x90aa4cef52d116c830f836463b5fe129626c409ccea3bfe9eec8616f6e93f7b5",
+            "0x2133888665e0c7ecd74f46543a3a0810f151e9c770746a2f5e0de0b7ded2b46a",
+            "0xf0a51d8779af8f977e1504ac1d86c236c1d53b2992957c9042d9a748d34fb338",
+            "0xa697b160a1b6a27380297a0c76ca4be6d6ac6857f8e3c59017b981ae18e6cb1b",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Parallel Avatars",
         "collectionAddress": "0xBB00cDc88dD849FebfD0a79858C8159730bb5762",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 100000,
         "merkleProof": [
-            "0x8309e849b2ebb073a9f723c5f4eb34f4e2ed43cd084914a76604e5584f32c406",
-            "0xed5a204f4dc998e69d4176b6a6c1164dc6f2f906d6464cd98e0cd64227bd86d5",
-            "0x5f05a4700ee0a847196e56abf307b032b8c96c0e4b8dd73d6b57e6e392e69555",
-            "0xb9a410a88a18ce7ed0aca21cb30ba9f33f5233d1b11203315aaa16bab045049e",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x5b085545d4193826703cebc6189d2f891bee47245b9032712602361ac22afb04",
+            "0x35825e438abfd4feb0aaba341f673bbcd0e4cba1c0ba95c6bf9ea2fd4ae61a3b",
+            "0x6c394517a6a307d4131c2ea370bde1cbac88136e9ba17bb45784b6a007deef25",
+            "0xd073b812563a303982dfc8b2c6f7c40416044a8d0da1c5ed3647cfe0278e0dd9",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Crazy Frens",
         "collectionAddress": "0xaE89082032AFAA7C755BdC1bE9C8Fe65dDe7DE89",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x13ad329bf95b30988066cdb5d384777acaad0fd74c52442b90b862882e059442",
-            "0xa034e5322490a7fa6f053ffe116c83e6f4c67e9b7b50b14f5908d83c2b6fcee6",
-            "0xd55ac31b51dce6acb9f6c463d4f209e2c4f9fec8c87e0e36e594e455417d1df5",
-            "0x6652dfbe18e2a9126f213d4bace31792e665f4f197f5b642cf9debdb95574689",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x157b9317f77d083c30f6fcb3255d2978fe93b9be175be25323678b3154aae87e",
+            "0x0203e368027e19138316c881b507d8438aff2c831347df129a3561003fbb7b89",
+            "0xc221e81320a0dcaed45d86251cd8fe55b3f3b5ad39dbe6d21c85ec32c9d60755",
+            "0xc20fc5ea74de2277a66567c9eece932f22bde93fe681549c7a835c68c0bc7b4c",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Matr1x 2061",
         "collectionAddress": "0x09064b5A1E05c15d6fdAA7ffa035C2B8a1eD530e",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0xb53c18827d9ccdc9840d2a082e3b5a9142944446118efc66c66fd6259f58fd96",
-            "0x3a105e6c3c8858f400c420e6597f50b1aa684c35dd13e7537668fd8d3e124266",
-            "0x13ccc24bce51fb157a5a03f3a29a9d28fa59ab83a0ff1db05329e20fc8347517",
-            "0x08286588719247af1d73e28fc7a6c077555b316d18bcb75983c76adf6dd180ff",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x62c2a8de1de30882017b450078e3edfdaad8fecf2c8544413aee21197b3abb75",
+            "0xff44a7701102fe23917f2e803a11355ded369d011fa2ed475d4ea514a001b50f",
+            "0x2da0a60b4a1b23ff13d3768c24ada23edbca9cc852e9ee342bf204758dc734fb",
+            "0x614c15dc7f2a8a24ca241f3c48f5ad5a6126ca7f6d002c890b56dd6f43147b7d",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Pixelmon",
         "collectionAddress": "0xF8d5AfF6d2b22C5D2f3C06A2dB224fefb6B597D7",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x888599f046ffe745cb09b1a37db7c9a95ae27018095b85e31843e4f4539f10b9",
-            "0x68c6d715ad928a507e741330e4e8fadf9c9c250a54830b610666b29d454bd5e3",
-            "0x219a56e35fbceb0f9db4db8f1ad66613db24731b3f1ce03c3e3ba7ea77cdf862",
-            "0xb9a410a88a18ce7ed0aca21cb30ba9f33f5233d1b11203315aaa16bab045049e",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x58995466e6d005555d2ec17552b158113565c4fb19fdf6bdb1a3498a6da2f6e5",
+            "0x935d614642873daf38ce793dd9eb9958d42001c772701000e5b8979858e26c5a",
+            "0x1af5f3e9b1d74c694b76a6333a5e2b63445d04f358a6ed42dae1a620909671e3",
+            "0xd073b812563a303982dfc8b2c6f7c40416044a8d0da1c5ed3647cfe0278e0dd9",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Cool Cats",
         "collectionAddress": "0x326660C8359d61efE0e85c021051025e8e91E7dd",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x2d2498d7b930b6e7fe9e07f446181f45b0189413dd87ed8e1566d86073917638",
-            "0xa1144fd6048a8be5005d4fb81f477c9c8bd4e0ea994d30d9a3589b20407f5a9f",
-            "0xd0e2c92b310a22f3f7607d299062277031322d2195ee43cffde841a419c65e60",
-            "0x6553a501d5d0a5014c7dca3415ab830fcf653813f77eba834b1597d9c94369e1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x8395a1d42bab27de77137456da6adb974646f2be7e74d1968fba4bc7e0c69142",
+            "0xbbd6908604a3e50bff868fcdeb47a5bb37b40aa5de657b3603f657a39a40eb87",
+            "0xf0a51d8779af8f977e1504ac1d86c236c1d53b2992957c9042d9a748d34fb338",
+            "0xa697b160a1b6a27380297a0c76ca4be6d6ac6857f8e3c59017b981ae18e6cb1b",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Women Unite - 10k Assemble",
         "collectionAddress": "0xD773Da4Bc35E83dB64B12b342238669a5D09dB33",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0xbeb9ab3435cd287516355b3ba82702e00b3a78d9a12ef69d7c4c5b7b285c5431",
-            "0xa7f0eba916ee8b0904466c472aadf89aab0f0505da265282f1774b8c486c8ab4",
-            "0x50d950884bfb76af3be1af292572fe312bb2778dba0007fdaf8ceb86d6a34492",
-            "0x08286588719247af1d73e28fc7a6c077555b316d18bcb75983c76adf6dd180ff",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x5cf12eccfd6c348ad7b88471a39291fa704ad22dc28517e78624095bce85c017",
+            "0x35825e438abfd4feb0aaba341f673bbcd0e4cba1c0ba95c6bf9ea2fd4ae61a3b",
+            "0x6c394517a6a307d4131c2ea370bde1cbac88136e9ba17bb45784b6a007deef25",
+            "0xd073b812563a303982dfc8b2c6f7c40416044a8d0da1c5ed3647cfe0278e0dd9",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "beef brothko",
         "collectionAddress": "0xe620fB92E1215C6c8603edcf39Bb9fbFbe22529b",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0xda11b7afc2811f1fda6a29bfaefbefbfd3d14546c8be852c5b48144db3d64120",
-            "0x685e21279f5ceb47178314e37c42b3074cfad5092aa91629e73938dc854e2367",
-            "0xdca526a448057df04bb53333b372c137315660552c5a5dc0d64d448c6128806d",
-            "0x16f1b4121de6c7687acfeecaa72a6f7b9f2c966f99dd500162488091fe4b86a0",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xc3a3c95f8a0b197e481e3f7afc56135f627f64955be1f93891c282a3d1d66259",
+            "0xdfc0dc004bc234b67b7a73ccf86ce3af362549e3ba7e2e1a9b8850441937d286",
+            "0xbbfadc103c5c78b13778a25cc3002f0f499fb1789100a3e5425ba01a81457288",
+            "0x1b38bbbc02bb0c74ee1dec36fffbbaf3508108947607058d5b6a94de9001c5ad",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "TRIS",
         "collectionAddress": "0x0eCC5879D5ae5d30A89dbd7693EEA6f54abFe619",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x5d170ee1c54a3d620376e2d1f43c1a6a64412972fe0cf3bbec8da6be0087ff9e",
-            "0xefefd5f57b91bd7a7cbcfaba0b49ab64e44ac8dbde20b1a94810b408df9ba361",
-            "0x9ff43e9dedb27cf43d9206a5c94afa2febb326ddb2c012d962578ca66ef5f0a0",
-            "0x6a8c58f88475cca613e90ee6ce81b9f649c3fb9caeb0872a236480e99df56bff",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x3f23b00fb762f6dcaaa2d3f35f8fded4179a530027c0c8d4d1b0bc6be52105fa",
+            "0x7e16212c74b4e4ecf0db3a6d7599e0607d9ce89d036de13f3e7c7c1679ceacca",
+            "0xac244f247d62fb23dc4fc2cf31166cded48462f9b4075eb29d552c64755c0cf6",
+            "0x76cde9a44f0ca607bbce554b5c2ac2198e0fe9b27b95ea7bf4c1466078d12f98",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "KILLABEARS",
         "collectionAddress": "0x6772611c0aB4782aD9eb74166045f26B7513DBE1",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x46336fe64a12c3d9036cf69e93e83950773add25b1e9d3472fd9e17d68546843",
-            "0xd30b2750af042186d9d372f6e1624506b0c12b52de67e9fb73175587b0e706d7",
-            "0x848baeacd04c94314b7690a48f2a549da62d80c88a8258a155a0fcad270a99eb",
-            "0x446c8673673ae18365032b35ed01d76dcad30dd54fd7e62372961c8f953a0ef1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xb365cdaa770a49753c7fc2771fbb1b948abe0d8ac4b7e99f66928b77752107e5",
+            "0x937d48bde566e6a9650e1166f98bf859d3029336ce46e68759d4a76aa2038590",
+            "0xcd8fac761aefe04af5772271540800a7e4fe8bd7ecddb2db3b7876103b0eeba7",
+            "0x1b38bbbc02bb0c74ee1dec36fffbbaf3508108947607058d5b6a94de9001c5ad",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Creepz by OVERLORD",
         "collectionAddress": "0x1c0B9E68bFeAbEdF22d730F9e1df9a82DAdEA725",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x1e2edbbe77c2a5c01e4e91bc6800491a50c27a812a1b2141d563f5bc11f5d344",
-            "0xdf90b3da94c6dd5e1ac4bfd7bb6ae2ebcda30d1a79080213559c0c8a1ed4acea",
-            "0xc1fcd8b9b92a0331985adec6e498d5bffcfffb5ee36d575e397699cd87faa15e",
-            "0x6553a501d5d0a5014c7dca3415ab830fcf653813f77eba834b1597d9c94369e1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x015091fa2a1d28e56bd9a5a20b364d9e303f6118b4b33b08496bf6063329b821",
+            "0xfd128609d09e4a3b87c6647198c556c66f87d6a850d3889db6f819622068e7cb",
+            "0x5f2f95ccf3d8216c2e91d48c08b561fb3d15da47c1f1816a8c43cce7a9aed511",
+            "0xc20fc5ea74de2277a66567c9eece932f22bde93fe681549c7a835c68c0bc7b4c",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Velocity Pass",
         "collectionAddress": "0x8329Db8310ED31448dAe6818D2f74F68c5144445",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0xce224ce59f1ceb675f1ef3bf5ddeb714e9a4250a395754aae9577d9311e8ffcb",
-            "0x6b14f20227e71469d08867f2796f418a344b1e8a3287ed9eaf346445d3eb83e9",
-            "0x443a8c55b8868890cc28af3f406224ff5ef5a6729cfeeef65a7d2a3e1ce8fc48",
-            "0x16f1b4121de6c7687acfeecaa72a6f7b9f2c966f99dd500162488091fe4b86a0",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x9b7b0c5e4714f902a87598acae8323e3ea41a6cc20a110f5e9d17f92f085a586",
+            "0x5f2f95ccf3d8216c2e91d48c08b561fb3d15da47c1f1816a8c43cce7a9aed511",
+            "0xc20fc5ea74de2277a66567c9eece932f22bde93fe681549c7a835c68c0bc7b4c",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "My Pet Hooligan",
         "collectionAddress": "0x428dc19D25d5c349F92295908a0DEFa1A7C1ab4C",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x69e41351a2084aebef47050f4657c82082a9bb8dae8c305544f002008f7567f8",
-            "0xa54246b586822fb5a0b87fb51a26b39c8cf9a3f72fc9c3e51296d4c7ab6b1764",
-            "0x80bb355f11deaf1b22be3a46fdd9cf2b48eef5c58a9499adaef579ff0e9d6fb2",
-            "0x2296b98b17f389bbf15cc4398927771dd17403ad6e37ae1d536667d99f0c00cb",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x947324dad7dd82bb43d3ea0cac4de1ea647db700b0ef0f7a7d736a26a7b5eaf2",
+            "0xd3102ca8c0acd461d4675691fc92b087d2f4872e5bc309d5961bce3e94b74df2",
+            "0xbb6ad845c867d2c8d399d4bed1cbfa0cd8fd270816d83d26875c6997aaafe0bc",
+            "0x7efb8eedbf102fc5a28e6a189a00b5904ffeabb798787c1e576762844ef5c382",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "MonsterMyCity",
         "collectionAddress": "0x24d00195899C290d9b2a8685139b37d5f68c30B8",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x2ffdd1ac8d0bb02d066f6dafc3138f0720319aa260c287f2085b27925aa944d7",
-            "0xff9e328238907bc5706577111344916cb3e963f9966e221d393feadce3728081",
-            "0xd0e2c92b310a22f3f7607d299062277031322d2195ee43cffde841a419c65e60",
-            "0x6553a501d5d0a5014c7dca3415ab830fcf653813f77eba834b1597d9c94369e1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xb497ffb8ec4525cfd4771c6a288e232537b29a14f9a27c43040390c04e19b04c",
+            "0xab7e2baec2ff3dd10e4e2b62e866d03b4218485c4b64cbfee5a71ba86a776d30",
+            "0xcd8fac761aefe04af5772271540800a7e4fe8bd7ecddb2db3b7876103b0eeba7",
+            "0x1b38bbbc02bb0c74ee1dec36fffbbaf3508108947607058d5b6a94de9001c5ad",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Bonkler",
         "collectionAddress": "0xdE9bF72a26c300Cbf2124A9F972fdf70E30A078D",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0xba3f4b711e73b6453884f264a4e8cc45543abafb2ff1bc7d65e42eb357bf18de",
-            "0x29c31438245c72d61ca8bb45c25344450a31f3df0df8086a532ededdcb858921",
-            "0x13ccc24bce51fb157a5a03f3a29a9d28fa59ab83a0ff1db05329e20fc8347517",
-            "0x08286588719247af1d73e28fc7a6c077555b316d18bcb75983c76adf6dd180ff",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x61094cab816e0d6229da0d4e5c47125225a4eda8c956956d1da719dd696b9a3d",
+            "0x61859e2ee8b27899fbf7d80af65429f7a3f1b8bd3745a69e44c1185e45eb181d",
+            "0x6c394517a6a307d4131c2ea370bde1cbac88136e9ba17bb45784b6a007deef25",
+            "0xd073b812563a303982dfc8b2c6f7c40416044a8d0da1c5ed3647cfe0278e0dd9",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "The Grapes",
         "collectionAddress": "0x6B3563F066be31f9eDbA28B7131ae5fE6966b2c5",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x745e0d5213114ffc3055aaec5b0ac2caaf0c32eed9f79cae25a36bd2275c4872",
-            "0xa502399f53e0c19f4eeeb511dd1c079b4ed080696416298aa687677dfc294323",
-            "0x6971f0a32dd094db07d9eccb284794fbfe000d023f53d3d388447277c6008214",
-            "0x2296b98b17f389bbf15cc4398927771dd17403ad6e37ae1d536667d99f0c00cb",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x64d17b831c323dcb2c79bbcc9ac10cab9d4f092b824e281673ee181f4bb604ee",
+            "0xff44a7701102fe23917f2e803a11355ded369d011fa2ed475d4ea514a001b50f",
+            "0x2da0a60b4a1b23ff13d3768c24ada23edbca9cc852e9ee342bf204758dc734fb",
+            "0x614c15dc7f2a8a24ca241f3c48f5ad5a6126ca7f6d002c890b56dd6f43147b7d",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "a KID called BEAST",
         "collectionAddress": "0xF70A10E059862c3860DB3C73f6bf0E9e09204488",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x304d6ef348ff36d85d7fdeebbf7e583a0bd31631457470218873cdae4a7dd5f4",
-            "0xff9e328238907bc5706577111344916cb3e963f9966e221d393feadce3728081",
-            "0xd0e2c92b310a22f3f7607d299062277031322d2195ee43cffde841a419c65e60",
-            "0x6553a501d5d0a5014c7dca3415ab830fcf653813f77eba834b1597d9c94369e1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x011bca0bea5ad452fb15505bc92ce3b416b8fd11fb1b3ae22ff3bd5dad3a7625",
+            "0xfd128609d09e4a3b87c6647198c556c66f87d6a850d3889db6f819622068e7cb",
+            "0x5f2f95ccf3d8216c2e91d48c08b561fb3d15da47c1f1816a8c43cce7a9aed511",
+            "0xc20fc5ea74de2277a66567c9eece932f22bde93fe681549c7a835c68c0bc7b4c",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "LACMACLV5WilliamMapan",
         "collectionAddress": "0xff05427F8B44c1D793444286928115858765A656",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x24b72682f4e158e17d8e1e8f1c49bd2076b4253fae11c3048c8cc3a1ba0af0a0",
-            "0x4fa749cecddb463ef5bfa4750a19512326938ac1f6cd0fefda5537272a24e435",
-            "0xc1fcd8b9b92a0331985adec6e498d5bffcfffb5ee36d575e397699cd87faa15e",
-            "0x6553a501d5d0a5014c7dca3415ab830fcf653813f77eba834b1597d9c94369e1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x488be206c52fede52ca5badd4f493e365b912ec157158d24ecaabdbcb72afb9a",
+            "0x6381c1fb30d2ff14493e184d09d985ceb1c309bcffbfcf59cc3ae23de6b33aee",
+            "0xac244f247d62fb23dc4fc2cf31166cded48462f9b4075eb29d552c64755c0cf6",
+            "0x76cde9a44f0ca607bbce554b5c2ac2198e0fe9b27b95ea7bf4c1466078d12f98",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "World Of Women",
         "collectionAddress": "0xFA5ECf663d5501bcDc95630A4e892c5c31eD4332",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x9d253c0d0feb94cc44abc3d5ef17befa7fd58c7db75411b413a853ae4c26904b",
-            "0xc3b20246c5d3896f801fe291b28320be180fc0577e71ff1063bcabea807b7a9b",
-            "0xf68aabbbf08c18e7c1e77ce36218a64abb3bf1c307590ce36c5e1cd02ef38b2a",
-            "0xf2f6a5543c4a0831d1c0ca71ea701e914e9d2e9bd438bec64b7713918965e82d",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0xd39006023e3f4bceff819c728aae5a56e405378fd2f3b2956a7dd7b93e3c4209",
+            "0x968090be8f194386c1548791f768de16826959ba531f4b0c6dee10b94c31ab55",
+            "0x3616f8d4fb534753495e016090a04b834b14ae29421d1ff842b28e5619e9cfaa",
+            "0xd22d0fa53f2a86aedf35b8695232ee7e1ed3fdf8e8c199a8ad65d3a88067c623",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "JERKS",
         "collectionAddress": "0x6f845Fdc49b17dD9B876A9ABC0841579E3dEd046",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0xd39006023e3f4bceff819c728aae5a56e405378fd2f3b2956a7dd7b93e3c4209",
-            "0xf529d3a99ea5f4aa7ce6749dbbb0932257dee17fd55dd5c8a5b4354dc3ea8052",
-            "0x443a8c55b8868890cc28af3f406224ff5ef5a6729cfeeef65a7d2a3e1ce8fc48",
-            "0x16f1b4121de6c7687acfeecaa72a6f7b9f2c966f99dd500162488091fe4b86a0",
-            "0x36c72c273aa768914a73eed12d94a77b8d0b484e7faf80ee73cbde2fa5521135",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x09769d7cdc58d37bf169a8762eb41a4cb4779234097dd929cd939fc21abb2a6b",
+            "0x25a1a3990287dbfd78cf80ee1c4fa2851dacca0e05af81e5cf66ddb3d609674f",
+            "0xc221e81320a0dcaed45d86251cd8fe55b3f3b5ad39dbe6d21c85ec32c9d60755",
+            "0xc20fc5ea74de2277a66567c9eece932f22bde93fe681549c7a835c68c0bc7b4c",
+            "0xe670f5abbf07a1c64bfc39ab21c176dc21614d1599df6fdc29c2d8be847c3a61",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Rektguy",
         "collectionAddress": "0x99A018e58fe21bF47e6e87e865a0e5CB9967Ae74",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x0fa89d3b540341c13062f4281d1e8d7af9333fefd719ae326190697244c9176d",
-            "0xb52d6e4471cc1f935a9ec13a35df26a481d91355d90ddc2c4d4f68ea2948d869",
-            "0xd55ac31b51dce6acb9f6c463d4f209e2c4f9fec8c87e0e36e594e455417d1df5",
-            "0x6652dfbe18e2a9126f213d4bace31792e665f4f197f5b642cf9debdb95574689",
-            "0x1dcdbf5f929e9f16c8bfd7cc75b8a3d05a36ed4f136b9a139c29fc6ef3c89844",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xe7843c92550add9236b7b290272243bf180ab0687f5197227c631350076abf65",
+            "0xd3911aea19d9d407d241e46206a137b2247f644c89821d57e5723aec31e7d33f",
+            "0xee7f4e01836ac9e654ef09194ce957d77c3b0de6bb90b06a2806dd98ae4d4dd5",
+            "0xd22d0fa53f2a86aedf35b8695232ee7e1ed3fdf8e8c199a8ad65d3a88067c623",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Outside Yacht Club",
         "collectionAddress": "0xdcE4042FCf1EdFf1482c064e9a18b1dBCeE49652",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x1c6f3567e6163c93f6fee23342a7efd6118954c0699f649a71a21f88a793de0a",
-            "0xdf90b3da94c6dd5e1ac4bfd7bb6ae2ebcda30d1a79080213559c0c8a1ed4acea",
-            "0xc1fcd8b9b92a0331985adec6e498d5bffcfffb5ee36d575e397699cd87faa15e",
-            "0x6553a501d5d0a5014c7dca3415ab830fcf653813f77eba834b1597d9c94369e1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x76bf8f8536c1a53be50c1c5afff65dbe305c36bff4a0ba1f8a60c2771204df5c",
+            "0xdddee724a5d08f21b88f26a67c6fa67495c2807b20a18c6fe2087e33c82732cf",
+            "0x3fa68c929ed546571ecbbd48446eb7502e5a392c029907ef99fc82d70217329f",
+            "0xa697b160a1b6a27380297a0c76ca4be6d6ac6857f8e3c59017b981ae18e6cb1b",
+            "0x0747cc63b3f669f53925f8e00a148f3ef4cd1349a5f073a7868b2187a9a93b86",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "Mocaverse",
         "collectionAddress": "0xBCfE389A87942E888E035D0eC690230e278e3eF5",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x5c4b9717b4457fdb0b8afb188c6c8fa3122fa2763a6dc347d9adc5cf345828fc",
-            "0xefefd5f57b91bd7a7cbcfaba0b49ab64e44ac8dbde20b1a94810b408df9ba361",
-            "0x9ff43e9dedb27cf43d9206a5c94afa2febb326ddb2c012d962578ca66ef5f0a0",
-            "0x6a8c58f88475cca613e90ee6ce81b9f649c3fb9caeb0872a236480e99df56bff",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x348654205bbe6f6f3bee76f285ebc971dbc0a51d7f2eb63484260132c9c4bae7",
+            "0xa00215f310eb59790835f2768e74e1ceb0c1c2e30cbf7c043f37e856b6bd6309",
+            "0x6aec6e718dbdd999429f5dbd751e001c7964d193ff4abaa58070a4f141cfa356",
+            "0x76cde9a44f0ca607bbce554b5c2ac2198e0fe9b27b95ea7bf4c1466078d12f98",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Apes Together Strong",
         "collectionAddress": "0x045E13b8bcD4d04305CD4E2C4BBee33176585656",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x3c170574c1c7bd5ad8cb04be7f58af889cdbb61a4ad2e8711e154cf5f3595c3e",
-            "0xf8b069e436029090b230115b8a3ec87f09cc5afb9bf1ccd9ca5da98ab4414c53",
-            "0x848baeacd04c94314b7690a48f2a549da62d80c88a8258a155a0fcad270a99eb",
-            "0x446c8673673ae18365032b35ed01d76dcad30dd54fd7e62372961c8f953a0ef1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0xb0aa921c929a2927cbae3f95ec339a18230557f7c36bb2404073a494688cf279",
+            "0x937d48bde566e6a9650e1166f98bf859d3029336ce46e68759d4a76aa2038590",
+            "0xcd8fac761aefe04af5772271540800a7e4fe8bd7ecddb2db3b7876103b0eeba7",
+            "0x1b38bbbc02bb0c74ee1dec36fffbbaf3508108947607058d5b6a94de9001c5ad",
+            "0x7300c871e763dc119428f4a4b06a526af0d76162e4c64fa6ac93001ffb095c7e",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Art Blocks",
         "collectionAddress": "0xe33634cDACA26DE0C54afe5b23ccFB4Ff57CC1E8",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0xaaccb2e2ed48a0acc1d232d23fc4dcf6e27aee4967d6346b072b182475fadb20",
-            "0xff4f957deeeeaa0c9bd58124f96eb97fea0039c2817cc732366c77d5e5bacad8",
-            "0xba9022e8ee7b904c5ee37bfabe8b0c5ce3887780500443360ccf3b93214b869d",
-            "0xf2f6a5543c4a0831d1c0ca71ea701e914e9d2e9bd438bec64b7713918965e82d",
-            "0x4f461f52f4e0505c434acefd4ebbea075e4d523f755d0d74e8929d9e0c2b5578",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x753ca1cf270dc46f6df16907cd59bfcf5ef4b6a34b2fa57202897c1aa6e6078c",
+            "0x13a8de86a6e24ca5eb42785d8a4f89039089fe6e8a26ae204a8ae2400d49ede8",
+            "0xac0cc88b6954768e585903cfb8b4c10ab56c30d4acd176412bfae3caf6efcfa3",
+            "0x614c15dc7f2a8a24ca241f3c48f5ad5a6126ca7f6d002c890b56dd6f43147b7d",
+            "0x4462eba1fc9eb09a71a7bcd5f227796b9a2b4d7121aa46f366d56a57501e88c5",
+            "0x79f292bce917113f4d95ec15b180bcf3077a9b09cf8aecca89219798167dc9e4"
         ]
     },
     {
         "name": "BlockGames Dice",
         "collectionAddress": "0x1fE6879DCDdfC5b1c1Fa19bf42FD3D85fFF282e4",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x356a79b74fde295f105947889fff018086781e3920582387b0aac6ec9a48b35b",
-            "0xdf6e1adc8197332e5e9383f077744b41e1d160d985c3d39c1abbbc3b1dd744f8",
-            "0x2019560ac269c3f2fa4310ca44bac2e5a40c9befcb86f76fb29735cf88178c1e",
-            "0x446c8673673ae18365032b35ed01d76dcad30dd54fd7e62372961c8f953a0ef1",
-            "0xdfddb96519b113a4a9a9915cdefe2af511dcd706f62cb1c3cf8cbadc55e81262",
-            "0x90e8b938396bc0f1e6b37095ae5b0ea074aeddf464acff63a2bf245ebacaae3f",
-            "0x75a18c51f8f3c74b2df06c449914481513b02248dc3c156f4c8bdc765b55ea18"
+            "0x347b0d5b8e2464a9fc0219168bf4105f5a8f166f99dc3378d974d225f1660989",
+            "0xa00215f310eb59790835f2768e74e1ceb0c1c2e30cbf7c043f37e856b6bd6309",
+            "0x6aec6e718dbdd999429f5dbd751e001c7964d193ff4abaa58070a4f141cfa356",
+            "0x76cde9a44f0ca607bbce554b5c2ac2198e0fe9b27b95ea7bf4c1466078d12f98",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     },
     {
         "name": "Taciturn-robot",
         "collectionAddress": "0xd19ebBF60cFB47c77aac1e6398A59391d8A34e03",
-        "opentotalmopnpoint": 3000,
+        "opentotalmopnpoint": 300000,
         "merkleProof": [
-            "0x7b3e642aa406f01f26774242844a63f6f960449402c8945502cccb602c0875b5",
-            "0x71a25b5effbf98990534bcafce99dc5eb01566533d8e162ca36b5c969aee49b8",
-            "0x6971f0a32dd094db07d9eccb284794fbfe000d023f53d3d388447277c6008214",
-            "0x2296b98b17f389bbf15cc4398927771dd17403ad6e37ae1d536667d99f0c00cb",
-            "0x8f0fa2175c3fbaca520bf995078f29f36552c51e97daeb1a32c2f52b0a29b010",
-            "0x4a95865064b120c0bd4a7104a6db683dbe324c040e59c3ba41242c8f5a3c5d10"
+            "0x1b85889ff9e023c9db3b5721b6a739d64437838ef4d5dd6963ac7b0fff0e77e8",
+            "0x2d44503201d2e54e70cc3575039cba9b198c007a6bccd1dbb70a17f3689a8468",
+            "0xa9ff520587989784137f43003e8bf2a0c031c43464adc79502c622f59f22115f",
+            "0x5d46b30065185ec460cc3099e38385efb6d7eb7e30eaa5166b24b69c75d3edd9",
+            "0xc27e16252df62b4ae3cf69125961d0e8542b5891dd6fec28c3aa7b1902e7c094",
+            "0x83777fc53ec0b5a1d02eb27d05e0edaecf8dba5fcf296f33310f40e825652c24",
+            "0xf170dadd998eb2b3685d2a9fafaad847fb92707d9f84dfa3129457d2b2ad1d43"
         ]
     }
 ]
