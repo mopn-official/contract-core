@@ -35,17 +35,20 @@ contract MOPNGovernance is Multicall, Ownable {
     address public ERC6551Registry;
     address public ERC6551AccountProxy;
     address public ERC6551AccountHelper;
+    address public rentalContract;
 
     address[] public ERC6551AccountImplementations;
 
     function updateERC6551Contract(
         address ERC6551Registry_,
         address ERC6551AccountProxy_,
-        address ERC6551AccountHelper_
+        address ERC6551AccountHelper_,
+        address rentalContract_
     ) public onlyOwner {
         ERC6551Registry = ERC6551Registry_;
         ERC6551AccountProxy = ERC6551AccountProxy_;
         ERC6551AccountHelper = ERC6551AccountHelper_;
+        rentalContract = rentalContract_;
     }
 
     address public mopnContract;
@@ -55,7 +58,7 @@ contract MOPNGovernance is Multicall, Ownable {
     address public landContract;
     address public dataContract;
     address public collectionVaultContract;
-    address public rentalContract;
+
     address public auctionHouseContract;
 
     function updateMOPNContracts(
@@ -66,8 +69,7 @@ contract MOPNGovernance is Multicall, Ownable {
         address pointContract_,
         address landContract_,
         address dataContract_,
-        address collectionVaultContract_,
-        address rentalContract_
+        address collectionVaultContract_
     ) public onlyOwner {
         auctionHouseContract = auctionHouseContract_;
         mopnContract = mopnContract_;
@@ -77,7 +79,6 @@ contract MOPNGovernance is Multicall, Ownable {
         landContract = landContract_;
         dataContract = dataContract_;
         collectionVaultContract = collectionVaultContract_;
-        rentalContract = rentalContract_;
     }
 
     function getDefault6551AccountImplementation()

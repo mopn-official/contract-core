@@ -38,8 +38,6 @@ contract MOPNERC6551Account is
 
     address public immutable governance;
 
-    address public immutable ownershipRentalContract;
-
     uint8 public ownershipMode;
 
     uint40 public rentEndBlock;
@@ -48,9 +46,8 @@ contract MOPNERC6551Account is
 
     uint256 public state;
 
-    constructor(address governance_, address ownershipRentalContract_) {
+    constructor(address governance_) {
         governance = governance_;
-        ownershipRentalContract = ownershipRentalContract_;
     }
 
     receive() external payable {}
@@ -218,7 +215,10 @@ contract MOPNERC6551Account is
         if (ownershipMode == 0) {
             require(msg.sender == nftowner(), "not allowed");
         } else if (ownershipMode == 1) {
-            require(msg.sender == ownershipRentalContract, "not allowed");
+            require(
+                msg.sender == IMOPNGovernance(governance).rentalContract(),
+                "not allowed"
+            );
         } else {
             require(false, "OwnershipMode not supported transfer");
         }

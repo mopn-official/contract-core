@@ -71,7 +71,8 @@ describe("MOPNRental", function () {
     const governanceset6551tx = await governance.updateERC6551Contract(
       registry.getAddress(),
       accountProxy.getAddress(),
-      accountProxy.getAddress()
+      accountProxy.getAddress(),
+      mopnRental.getAddress()
     );
     await governanceset6551tx.wait();
 
