@@ -35,11 +35,7 @@ contract MOPNPoint is ERC20 {
         return 0;
     }
 
-    function _beforeTokenTransfer(
-        address,
-        address,
-        uint256
-    ) internal virtual override {
+    function _beforeTokenTransfer(address, address, uint256) internal virtual {
         require(false, "MOPN Point can't transfer");
     }
 }
