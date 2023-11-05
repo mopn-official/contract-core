@@ -10,15 +10,18 @@ import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+<<<<<<< Updated upstream
 import "@openzeppelin/contracts/access/Ownable.sol";
+=======
+import "@openzeppelin/contracts/utils/Strings.sol";
+>>>>>>> Stashed changes
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 contract MOPNCollectionVault is
     IMOPNCollectionVault,
     ERC20,
     IERC20Receiver,
-    IERC721Receiver,
-    Ownable
+    IERC721Receiver
 {
     uint256 public COID;
 

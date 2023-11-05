@@ -33,10 +33,71 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
     using TileMath for uint32;
 
+<<<<<<< Updated upstream
     event AvatarMint(
         uint256 indexed avatarId,
         uint256 indexed COID,
         address collectionContract,
+=======
+    constructor(
+        address governance_,
+        uint32 MTOutputPerBlock_,
+        uint32 MTStepStartBlock_,
+        uint256 MTReduceInterval_,
+        uint256 MaxCollectionOnMapNum_,
+        uint24 MaxCollectionMOPNPoint_,
+        uint48 whiteListOffTotalMOPNPoint_,
+        bytes32 whiteListRoot_,
+        address initialOwner
+    ) Ownable(initialOwner) {
+        governance = IMOPNGovernance(governance_);
+        MTReduceInterval = MTReduceInterval_;
+        MaxCollectionOnMapNum = MaxCollectionOnMapNum_;
+        MaxCollectionMOPNPoint = MaxCollectionMOPNPoint_;
+        LastTickBlock = MTStepStartBlock_;
+        whiteListOffTotalMOPNPoint = whiteListOffTotalMOPNPoint_;
+        MTOutputPerBlock = MTOutputPerBlock_;
+        MTStepStartBlock = MTStepStartBlock_;
+        NFTOfferCoefficient = 10 ** 13;
+        whiteListRoot = whiteListRoot_;
+        PerMOPNPointMinted = 1;
+    }
+
+    function getGovernance() external view returns (address) {
+        return address(governance);
+    }
+
+    function whiteListRootUpdate(bytes32 root) public onlyOwner {
+        whiteListRoot = root;
+    }
+
+    function checkAccountQualification(
+        address account
+    ) public view returns (address collectionAddress) {
+        try IMOPNERC6551Account(payable(account)).token() returns (
+            uint256 chainId,
+            address collectionAddress_,
+            uint256 tokenId
+        ) {
+            if (ADs[account].PerMOPNPointMinted == 0) {
+                require(
+                    chainId == block.chainid,
+                    "not support cross chain account"
+                );
+                require(
+                    account == computeMOPNAccount(collectionAddress, tokenId),
+                    "not a mopn Account Implementation"
+                );
+            }
+            collectionAddress = collectionAddress_;
+        } catch (bytes memory) {
+            require(false, "account error");
+        }
+    }
+
+    function computeMOPNAccount(
+        address tokenContract,
+>>>>>>> Stashed changes
         uint256 tokenId
     );
 

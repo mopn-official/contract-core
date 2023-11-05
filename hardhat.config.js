@@ -7,11 +7,40 @@ dotenv.config();
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
+<<<<<<< Updated upstream
     version: "0.8.19",
     settings: {
       optimizer: {
         enabled: true,
         runs: 1000,
+=======
+    compilers: [
+      {
+        version: "0.8.20",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1000,
+          },
+        },
+      },
+      {
+        version: "0.4.18",
+      },
+    ],
+  },
+  networks: {
+    // hardhat: {
+    //   mining: {
+    //     auto: false,
+    //     interval: 0
+    //   }
+    // },
+    hardhat: {
+      forking: {
+        url: process.env.GOERLI_URL,
+        blockNumber: 9956585,
+>>>>>>> Stashed changes
       },
     },
   },

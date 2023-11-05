@@ -25,10 +25,16 @@
   },
   "homepage": "https://mopn.xyz",
   "dependencies": {
+<<<<<<< Updated upstream
     "@enzoferey/ethers-error-parser": "^0.2.3",
     "@graphprotocol/graph-ts": "^0.30.0",
     "@openzeppelin/contracts": "^4.8.2",
     "@openzeppelin/merkle-tree": "^1.0.4",
+=======
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0",
+    "@openzeppelin/merkle-tree": "^1.0.5",
+>>>>>>> Stashed changes
     "abdk-libraries-solidity": "^3.2.0",
     "base64-sol": "^1.1.0",
     "erc721a": "^4.2.3",

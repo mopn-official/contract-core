@@ -33,12 +33,31 @@ contract MOPNGovernance is Multicall, Ownable {
 
     mapping(uint256 => address) public CollectionVaults;
 
+<<<<<<< Updated upstream
     /**
      * @notice update whitelist root
      * @param whiteListRoot_ white list merkle tree root
      */
     function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
         whiteListRoot = whiteListRoot_;
+=======
+    address public ERC6551Registry;
+    address public ERC6551AccountProxy;
+    address public ERC6551AccountHelper;
+
+    address[] public ERC6551AccountImplementations;
+
+    constructor(address initialOwner) Ownable(initialOwner) {}
+
+    function updateERC6551Contract(
+        address ERC6551Registry_,
+        address ERC6551AccountProxy_,
+        address ERC6551AccountHelper_
+    ) public onlyOwner {
+        ERC6551Registry = ERC6551Registry_;
+        ERC6551AccountProxy = ERC6551AccountProxy_;
+        ERC6551AccountHelper = ERC6551AccountHelper_;
+>>>>>>> Stashed changes
     }
 
     address public auctionHouseContract;

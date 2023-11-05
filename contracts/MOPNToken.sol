@@ -52,4 +52,39 @@ contract MOPNToken is ERC20Burnable, Ownable {
             require(response == ERC20_RECEIVED);
         }
     }
+<<<<<<< Updated upstream
+=======
+
+    function totalSupply() public view override returns (uint256) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        return
+            mopn.MTTotalMinted() +
+            (IMOPNData(governance.dataContract()).calcPerMOPNPointMinted() -
+                mopn.PerMOPNPointMinted()) *
+            mopn.TotalMOPNPoints();
+    }
+
+    function balanceOf(
+        address account
+    ) public view virtual override returns (uint256 balance) {
+        balance = super.balanceOf(account);
+        balance += IMOPNData(governance.dataContract()).calcAccountMT(account);
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address,
+        uint256 amount
+    ) internal virtual {
+        uint256 realbalance = super.balanceOf(from);
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        IMOPN.AccountDataStruct memory accountData = mopn.getAccountData(from);
+        if (
+            accountData.PerMOPNPointMinted > 0 &&
+            (accountData.AgentPlacer != address(0) || realbalance < amount)
+        ) {
+            mopn.claimAccountMTTo(from, from);
+        }
+    }
+>>>>>>> Stashed changes
 }
