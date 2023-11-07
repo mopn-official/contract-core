@@ -1,31 +1,45 @@
 const MOPNContract = require("./MOPNContract");
-const TheGraph = require("../simulator/TheGraph");
+const TheGraph = require("./TheGraph");
+const MOPNMath = require("../simulator/MOPNMath");
+const { ZeroAddress } = require("ethers");
+
+const centerCoordinate = {
+  "0x90ccfad2c1dc253285e379a0050a503d1a5abcee": { coordinate: 10001000, placeStyle: 1 },
+};
 
 async function main() {
-  // MOPNContract.setCurrentAccount(1);
-  // console.log(await MOPNContract.moveTo("0x34a08ac41031d82c8f47c83705913bccca18465b", 1, 10300980));
-  // console.log(await MOPNContract.buybomb(1));
-  // console.log(await MOPNContract.stackMT('0x34a08ac41031d82c8f47c83705913bccca18465b', 1000000000));
-  // console.log(await MOPNContract.removeStakingMT('0x34a08ac41031d82c8f47c83705913bccca18465b', "1000000000000000000000"));
-  // const accounts = [
-  //   "0xc6a3d78d7f2ddcb807dcb0c76a1b2145fa88c956",
-  //   "0x315d5d65b95150efb88687055cdcd4dc310d13be",
-  //   "0x3e2299d35e1caaf6aed27c7853ec6df80d022bad",
-  // ];
-  // for (const account of accounts) {
-  //   console.log(await MOPNContract.getAccountNFTInfo(account));
-  // }
+  const collection = "0x90ccfad2c1dc253285e379a0050a503d1a5abcee";
+  const collectionOnMapData = await getCollectionOnMapData(collection);
 
-  console.log(MOPNMath.LandRingNum(7));
+  console.log(collectionOnMapData);
 
-  await MOPNContract.mintMockNFTs("0x1fE6879DCDdfC5b1c1Fa19bf42FD3D85fFF282e4", 5);
+  const nextMoveTiles = await getCollectionNextMoveBatchData(collection, 1);
+  let tokenId = 0;
+
+  for (const nextMoveTile of nextMoveTiles) {
+    if (nextMoveTile.account != ZeroAddress) continue;
+    const xy = MOPNMath.coordinateIntToXY(nextMoveTile.coordinate);
+    if (xy.x % 2 != 0 || xy.y % 2 != 0) continue;
+    if (centerCoordinate[collection].placeStyle == 2) {
+      if (xy.x % 10 != 0 && xy.y % 10 != 0) continue;
+    }
+    if ((await checkMoveToTile(nextMoveTile.coordinate, collection)) == false) continue;
+
+    console.log(nextMoveTile);
+    while (true) {
+      if (!collectionOnMapData.tokenIds.includes(tokenId.toString())) {
+        break;
+      }
+      tokenId++;
+    }
+
+    console.log("move", collection, tokenId, "to", nextMoveTile.coordinate);
+    collectionOnMapData.tokenIds.push(tokenId.toString());
+    // await MOPNContract.moveTo(collection, tokenId, nextMoveTile.coordinate);
+  }
 }
 
 async function getCollectionOnMapData(collection) {
-  const centerCoordinate = {
-    "0xD7ea10E5D7CA72AF25b6502A7919d0cDBBC16A3E": 10001000,
-  };
-
   const accounts = await TheGraph.getCollectionOnMapAccounts(collection);
   const coordinates = [];
   const tokenIds = [];
@@ -34,14 +48,62 @@ async function getCollectionOnMapData(collection) {
     tokenIds.push(account.tokenId);
   }
   return {
-    center: centerCoordinate[collection],
+    center: centerCoordinate[collection].coordinate,
+    placeStyle: centerCoordinate[collection].placeStyle,
     coordinates: coordinates,
     tokenIds: tokenIds,
   };
 }
 
-async function getCollectionNextMoveGrid(collection) {
-  [center, coodinates, tokenIds] = await getCollectionOnMapData(collection);
+async function getCollectionNextMoveBatchData(collection, startIndex) {
+  if (!startIndex) startIndex = 1;
+  const data = await getCollectionOnMapData(collection);
+
+  let IndexRingNum = MOPNMath.HexagonIndexRingNum(startIndex);
+  const IndexRingPos = MOPNMath.HexagonIndexRingPos(startIndex);
+  const side = Math.ceil(IndexRingPos / IndexRingNum);
+
+  let sidepos = 0;
+  if (IndexRingNum > 1) {
+    sidepos = (IndexRingPos - 1) % IndexRingNum;
+  }
+
+  let coordinate =
+    data.center +
+    MOPNMath.direction(side < 3 ? side + 3 : side - 3) * IndexRingNum +
+    MOPNMath.direction(side - 1) * sidepos;
+
+  let batchcoordinates = [];
+
+  let batchnum = 0;
+  let firstRing = true;
+  while (batchnum < 100) {
+    for (let j = 0; j < 6; j++) {
+      if (firstRing && j < side - 1) continue;
+      for (let k = 0; k < IndexRingNum; k++) {
+        if (firstRing && k < sidepos) continue;
+        batchcoordinates.push(coordinate.toString());
+        coordinate = MOPNMath.neighbor(coordinate, j);
+        batchnum++;
+      }
+    }
+    coordinate = MOPNMath.neighbor(coordinate, 4);
+    IndexRingNum++;
+    firstRing = false;
+  }
+
+  console.log(batchcoordinates);
+  return TheGraph.getTilesAccountsRich(batchcoordinates);
+}
+
+async function checkMoveToTile(coordinate, collection) {
+  const tileAccounts = await TheGraph.getMoveToTilesAccountsRich(coordinate);
+  for (let tileAccount of tileAccounts) {
+    if (tileAccount.collection != ZeroAddress && tileAccount.collection != collection) {
+      return false;
+    }
+  }
+  return true;
 }
 
 main().catch((error) => {

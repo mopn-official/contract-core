@@ -1,21 +1,21 @@
 const centerTiles = require("./data/LandCenterTiles.json");
 
-function RungNumLands(ringNum) {
+function RingHexagons(ringNum) {
   return 3 * ringNum * ringNum + 3 * ringNum;
 }
 
-function LandRingNum(LandId) {
-  let n = Math.floor((Math.sqrt(9 + 12 * (LandId - 1)) - 3) / 6);
-  if (3 * n * n + 3 * n == LandId) {
+function HexagonIndexRingNum(index) {
+  let n = Math.floor((Math.sqrt(9 + 12 * (index - 1)) - 3) / 6);
+  if (3 * n * n + 3 * n == index) {
     return n;
   } else {
     return n + 1;
   }
 }
 
-function LandRingPos(LandId) {
-  const ringNum = LandRingNum(LandId) - 1;
-  return LandId - (3 * ringNum * ringNum + 3 * ringNum);
+function HexagonIndexRingPos(index) {
+  const ringNum = HexagonIndexRingNum(index) - 1;
+  return index - (3 * ringNum * ringNum + 3 * ringNum);
 }
 
 function LandRingStartCenterTile(LandIdRingNum_) {
@@ -28,11 +28,11 @@ function LandCenterTile(LandId) {
     return 10001000;
   }
 
-  const LandIdRingNum_ = LandRingNum(LandId);
+  const LandIdRingNum_ = HexagonIndexRingNum(LandId);
 
   const starttile = coordinateIntToArr(LandRingStartCenterTile(LandIdRingNum_));
 
-  const LandIdRingPos_ = LandRingPos(LandId);
+  const LandIdRingPos_ = HexagonIndexRingPos(LandId);
 
   const side = Math.ceil(LandIdRingPos_ / LandIdRingNum_);
 
@@ -340,13 +340,14 @@ function getCoordinateByRange(startCoordinate, width, height) {
 }
 
 module.exports = {
-  RungNumLands,
-  LandRingNum,
-  LandRingPos,
+  RingHexagons,
+  HexagonIndexRingNum,
+  HexagonIndexRingPos,
   LandRingStartCenterTile,
   LandCenterTile,
   getTileEAW,
   getLandTilesEAW,
+  direction,
   neighbor,
   getTileLandId,
   checkLandIdOpen,

@@ -167,30 +167,35 @@ async function getTilesAccountsRich(coordinates) {
 async function getCollectionOnMapAccounts(collection) {
   let accounts = [];
 
-  const graphqlQuery = {
-    operationName: "fetchCollectionOnMapAccounts",
-    query: `query fetchCollectionOnMapAccounts($id: String!) {
-      collectionData(id: $id) {
-        accounts(where: {coordinate_not: null}){
-          id
-          coordinate{
+  while (true) {
+    const graphqlQuery = {
+      operationName: "fetchCollectionOnMapAccounts",
+      query: `query fetchCollectionOnMapAccounts($id: String!) {
+        collectionData(id: $id) {
+          accounts(where: {coordinate_not: null}){
             id
+            coordinate{
+              id
+            }
+            tokenId
           }
-          tokenId
         }
-      }
-    }`,
-    variables: {
-      id: collection,
-    },
-  };
-  const accountsDatas = await fetchData(graphqlQuery);
-  for (let account of accountsDatas.data.collectionData.accounts) {
-    accounts.push({
-      account: account.id,
-      coordinate: account.coordinate.id,
-      tokenId: account.tokenId,
-    });
+      }`,
+      variables: {
+        id: collection,
+      },
+    };
+    const accountsDatas = await fetchData(graphqlQuery);
+    for (let account of accountsDatas.data.collectionData.accounts) {
+      accounts.push({
+        account: account.id,
+        coordinate: account.coordinate.id,
+        tokenId: account.tokenId,
+      });
+    }
+    if (accountsDatas.data.collectionData.accounts.length < 1000) {
+      break;
+    }
   }
 
   return accounts;

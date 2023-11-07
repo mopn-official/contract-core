@@ -628,17 +628,14 @@ contract MOPN is IMOPN, Multicall, Ownable {
                         (CDs[collectionAddress].PerCollectionNFTMinted -
                             ADs[account].PerCollectionNFTMinted);
 
-                    address landAccount = LandAccounts[ADs[account].LandId];
-                    if (landAccount == address(0)) {
-                        landAccount = computeMOPNAccount(
-                            governance.landContract(),
+                    IMOPNToken(governance.tokenContract()).mint(
+                        IMOPNLand(governance.landContract()).ownerOf(
                             ADs[account].LandId
-                        );
-                        LandAccounts[ADs[account].LandId] = landAccount;
-                    }
-                    uint48 landamount = amount / 20;
-                    ADs[landAccount].SettledMT += landamount;
-                    emit LandHolderMTMinted(ADs[account].LandId, landamount);
+                        ),
+                        amount / 20
+                    );
+                    emit LandHolderMTMinted(ADs[account].LandId, amount / 20);
+
                     if (ADs[account].AgentPlacer != address(0)) {
                         IMOPNToken(governance.tokenContract()).mint(
                             ADs[account].AgentPlacer,

@@ -51,36 +51,6 @@ contract MOPNGovernance is Multicall, Ownable {
         rentalContract = rentalContract_;
     }
 
-    address public mopnContract;
-    address public bombContract;
-    address public tokenContract;
-    address public pointContract;
-    address public landContract;
-    address public dataContract;
-    address public collectionVaultContract;
-
-    address public auctionHouseContract;
-
-    function updateMOPNContracts(
-        address auctionHouseContract_,
-        address mopnContract_,
-        address bombContract_,
-        address tokenContract_,
-        address pointContract_,
-        address landContract_,
-        address dataContract_,
-        address collectionVaultContract_
-    ) public onlyOwner {
-        auctionHouseContract = auctionHouseContract_;
-        mopnContract = mopnContract_;
-        bombContract = bombContract_;
-        tokenContract = tokenContract_;
-        pointContract = pointContract_;
-        landContract = landContract_;
-        dataContract = dataContract_;
-        collectionVaultContract = collectionVaultContract_;
-    }
-
     function getDefault6551AccountImplementation()
         public
         view
@@ -154,6 +124,36 @@ contract MOPNGovernance is Multicall, Ownable {
             if (ERC6551AccountImplementations[i] == implementation) return true;
         }
         return false;
+    }
+
+    address public mopnContract;
+    address public bombContract;
+    address public tokenContract;
+    address public pointContract;
+    address public landContract;
+    address public dataContract;
+    address public collectionVaultContract;
+
+    address public auctionHouseContract;
+
+    function updateMOPNContracts(
+        address auctionHouseContract_,
+        address mopnContract_,
+        address bombContract_,
+        address tokenContract_,
+        address pointContract_,
+        address landContract_,
+        address dataContract_,
+        address collectionVaultContract_
+    ) public onlyOwner {
+        auctionHouseContract = auctionHouseContract_;
+        mopnContract = mopnContract_;
+        bombContract = bombContract_;
+        tokenContract = tokenContract_;
+        pointContract = pointContract_;
+        landContract = landContract_;
+        dataContract = dataContract_;
+        collectionVaultContract = collectionVaultContract_;
     }
 
     function createCollectionVault(
