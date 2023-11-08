@@ -9,14 +9,18 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
 import "@openzeppelin/contracts/proxy/Proxy.sol";
 
 contract MOCKNFTProxy is Proxy, ERC1967Upgrade {
-    address public immutable defaultImplementation;
+    error InitializationFailed();
 
-    constructor(address defaultImplementation_) {
+    address public immutable defaultImplementation;
+    address public immutable owner;
+
+    constructor(address defaultImplementation_, address owner_) {
         defaultImplementation = defaultImplementation_;
+        owner = owner_;
     }
 
     function upgradeTo(address implementation_) public {
-        require(msg.sender == owner(), "only owner can upgrade");
+        require(msg.sender == owner, "only owner can upgrade");
         require(implementation_ != _implementation(), "same Implementation");
         ERC1967Upgrade._upgradeTo(implementation_);
     }
@@ -34,16 +38,5 @@ contract MOCKNFTProxy is Proxy, ERC1967Upgrade {
 
     function implementation() public view returns (address) {
         return _implementation();
-    }
-
-    function owner() internal view returns (address) {
-        bytes memory footer = new bytes(0x20);
-
-        assembly {
-            // copy 0x20 bytes from end of footer
-            extcodecopy(address(), add(footer, 0x20), 0x4d, 0x6d)
-        }
-
-        return abi.decode(footer, (address));
     }
 }

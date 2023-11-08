@@ -6,35 +6,17 @@ async function main() {
 
   const mocknfts = loadMockNFTs();
 
-  const mintablemocknfts = loadMintableMockNFTs();
-
   const whitlist = [];
   let i = 1;
   for (const key in mocknfts.collections) {
     let collection = {
       name: mocknfts.collections[key].name,
       collectionAddress: mocknfts.collections[key].collectionAddress,
-      opentotalmopnpoint: 0,
+      opentotalmopnpoint: mocknfts.collections[key].opentotalmopnpoint,
     };
-    if (i > 50) {
-      collection.opentotalmopnpoint = 300000;
-    } else if (i > 10) {
-      collection.opentotalmopnpoint = 100000;
-    }
     whitlist.push(collection);
     i++;
   }
-
-  // i = 1;
-  // for (const key in mintablemocknfts.collections) {
-  //   let collection = {
-  //     name: mintablemocknfts.collections[key].name,
-  //     collectionAddress: mintablemocknfts.collections[key].collectionAddress,
-  //     opentotalmopnpoint: 0,
-  //   };
-  //   whitlist.push(collection);
-  //   i++;
-  // }
 
   const whitelistTree = [];
   for (const collection of whitlist) {
@@ -60,7 +42,7 @@ async function main() {
 }
 
 function loadMockNFTs() {
-  const deployConf = JSON.parse(fs.readFileSync("./scripts/mocknfts/nfts.json"));
+  const deployConf = JSON.parse(fs.readFileSync("./src/preprod/mocknfts/goerlimirrornfts.json"));
 
   if (!deployConf) {
     console.log("no mock nfts");
@@ -72,22 +54,9 @@ function loadMockNFTs() {
   return deployConf;
 }
 
-function loadMintableMockNFTs() {
-  const deployConf = JSON.parse(fs.readFileSync("./scripts/mocknfts/mintablenfts.json"));
-
-  if (!deployConf) {
-    console.log("no mintable mock nfts");
-    console.error(error);
-    process.exitCode = 1;
-    return;
-  }
-
-  return deployConf;
-}
-
 function saveWhiteList(whitelist) {
   fs.writeFile(
-    "./scripts/whitelist/goerli.json",
+    "./src/preprod/whitelist/goerli.json",
     JSON.stringify(whitelist, null, 4),
     "utf8",
     function (err) {
@@ -98,7 +67,7 @@ function saveWhiteList(whitelist) {
 
 function saveWhiteListTree(whitelist) {
   fs.writeFile(
-    "./scripts/whitelist/goerli_tree.json",
+    "./src/preprod/data/goerli_tree.json",
     JSON.stringify(whitelist, null, 4),
     "utf8",
     function (err) {

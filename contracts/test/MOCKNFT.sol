@@ -6,9 +6,10 @@ import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 contract MOCKNFT is ERC721AUpgradeable {
     string public baseURI;
     string public extURI;
+    address public owner;
 
     modifier onlyOwner() {
-        require(msg.sender == owner(), "only owner");
+        require(msg.sender == owner, "only owner");
         _;
     }
 
@@ -18,16 +19,21 @@ contract MOCKNFT is ERC721AUpgradeable {
     function initialize(
         string memory name,
         string memory symbol,
+        address owner_,
         string memory baseURI_,
         string memory extURI_
     ) public initializerERC721A {
         __ERC721A_init(name, symbol);
+        owner = owner_;
         baseURI = baseURI_;
         extURI = extURI_;
     }
 
     function mint(uint256 quantity) external {
-        require(_numberMinted(msg.sender) <= 10, "wallet mint limit reached");
+        require(
+            _numberMinted(msg.sender) <= 10 || msg.sender == owner,
+            "wallet mint limit reached"
+        );
         _mint(msg.sender, quantity);
     }
 
@@ -47,27 +53,5 @@ contract MOCKNFT is ERC721AUpgradeable {
         uint256 _tokenId
     ) public view override returns (string memory) {
         return string.concat(super.tokenURI(_tokenId), extURI);
-    }
-
-    function owner() internal view returns (address) {
-        bytes memory footer = new bytes(0x20);
-
-        assembly {
-            // copy 0x20 bytes from end of footer
-            extcodecopy(address(), add(footer, 0x20), 0x4d, 0x6d)
-        }
-
-        return abi.decode(footer, (address));
-    }
-
-    function salt() internal view returns (uint256) {
-        bytes memory footer = new bytes(0x20);
-
-        assembly {
-            // copy 0x20 bytes from beginning of footer
-            extcodecopy(address(), add(footer, 0x20), 0x2d, 0x4d)
-        }
-
-        return abi.decode(footer, (uint256));
     }
 }
