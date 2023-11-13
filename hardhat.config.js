@@ -52,14 +52,27 @@ module.exports = {
       etherscanHost: "https://goerli.etherscan.io/",
       accounts:
         process.env.PRIVATE_KEY !== undefined
-          ? [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY_1, process.env.PRIVATE_KEY_2]
+          ? [
+              process.env.PRIVATE_KEY,
+              process.env.PRIVATE_KEY_1,
+              process.env.PRIVATE_KEY_2,
+              process.env.PRIVATE_KEY_3,
+            ]
           : [],
     },
     goerli_dev: {
       url: process.env.GOERLI_URL,
       chainId: 5,
       etherscanHost: "https://goerli.etherscan.io/",
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts:
+        process.env.PRIVATE_KEY !== undefined
+          ? [
+              process.env.PRIVATE_KEY,
+              process.env.PRIVATE_KEY_1,
+              process.env.PRIVATE_KEY_2,
+              process.env.PRIVATE_KEY_3,
+            ]
+          : [],
     },
     sepolia: {
       url: process.env.SEPOLIA_URL,

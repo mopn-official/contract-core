@@ -50,65 +50,17 @@ async function getContractObj(contractName, address) {
 }
 
 async function moveTo(tokenContract, tokenId, coordinate) {
-  const accounthelper = await getContractObj("MOPNERC6551AccountHelper");
-  const account = await accounthelper.checkAccountExist(
-    await getContractAddress("MOPNERC6551AccountProxy"),
-    hre.network.config.chainId,
-    tokenContract,
-    tokenId,
-    0
-  );
-  const mopn = await getContractObj("MOPN");
   const landId = MOPNMath.getTileLandId(coordinate);
-  let tx;
-  if (account.exist) {
-    const accountContract = await getContractObj("MOPNERC6551Account", account._account);
-    if (
-      (await accountContract.isOwner((await getCurrentAccount()).address)) ||
-      (await mopn.getAccountOnMapMOPNPoint(account._account)) == 0
-    ) {
-      tx = await mopn
-        .connect(await getCurrentAccount())
-        .moveTo(
-          account._account,
-          coordinate,
-          landId,
-          await TheGraph.getMoveToTilesAccounts(coordinate)
-        );
-    } else {
-      console.log("account is placed");
-      return;
-    }
-  } else {
-    tx = await mopn
-      .connect(await getCurrentAccount())
-      .moveToNFT(
-        tokenContract,
-        tokenId,
-        coordinate,
-        landId,
-        await TheGraph.getMoveToTilesAccounts(coordinate),
-        "0x"
-      );
-  }
-
-  console.log(
-    "wallet",
-    (await getCurrentAccount()).address,
-    "move",
+  moveToRich(
     tokenContract,
     tokenId,
-    "account",
-    account._account,
-    "to",
     coordinate,
-    "tx sent!"
+    landId,
+    await TheGraph.getMoveToTilesAccounts(coordinate)
   );
-  console.log(hre.network.config.etherscanHost + "tx/" + tx.hash);
-  await tx.wait();
 }
 
-async function moveToWithTilesAccounts(tokenContract, tokenId, coordinate, tilesaccounts) {
+async function moveToRich(tokenContract, tokenId, coordinate, landId, tilesaccounts) {
   const accounthelper = await getContractObj("MOPNERC6551AccountHelper");
   const account = await accounthelper.checkAccountExist(
     await getContractAddress("MOPNERC6551AccountProxy"),
@@ -118,7 +70,6 @@ async function moveToWithTilesAccounts(tokenContract, tokenId, coordinate, tiles
     0
   );
   const mopn = await getContractObj("MOPN");
-  const landId = MOPNMath.getTileLandId(coordinate);
   let tx;
   if (account.exist) {
     const accountContract = await getContractObj("MOPNERC6551Account", account._account);
@@ -325,7 +276,7 @@ async function buyLandByETH(amount) {
 
 async function mintMockNFTs(contract, amount) {
   const mocknft = await getContractObj("MOCKNFT", contract);
-  const tx = await mocknft.mint(amount);
+  const tx = await mocknft.connect(await getCurrentAccount()).mint(amount);
   console.log(
     "wallet",
     (await getCurrentAccount()).address,
@@ -491,11 +442,15 @@ async function getAccountNFTInfo(account) {
   return await accountContract.token();
 }
 
+async function getCurrentLandId() {
+  return (await getContractObj("MOPNLand")).nextTokenId();
+}
+
 module.exports = {
   getContractAddress,
   getContractObj,
   moveTo,
-  moveToWithTilesAccounts,
+  moveToRich,
   setCurrentAccount,
   buybomb,
   stackMT,
@@ -508,4 +463,5 @@ module.exports = {
   rentNFT_rentFromList,
   getAccountNFTOwner,
   getAccountNFTInfo,
+  getCurrentLandId,
 };

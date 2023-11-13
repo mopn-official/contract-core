@@ -68,6 +68,7 @@ async function getMoveToTilesAccountsRich(coordinate) {
   let coordinates = [];
   let tilesaccounts = [];
 
+  coordinate = parseInt(coordinate);
   coordinates[0] = coordinate.toString();
   coordinate++;
   for (let i = 0; i < 18; i++) {
@@ -100,6 +101,7 @@ async function getMoveToTilesAccountsRich(coordinate) {
   for (let coordinateData of coordinateDatas.data.coordinateDatas) {
     if (coordinateData.account !== null) {
       tileaccounts[coordinateData.id] = {
+        coordinate: coordinateData.id,
         account: coordinateData.account.id,
         collection: coordinateData.account.ContractAddress,
       };
@@ -111,6 +113,7 @@ async function getMoveToTilesAccountsRich(coordinate) {
       tilesaccounts.push(tileaccounts[coordinate]);
     } else {
       tilesaccounts.push({
+        coordinate: coordinate,
         account: ZeroAddress,
         collection: ZeroAddress,
       });
@@ -126,7 +129,7 @@ async function getTilesAccountsRich(coordinates) {
   const graphqlQuery = {
     operationName: "fetchCoordinates",
     query: `query fetchCoordinates($id_in: [String!]) {
-      coordinateDatas(where: {id_in: $id_in}) {
+      coordinateDatas(first:1000, where: {id_in: $id_in}) {
         id
         account {
           id
@@ -172,7 +175,7 @@ async function getCollectionOnMapAccounts(collection) {
       operationName: "fetchCollectionOnMapAccounts",
       query: `query fetchCollectionOnMapAccounts($id: String!) {
         collectionData(id: $id) {
-          accounts(where: {coordinate_not: null}){
+          accounts(first: 1000, where: {coordinate_not: null}){
             id
             coordinate{
               id
@@ -186,6 +189,9 @@ async function getCollectionOnMapAccounts(collection) {
       },
     };
     const accountsDatas = await fetchData(graphqlQuery);
+    if (accountsDatas.data.collectionData == null) {
+      break;
+    }
     for (let account of accountsDatas.data.collectionData.accounts) {
       accounts.push({
         account: account.id,

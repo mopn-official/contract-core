@@ -25,9 +25,10 @@ async function main() {
   //   await MOPNContract.getMockNFTTokenUri("0x25B63766fAeF35Ef72ec4ACFc776c80001A4eeb4", 1)
   // );
 
-  console.log(
-    await TheGraph.getCollectionOnMapAccounts("0x90ccfad2c1dc253285e379a0050a503d1a5abcee")
-  );
+  MOPNContract.setCurrentAccount(1);
+  await MOPNContract.mintMockNFTs("0x46047f9D95EEb28aAbB6017E1D6EB3aBC8fDB611", 100);
+  await MOPNContract.mintMockNFTs("0xaF5728834640C90aCCb2e082372EE40366559694", 100);
+  await MOPNContract.mintMockNFTs("0x82C46C4EA58B7D6D87704ecD459ee9EfBf458B26", 100);
 }
 
 main().catch((error) => {

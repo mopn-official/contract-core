@@ -4,28 +4,51 @@ const MOPNMath = require("../simulator/MOPNMath");
 const { ZeroAddress } = require("ethers");
 
 const centerCoordinate = {
-  "0x90ccfad2c1dc253285e379a0050a503d1a5abcee": { coordinate: 10001000, placeStyle: 1 },
+  "0x46047f9d95eeb28aabb6017e1d6eb3abc8fdb611": { coordinate: "9901040", placeStyle: 2 },
+  "0xaf5728834640c90accb2e082372ee40366559694": { coordinate: "10201000", placeStyle: 1 },
 };
 
 async function main() {
-  const collection = "0x90ccfad2c1dc253285e379a0050a503d1a5abcee";
+  const currentLandId = await MOPNContract.getCurrentLandId();
+  console.log("currentLandId", currentLandId.toString());
+
+  MOPNContract.setCurrentAccount(2);
+  const collection = "0xaf5728834640c90accb2e082372ee40366559694";
   const collectionOnMapData = await getCollectionOnMapData(collection);
 
-  console.log(collectionOnMapData);
-
-  const nextMoveTiles = await getCollectionNextMoveBatchData(collection, 1);
+  const nextMoveTiles = await getCollectionNextMoveBatchData(collection, 2500);
   let tokenId = 0;
 
   for (const nextMoveTile of nextMoveTiles) {
-    if (nextMoveTile.account != ZeroAddress) continue;
-    const xy = MOPNMath.coordinateIntToXY(nextMoveTile.coordinate);
-    if (xy.x % 2 != 0 || xy.y % 2 != 0) continue;
-    if (centerCoordinate[collection].placeStyle == 2) {
-      if (xy.x % 10 != 0 && xy.y % 10 != 0) continue;
+    if (nextMoveTile.account != ZeroAddress) {
+      console.log(nextMoveTile.coordinate, "jump 1");
+      continue;
     }
-    if ((await checkMoveToTile(nextMoveTile.coordinate, collection)) == false) continue;
+    const xy = MOPNMath.coordinateIntToXY(nextMoveTile.coordinate);
+    if (centerCoordinate[collection].placeStyle == 2) {
+      if (xy.x % 10 != 0 && xy.y % 10 != 0) {
+        console.log(nextMoveTile.coordinate, "jump 2");
+        continue;
+      }
+    } else {
+      if (xy.x % 2 != 0 || xy.y % 2 != 0) {
+        console.log(nextMoveTile.coordinate, "jump 3");
+        continue;
+      }
+    }
 
-    console.log(nextMoveTile);
+    const landId = MOPNMath.getTileLandId(nextMoveTile.coordinate);
+    if (landId > currentLandId) {
+      console.log(nextMoveTile.coordinate, "jump 4");
+      continue;
+    }
+
+    const tileAccounts = await TheGraph.getMoveToTilesAccountsRich(nextMoveTile.coordinate);
+    if ((await checkMoveToTile(collection, tileAccounts)) == false) {
+      console.log(nextMoveTile.coordinate, "jump 5");
+      continue;
+    }
+
     while (true) {
       if (!collectionOnMapData.tokenIds.includes(tokenId.toString())) {
         break;
@@ -35,7 +58,17 @@ async function main() {
 
     console.log("move", collection, tokenId, "to", nextMoveTile.coordinate);
     collectionOnMapData.tokenIds.push(tokenId.toString());
-    // await MOPNContract.moveTo(collection, tokenId, nextMoveTile.coordinate);
+    try {
+      await MOPNContract.moveToRich(
+        collection,
+        tokenId,
+        nextMoveTile.coordinate,
+        landId,
+        array_column(tileAccounts, "account")
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 }
 
@@ -57,7 +90,6 @@ async function getCollectionOnMapData(collection) {
 
 async function getCollectionNextMoveBatchData(collection, startIndex) {
   if (!startIndex) startIndex = 1;
-  const data = await getCollectionOnMapData(collection);
 
   let IndexRingNum = MOPNMath.HexagonIndexRingNum(startIndex);
   const IndexRingPos = MOPNMath.HexagonIndexRingPos(startIndex);
@@ -68,20 +100,39 @@ async function getCollectionNextMoveBatchData(collection, startIndex) {
     sidepos = (IndexRingPos - 1) % IndexRingNum;
   }
 
+  let batchcoordinates = [];
+
+  if (startIndex == 1) {
+    batchcoordinates.push(centerCoordinate[collection].coordinate);
+  }
   let coordinate =
-    data.center +
+    parseInt(centerCoordinate[collection].coordinate) +
     MOPNMath.direction(side < 3 ? side + 3 : side - 3) * IndexRingNum +
     MOPNMath.direction(side - 1) * sidepos;
 
-  let batchcoordinates = [];
+  console.log(
+    "center coordinate",
+    centerCoordinate[collection].coordinate,
+    "begin with ring num",
+    IndexRingNum,
+    "ring pos",
+    IndexRingPos,
+    "side",
+    side,
+    "sidepos",
+    sidepos,
+    "coordinate",
+    coordinate.toString()
+  );
 
   let batchnum = 0;
   let firstRing = true;
-  while (batchnum < 100) {
+  while (batchnum < 500) {
     for (let j = 0; j < 6; j++) {
       if (firstRing && j < side - 1) continue;
       for (let k = 0; k < IndexRingNum; k++) {
         if (firstRing && k < sidepos) continue;
+        if (batchnum > 500) break;
         batchcoordinates.push(coordinate.toString());
         coordinate = MOPNMath.neighbor(coordinate, j);
         batchnum++;
@@ -92,12 +143,10 @@ async function getCollectionNextMoveBatchData(collection, startIndex) {
     firstRing = false;
   }
 
-  console.log(batchcoordinates);
   return TheGraph.getTilesAccountsRich(batchcoordinates);
 }
 
-async function checkMoveToTile(coordinate, collection) {
-  const tileAccounts = await TheGraph.getMoveToTilesAccountsRich(coordinate);
+async function checkMoveToTile(collection, tileAccounts) {
   for (let tileAccount of tileAccounts) {
     if (tileAccount.collection != ZeroAddress && tileAccount.collection != collection) {
       return false;
@@ -110,3 +159,11 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+function array_column(a, i, ok) {
+  return a.length
+    ? typeof ok === "undefined"
+      ? [a[0][i], ...array_column(a.slice(1), i, ok)]
+      : { [a[0][ok]]: i === null ? a[0] : a[0][i], ...array_column(a.slice(1), i, ok) }
+    : [];
+}
