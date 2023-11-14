@@ -1,13 +1,20 @@
-const { ethers, config } = require("hardhat");
+const { config } = require("hardhat");
+const ethers = require("ethers");
 
 async function main() {
-  const mopndata = await ethers.getContractAt(
-    "MOPNData",
-    "0x1716417A14CC225Ab0A5Dab6A432B4d319D1c723"
+  const provider = new ethers.JsonRpcProvider(config.networks["goerli_dev"].url);
+
+  const MOPNDataabi = [
+    "function getWalletStakingMTs(address[] memory collections) public view returns (uint256 amount)",
+  ];
+  const mopndata = new ethers.Contract(
+    "0x1716417A14CC225Ab0A5Dab6A432B4d319D1c723",
+    MOPNDataabi,
+    provider
   );
   const amount = await mopndata.getWalletStakingMTs(
-    ["0x41ada2d9dae3628b252b647e3c25dd42523d5cc2", "0x3d05623032515a4bf171c90301260e4ea7715cb4"],
-    { from: "0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4" }
+    ["0x82c46c4ea58b7d6d87704ecd459ee9efbf458b26"],
+    { from: "0xcEf831B24dD65eb8eaeA890D48115eD374bbdcc0" }
   );
   console.log(amount);
 }
