@@ -286,14 +286,15 @@ contract MOPNData is IMOPNData, Multicall {
     }
 
     function getWalletStakingMTs(
-        address[] memory collections
+        address[] memory collections,
+        address wallet
     ) public view returns (uint256 amount) {
         for (uint256 i = 0; i < collections.length; i++) {
             address collectionVault = governance.getCollectionVault(
                 collections[i]
             );
             amount += IMOPNCollectionVault(collectionVault).V2MTAmountRealtime(
-                IMOPNCollectionVault(collectionVault).balanceOf(msg.sender)
+                IMOPNCollectionVault(collectionVault).balanceOf(wallet)
             );
         }
     }
