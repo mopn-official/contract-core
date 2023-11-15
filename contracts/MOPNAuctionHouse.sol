@@ -22,6 +22,13 @@ contract MOPNAuctionHouse is Multicall {
 
     uint256 public constant landPrice = 1000000000000;
 
+    struct QActStruct {
+        uint16[24] qacts;
+        uint32 lastQactBlock;
+    }
+
+    QActStruct public qact;
+
     uint32 public landRoundStartBlock;
 
     uint64 public landRoundId;
@@ -78,14 +85,43 @@ contract MOPNAuctionHouse is Multicall {
         emit BombSold(buyer, amount, price);
     }
 
+    function getQAct() public view returns (uint256) {
+        uint256 qactgap = block.number - qact.lastQactBlock;
+        if (qactgap >= 6900) {
+            return 0;
+        } else {
+            uint256 i = qactgap / 300;
+        }
+    }
+
     /**
      * @notice get the current auction price by block.timestamp
      * @return price current auction price
      */
     function getBombCurrentPrice() public view returns (uint256) {
-        return
-            (IMOPN(governance.mopnContract()).currentMTPPB() * 50000) /
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        uint256 pmt = mopn.currentMTPPB() * 7200;
+        uint256 pexp = (pmt * 7) /
             (91 * IMOPNLand(governance.landContract()).nextTokenId());
+        int256 qexp = int256(pmt / (2 * pexp));
+        int256 qact = 1;
+        return
+            ABDKMath64x64.mulu(
+                ABDKMath64x64.exp(ABDKMath64x64.divi(qact - qexp, qexp)),
+                pexp
+            );
+    }
+
+    function testBombPrice() public view returns (uint256) {
+        uint256 pmt = 60000000 * 7200;
+        uint256 pexp = (pmt * 7) / (91 * 10981);
+        int256 qexp = int256(pmt / (4 * pexp));
+        int256 qact = 1;
+        return
+            ABDKMath64x64.mulu(
+                ABDKMath64x64.exp(ABDKMath64x64.divi(qact - qexp, qexp)),
+                pexp
+            );
     }
 
     /**
