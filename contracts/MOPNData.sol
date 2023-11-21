@@ -349,7 +349,7 @@ contract MOPNData is IMOPNData, Multicall {
             (((mopn.MTTotalMinted() +
                 (calcPerMOPNPointMinted() - mopn.PerMOPNPointMinted()) *
                 mopn.TotalMOPNPoints()) * 5) / 100) -
-            mopn.TotalCollectionClaimed() +
-            mopn.TotalMTStaking();
+            governance.TotalCollectionClaimed() +
+            governance.TotalMTStaking();
     }
 }

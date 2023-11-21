@@ -23,32 +23,91 @@ import "@openzeppelin/contracts/utils/Create2.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
 contract MOPNGovernance is Multicall, Ownable {
-    uint256 public vaultIndex;
     event CollectionVaultCreated(
         address indexed collectionAddress,
         address indexed collectionVault
     );
 
+    uint48 public NFTOfferCoefficient;
+    uint64 public TotalMTStaking;
+    uint48 public TotalCollectionClaimed;
+
+    uint256 public vaultIndex;
+
     /// uint160 vaultAdderss + uint96 vaultIndex
     mapping(address => uint256) public CollectionVaults;
+
+    address public mopnContract;
+    address public bombContract;
+    address public tokenContract;
+    address public pointContract;
+    address public landContract;
+    address public dataContract;
+    address public collectionVaultContract;
+    address public auctionHouseContract;
 
     address public ERC6551Registry;
     address public ERC6551AccountProxy;
     address public ERC6551AccountHelper;
-    address public rentalContract;
 
     address[] public ERC6551AccountImplementations;
+
+    modifier onlyMOPN() {
+        require(msg.sender == mopnContract, "not allowed");
+        _;
+    }
+
+    modifier onlyCollectionVault(address collectionAddress) {
+        require(
+            msg.sender == getCollectionVault(collectionAddress),
+            "only collection vault allowed"
+        );
+        _;
+    }
+
+    constructor() {
+        NFTOfferCoefficient = 10 ** 13;
+    }
+
+    function claimCollectionSettledMT(uint48 amount) public onlyMOPN {
+        TotalCollectionClaimed += amount;
+        TotalMTStaking += amount;
+    }
+
+    function NFTOfferAccept(
+        address collectionAddress,
+        uint256 price
+    ) external onlyCollectionVault(collectionAddress) {
+        uint64 totalMTStakingRealtime = (IMOPN(mopnContract).MTTotalMinted() /
+            20) -
+            TotalCollectionClaimed +
+            TotalMTStaking;
+        NFTOfferCoefficient = uint48(
+            ((totalMTStakingRealtime + 1000000 - price) * NFTOfferCoefficient) /
+                (totalMTStakingRealtime + 1000000)
+        );
+    }
+
+    function changeTotalMTStaking(
+        address collectionAddress,
+        uint256 direction,
+        uint256 amount
+    ) external onlyCollectionVault(collectionAddress) {
+        if (direction > 0) {
+            TotalMTStaking += uint64(amount);
+        } else {
+            TotalMTStaking -= uint64(amount);
+        }
+    }
 
     function updateERC6551Contract(
         address ERC6551Registry_,
         address ERC6551AccountProxy_,
-        address ERC6551AccountHelper_,
-        address rentalContract_
+        address ERC6551AccountHelper_
     ) public onlyOwner {
         ERC6551Registry = ERC6551Registry_;
         ERC6551AccountProxy = ERC6551AccountProxy_;
         ERC6551AccountHelper = ERC6551AccountHelper_;
-        rentalContract = rentalContract_;
     }
 
     function getDefault6551AccountImplementation()
@@ -125,16 +184,6 @@ contract MOPNGovernance is Multicall, Ownable {
         }
         return false;
     }
-
-    address public mopnContract;
-    address public bombContract;
-    address public tokenContract;
-    address public pointContract;
-    address public landContract;
-    address public dataContract;
-    address public collectionVaultContract;
-
-    address public auctionHouseContract;
 
     function updateMOPNContracts(
         address auctionHouseContract_,

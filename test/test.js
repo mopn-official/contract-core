@@ -16,8 +16,11 @@ describe("MOPN", function () {
   it("deply Governance", async function () {
     const accounts = config.networks.hardhat.accounts;
     console.log(accounts);
-    const wallet1 = ethers.HDNodeWallet.fromPhrase(accounts.mnemonic);
-    console.log(wallet1.privateKey);
+    const hdNodeWallet = ethers.HDNodeWallet.fromPhrase(accounts.mnemonic);
+    let wallet = hdNodeWallet.derivePath(accounts.path + "/0");
+    console.log(wallet);
+    wallet = hdNodeWallet.derivePath(accounts.path + "/1");
+    console.log(wallet);
     const MOPNGovernance = await ethers.getContractFactory("MOPNGovernance");
     mopngovernance = await MOPNGovernance.deploy();
     await mopngovernance.waitForDeployment();
@@ -31,10 +34,7 @@ describe("MOPN", function () {
     console.log("ERC6551Registry", await erc6551registry.getAddress());
 
     const MOPNERC6551Account = await ethers.getContractFactory("MOPNERC6551Account");
-    erc6551account = await MOPNERC6551Account.deploy(
-      await mopngovernance.getAddress(),
-      ZeroAddress
-    );
+    erc6551account = await MOPNERC6551Account.deploy(await mopngovernance.getAddress());
     await erc6551account.waitForDeployment();
     console.log("MOPNERC6551Account", await erc6551account.getAddress());
 
@@ -58,10 +58,6 @@ describe("MOPN", function () {
       mopngovernance.getAddress(),
       60000000,
       0,
-      50400,
-      10000,
-      99999,
-      500000,
       "0x7e53a927cd6ec3af3b9bb0b1aec96074c82344674a0d328ab20431416cccb45f"
     );
     await mopn.waitForDeployment();

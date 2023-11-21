@@ -15,7 +15,6 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /*
@@ -29,12 +28,13 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /// @title MOPN Contract
 /// @author Cyanface <cyanface@outlook.com>
-contract MOPN is IMOPN, Multicall, Ownable {
+contract MOPN is IMOPN, Multicall {
     using BitMaps for BitMaps.BitMap;
 
-    uint256 public immutable MTReduceInterval;
-    uint256 public immutable MaxCollectionOnMapNum;
-    uint24 public immutable MaxCollectionMOPNPoint;
+    uint256 public constant MTReduceInterval = 50400;
+    uint256 public constant MaxCollectionOnMapNum = 10000;
+    uint24 public constant MaxCollectionMOPNPoint = 99999;
+    uint48 public constant whiteListOffTotalMOPNPoint = 1000000;
 
     bytes32 private whiteListRoot;
 
@@ -44,21 +44,15 @@ contract MOPN is IMOPN, Multicall, Ownable {
     uint32 public LastTickBlock;
     uint48 public PerMOPNPointMinted;
     uint64 public MTTotalMinted;
-    uint64 public TotalMTStaking;
     uint32 public MTOutputPerBlock;
     uint32 public MTStepStartBlock;
     uint16 public nextLandId;
-    uint48 public NFTOfferCoefficient;
-    uint48 public TotalCollectionClaimed;
-    uint48 public whiteListOffTotalMOPNPoint;
 
     //total uint bits of above
 
     mapping(address => CollectionDataStruct) public CDs;
 
     mapping(address => AccountDataStruct) public ADs;
-
-    mapping(uint16 => address) public LandAccounts;
 
     IMOPNGovernance public immutable governance;
 
@@ -79,21 +73,12 @@ contract MOPN is IMOPN, Multicall, Ownable {
         address governance_,
         uint32 MTOutputPerBlock_,
         uint32 MTStepStartBlock_,
-        uint256 MTReduceInterval_,
-        uint256 MaxCollectionOnMapNum_,
-        uint24 MaxCollectionMOPNPoint_,
-        uint48 whiteListOffTotalMOPNPoint_,
         bytes32 whiteListRoot_
     ) {
         governance = IMOPNGovernance(governance_);
-        MTReduceInterval = MTReduceInterval_;
-        MaxCollectionOnMapNum = MaxCollectionOnMapNum_;
-        MaxCollectionMOPNPoint = MaxCollectionMOPNPoint_;
         LastTickBlock = MTStepStartBlock_;
-        whiteListOffTotalMOPNPoint = whiteListOffTotalMOPNPoint_;
         MTOutputPerBlock = MTOutputPerBlock_;
         MTStepStartBlock = MTStepStartBlock_;
-        NFTOfferCoefficient = 10 ** 13;
         whiteListRoot = whiteListRoot_;
         PerMOPNPointMinted = 1;
     }
@@ -102,7 +87,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         return address(governance);
     }
 
-    function whiteListRootUpdate(bytes32 root) public onlyOwner {
+    function whiteListRootUpdate(bytes32 root) public {
+        require(governance.owner() == msg.sender, "not owner");
         whiteListRoot = root;
     }
 
@@ -549,7 +535,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
         }
     }
 
-    function claimCollectionMT(address collectionAddress) external {
+    function claimCollectionMT(
+        address collectionAddress
+    ) external onlyCollectionVault(collectionAddress) {
         settlePerMOPNPointMinted();
         settleCollectionMT(collectionAddress);
         if (CDs[collectionAddress].SettledMT > 0) {
@@ -565,8 +553,9 @@ contract MOPN is IMOPN, Multicall, Ownable {
                 CDs[collectionAddress].SettledMT
             );
 
-            TotalCollectionClaimed += CDs[collectionAddress].SettledMT;
-            TotalMTStaking += CDs[collectionAddress].SettledMT;
+            governance.claimCollectionSettledMT(
+                CDs[collectionAddress].SettledMT
+            );
 
             CDs[collectionAddress].SettledMT = 0;
         }
@@ -689,16 +678,8 @@ contract MOPN is IMOPN, Multicall, Ownable {
         if (amount > 0) mt.mint(msg.sender, amount);
     }
 
-    function claimAccountMTTo(address account, address to) external onlyToken {
-        _claimAccountMTTo(account, to);
-    }
-
     function claimAccountMT(address account) external {
-        _claimAccountMTTo(account, msg.sender);
-    }
-
-    function _claimAccountMTTo(address account, address to) internal {
-        if (IMOPNERC6551Account(payable(account)).isOwner(to)) {
+        if (IMOPNERC6551Account(payable(account)).isOwner(msg.sender)) {
             if (ADs[account].Coordinate > 0) {
                 settlePerMOPNPointMinted();
                 address collectionAddress = getAccountCollection(account);
@@ -708,36 +689,11 @@ contract MOPN is IMOPN, Multicall, Ownable {
 
             if (ADs[account].SettledMT > 0) {
                 IMOPNToken(governance.tokenContract()).mint(
-                    to,
+                    msg.sender,
                     ADs[account].SettledMT
                 );
                 ADs[account].SettledMT = 0;
             }
-        }
-    }
-
-    function NFTOfferAccept(
-        address collectionAddress,
-        uint256 price
-    ) external onlyCollectionVault(collectionAddress) {
-        uint64 totalMTStakingRealtime = (MTTotalMinted / 20) -
-            TotalCollectionClaimed +
-            TotalMTStaking;
-        NFTOfferCoefficient = uint48(
-            ((totalMTStakingRealtime + 1000000 - price) * NFTOfferCoefficient) /
-                (totalMTStakingRealtime + 1000000)
-        );
-    }
-
-    function changeTotalMTStaking(
-        address collectionAddress,
-        uint256 direction,
-        uint256 amount
-    ) external onlyCollectionVault(collectionAddress) {
-        if (direction > 0) {
-            TotalMTStaking += uint64(amount);
-        } else {
-            TotalMTStaking -= uint64(amount);
         }
     }
 

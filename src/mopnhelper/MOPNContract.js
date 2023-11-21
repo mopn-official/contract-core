@@ -106,6 +106,25 @@ async function moveToRich(tokenContract, tokenId, coordinate, landId, tilesaccou
   await tx.wait();
 }
 
+async function multiCallMoveTo(moveToRichParams) {
+  const mopn = await getContractObj("MOPN");
+  const multicallData = [];
+  for (const moveToRichParam of moveToRichParams) {
+    moveToRichParam.push("0x");
+    multicallData.push(mopn.interface.encodeFunctionData("moveToNFT", moveToRichParam));
+  }
+  const tx = await mopn.connect(await getCurrentAccount()).multicall(multicallData);
+  console.log(
+    "wallet",
+    (await getCurrentAccount()).address,
+    "multi call move",
+    moveToRichParams,
+    "tx sent!"
+  );
+  console.log(hre.network.config.etherscanHost + "tx/" + tx.hash);
+  await tx.wait();
+}
+
 async function buybomb(amount) {
   const auctionhouse = await getContractObj("MOPNAuctionHouse");
   const price = await auctionhouse.getBombCurrentPrice();
@@ -442,8 +461,23 @@ async function getAccountNFTInfo(account) {
   return await accountContract.token();
 }
 
+async function getAccount(collection, tokenId) {
+  const MOPNERC6551AccountHelper = await getContractObj("MOPNERC6551AccountHelper");
+  return await MOPNERC6551AccountHelper.checkAccountExist(
+    await getContractAddress("MOPNERC6551AccountProxy"),
+    hre.network.config.chainId,
+    collection,
+    tokenId,
+    0
+  );
+}
+
 async function getCurrentLandId() {
   return (await getContractObj("MOPNLand")).nextTokenId();
+}
+
+async function getCollectionTotalSupply(collection) {
+  return (await getContractObj("MOPNLand", collection)).totalSupply();
 }
 
 module.exports = {
@@ -464,4 +498,7 @@ module.exports = {
   getAccountNFTOwner,
   getAccountNFTInfo,
   getCurrentLandId,
+  multiCallMoveTo,
+  getAccount,
+  getCollectionTotalSupply,
 };

@@ -81,16 +81,53 @@ contract MOPNAuctionHouse is Multicall {
     }
 
     function _buyBomb(address buyer, uint256 amount, uint256 price) internal {
+        increaseQAct(amount);
         IMOPNBomb(governance.bombContract()).mint(buyer, 1, amount);
         emit BombSold(buyer, amount, price);
     }
 
-    function getQAct() public view returns (uint256) {
+    function getQAct() public view returns (uint256 qact_) {
         uint256 qactgap = block.number - qact.lastQactBlock;
-        if (qactgap >= 6900) {
-            return 0;
+        if (qactgap < 7200) {
+            uint256 currentIndex = (block.number % 7200) / 300;
+            uint256 endIndex = 23 - (qactgap / 300);
+            if (endIndex == 23) {
+                qact_ = qact.qacts[currentIndex];
+            }
+
+            endIndex = (currentIndex + endIndex) % 24;
+            currentIndex = (currentIndex + 1) % 24;
+            while (currentIndex != endIndex) {
+                qact_ += qact.qacts[currentIndex];
+                currentIndex = (currentIndex + 1) % 24;
+            }
+        }
+    }
+
+    function increaseQAct(uint256 amount) internal {
+        uint256 qactgap = block.number - qact.lastQactBlock;
+        if (qactgap >= 7200) {
+            qactgap = 7199;
+        }
+        uint256 currentIndex = (block.number % 7200) / 300;
+        uint256 endIndex = 24 - (qactgap / 300);
+
+        endIndex = (currentIndex + endIndex) % 24;
+
+        while (currentIndex != endIndex) {
+            qact.qacts[endIndex] = 0;
+            endIndex = (endIndex + 1) % 24;
+        }
+
+        qact.lastQactBlock = uint32(block.number);
+        if (qactgap >= 300) {
+            qact.qacts[currentIndex] = uint16(amount);
         } else {
-            uint256 i = qactgap / 300;
+            if (amount + qact.qacts[currentIndex] > type(uint16).max) {
+                qact.qacts[currentIndex] = type(uint16).max;
+            } else {
+                qact.qacts[currentIndex] += uint16(amount);
+            }
         }
     }
 
@@ -104,22 +141,12 @@ contract MOPNAuctionHouse is Multicall {
         uint256 pexp = (pmt * 7) /
             (91 * IMOPNLand(governance.landContract()).nextTokenId());
         int256 qexp = int256(pmt / (2 * pexp));
-        int256 qact = 1;
-        return
-            ABDKMath64x64.mulu(
-                ABDKMath64x64.exp(ABDKMath64x64.divi(qact - qexp, qexp)),
-                pexp
-            );
-    }
 
-    function testBombPrice() public view returns (uint256) {
-        uint256 pmt = 60000000 * 7200;
-        uint256 pexp = (pmt * 7) / (91 * 10981);
-        int256 qexp = int256(pmt / (4 * pexp));
-        int256 qact = 1;
         return
             ABDKMath64x64.mulu(
-                ABDKMath64x64.exp(ABDKMath64x64.divi(qact - qexp, qexp)),
+                ABDKMath64x64.exp(
+                    ABDKMath64x64.divi(int256(getQAct()) - qexp, qexp)
+                ),
                 pexp
             );
     }

@@ -84,12 +84,6 @@ interface IMOPN {
 
     function MTTotalMinted() external view returns (uint64);
 
-    function NFTOfferCoefficient() external view returns (uint48);
-
-    function TotalCollectionClaimed() external view returns (uint48);
-
-    function TotalMTStaking() external view returns (uint64);
-
     function currentMTPPB() external view returns (uint256);
 
     function currentMTPPB(uint256 reduceTimes) external view returns (uint256);
@@ -125,14 +119,4 @@ interface IMOPN {
     ) external view returns (uint256 OnMapMOPNPoint);
 
     function claimAccountMT(address account) external;
-
-    function claimAccountMTTo(address account, address to) external;
-
-    function changeTotalMTStaking(
-        address collectionAddress,
-        uint256 direction,
-        uint256 amount
-    ) external;
-
-    function NFTOfferAccept(address collectionAddress, uint256 price) external;
 }

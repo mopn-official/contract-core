@@ -32,17 +32,7 @@ contract MOPNERC6551Account is
     IMOPNERC6551Account,
     Multicall
 {
-    event OwnershipModeChange(uint8 ownershipMode, uint8 oldOwnershipMode);
-
-    event OwnerTransfer(address to, uint40 endBlock);
-
     address public immutable governance;
-
-    uint8 public ownershipMode;
-
-    uint40 public rentEndBlock;
-
-    address public renter;
 
     uint256 public state;
 
@@ -102,14 +92,6 @@ contract MOPNERC6551Account is
     }
 
     function owner() public view returns (address) {
-        if (block.number < rentEndBlock) {
-            return renter;
-        }
-
-        return nftowner();
-    }
-
-    function nftowner() public view returns (address) {
         (uint256 chainId, address tokenContract, uint256 tokenId) = this
             .token();
         if (chainId != block.chainid) return address(0);
@@ -192,39 +174,6 @@ contract MOPNERC6551Account is
         bytes calldata
     ) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
-    }
-
-    function setOwnershipMode(uint8 ownershipMode_) public {
-        address nftowner_ = nftowner();
-        require(
-            msg.sender == nftowner_ ||
-                (msg.sender == IMOPNGovernance(governance).ERC6551Registry() &&
-                    tx.origin == nftowner_),
-            "not nft owner"
-        );
-        require(ownershipMode != ownershipMode_, "mode not change");
-        require(rentEndBlock < block.number, "rent not finish");
-
-        emit OwnershipModeChange(ownershipMode_, ownershipMode);
-        ownershipMode = ownershipMode_;
-        rentEndBlock = 0;
-        renter = address(0);
-    }
-
-    function ownerTransferTo(address to, uint40 endBlock) public {
-        if (ownershipMode == 0) {
-            require(msg.sender == nftowner(), "not allowed");
-        } else if (ownershipMode == 1) {
-            require(
-                msg.sender == IMOPNGovernance(governance).rentalContract(),
-                "not allowed"
-            );
-        } else {
-            require(false, "OwnershipMode not supported transfer");
-        }
-        renter = to;
-        rentEndBlock = endBlock;
-        emit OwnerTransfer(to, endBlock);
     }
 
     modifier onlyHelper() {

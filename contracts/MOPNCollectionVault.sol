@@ -13,7 +13,6 @@ import "./libraries/CollectionVaultLib.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -21,8 +20,7 @@ contract MOPNCollectionVault is
     IMOPNCollectionVault,
     ERC20,
     IERC20Receiver,
-    IERC721Receiver,
-    Ownable
+    IERC721Receiver
 {
     address public immutable governance;
 
@@ -154,7 +152,11 @@ contract MOPNCollectionVault is
         );
         _burn(msg.sender, amount);
         mopn.settleCollectionMOPNPoint(collectionAddress_);
-        mopn.changeTotalMTStaking(collectionAddress_, 0, mtAmount);
+        IMOPNGovernance(governance).changeTotalMTStaking(
+            collectionAddress_,
+            0,
+            mtAmount
+        );
 
         emit MTWithdraw(msg.sender, mtAmount, amount);
     }
@@ -163,9 +165,8 @@ contract MOPNCollectionVault is
         uint256 amount = MTBalanceRealtime();
 
         return
-            (amount *
-                IMOPN(IMOPNGovernance(governance).mopnContract())
-                    .NFTOfferCoefficient()) / 10 ** 15;
+            (amount * IMOPNGovernance(governance).NFTOfferCoefficient()) /
+            10 ** 15;
     }
 
     function MTBalanceRealtime() public view returns (uint256 amount) {
@@ -200,7 +201,8 @@ contract MOPNCollectionVault is
 
         uint256 offerPrice = (IMOPNToken(
             IMOPNGovernance(governance).tokenContract()
-        ).balanceOf(address(this)) * mopn.NFTOfferCoefficient()) / 10 ** 15;
+        ).balanceOf(address(this)) *
+            IMOPNGovernance(governance).NFTOfferCoefficient()) / 10 ** 15;
 
         IMOPNToken(IMOPNGovernance(governance).tokenContract()).transfer(
             msg.sender,
@@ -213,9 +215,16 @@ contract MOPNCollectionVault is
         OfferStatus = 1;
 
         mopn.settleCollectionMOPNPoint(collectionAddress_);
-        mopn.changeTotalMTStaking(collectionAddress_, 0, offerPrice);
+        IMOPNGovernance(governance).changeTotalMTStaking(
+            collectionAddress_,
+            0,
+            offerPrice
+        );
 
-        mopn.NFTOfferAccept(collectionAddress_, offerPrice);
+        IMOPNGovernance(governance).NFTOfferAccept(
+            collectionAddress_,
+            offerPrice
+        );
 
         emit NFTOfferAccept(msg.sender, tokenId, offerPrice);
     }
@@ -263,7 +272,11 @@ contract MOPNCollectionVault is
 
             mopn.claimCollectionMT(collectionAddress_);
             mopn.settleCollectionMOPNPoint(collectionAddress_);
-            mopn.changeTotalMTStaking(collectionAddress_, 1, price);
+            IMOPNGovernance(governance).changeTotalMTStaking(
+                collectionAddress_,
+                1,
+                price
+            );
 
             IERC721(collectionAddress_).safeTransferFrom(
                 address(this),
@@ -286,7 +299,11 @@ contract MOPNCollectionVault is
             require(vtokenAmount > 0, "need more mt to get at least 1 vtoken");
             _mint(from, vtokenAmount);
             mopn.settleCollectionMOPNPoint(collectionAddress_);
-            mopn.changeTotalMTStaking(collectionAddress_, 1, value);
+            IMOPNGovernance(governance).changeTotalMTStaking(
+                collectionAddress_,
+                1,
+                value
+            );
 
             emit MTDeposit(from, value, vtokenAmount);
         }

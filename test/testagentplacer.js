@@ -1,8 +1,9 @@
 const hre = require("hardhat");
-const { loadFixture, time, mine } = require("@nomicfoundation/hardhat-network-helpers");
+const { loadFixture, mine } = require("@nomicfoundation/hardhat-network-helpers");
+const helpers = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const fs = require("fs");
 const Table = require("cli-table3");
-const { BigNumber } = require("ethers");
+const { ZeroAddress, formatUnits, keccak256, toUtf8Bytes } = require("ethers");
 const MOPNMath = require("../src/simulator/MOPNMath");
 
 describe("MOPN", function () {
@@ -15,501 +16,220 @@ describe("MOPN", function () {
     mopn,
     mopnbomb,
     mopnpoint,
-    mopnmt,
+    mopntoken,
     mopnData,
     mopncollectionVault,
-    mopnrental,
     mopnland,
     mopnlandMetaDataRender;
   let owners,
+    owner,
     mtdecimals,
     accounts = [],
     collections = [],
     tiles = {};
 
   it("deploy one time contracts and params", async function () {
+    await helpers.impersonateAccount("0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4");
+    owner = await hre.ethers.getSigner("0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4");
+    console.log("owner", owner.address);
     owners = await hre.ethers.getSigners();
-    console.log("owner", owners[0].address);
+    console.log("owner0", owners[0].address);
     console.log("owner1", owners[1].address);
 
-    let promises = [];
+    erc6551registry = await hre.ethers.deployContract("ERC6551Registry");
+    await erc6551registry.waitForDeployment();
+    console.log("ERC6551Registry", await erc6551registry.getAddress());
 
-    let tx = await hre.ethers.deployContract("ERC6551Registry");
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            erc6551registry = res;
-            console.log("ERC6551Registry", erc6551registry.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    tileMath = await hre.ethers.deployContract("TileMath");
+    await tileMath.waitForDeployment();
+    console.log("TileMath", await tileMath.getAddress());
 
-    tx = await hre.ethers.deployContract("TileMath");
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            tileMath = res;
-            console.log("TileMath", tileMath.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-    const tileMathAddress = tx.address;
+    nftsvg = await hre.ethers.deployContract("NFTSVG");
+    await nftsvg.waitForDeployment();
+    console.log("NFTSVG", await nftsvg.getAddress());
 
-    tx = await hre.ethers.deployContract("NFTSVG");
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            nftsvg = res;
-            console.log("NFTSVG", nftsvg.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-    const nftsvgAddress = tx.address;
-
-    tx = await hre.ethers.deployContract("NFTMetaData", {
+    nftmetadata = await hre.ethers.deployContract("NFTMetaData", {
       libraries: {
-        NFTSVG: nftsvgAddress,
-        TileMath: tileMathAddress,
+        NFTSVG: await nftsvg.getAddress(),
+        TileMath: await tileMath.getAddress(),
       },
     });
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            nftmetadata = res;
-            console.log("NFTMetaData", nftmetadata.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-
-    await Promise.all(promises);
+    await nftmetadata.waitForDeployment();
+    console.log("NFTMetaData", await nftmetadata.getAddress());
 
     testazuki = await hre.ethers.getContractAt(
       "IERC721",
-      "0x016db4c041ba5025f71148765491717fc82f82d8"
+      "0x82C46C4EA58B7D6D87704ecD459ee9EfBf458B26"
     );
 
     testwow = await hre.ethers.getContractAt(
       "IERC721",
-      "0x3e0a709ab1fcc275b0490f4b96373cd830ff63b8"
+      "0x0f25e56443330242F3a70dC101D1Cd42bd12F629"
     );
   });
 
   async function deployAndSetInitialNFTS() {
-    let promises = [];
+    mopngovernance = await hre.ethers.deployContract("MOPNGovernance");
+    await mopngovernance.waitForDeployment();
+    console.log("MOPNGovernance", await mopngovernance.getAddress());
 
-    let tx = await hre.ethers.deployContract("MOPNGovernance");
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            mopngovernance = res;
-            console.log("MOPNGovernance", mopngovernance.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-    const mopngovernanceAddress = tx.address;
+    mopnbomb = await hre.ethers.deployContract("MOPNBomb", [await mopngovernance.getAddress()]);
+    await mopnbomb.waitForDeployment();
+    console.log("MOPNBomb", await mopnbomb.getAddress());
 
-    tx = await hre.ethers.deployContract("MOPNBomb", [mopngovernanceAddress]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then(async (res) => {
-            mopnbomb = res;
-            console.log("MOPNBomb", mopnbomb.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    mopnpoint = await hre.ethers.deployContract("MOPNPoint", [await mopngovernance.getAddress()]);
+    await mopnpoint.waitForDeployment();
+    console.log("MOPNPoint", await mopnpoint.getAddress());
 
-    tx = await hre.ethers.deployContract("MOPNPoint", [mopngovernanceAddress]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then(async (res) => {
-            mopnpoint = res;
-            console.log("MOPNPoint", mopnpoint.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    mopntoken = await hre.ethers.deployContract("MOPNToken", [await mopngovernance.getAddress()]);
+    await mopntoken.waitForDeployment();
+    console.log("MOPNToken", await mopntoken.getAddress());
+    mtdecimals = await mopntoken.decimals();
+    console.log("mtdecimals", mtdecimals);
 
-    tx = await hre.ethers.deployContract("MOPNToken", [mopngovernanceAddress]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then(async (res) => {
-            mopnmt = res;
-            console.log("MOPNToken", mopnmt.address);
-            mtdecimals = await mopnmt.decimals();
-            console.log("mtdecimals", mtdecimals);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-    const mopntokenAddress = tx.address;
-
-    tx = await hre.ethers.deployContract("MOPNRental", [mopntokenAddress, erc6551registry.address]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            mopnrental = res;
-            console.log("MOPNRental", mopnrental.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-    const mopnrentalAddress = tx.address;
-
-    tx = await hre.ethers.deployContract("MOPNERC6551Account", [
-      mopngovernanceAddress,
-      mopnrentalAddress,
+    erc6551account = await hre.ethers.deployContract("MOPNERC6551Account", [
+      await mopngovernance.getAddress(),
     ]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            erc6551account = res;
-            console.log("MOPNERC6551Account", erc6551account.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-    const erc6551accountAddress = tx.address;
+    await erc6551account.waitForDeployment();
+    console.log("MOPNERC6551Account", await erc6551account.getAddress());
 
-    tx = await hre.ethers.deployContract("MOPNERC6551AccountProxy", [
-      mopngovernanceAddress,
-      erc6551accountAddress,
+    erc6551accountproxy = await hre.ethers.deployContract("MOPNERC6551AccountProxy", [
+      await mopngovernance.getAddress(),
+      await erc6551account.getAddress(),
     ]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            erc6551accountproxy = res;
-            console.log("MOPNERC6551AccountProxy", erc6551accountproxy.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    await erc6551accountproxy.waitForDeployment();
+    console.log("MOPNERC6551AccountProxy", await erc6551accountproxy.getAddress());
 
-    tx = await hre.ethers.deployContract("MOPNERC6551AccountHelper", [mopngovernanceAddress]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            erc6551accounthelper = res;
-            console.log("MOPNERC6551AccountHelper", erc6551accounthelper.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-
-    const unixTimeStamp = Math.floor(Date.now() / 1000) - 86000;
-    console.log("auction start timestamp", unixTimeStamp);
-
-    tx = await hre.ethers.deployContract("MOPNAuctionHouse", [
-      mopngovernanceAddress,
-      unixTimeStamp,
+    erc6551accounthelper = await hre.ethers.deployContract("MOPNERC6551AccountHelper", [
+      await mopngovernance.getAddress(),
     ]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            mopnauctionHouse = res;
-            console.log("MOPNAuctionHouse", mopnauctionHouse.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-    let mopnauctionHouseAddress = tx.address;
+    await erc6551accounthelper.waitForDeployment();
+    console.log("MOPNERC6551AccountHelper", await erc6551accounthelper.getAddress());
 
     const startBlock = await hre.ethers.provider.getBlockNumber();
     console.log("mopn start block ", startBlock);
 
-    tx = await hre.ethers.deployContract("MOPN", [
-      mopngovernanceAddress,
+    mopnauctionHouse = await hre.ethers.deployContract("MOPNAuctionHouse", [
+      await mopngovernance.getAddress(),
+      startBlock,
+    ]);
+    await mopnauctionHouse.waitForDeployment();
+    console.log("MOPNAuctionHouse", await mopnauctionHouse.getAddress());
+
+    mopn = await hre.ethers.deployContract("MOPN", [
+      await mopngovernance.getAddress(),
       60000000,
       startBlock,
-      50400,
-      10000,
-      99999,
-      5000,
-      "0x2a2c1e9f154879c6658877c9b438c978092705a489202f5678dbd468e3544180",
+      "0xc43ea6b2332e02fa1fe0b50f7ab5c9cff3b7ef8bf6ad7bb97570c3a8c4711e26",
     ]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            mopn = res;
-            console.log("MOPN", mopn.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    await mopn.waitForDeployment();
+    console.log("MOPN", await mopn.getAddress());
 
-    tx = await hre.ethers.deployContract("MOPNData", [mopngovernanceAddress], {
+    mopnData = await hre.ethers.deployContract("MOPNData", [await mopngovernance.getAddress()], {
       libraries: {
-        TileMath: tileMath.address,
+        TileMath: await tileMath.getAddress(),
       },
     });
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            mopnData = res;
-            console.log("MOPNData", mopnData.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    await mopnData.waitForDeployment();
+    console.log("MOPNData", await mopnData.getAddress());
 
-    tx = await hre.ethers.deployContract("MOPNCollectionVault", [mopngovernanceAddress]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            mopncollectionVault = res;
-            console.log("MOPNCollectionVault", mopncollectionVault.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    mopncollectionVault = await hre.ethers.deployContract("MOPNCollectionVault", [
+      await mopngovernance.getAddress(),
+    ]);
+    await mopncollectionVault.waitForDeployment();
+    console.log("MOPNCollectionVault", await mopncollectionVault.getAddress());
 
-    tx = await hre.ethers.deployContract("MOPNLandMetaDataRender", [mopngovernanceAddress], {
-      libraries: {
-        NFTMetaData: nftmetadata.address,
-        TileMath: tileMath.address,
-      },
-    });
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            mopnlandMetaDataRender = res;
-            console.log("MOPNLandMetaDataRender", mopnlandMetaDataRender.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
+    mopnlandMetaDataRender = await hre.ethers.deployContract(
+      "MOPNLandMetaDataRender",
+      [await mopngovernance.getAddress()],
+      {
+        libraries: {
+          NFTMetaData: await nftmetadata.getAddress(),
+          TileMath: await tileMath.getAddress(),
+        },
+      }
     );
-    let mopnlandMetaDataRenderAddress = tx.address;
+    await mopnlandMetaDataRender.waitForDeployment();
+    console.log("MOPNLandMetaDataRender", await mopnlandMetaDataRender.getAddress());
 
-    tx = await hre.ethers.deployContract("MOPNLand", [
-      unixTimeStamp,
+    const unixTimeStamp = Math.floor(Date.now() / 1000) - 86000;
+    console.log("auction start timestamp", unixTimeStamp);
+    mopnland = await hre.ethers.deployContract("MOPNLand", [
+      1,
       200000000000000,
       1001,
       owners[0].address,
-      mopnlandMetaDataRenderAddress,
-      mopnauctionHouseAddress,
+      await mopnlandMetaDataRender.getAddress(),
+      await mopnauctionHouse.getAddress(),
     ]);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.deployed()
-          .then((res) => {
-            mopnland = res;
-            console.log("MOPNLand ", mopnland.address);
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
-
-    await Promise.all(promises);
+    await mopnland.waitForDeployment();
+    console.log("MOPNLand", await mopnland.getAddress());
 
     promises = [];
-    tx = await mopnland.transferOwnership(mopngovernanceAddress);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.wait()
-          .then(() => {
-            console.log("land owner transfered");
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    let tx;
+
+    tx = await mopnland.transferOwnership(await mopngovernance.getAddress());
+    await tx.wait();
+    console.log("land owner transfered");
 
     tx = await mopnland.ethMint(5, { value: "1000000000000000000" });
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.wait()
-          .then(() => {
-            console.log("5 land minted");
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    await tx.wait();
+    console.log("5 land minted");
 
-    tx = await mopnbomb.transferOwnership(mopngovernanceAddress);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.wait()
-          .then(() => {
-            console.log("bomb owner transfered");
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    tx = await mopnbomb.transferOwnership(await mopngovernance.getAddress());
+    await tx.wait();
+    console.log("bomb owner transfered");
 
     tx = await mopngovernance.updateMOPNContracts(
-      mopnauctionHouse.address,
-      mopn.address,
-      mopnbomb.address,
-      mopnmt.address,
-      mopnpoint.address,
-      mopnland.address,
-      mopnData.address,
-      mopncollectionVault.address,
-      mopnrental.address
+      await mopnauctionHouse.getAddress(),
+      await mopn.getAddress(),
+      await mopnbomb.getAddress(),
+      await mopntoken.getAddress(),
+      await mopnpoint.getAddress(),
+      await mopnland.getAddress(),
+      await mopnData.getAddress(),
+      await mopncollectionVault.getAddress()
     );
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.wait()
-          .then(() => {
-            console.log("updateMOPNContracts sent");
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    await tx.wait();
+    console.log("updateMOPNContracts sent");
 
     tx = await mopngovernance.updateERC6551Contract(
-      erc6551registry.address,
-      erc6551accountproxy.address,
-      erc6551accounthelper.address
+      await erc6551registry.getAddress(),
+      await erc6551accountproxy.getAddress(),
+      await erc6551accounthelper.getAddress()
     );
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.wait()
-          .then(() => {
-            console.log("updateERC6551Contract sent");
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    await tx.wait();
+    console.log("updateERC6551Contract sent");
 
-    tx = await mopngovernance.add6551AccountImplementation(erc6551account.address);
-    promises.push(
-      new Promise((resolve, reject) => {
-        tx.wait()
-          .then(() => {
-            console.log("add6551AccountImplementation sent");
-            resolve();
-          })
-          .catch((err) => {
-            console.error(err);
-            reject();
-          });
-      })
-    );
+    tx = await mopngovernance.add6551AccountImplementation(await erc6551account.getAddress());
+    await tx.wait();
+    console.log("add6551AccountImplementation sent");
 
-    await Promise.all(promises);
+    collections[0] = "0x82C46C4EA58B7D6D87704ecD459ee9EfBf458B26";
+    collections[1] = "0x0f25e56443330242F3a70dC101D1Cd42bd12F629";
 
-    tx = await mopn.collectionWhiteListRegistry("0x016Db4C041bA5025F71148765491717Fc82f82d8", 0, [
-      "0xc1f663e50f998d609c80c9e92fab51c8079464aac70bd4b1fd0441186ba62463",
-      "0x0993b6e45352fc4ee86456b53f301f554a89d7ee3c4a9a67dfe91316d6d581c7",
-      "0x96445c6d18776b38bf6449f1d9236c2f6fe4a3197d396ca6b9318d9895f58c26",
-      "0x039eb31152cd2fa23a36b2ed2d343cd698c2c662cb4772fd535609d15f157f8c",
-      "0x799dfa8e6e72bb54dfa558bbaf16ebea197d7eff43a9e43a558eb212b728adb0",
-      "0xbf9839e8dacd17689f31a365ba675571f3832232db7c5be68798fa49ceb1ef57",
+    tx = await mopn.collectionWhiteListRegistry(collections[0], 0, [
+      "0x74882db2fc8c52e1a83ccbcc351efb82d37d42803f50a771078eb69aac8a6b9e",
+      "0x565d5e5a20784c2192fd5f801926b7c52b08573d2fe8458ccf8969e5b4581ce9",
+      "0xf7d2a360ca36c546533e951bb50472806e71000bcf23c826c3980d0ce44ecd2f",
+      "0xb576db60f1950d3e499e5a3c83d9d6bca2b45302e28f5bfeb28e9414e32fb2dd",
+      "0x3cde0dfb246cc3d90328601e821052ead77bc24444ab740a68343e02d342d9ba",
+      "0x245ae6b3e3c3733b833cb65e653702faeeaf2a6a86cc2675091858e386bea3d4",
     ]);
+    await tx.wait();
+    console.log("collectionWhiteListRegistry Azuki sent");
+
+    tx = await mopn.collectionWhiteListRegistry(collections[1], 0, [
+      "0xb0b4877790136dd9133e710634ce00a988c2e8faba388f28df838faf7a8c87da",
+      "0x9afee0bc7cc23bc497b9dc655be4ecceb3c02d279dbdfeefb88f17a3c8ae311a",
+      "0x9834b84c866139a0796098a7b5f63375b4b03025d34e589faf09eaeb3a6b94e2",
+      "0xd0bbdf62c754b7c975ad905c418d2538a99b492b63757dde24e4ed087229aefa",
+      "0xc194bdb664ed18e5ff5f21332c5d1a5531de78bebecb94248259853c8b74b210",
+    ]);
+    await tx.wait();
+    console.log("collectionWhiteListRegistry Doodles sent");
+
+    tx = await mopntoken.mint(owners[0].address, "1000000000000");
     await tx.wait();
 
     promises = [];
@@ -519,14 +239,14 @@ describe("MOPN", function () {
 
     for (let i = 0; i < 8; i++) {
       if (i == 0) {
-        await deployAccountNFT(testazuki.address, i, coordinates[i], 0);
+        await deployAccountNFT(await testazuki.getAddress(), i, coordinates[i], 0);
       } else {
-        await deployAccountNFT(testazuki.address, i, coordinates[i], 0);
+        await deployAccountNFT(await testazuki.getAddress(), i, coordinates[i], 0);
       }
     }
 
-    // await deployAccountNFT(testwow.address, 0, 10000997, 0);
-    // await deployAccountNFT(testwow.address, 1, 10000996, 0);
+    await deployAccountNFT(await testwow.getAddress(), 0, 10000997, 0);
+    await deployAccountNFT(await testwow.getAddress(), 1, 10000996, 0);
 
     await avatarInfo();
     await collectionInfo();
@@ -542,7 +262,7 @@ describe("MOPN", function () {
     await collectionInfo();
     await showWalletBalance();
 
-    // await buyBombAnddeployAccount(1, testwow.address, 2, 10000998, 0);
+    await buyBombAnddeployAccount(1, await testwow.getAddress(), 2, 10000998, 0);
 
     await avatarInfo();
     await collectionInfo();
@@ -563,28 +283,28 @@ describe("MOPN", function () {
       "MOPNCollectionVault",
       await mopngovernance.getCollectionVault(collection1)
     );
-    console.log(collection1, "vault1", vault1.address);
+    console.log(collection1, "vault1", await vault1.getAddress());
 
     console.log("stake 10000MT to vault1");
-    const tx2 = await mopnmt.safeTransferFrom(
+    const tx2 = await mopntoken.safeTransferFrom(
       owners[0].address,
-      vault1.address,
-      hre.ethers.BigNumber.from("10000000000"),
+      await vault1.getAddress(),
+      10000000000n,
       "0x"
     );
     await tx2.wait();
     await showWalletBalance();
     await collectionInfo();
 
-    console.log(
-      "vault1 nft offer price",
-      hre.ethers.utils.formatUnits(await vault1.getNFTOfferPrice(), mtdecimals)
-    );
-    const tx4 = await testnft.approve(vault1.address, 1);
+    console.log("vault1 nft offer price", formatUnits(await vault1.getNFTOfferPrice(), mtdecimals));
+
+    console.log("nft owner", await testazuki.ownerOf(1), "owner1", owner.address);
+
+    const tx4 = await testazuki.connect(owner).approve(await vault1.getAddress(), 1);
     await tx4.wait();
 
     console.log("accept vault1 nft offer");
-    const tx5 = await vault1.acceptNFTOffer(1);
+    const tx5 = await vault1.connect(owner).acceptNFTOffer(1);
     await tx5.wait();
 
     await showWalletBalance();
@@ -592,19 +312,19 @@ describe("MOPN", function () {
 
     console.log("vault1 auction info", await vault1.getAuctionInfo());
     console.log("vault1 auction price", await vault1.getAuctionCurrentPrice());
-    const tx6 = await mopnmt.safeTransferFrom(
+    const tx6 = await mopntoken.safeTransferFrom(
       owners[0].address,
-      vault1.address,
+      await vault1.getAddress(),
       await vault1.getAuctionCurrentPrice(),
-      hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("acceptAuctionBid"))
+      keccak256(toUtf8Bytes("acceptAuctionBid"))
     );
     await tx6.wait();
     console.log("vault1 auction info", await vault1.getAuctionInfo());
 
     const vault1vtbalance = await vault1.balanceOf(owners[0].address);
     console.log("vault1 vt balance", vault1vtbalance);
-    console.log("vault1 mt balance", await mopnmt.balanceOf(vault1.address));
-    const tx7 = await vault1.withdraw(vault1vtbalance - 1);
+    console.log("vault1 mt balance", await mopntoken.balanceOf(await vault1.getAddress()));
+    const tx7 = await vault1.withdraw(vault1vtbalance - 1n);
     await tx7.wait();
 
     await showWalletBalance();
@@ -651,9 +371,14 @@ describe("MOPN", function () {
     });
 
     for (const account of accounts) {
-      const hbalance = await mopnmt.balanceOf(account);
+      const hbalance = await mopntoken.balanceOf(account);
       const accountData = await mopn.getAccountData(account);
-      table.push([account, accountData.AgentPlacer, accountData.Coordinate, hbalance.toString()]);
+      table.push([
+        account,
+        accountData.AgentPlacer,
+        accountData.Coordinate.toString(),
+        hbalance.toString(),
+      ]);
     }
 
     console.log("hardhat TotalMOPNPoint", (await mopn.TotalMOPNPoints()).toString());
@@ -665,9 +390,9 @@ describe("MOPN", function () {
       head: ["Collection", "OnMapNum", "collectionPoint", "balance", "mvtbalance"],
     });
     for (const collection of collections) {
-      let mvtbalance = BigNumber.from(0);
+      let mvtbalance = 0n;
       let vaultaddress = await mopngovernance.getCollectionVault(collection);
-      if (vaultaddress != hre.ethers.constants.AddressZero) {
+      if (vaultaddress != ZeroAddress) {
         const vault = await hre.ethers.getContractAt("MOPNCollectionVault", vaultaddress);
         mvtbalance = await vault.totalSupply();
       }
@@ -678,85 +403,23 @@ describe("MOPN", function () {
         collection,
         collectionData.OnMapNftNumber.toString(),
         collectionData.CollectionMOPNPoint.toString(),
-        (await mopnmt.balanceOf(await mopngovernance.getCollectionVault(collection)))
-          .add(await mopnData.calcCollectionSettledMT(collection))
-          .toString(),
+        (await mopntoken.balanceOf(await mopngovernance.getCollectionVault(collection))) +
+          (await mopnData.calcCollectionSettledMT(collection)).toString(),
         mvtbalance.toString(),
       ]);
     }
     console.log(table.toString());
   };
 
-  const deployAccountBasic = async (tokenContract, tokenId, coordinate, landId) => {
-    const account = await erc6551accounthelper.computeAccount(
-      erc6551accountproxy.address,
-      31337,
-      tokenContract,
-      tokenId,
-      0
-    );
-    accounts.push(account);
-    let tx = await erc6551registry.createAccount(
-      erc6551accountproxy.address,
-      31337,
-      tokenContract,
-      tokenId,
-      0,
-      "0x"
-      //erc6551account.interface.encodeFunctionData("setOwnershipHostingType", [1]),
-    );
-    await tx.wait();
-
-    const accountContract = await hre.ethers.getContractAt("MOPNERC6551Account", account);
-    tx = await accountContract.execute(
-      mopn.address,
-      0,
-      mopn.interface.encodeFunctionData("moveTo", [
-        account,
-        coordinate,
-        landId,
-        await getMoveToTilesAccounts(coordinate),
-      ]),
-      0
-    );
-    await tx.wait();
-
-    tiles[coordinate] = account;
-  };
-
-  const deployAccountAndMoveTo = async (tokenContract, tokenId, coordinate, landId) => {
-    const account = await erc6551accounthelper.computeAccount(
-      erc6551accountproxy.address,
-      31337,
-      tokenContract,
-      tokenId,
-      0
-    );
-    accounts.push(account);
-    let tx = await erc6551registry.createAccount(
-      erc6551accountproxy.address,
-      31337,
-      tokenContract,
-      tokenId,
-      0,
-      "0x"
-    );
-    await tx.wait();
-
-    tx = await mopn.moveTo(account, coordinate, landId, await getMoveToTilesAccounts(coordinate));
-    await tx.wait();
-
-    tiles[coordinate] = account;
-  };
-
   const deployAccountNFT = async (tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
-      erc6551accountproxy.address,
+      await erc6551accountproxy.getAddress(),
       31337,
       tokenContract,
       tokenId,
       0
     );
+    console.log("account move", account);
     accounts.push(account);
     const tx = await mopn
       .connect(owners[1])
@@ -775,7 +438,7 @@ describe("MOPN", function () {
 
   const buyBombAnddeployAccount = async (amount, tokenContract, tokenId, coordinate, landId) => {
     const account = await erc6551accounthelper.computeAccount(
-      erc6551accountproxy.address,
+      await erc6551accountproxy.getAddress(),
       31337,
       tokenContract,
       tokenId,
@@ -826,14 +489,10 @@ describe("MOPN", function () {
 
   const getMoveToTilesAccounts = async (tileCoordinate) => {
     let tileaccounts = [];
-    tileaccounts[0] = tiles[tileCoordinate]
-      ? tiles[tileCoordinate]
-      : hre.ethers.constants.AddressZero;
+    tileaccounts[0] = tiles[tileCoordinate] ? tiles[tileCoordinate] : ZeroAddress;
     tileCoordinate++;
     for (let i = 0; i < 18; i++) {
-      tileaccounts[i + 1] = tiles[tileCoordinate]
-        ? tiles[tileCoordinate]
-        : hre.ethers.constants.AddressZero;
+      tileaccounts[i + 1] = tiles[tileCoordinate] ? tiles[tileCoordinate] : ZeroAddress;
       if (i == 5) {
         tileCoordinate += 10001;
       } else if (i < 5) {
@@ -845,24 +504,11 @@ describe("MOPN", function () {
     return tileaccounts;
   };
 
-  const claimAccountMT = async (number) => {
-    console.log("claim accounts", [accounts.slice(0, number)]);
-    const tx = await mopn.batchClaimAccountMT([accounts.slice(0, number)]);
-    await tx.wait();
-  };
-
   const claimAccountsMT = async () => {
     console.log("claim accounts", [accounts.slice(0, 8), accounts.slice(8, 10)]);
-    const tx = await mopn.batchClaimAccountMT([accounts.slice(0, 8), accounts.slice(8, 10)]);
-    await tx.wait();
-  };
-
-  const claimNFTsMT = async () => {
-    console.log("claim nfts", collections);
-    const tx = await mopn.batchClaimNFTMT(collections, [
-      [0, 1, 2, 3, 4, 5, 6, 7],
-      [0, 1, 2],
-    ]);
+    const tx = await mopn
+      .connect(owner)
+      .batchClaimAccountMT([accounts.slice(0, 8), accounts.slice(8, 10)]);
     await tx.wait();
   };
 
@@ -879,7 +525,7 @@ describe("MOPN", function () {
       table.push([
         "owner" + i,
         owners[i].address,
-        (await mopnmt.balanceOf(owners[i].address)).toString(),
+        (await mopntoken.balanceOf(owners[i].address)).toString(),
       ]);
     }
     console.log(table.toString());

@@ -23,9 +23,7 @@ contract MOPNToken is ERC20Burnable, Multicall {
     modifier onlyMOPN() {
         require(
             msg.sender == governance.mopnContract() ||
-                msg.sender == governance.auctionHouseContract() ||
-                msg.sender == 0x3FFE98b5c1c61Cc93b684B44aA2373e1263Dd4A4 ||
-                msg.sender == 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, // remove before prod
+                msg.sender == governance.auctionHouseContract(),
             "MOPNToken: Only MOPN contract can call this function"
         );
         _;
@@ -100,16 +98,12 @@ contract MOPNToken is ERC20Burnable, Multicall {
     function _beforeTokenTransfer(
         address from,
         address,
-        uint256 amount
+        uint256
     ) internal virtual override {
-        uint256 realbalance = super.balanceOf(from);
         IMOPN mopn = IMOPN(governance.mopnContract());
         IMOPN.AccountDataStruct memory accountData = mopn.getAccountData(from);
-        if (
-            accountData.PerMOPNPointMinted > 0 &&
-            (accountData.AgentPlacer != address(0) || realbalance < amount)
-        ) {
-            mopn.claimAccountMTTo(from, from);
+        if (accountData.Coordinate > 0) {
+            mopn.claimAccountMT(from);
         }
     }
 }
