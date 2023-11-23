@@ -296,7 +296,7 @@ describe("MOPN", function () {
     await showWalletBalance();
     await collectionInfo();
 
-    console.log("vault1 nft offer price", formatUnits(await vault1.getNFTOfferPrice(), mtdecimals));
+    console.log("vault1 nft bid price", formatUnits(await vault1.getBidPrice(), mtdecimals));
 
     console.log("nft owner", await testazuki.ownerOf(1), "owner1", owner.address);
 
@@ -304,22 +304,24 @@ describe("MOPN", function () {
     await tx4.wait();
 
     console.log("accept vault1 nft offer");
-    const tx5 = await vault1.connect(owner).acceptNFTOffer(1);
+    const tx5 = await vault1.connect(owner).acceptBid(1);
     await tx5.wait();
 
     await showWalletBalance();
     await collectionInfo();
 
-    console.log("vault1 auction info", await vault1.getAuctionInfo());
-    console.log("vault1 auction price", await vault1.getAuctionCurrentPrice());
+    console.log("vault1 ask info", await vault1.getAskInfo());
+    console.log("vault1 ask price", await vault1.getAskCurrentPrice());
     const tx6 = await mopntoken.safeTransferFrom(
       owners[0].address,
       await vault1.getAddress(),
-      await vault1.getAuctionCurrentPrice(),
-      keccak256(toUtf8Bytes("acceptAuctionBid"))
+      await vault1.getAskCurrentPrice(),
+      keccak256(toUtf8Bytes("acceptAsk"))
     );
     await tx6.wait();
-    console.log("vault1 auction info", await vault1.getAuctionInfo());
+    console.log("vault1 ask info", await vault1.getAskInfo());
+
+    console.log("vault1 BidCoefficient", await vault1.getBidCoefficient());
 
     const vault1vtbalance = await vault1.balanceOf(owners[0].address);
     console.log("vault1 vt balance", vault1vtbalance);
@@ -403,8 +405,10 @@ describe("MOPN", function () {
         collection,
         collectionData.OnMapNftNumber.toString(),
         collectionData.CollectionMOPNPoint.toString(),
-        (await mopntoken.balanceOf(await mopngovernance.getCollectionVault(collection))) +
-          (await mopnData.calcCollectionSettledMT(collection)).toString(),
+        (
+          (await mopntoken.balanceOf(await mopngovernance.getCollectionVault(collection))) +
+          (await mopnData.calcCollectionSettledMT(collection))
+        ).toString(),
         mvtbalance.toString(),
       ]);
     }

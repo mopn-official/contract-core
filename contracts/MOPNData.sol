@@ -216,6 +216,8 @@ contract MOPNData is IMOPNData, Multicall {
             .getCollectionData(collectionAddress);
 
         accountData.AgentPlacer = mopnAccountData.AgentPlacer;
+        accountData.AgentAssignPercentage = mopnAccountData
+            .AgentAssignPercentage;
         accountData.owner = IMOPNERC6551Account(payable(account)).owner();
         accountData.CollectionMOPNPoint = collectionData.CollectionMOPNPoint;
         accountData.MTBalance = IMOPNToken(governance.tokenContract())
@@ -315,6 +317,8 @@ contract MOPNData is IMOPNData, Multicall {
             .getCollectionData(collectionAddress);
 
         cData.OnMapNum = collectionData.OnMapNftNumber;
+        cData.OnMapAgentPlaceNftNumber = collectionData
+            .OnMapAgentPlaceNftNumber;
         cData.MTBalance = IMOPNToken(governance.tokenContract()).balanceOf(
             governance.getCollectionVault(collectionAddress)
         );
@@ -327,8 +331,8 @@ contract MOPNData is IMOPNData, Multicall {
         cData.CollectionMOPNPoints = cData.CollectionMOPNPoint * cData.OnMapNum;
 
         if (cData.collectionVault != address(0)) {
-            cData.NFTAuction = IMOPNCollectionVault(cData.collectionVault)
-                .getAuctionInfo();
+            cData.AskStruct = IMOPNCollectionVault(cData.collectionVault)
+                .getAskInfo();
             cData.PMTTotalSupply = IMOPNCollectionVault(cData.collectionVault)
                 .totalSupply();
         }
@@ -343,13 +347,10 @@ contract MOPNData is IMOPNData, Multicall {
         }
     }
 
-    function getTotalMTStakingRealtime() public view returns (uint256) {
+    function getTotalCollectionVaultMinted() public view returns (uint256) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        return
-            (((mopn.MTTotalMinted() +
-                (calcPerMOPNPointMinted() - mopn.PerMOPNPointMinted()) *
-                mopn.TotalMOPNPoints()) * 5) / 100) -
-            governance.TotalCollectionClaimed() +
-            governance.TotalMTStaking();
+        return ((mopn.MTTotalMinted() +
+            (calcPerMOPNPointMinted() - mopn.PerMOPNPointMinted()) *
+            mopn.TotalMOPNPoints()) / 20);
     }
 }

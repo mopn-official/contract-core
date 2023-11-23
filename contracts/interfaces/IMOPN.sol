@@ -6,18 +6,20 @@ interface IMOPN {
         uint24 CollectionMOPNPoint;
         uint48 OnMapMOPNPoints;
         uint16 OnMapNftNumber;
+        uint16 OnMapAgentPlaceNftNumber;
         uint48 PerCollectionNFTMinted;
         uint48 PerMOPNPointMinted;
         uint48 SettledMT;
     }
 
     struct AccountDataStruct {
-        address AgentPlacer;
         uint16 LandId;
         uint24 Coordinate;
         uint48 PerMOPNPointMinted;
         uint48 SettledMT;
         uint48 PerCollectionNFTMinted;
+        uint16 AgentAssignPercentage;
+        address AgentPlacer;
     }
 
     /**

@@ -4,22 +4,6 @@ pragma solidity ^0.8.19;
 interface IMOPNGovernance {
     function owner() external view returns (address);
 
-    function NFTOfferCoefficient() external view returns (uint48);
-
-    function TotalMTStaking() external view returns (uint64);
-
-    function TotalCollectionClaimed() external view returns (uint48);
-
-    function claimCollectionSettledMT(uint48 amount) external;
-
-    function changeTotalMTStaking(
-        address collectionAddress,
-        uint256 direction,
-        uint256 amount
-    ) external;
-
-    function NFTOfferAccept(address collectionAddress, uint256 price) external;
-
     function auctionHouseContract() external view returns (address);
 
     function mopnContract() external view returns (address);

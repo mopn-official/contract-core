@@ -28,10 +28,6 @@ contract MOPNGovernance is Multicall, Ownable {
         address indexed collectionVault
     );
 
-    uint48 public NFTOfferCoefficient;
-    uint64 public TotalMTStaking;
-    uint48 public TotalCollectionClaimed;
-
     uint256 public vaultIndex;
 
     /// uint160 vaultAdderss + uint96 vaultIndex
@@ -63,41 +59,6 @@ contract MOPNGovernance is Multicall, Ownable {
             "only collection vault allowed"
         );
         _;
-    }
-
-    constructor() {
-        NFTOfferCoefficient = 10 ** 13;
-    }
-
-    function claimCollectionSettledMT(uint48 amount) public onlyMOPN {
-        TotalCollectionClaimed += amount;
-        TotalMTStaking += amount;
-    }
-
-    function NFTOfferAccept(
-        address collectionAddress,
-        uint256 price
-    ) external onlyCollectionVault(collectionAddress) {
-        uint64 totalMTStakingRealtime = (IMOPN(mopnContract).MTTotalMinted() /
-            20) -
-            TotalCollectionClaimed +
-            TotalMTStaking;
-        NFTOfferCoefficient = uint48(
-            ((totalMTStakingRealtime + 1000000 - price) * NFTOfferCoefficient) /
-                (totalMTStakingRealtime + 1000000)
-        );
-    }
-
-    function changeTotalMTStaking(
-        address collectionAddress,
-        uint256 direction,
-        uint256 amount
-    ) external onlyCollectionVault(collectionAddress) {
-        if (direction > 0) {
-            TotalMTStaking += uint64(amount);
-        } else {
-            TotalMTStaking -= uint64(amount);
-        }
     }
 
     function updateERC6551Contract(

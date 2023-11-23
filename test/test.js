@@ -79,6 +79,20 @@ describe("MOPN", function () {
   });
 
   it("test try cache", async function () {
+    console.log(await mopn.getCollectionAgentAssignPercentage(1));
+    console.log(await mopn.getCollectionAgentAssignPercentage(10));
+    console.log(await mopn.getCollectionAgentAssignPercentage(100));
+    console.log(await mopn.getCollectionAgentAssignPercentage(500));
+    console.log(await mopn.getCollectionAgentAssignPercentage(1000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(2000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(3000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(4000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(5000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(6000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(7000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(8000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(9000));
+    console.log(await mopn.getCollectionAgentAssignPercentage(10000));
     const tx = await erc6551registry.createAccount(
       await erc6551accountproxy.getAddress(),
       31337,

@@ -391,6 +391,11 @@ contract MOPN is IMOPN, Multicall {
         ADs[account].Coordinate = tileCoordinate;
         if (!isOwner) {
             ADs[account].AgentPlacer = msg.sender;
+            CDs[collectionAddress].OnMapAgentPlaceNftNumber++;
+            ADs[account]
+                .AgentAssignPercentage = getCollectionAgentAssignPercentage(
+                collectionAddress
+            );
         }
 
         tilesbitmap.set(tileCoordinate);
@@ -489,6 +494,25 @@ contract MOPN is IMOPN, Multicall {
         }
     }
 
+    function getCollectionAgentAssignPercentage(
+        address collectionAddress
+    ) public view returns (uint16) {
+        return
+            uint16(
+                ABDKMath64x64.mulu(
+                    ABDKMath64x64.exp(
+                        ABDKMath64x64.mul(
+                            ABDKMath64x64.divi(-6, 10000),
+                            ABDKMath64x64.fromUInt(
+                                CDs[collectionAddress].OnMapAgentPlaceNftNumber
+                            )
+                        )
+                    ),
+                    6000
+                )
+            );
+    }
+
     function getCollectionMOPNPointFromStaking(
         address collectionAddress
     ) public view returns (uint24 point) {
@@ -550,10 +574,6 @@ contract MOPN is IMOPN, Multicall {
             );
             IMOPNToken(governance.tokenContract()).mint(
                 collectionVault,
-                CDs[collectionAddress].SettledMT
-            );
-
-            governance.claimCollectionSettledMT(
                 CDs[collectionAddress].SettledMT
             );
 
@@ -625,15 +645,20 @@ contract MOPN is IMOPN, Multicall {
                     );
                     emit LandHolderMTMinted(ADs[account].LandId, amount / 20);
 
+                    amount = (amount * 9) / 10;
                     if (ADs[account].AgentPlacer != address(0)) {
                         IMOPNToken(governance.tokenContract()).mint(
                             ADs[account].AgentPlacer,
-                            amount / 10
+                            (amount * ADs[account].AgentAssignPercentage) /
+                                10000
                         );
-                        amount = (amount * 8) / 10;
+
+                        amount -=
+                            (amount * ADs[account].AgentAssignPercentage) /
+                            10000;
+                        ADs[account].AgentAssignPercentage = 0;
                         ADs[account].AgentPlacer = address(0);
-                    } else {
-                        amount = (amount * 9) / 10;
+                        CDs[collectionAddress].OnMapAgentPlaceNftNumber--;
                     }
 
                     emit AccountMTMinted(account, amount);

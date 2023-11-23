@@ -20,6 +20,7 @@ interface IMOPNData {
         uint32 tileCoordinate;
         address owner;
         address AgentPlacer;
+        uint256 AgentAssignPercentage;
     }
 
     struct CollectionDataOutput {
@@ -32,7 +33,8 @@ interface IMOPNData {
         uint256 OnMapMOPNPoints;
         uint256 CollectionMOPNPoint;
         uint256 PMTTotalSupply;
-        IMOPNCollectionVault.NFTAuction NFTAuction;
+        uint256 OnMapAgentPlaceNftNumber;
+        IMOPNCollectionVault.AskStruct AskStruct;
     }
 
     function getAccountData(

@@ -4,25 +4,23 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 
 interface IMOPNCollectionVault is IERC20 {
-    struct NFTAuction {
-        uint256 offerStatus;
-        uint256 startTimestamp;
-        uint256 offerAcceptPrice;
+    struct AskStruct {
+        uint256 vaultStatus;
+        uint256 startBlock;
+        uint256 bidAcceptPrice;
         uint256 tokenId;
         uint256 currentPrice;
     }
 
-    event NFTOfferAccept(
-        address indexed operator,
-        uint256 tokenId,
-        uint256 price
-    );
+    struct BidStruct {
+        uint256 vaultStatus;
+        uint256 startBlock;
+        uint256 Coefficient;
+    }
 
-    event NFTAuctionAccept(
-        address indexed operator,
-        uint256 tokenId,
-        uint256 price
-    );
+    event BidAccept(address indexed operator, uint256 tokenId, uint256 price);
+
+    event AskAccept(address indexed operator, uint256 tokenId, uint256 price);
 
     event MTDeposit(
         address indexed operator,
@@ -36,7 +34,7 @@ interface IMOPNCollectionVault is IERC20 {
         uint256 VTAmount
     );
 
-    function getAuctionInfo() external view returns (NFTAuction memory auction);
+    function getAskInfo() external view returns (AskStruct memory auction);
 
     function MTBalance() external view returns (uint256 balance);
 
