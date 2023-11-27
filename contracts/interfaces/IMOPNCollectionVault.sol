@@ -15,7 +15,8 @@ interface IMOPNCollectionVault is IERC20 {
     struct BidStruct {
         uint256 vaultStatus;
         uint256 startBlock;
-        uint256 Coefficient;
+        uint256 askAcceptPrice;
+        uint256 currentPrice;
     }
 
     event BidAccept(address indexed operator, uint256 tokenId, uint256 price);
@@ -35,6 +36,10 @@ interface IMOPNCollectionVault is IERC20 {
     );
 
     function getAskInfo() external view returns (AskStruct memory auction);
+
+    function AskAcceptPrice() external view returns (uint64);
+
+    function getCollectionMOPNPoint() external view returns (uint24 point);
 
     function MTBalance() external view returns (uint256 balance);
 

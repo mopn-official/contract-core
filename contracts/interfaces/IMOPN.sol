@@ -98,15 +98,14 @@ interface IMOPN {
         address collectionAddress
     ) external view returns (CollectionDataStruct memory);
 
-    function getCollectionMOPNPointFromStaking(
-        address collectionAddress
-    ) external view returns (uint24);
-
     function settleCollectionMT(address collectionAddress) external;
 
     function claimCollectionMT(address collectionAddress) external;
 
-    function settleCollectionMOPNPoint(address collectionAddress) external;
+    function settleCollectionMOPNPoint(
+        address collectionAddress,
+        uint24 point
+    ) external;
 
     function getAccountData(
         address account

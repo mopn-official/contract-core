@@ -8,6 +8,7 @@ import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNAuctionHouse.sol";
+import "./interfaces/IMOPNCollectionVault.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNLand.sol";
@@ -513,23 +514,6 @@ contract MOPN is IMOPN, Multicall {
             );
     }
 
-    function getCollectionMOPNPointFromStaking(
-        address collectionAddress
-    ) public view returns (uint24 point) {
-        if (governance.getCollectionVault(collectionAddress) != address(0)) {
-            point = uint24(
-                (Math.sqrt(
-                    IMOPNToken(governance.tokenContract()).balanceOf(
-                        governance.getCollectionVault(collectionAddress)
-                    ) / 10 ** 6
-                ) * 3) / 10
-            );
-        }
-        if (point > MaxCollectionMOPNPoint) {
-            point = MaxCollectionMOPNPoint;
-        }
-    }
-
     function settleCollectionMT(address collectionAddress) public {
         unchecked {
             uint48 collectionPerMOPNPointMintedDiff = PerMOPNPointMinted -
@@ -582,9 +566,9 @@ contract MOPN is IMOPN, Multicall {
     }
 
     function settleCollectionMOPNPoint(
-        address collectionAddress
+        address collectionAddress,
+        uint24 point
     ) external onlyCollectionVault(collectionAddress) {
-        uint24 point = getCollectionMOPNPointFromStaking(collectionAddress);
         if (point > CDs[collectionAddress].CollectionMOPNPoint) {
             TotalMOPNPoints +=
                 (point - CDs[collectionAddress].CollectionMOPNPoint) *

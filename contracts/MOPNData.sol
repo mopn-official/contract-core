@@ -325,9 +325,8 @@ contract MOPNData is IMOPNData, Multicall {
         cData.UnclaimMTBalance = calcCollectionSettledMT(collectionAddress);
 
         cData.OnMapMOPNPoints = collectionData.OnMapMOPNPoints;
-        cData.CollectionMOPNPoint = mopn.getCollectionMOPNPointFromStaking(
-            collectionAddress
-        );
+        cData.CollectionMOPNPoint = IMOPNCollectionVault(cData.collectionVault)
+            .getCollectionMOPNPoint();
         cData.CollectionMOPNPoints = cData.CollectionMOPNPoint * cData.OnMapNum;
 
         if (cData.collectionVault != address(0)) {

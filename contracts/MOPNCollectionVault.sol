@@ -23,14 +23,14 @@ contract MOPNCollectionVault is
     IERC721Receiver
 {
     address public immutable governance;
-    uint48 public constant MaxBidCoefficient = 100000;
+    uint48 public constant MaxBidCoefficient = 200000;
     uint48 public constant MinBidCoefficient = 1;
 
     uint8 public VaultStatus;
     uint32 public AskStartBlock;
-    uint64 public BidAcceptPrice;
-    uint48 public BidCoefficient;
+    uint64 public AskAcceptPrice;
     uint32 public BidStartBlock;
+    uint64 public BidAcceptPrice;
     uint256 public BidAcceptTokenId;
 
     constructor(address governance_) ERC20("MOPN VToken", "MVT") {
@@ -60,23 +60,13 @@ contract MOPNCollectionVault is
         return CollectionVaultLib.collectionAddress();
     }
 
-    function getBidCoefficient() public view returns (uint48 BidCoefficient_) {
-        BidCoefficient_ = BidCoefficient;
-        if (BidCoefficient_ == 0) {
-            BidCoefficient_ = MaxBidCoefficient;
-        }
-        if (VaultStatus == 0) {
-            BidCoefficient_ = uint48(
-                ABDKMath64x64.mulu(
-                    ABDKMath64x64.pow(
-                        ABDKMath64x64.divu(101, 100),
-                        (block.number - BidStartBlock) / 7200
-                    ),
-                    BidCoefficient_
-                )
-            );
-            if (BidCoefficient_ > MaxBidCoefficient) {
-                BidCoefficient_ = MaxBidCoefficient;
+    function getCollectionMOPNPoint() public view returns (uint24 point) {
+        point = uint24((Math.sqrt(MTBalance() / 10 ** 6) * 3) / 10);
+
+        if (AskAcceptPrice > 0) {
+            uint24 maxPoint = uint24((Math.sqrt(AskAcceptPrice) * 3) / 100);
+            if (point > maxPoint) {
+                point = maxPoint;
             }
         }
     }
@@ -88,13 +78,13 @@ contract MOPNCollectionVault is
     function getAskCurrentPrice() public view returns (uint256) {
         if (VaultStatus == 0) return 0;
 
-        return getAskPrice((block.number - AskStartBlock) / 60);
+        return getAskPrice(block.number - AskStartBlock);
     }
 
     function getAskPrice(uint256 reduceTimes) public view returns (uint256) {
-        int128 reducePercentage = ABDKMath64x64.divu(99, 100);
+        int128 reducePercentage = ABDKMath64x64.divu(9995, 10000);
         int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, (BidAcceptPrice * 12) / 10);
+        return ABDKMath64x64.mulu(reducePower, (BidAcceptPrice * 5) / 4);
     }
 
     function getAskInfo() public view returns (AskStruct memory auction) {
@@ -170,7 +160,10 @@ contract MOPNCollectionVault is
             mtAmount
         );
         _burn(msg.sender, amount);
-        mopn.settleCollectionMOPNPoint(collectionAddress_);
+        mopn.settleCollectionMOPNPoint(
+            collectionAddress_,
+            getCollectionMOPNPoint()
+        );
 
         emit MTWithdraw(msg.sender, mtAmount, amount);
     }
@@ -191,15 +184,29 @@ contract MOPNCollectionVault is
             .balanceOf(address(this));
     }
 
-    function getBidPrice() public view returns (uint256) {
-        uint256 amount = MTBalanceRealtime();
-        return (amount * getBidCoefficient()) / 1000000;
+    function getBidCurrentPrice() public view returns (uint256) {
+        uint256 max = MTBalanceRealtime() / 5;
+        uint256 currentPrice = getBidPrice(block.number - BidStartBlock);
+        if (currentPrice > max || currentPrice == 0) {
+            currentPrice = max;
+        }
+        return currentPrice;
+    }
+
+    function getBidPrice(uint256 increaseTimes) public view returns (uint256) {
+        if (AskAcceptPrice == 0) return 0;
+        int128 increasePercentage = ABDKMath64x64.divu(10005, 10000);
+        int128 increasePower = ABDKMath64x64.pow(
+            increasePercentage,
+            increaseTimes
+        );
+        return ABDKMath64x64.mulu(increasePower, (AskAcceptPrice * 3) / 4);
     }
 
     function getBidInfo() public view returns (BidStruct memory bid) {
         bid.vaultStatus = VaultStatus;
         bid.startBlock = AskStartBlock;
-        bid.Coefficient = getBidCoefficient();
+        bid.currentPrice = getBidCurrentPrice();
     }
 
     function acceptBid(uint256 tokenId) public {
@@ -216,27 +223,23 @@ contract MOPNCollectionVault is
 
         mopn.claimCollectionMT(collectionAddress_);
 
-        BidCoefficient = getBidCoefficient();
-        uint256 offerPrice = (IMOPNToken(
-            IMOPNGovernance(governance).tokenContract()
-        ).balanceOf(address(this)) * BidCoefficient) / 1000000;
+        uint256 offerPrice = getBidCurrentPrice();
 
         IMOPNToken(IMOPNGovernance(governance).tokenContract()).transfer(
             msg.sender,
             offerPrice
         );
 
+        BidStartBlock = 0;
         BidAcceptTokenId = tokenId;
         BidAcceptPrice = uint64(offerPrice);
         AskStartBlock = uint32(block.number);
         VaultStatus = 1;
 
-        BidCoefficient = (BidCoefficient * 98) / 100;
-        if (BidCoefficient < MinBidCoefficient) {
-            BidCoefficient = MinBidCoefficient;
-        }
-
-        mopn.settleCollectionMOPNPoint(collectionAddress_);
+        mopn.settleCollectionMOPNPoint(
+            collectionAddress_,
+            getCollectionMOPNPoint()
+        );
 
         emit BidAccept(msg.sender, tokenId, offerPrice);
     }
@@ -280,7 +283,10 @@ contract MOPNCollectionVault is
             }
 
             mopn.claimCollectionMT(collectionAddress_);
-            mopn.settleCollectionMOPNPoint(collectionAddress_);
+            mopn.settleCollectionMOPNPoint(
+                collectionAddress_,
+                getCollectionMOPNPoint()
+            );
 
             IERC721(collectionAddress_).safeTransferFrom(
                 address(this),
@@ -292,10 +298,11 @@ contract MOPNCollectionVault is
             emit AskAccept(from, BidAcceptTokenId, price + burnAmount);
 
             VaultStatus = 0;
-            BidAcceptTokenId = 0;
             AskStartBlock = 0;
-            BidAcceptPrice = 0;
+            AskAcceptPrice = uint64(price + burnAmount);
             BidStartBlock = uint32(block.number);
+            BidAcceptPrice = 0;
+            BidAcceptTokenId = 0;
         } else {
             require(VaultStatus == 0, "no staking during ask");
             mopn.claimCollectionMT(collectionAddress_);
@@ -303,7 +310,10 @@ contract MOPNCollectionVault is
             uint256 vtokenAmount = MT2VAmount(value, true);
             require(vtokenAmount > 0, "need more mt to get at least 1 vtoken");
             _mint(from, vtokenAmount);
-            mopn.settleCollectionMOPNPoint(collectionAddress_);
+            mopn.settleCollectionMOPNPoint(
+                collectionAddress_,
+                getCollectionMOPNPoint()
+            );
 
             emit MTDeposit(from, value, vtokenAmount);
         }
