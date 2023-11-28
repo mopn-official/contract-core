@@ -35,7 +35,9 @@ interface IMOPNCollectionVault is IERC20 {
         uint256 VTAmount
     );
 
-    function getAskInfo() external view returns (AskStruct memory auction);
+    function getAskInfo() external view returns (AskStruct memory ask);
+
+    function getBidInfo() external view returns (BidStruct memory bid);
 
     function AskAcceptPrice() external view returns (uint64);
 

@@ -32,9 +32,8 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 contract MOPN is IMOPN, Multicall {
     using BitMaps for BitMaps.BitMap;
 
-    uint256 public constant MTReduceInterval = 50400;
+    uint256 public constant MTReduceInterval = 50000;
     uint256 public constant MaxCollectionOnMapNum = 10000;
-    uint24 public constant MaxCollectionMOPNPoint = 99999;
     uint48 public constant whiteListOffTotalMOPNPoint = 1000000;
 
     bytes32 private whiteListRoot;
@@ -72,13 +71,12 @@ contract MOPN is IMOPN, Multicall {
 
     constructor(
         address governance_,
-        uint32 MTOutputPerBlock_,
         uint32 MTStepStartBlock_,
         bytes32 whiteListRoot_
     ) {
         governance = IMOPNGovernance(governance_);
         LastTickBlock = MTStepStartBlock_;
-        MTOutputPerBlock = MTOutputPerBlock_;
+        MTOutputPerBlock = 60000000;
         MTStepStartBlock = MTStepStartBlock_;
         whiteListRoot = whiteListRoot_;
         PerMOPNPointMinted = 1;
@@ -478,6 +476,11 @@ contract MOPN is IMOPN, Multicall {
                                 nextReduceBlock = block.number;
                             }
                         }
+
+                        MTOutputPerBlock = uint32(currentMTPPB(reduceTimes));
+                        MTStepStartBlock += uint32(
+                            reduceTimes * MTReduceInterval
+                        );
                     }
                     PerMOPNPointMinted += uint48(perMOPNPointMintDiff);
                     MTTotalMinted += uint64(
@@ -487,31 +490,18 @@ contract MOPN is IMOPN, Multicall {
 
                 LastTickBlock = uint32(block.number);
             }
-
-            if (reduceTimes > 0) {
-                MTOutputPerBlock = uint32(currentMTPPB(reduceTimes));
-                MTStepStartBlock += uint32(reduceTimes * MTReduceInterval);
-            }
         }
     }
 
     function getCollectionAgentAssignPercentage(
         address collectionAddress
     ) public view returns (uint16) {
-        return
-            uint16(
-                ABDKMath64x64.mulu(
-                    ABDKMath64x64.exp(
-                        ABDKMath64x64.mul(
-                            ABDKMath64x64.divi(-6, 10000),
-                            ABDKMath64x64.fromUInt(
-                                CDs[collectionAddress].OnMapAgentPlaceNftNumber
-                            )
-                        )
-                    ),
-                    6000
-                )
-            );
+        int128 reducePercentage = ABDKMath64x64.divu(9994, 10000);
+        int128 reducePower = ABDKMath64x64.pow(
+            reducePercentage,
+            CDs[collectionAddress].OnMapAgentPlaceNftNumber
+        );
+        return uint16(ABDKMath64x64.mulu(reducePower, 6000));
     }
 
     function settleCollectionMT(address collectionAddress) public {

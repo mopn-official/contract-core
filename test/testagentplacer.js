@@ -118,7 +118,6 @@ describe("MOPN", function () {
 
     mopn = await hre.ethers.deployContract("MOPN", [
       await mopngovernance.getAddress(),
-      60000000,
       startBlock,
       "0xc43ea6b2332e02fa1fe0b50f7ab5c9cff3b7ef8bf6ad7bb97570c3a8c4711e26",
     ]);
@@ -296,7 +295,7 @@ describe("MOPN", function () {
     await showWalletBalance();
     await collectionInfo();
 
-    console.log("vault1 nft bid price", formatUnits(await vault1.getBidPrice(), mtdecimals));
+    console.log("vault1 nft bid price", formatUnits(await vault1.getBidCurrentPrice(), mtdecimals));
 
     console.log("nft owner", await testazuki.ownerOf(1), "owner1", owner.address);
 
@@ -320,8 +319,6 @@ describe("MOPN", function () {
     );
     await tx6.wait();
     console.log("vault1 ask info", await vault1.getAskInfo());
-
-    console.log("vault1 BidCoefficient", await vault1.getBidCoefficient());
 
     const vault1vtbalance = await vault1.balanceOf(owners[0].address);
     console.log("vault1 vt balance", vault1vtbalance);

@@ -23,8 +23,6 @@ contract MOPNCollectionVault is
     IERC721Receiver
 {
     address public immutable governance;
-    uint48 public constant MaxBidCoefficient = 200000;
-    uint48 public constant MinBidCoefficient = 1;
 
     uint8 public VaultStatus;
     uint32 public AskStartBlock;
@@ -61,10 +59,12 @@ contract MOPNCollectionVault is
     }
 
     function getCollectionMOPNPoint() public view returns (uint24 point) {
-        point = uint24((Math.sqrt(MTBalance() / 10 ** 6) * 3) / 10);
+        point = uint24((Math.sqrt(MTBalance() / 100) * 3) / 1000);
 
         if (AskAcceptPrice > 0) {
-            uint24 maxPoint = uint24((Math.sqrt(AskAcceptPrice) * 3) / 100);
+            uint24 maxPoint = uint24(
+                (Math.sqrt(AskAcceptPrice / 100) * 3) / 100
+            );
             if (point > maxPoint) {
                 point = maxPoint;
             }
@@ -75,10 +75,13 @@ contract MOPNCollectionVault is
      * @notice get the current auction price for land
      * @return price current auction price
      */
-    function getAskCurrentPrice() public view returns (uint256) {
+    function getAskCurrentPrice() public view returns (uint256 price) {
         if (VaultStatus == 0) return 0;
 
-        return getAskPrice(block.number - AskStartBlock);
+        price = getAskPrice(block.number - AskStartBlock);
+        if (price < 1000000) {
+            price = 1000000;
+        }
     }
 
     function getAskPrice(uint256 reduceTimes) public view returns (uint256) {
@@ -274,12 +277,13 @@ contract MOPNCollectionVault is
             }
             uint256 burnAmount;
             if (price > 0) {
-                burnAmount = price / 20;
-                IMOPNToken(IMOPNGovernance(governance).tokenContract()).burn(
-                    burnAmount
-                );
+                burnAmount = price / 200;
+                if (burnAmount > 0) {
+                    IMOPNToken(IMOPNGovernance(governance).tokenContract())
+                        .burn(burnAmount);
 
-                price = price - burnAmount;
+                    price = price - burnAmount;
+                }
             }
 
             mopn.claimCollectionMT(collectionAddress_);

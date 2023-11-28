@@ -325,15 +325,20 @@ contract MOPNData is IMOPNData, Multicall {
         cData.UnclaimMTBalance = calcCollectionSettledMT(collectionAddress);
 
         cData.OnMapMOPNPoints = collectionData.OnMapMOPNPoints;
-        cData.CollectionMOPNPoint = IMOPNCollectionVault(cData.collectionVault)
-            .getCollectionMOPNPoint();
-        cData.CollectionMOPNPoints = cData.CollectionMOPNPoint * cData.OnMapNum;
 
         if (cData.collectionVault != address(0)) {
             cData.AskStruct = IMOPNCollectionVault(cData.collectionVault)
                 .getAskInfo();
+            cData.BidStruct = IMOPNCollectionVault(cData.collectionVault)
+                .getBidInfo();
             cData.PMTTotalSupply = IMOPNCollectionVault(cData.collectionVault)
                 .totalSupply();
+            cData.CollectionMOPNPoint = IMOPNCollectionVault(
+                cData.collectionVault
+            ).getCollectionMOPNPoint();
+            cData.CollectionMOPNPoints =
+                cData.CollectionMOPNPoint *
+                cData.OnMapNum;
         }
     }
 

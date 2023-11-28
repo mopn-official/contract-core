@@ -35,6 +35,7 @@ interface IMOPNData {
         uint256 PMTTotalSupply;
         uint256 OnMapAgentPlaceNftNumber;
         IMOPNCollectionVault.AskStruct AskStruct;
+        IMOPNCollectionVault.BidStruct BidStruct;
     }
 
     function getAccountData(
