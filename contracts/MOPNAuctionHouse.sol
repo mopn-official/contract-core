@@ -86,15 +86,18 @@ contract MOPNAuctionHouse is Multicall {
         emit BombSold(buyer, amount, price);
     }
 
+    function getQActInfo() public view returns (QActStruct memory qact_) {
+        qact_ = qact;
+    }
+
     function getQAct() public view returns (uint256 qact_) {
         uint256 qactgap = block.number - qact.lastQactBlock;
         if (qactgap < 7200) {
             uint256 currentIndex = (block.number % 7200) / 300;
-            uint256 endIndex = 23 - (qactgap / 300);
-            if (endIndex == 23) {
+            if (qactgap < 300) {
                 qact_ = qact.qacts[currentIndex];
             }
-
+            uint256 endIndex = 24 - (qactgap / 300);
             endIndex = (currentIndex + endIndex) % 24;
             currentIndex = (currentIndex + 1) % 24;
             while (currentIndex != endIndex) {
@@ -106,21 +109,26 @@ contract MOPNAuctionHouse is Multicall {
 
     function increaseQAct(uint256 amount) internal {
         uint256 qactgap = block.number - qact.lastQactBlock;
-        if (qactgap >= 7200) {
-            qactgap = 7199;
-        }
+        uint256 lastIndex = (qact.lastQactBlock % 7200) / 300;
         uint256 currentIndex = (block.number % 7200) / 300;
-        uint256 endIndex = 24 - (qactgap / 300);
-
-        endIndex = (currentIndex + endIndex) % 24;
-
+        uint256 endIndex;
+        if (qactgap >= 7200) {
+            endIndex = (currentIndex + 1) % 24;
+        } else {
+            if (lastIndex == currentIndex) {
+                if (qactgap >= 300) endIndex = (lastIndex + 1) % 24;
+                else endIndex = lastIndex;
+            } else {
+                endIndex = (lastIndex + 1) % 24;
+            }
+        }
         while (currentIndex != endIndex) {
             qact.qacts[endIndex] = 0;
             endIndex = (endIndex + 1) % 24;
         }
 
         qact.lastQactBlock = uint32(block.number);
-        if (qactgap >= 300) {
+        if (lastIndex != currentIndex || qactgap >= 300) {
             qact.qacts[currentIndex] = uint16(amount);
         } else {
             if (amount + qact.qacts[currentIndex] > type(uint16).max) {

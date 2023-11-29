@@ -209,6 +209,7 @@ contract MOPNCollectionVault is
     function getBidInfo() public view returns (BidStruct memory bid) {
         bid.vaultStatus = VaultStatus;
         bid.startBlock = AskStartBlock;
+        bid.askAcceptPrice = AskAcceptPrice;
         bid.currentPrice = getBidCurrentPrice();
     }
 
