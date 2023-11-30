@@ -11,6 +11,7 @@ import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "./libraries/TileMath.sol";
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MOPNData is IMOPNData, Multicall {
@@ -339,6 +340,8 @@ contract MOPNData is IMOPNData, Multicall {
             cData.CollectionMOPNPoints =
                 cData.CollectionMOPNPoint *
                 cData.OnMapNum;
+        } else {
+            cData.BidStruct.currentPrice = cData.UnclaimMTBalance / 5;
         }
     }
 

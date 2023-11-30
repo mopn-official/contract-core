@@ -390,11 +390,11 @@ contract MOPN is IMOPN, Multicall {
         ADs[account].Coordinate = tileCoordinate;
         if (!isOwner) {
             ADs[account].AgentPlacer = msg.sender;
-            CDs[collectionAddress].OnMapAgentPlaceNftNumber++;
             ADs[account]
                 .AgentAssignPercentage = getCollectionAgentAssignPercentage(
                 collectionAddress
             );
+            CDs[collectionAddress].OnMapAgentPlaceNftNumber++;
         }
 
         tilesbitmap.set(tileCoordinate);
