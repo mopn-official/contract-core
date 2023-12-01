@@ -321,7 +321,7 @@ contract MOPNData is IMOPNData, Multicall {
         cData.OnMapAgentPlaceNftNumber = collectionData
             .OnMapAgentPlaceNftNumber;
         cData.MTBalance = IMOPNToken(governance.tokenContract()).balanceOf(
-            governance.getCollectionVault(collectionAddress)
+            cData.collectionVault
         );
         cData.UnclaimMTBalance = calcCollectionSettledMT(collectionAddress);
 

@@ -66,6 +66,10 @@ describe("MOPN", function () {
       "IERC721",
       "0x0f25e56443330242F3a70dC101D1Cd42bd12F629"
     );
+
+    testpunk = await hre.ethers.deployContract("CryptoPunksMarket");
+    await testpunk.waitForDeployment();
+    console.log("CryptoPunksMarket", await testpunk.getAddress());
   });
 
   async function deployAndSetInitialNFTS() {
@@ -119,7 +123,7 @@ describe("MOPN", function () {
     mopn = await hre.ethers.deployContract("MOPN", [
       await mopngovernance.getAddress(),
       startBlock,
-      "0xc43ea6b2332e02fa1fe0b50f7ab5c9cff3b7ef8bf6ad7bb97570c3a8c4711e26",
+      "0x4968379e63cd07ec65d2bcb3092d121e5f533c4c864b3d3a1ce197384f3466a1",
     ]);
     await mopn.waitForDeployment();
     console.log("MOPN", await mopn.getAddress());
@@ -206,29 +210,45 @@ describe("MOPN", function () {
 
     collections[0] = "0x82C46C4EA58B7D6D87704ecD459ee9EfBf458B26";
     collections[1] = "0x0f25e56443330242F3a70dC101D1Cd42bd12F629";
+    collections[2] = "0x4dEE0017ade1484D203C7CBE32f3BB79aEd7F66A";
 
     tx = await mopn.collectionWhiteListRegistry(collections[0], 0, [
-      "0x74882db2fc8c52e1a83ccbcc351efb82d37d42803f50a771078eb69aac8a6b9e",
-      "0x565d5e5a20784c2192fd5f801926b7c52b08573d2fe8458ccf8969e5b4581ce9",
-      "0xf7d2a360ca36c546533e951bb50472806e71000bcf23c826c3980d0ce44ecd2f",
-      "0xb576db60f1950d3e499e5a3c83d9d6bca2b45302e28f5bfeb28e9414e32fb2dd",
-      "0x3cde0dfb246cc3d90328601e821052ead77bc24444ab740a68343e02d342d9ba",
-      "0x245ae6b3e3c3733b833cb65e653702faeeaf2a6a86cc2675091858e386bea3d4",
+      "0x6a31284f78921fe2bc680cbf710906cc1bc515058a0038903f189ec6f5698dc9",
+      "0x0907015a50d51d0f9a6070a67ed26318352c25074e1cc5f71f632b21b1f4fac5",
+      "0xd8794106cc4e2ec3201a47d64290c81fcf57e97e12d231da28ac185fc7a9f462",
     ]);
     await tx.wait();
     console.log("collectionWhiteListRegistry Azuki sent");
 
     tx = await mopn.collectionWhiteListRegistry(collections[1], 0, [
-      "0xb0b4877790136dd9133e710634ce00a988c2e8faba388f28df838faf7a8c87da",
-      "0x9afee0bc7cc23bc497b9dc655be4ecceb3c02d279dbdfeefb88f17a3c8ae311a",
-      "0x9834b84c866139a0796098a7b5f63375b4b03025d34e589faf09eaeb3a6b94e2",
-      "0xd0bbdf62c754b7c975ad905c418d2538a99b492b63757dde24e4ed087229aefa",
-      "0xc194bdb664ed18e5ff5f21332c5d1a5531de78bebecb94248259853c8b74b210",
+      "0x8177ba6b397bfada0d305528b2c203a70dcdce62a6bc6c7808a04d60e5ccb450",
+      "0x85ab1964779fd84cf99c7726094e070951483466963ae0440de4c13afa867805",
+      "0xd8794106cc4e2ec3201a47d64290c81fcf57e97e12d231da28ac185fc7a9f462",
     ]);
     await tx.wait();
     console.log("collectionWhiteListRegistry Doodles sent");
 
-    tx = await mopntoken.mint(owners[0].address, "1000000000000");
+    tx = await mopn.collectionWhiteListRegistry(collections[2], 0, [
+      "0x6cebad840d832969075216c8907f6a768adf9cf36698dcc3ef01a547ebaa5303",
+      "0x0907015a50d51d0f9a6070a67ed26318352c25074e1cc5f71f632b21b1f4fac5",
+      "0xd8794106cc4e2ec3201a47d64290c81fcf57e97e12d231da28ac185fc7a9f462",
+    ]);
+    await tx.wait();
+    console.log("collectionWhiteListRegistry punks sent");
+
+    tx = await testpunk.allInitialOwnersAssigned();
+    await tx.wait();
+
+    tx = await testpunk.getPunk(0);
+    await tx.wait();
+
+    tx = await testpunk.getPunk(1);
+    await tx.wait();
+
+    tx = await testpunk.getPunk(2);
+    await tx.wait();
+
+    tx = await testpunk.getPunk(3);
     await tx.wait();
 
     promises = [];
@@ -244,8 +264,8 @@ describe("MOPN", function () {
       }
     }
 
-    await deployAccountNFT(await testwow.getAddress(), 0, 10000997, 0);
-    await deployAccountNFT(await testwow.getAddress(), 1, 10000996, 0);
+    await deployAccountNFT(await testpunk.getAddress(), 0, 10000997, 0);
+    await deployAccountNFT(await testpunk.getAddress(), 1, 10000996, 0);
 
     await avatarInfo();
     await collectionInfo();
@@ -261,7 +281,7 @@ describe("MOPN", function () {
     await collectionInfo();
     await showWalletBalance();
 
-    await buyBombAnddeployAccount(1, await testwow.getAddress(), 2, 10000998, 0);
+    await buyBombAnddeployAccount(1, await testpunk.getAddress(), 2, 10000998, 0);
 
     await avatarInfo();
     await collectionInfo();
@@ -271,8 +291,7 @@ describe("MOPN", function () {
   it("test stakingMT", async function () {
     await loadFixture(deployAndSetInitialNFTS);
 
-    const collection1 = collections[0];
-    const collection2 = collections[1];
+    const collection1 = collections[2];
 
     console.log("create collection", collection1, "vault");
     const tx1 = await mopngovernance.createCollectionVault(collection1);
@@ -297,13 +316,15 @@ describe("MOPN", function () {
 
     console.log("vault1 nft bid price", formatUnits(await vault1.getBidCurrentPrice(), mtdecimals));
 
-    console.log("nft owner", await testazuki.ownerOf(1), "owner1", owner.address);
+    console.log("nft owner", await testpunk.punkIndexToAddress(1), "owner0", owners[0].address);
 
-    const tx4 = await testazuki.connect(owner).approve(await vault1.getAddress(), 1);
+    const tx4 = await testpunk
+      .connect(owners[0])
+      .offerPunkForSaleToAddress(1, 0, await vault1.getAddress());
     await tx4.wait();
 
     console.log("accept vault1 nft offer");
-    const tx5 = await vault1.connect(owner).acceptBid(1);
+    const tx5 = await vault1.connect(owners[0]).acceptBid(1);
     await tx5.wait();
 
     await showWalletBalance();
@@ -323,7 +344,7 @@ describe("MOPN", function () {
     const vault1vtbalance = await vault1.balanceOf(owners[0].address);
     console.log("vault1 vt balance", vault1vtbalance);
     console.log("vault1 mt balance", await mopntoken.balanceOf(await vault1.getAddress()));
-    const tx7 = await vault1.withdraw(vault1vtbalance - 1n);
+    const tx7 = await vault1.withdraw(vault1vtbalance);
     await tx7.wait();
 
     await showWalletBalance();

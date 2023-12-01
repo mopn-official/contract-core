@@ -370,12 +370,31 @@ contract MOPN is IMOPN, Multicall {
                 CDs[collectionAddress].OnMapNftNumber < MaxCollectionOnMapNum,
                 "collection on map nft number overflow"
             );
-            emit AccountJumpIn(
-                account,
-                LandId,
-                tileCoordinate,
-                isOwner ? address(0) : msg.sender
-            );
+
+            if (!isOwner) {
+                ADs[account].AgentPlacer = msg.sender;
+                ADs[account]
+                    .AgentAssignPercentage = getCollectionAgentAssignPercentage(
+                    collectionAddress
+                );
+                CDs[collectionAddress].OnMapAgentPlaceNftNumber++;
+
+                emit AccountJumpIn(
+                    account,
+                    LandId,
+                    tileCoordinate,
+                    msg.sender,
+                    ADs[account].AgentAssignPercentage
+                );
+            } else {
+                emit AccountJumpIn(
+                    account,
+                    LandId,
+                    tileCoordinate,
+                    address(0),
+                    0
+                );
+            }
             unchecked {
                 TotalMOPNPoints +=
                     tileMOPNPoint +
@@ -388,14 +407,6 @@ contract MOPN is IMOPN, Multicall {
 
         ADs[account].LandId = LandId;
         ADs[account].Coordinate = tileCoordinate;
-        if (!isOwner) {
-            ADs[account].AgentPlacer = msg.sender;
-            ADs[account]
-                .AgentAssignPercentage = getCollectionAgentAssignPercentage(
-                collectionAddress
-            );
-            CDs[collectionAddress].OnMapAgentPlaceNftNumber++;
-        }
 
         tilesbitmap.set(tileCoordinate);
     }
@@ -630,12 +641,16 @@ contract MOPN is IMOPN, Multicall {
                         amount -=
                             (amount * ADs[account].AgentAssignPercentage) /
                             10000;
-                        ADs[account].AgentAssignPercentage = 0;
                         ADs[account].AgentPlacer = address(0);
                         CDs[collectionAddress].OnMapAgentPlaceNftNumber--;
                     }
 
-                    emit AccountMTMinted(account, amount);
+                    emit AccountMTMinted(
+                        account,
+                        amount,
+                        ADs[account].AgentAssignPercentage
+                    );
+                    ADs[account].AgentAssignPercentage = 0;
                     ADs[account].SettledMT += amount;
                 }
                 ADs[account].PerMOPNPointMinted = CDs[collectionAddress]

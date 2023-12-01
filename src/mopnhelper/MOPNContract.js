@@ -22,7 +22,7 @@ async function getContractAddress(contractName) {
   if (contractAddresses == null) {
     try {
       const response = await axios.get(
-        "https://raw.githubusercontent.com/mopn-official/contract-core/stable-dev/configs/" +
+        "https://raw.githubusercontent.com/mopn-official/contract-core/pre-prod/configs/" +
           hre.network.name +
           ".json"
       );

@@ -16,6 +16,12 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
+interface ICryptoPunks {
+    function buyPunk(uint punkIndex) external;
+
+    function transferPunk(address to, uint punkIndex) external;
+}
+
 contract MOPNCollectionVault is
     IMOPNCollectionVault,
     ERC20,
@@ -39,8 +45,21 @@ contract MOPNCollectionVault is
         return
             string(
                 abi.encodePacked(
-                    super.name(),
-                    " #",
+                    "MOPN VToken #",
+                    Strings.toString(
+                        IMOPNGovernance(governance).getCollectionVaultIndex(
+                            collectionAddress()
+                        )
+                    )
+                )
+            );
+    }
+
+    function symbol() public view override returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    "MVT #",
                     Strings.toString(
                         IMOPNGovernance(governance).getCollectionVaultIndex(
                             collectionAddress()
@@ -188,16 +207,25 @@ contract MOPNCollectionVault is
     }
 
     function getBidCurrentPrice() public view returns (uint256) {
-        uint256 max = MTBalanceRealtime() / 5;
-        uint256 currentPrice = getBidPrice(block.number - BidStartBlock);
-        if (currentPrice > max || currentPrice == 0) {
-            currentPrice = max;
-        }
-        return currentPrice;
+        return getBidPrice(block.number - BidStartBlock);
     }
 
     function getBidPrice(uint256 increaseTimes) public view returns (uint256) {
-        if (AskAcceptPrice == 0) return 0;
+        uint256 max = MTBalanceRealtime() / 5;
+        if (AskAcceptPrice == 0) return max;
+        uint256 maxIncreaseTimes = ABDKMath64x64.toUInt(
+            ABDKMath64x64.div(
+                ABDKMath64x64.ln(
+                    ABDKMath64x64.div(
+                        ABDKMath64x64.fromUInt(max),
+                        ABDKMath64x64.fromUInt(AskAcceptPrice)
+                    )
+                ),
+                ABDKMath64x64.ln(ABDKMath64x64.div(10005, 10000))
+            )
+        );
+        if (maxIncreaseTimes <= increaseTimes) return max;
+
         int128 increasePercentage = ABDKMath64x64.divu(10005, 10000);
         int128 increasePower = ABDKMath64x64.pow(
             increasePercentage,
@@ -216,12 +244,17 @@ contract MOPNCollectionVault is
     function acceptBid(uint256 tokenId) public {
         require(VaultStatus == 0, "last ask not finish");
         address collectionAddress_ = CollectionVaultLib.collectionAddress();
-        IERC721(collectionAddress_).safeTransferFrom(
-            msg.sender,
-            address(this),
-            tokenId,
-            "0x"
-        );
+
+        if (collectionAddress_ == 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB) {
+            ICryptoPunks(collectionAddress_).buyPunk(tokenId);
+        } else {
+            IERC721(collectionAddress_).safeTransferFrom(
+                msg.sender,
+                address(this),
+                tokenId,
+                "0x"
+            );
+        }
 
         IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
 
@@ -293,12 +326,21 @@ contract MOPNCollectionVault is
                 getCollectionMOPNPoint()
             );
 
-            IERC721(collectionAddress_).safeTransferFrom(
-                address(this),
-                from,
-                BidAcceptTokenId,
-                "0x"
-            );
+            if (
+                collectionAddress_ == 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB
+            ) {
+                ICryptoPunks(collectionAddress_).transferPunk(
+                    from,
+                    BidAcceptTokenId
+                );
+            } else {
+                IERC721(collectionAddress_).safeTransferFrom(
+                    address(this),
+                    from,
+                    BidAcceptTokenId,
+                    "0x"
+                );
+            }
 
             emit AskAccept(from, BidAcceptTokenId, price + burnAmount);
 

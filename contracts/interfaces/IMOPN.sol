@@ -32,7 +32,8 @@ interface IMOPN {
         address indexed account,
         uint16 indexed LandId,
         uint24 tileCoordinate,
-        address agentPlacer
+        address agentPlacer,
+        uint16 AgentAssignPercentage
     );
 
     /**
@@ -66,7 +67,11 @@ interface IMOPN {
         uint256 CollectionPoint
     );
 
-    event AccountMTMinted(address indexed account, uint256 amount);
+    event AccountMTMinted(
+        address indexed account,
+        uint256 amount,
+        uint16 AgentAssignPercentage
+    );
 
     event CollectionMTMinted(address indexed collectionAddress, uint256 amount);
 
