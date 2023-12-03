@@ -34,7 +34,7 @@ contract MOPN is IMOPN, Multicall {
 
     uint256 public constant MTReduceInterval = 50000;
     uint256 public constant MaxCollectionOnMapNum = 10000;
-    uint48 public constant whiteListOffTotalMOPNPoint = 1000000;
+    uint48 public constant whiteListOffTotalMOPNPoint = 30000000;
 
     bytes32 private whiteListRoot;
 
