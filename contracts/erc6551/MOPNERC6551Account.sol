@@ -17,6 +17,7 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "./lib/ERC6551AccountLib.sol";
 
 error NotAuthorized();
+error OwnerNotExist();
 
 interface ICryptoPunks {
     function punkIndexToAddress(
@@ -104,8 +105,10 @@ contract MOPNERC6551Account is
     }
 
     function isOwner(address caller) public view returns (bool) {
-        if (caller == owner()) return true;
+        address owner_ = owner();
+        if (caller == owner_) return true;
         if (caller == address(this)) return true;
+        if (owner_ == address(0)) revert OwnerNotExist();
         return false;
     }
 
