@@ -4,7 +4,8 @@ const axios = require("axios");
 const path = require("path");
 
 async function main() {
-  const collectionsMetadata = Object.values(loadCollectionsMetadata());
+  const collections = loadMainnetWhiteCollections();
+  const collectionsMetadata = loadCollectionsMetadata();
   const deployedConf = loadDeployed();
 
   const implementation = "0xba3e7dae1809a2157f115fe8a29829cb6009223b";
@@ -17,44 +18,53 @@ async function main() {
   console.log("deploy start");
 
   let i = 0;
-  for (const collection of collectionsMetadata) {
-    if (!deployedConf[collection.mainnetAddress]) {
-      console.log("deploy " + collection.name + " index " + i);
+  for (const collectionstage of collections) {
+    for (const collectionAddress of collectionstage) {
+      const collection = collectionsMetadata[collectionAddress];
+      if (collection) {
+        if (!deployedConf[collection.mainnetAddress]) {
+          console.log("deploy " + collection.name + " index " + i);
 
-      const MOCKNFTProxy = await ethers.getContractFactory("MOCKNFTProxy");
-      console.log([
-        collection.name,
-        collection.symbol,
-        owner,
-        collection.baseURI,
-        collection.extURI,
-      ]);
-      mocknftproxy = await MOCKNFTProxy.deploy(implementation, owner);
-      console.log("https://goerli.etherscan.io/tx/" + mocknftproxy.deploymentTransaction().hash);
-      await mocknftproxy.waitForDeployment();
-      console.log(collection.name, "deployed to", await mocknftproxy.getAddress());
-      deployedConf[collection.mainnetAddress] = {};
-      deployedConf[collection.mainnetAddress].mirrorAddress = await mocknftproxy.getAddress();
-      i++;
-      saveDeployed(deployedConf);
-    }
+          const MOCKNFTProxy = await ethers.getContractFactory("MOCKNFTProxy");
+          console.log([
+            collection.name,
+            collection.symbol,
+            owner,
+            collection.baseURI,
+            collection.extURI,
+          ]);
+          mocknftproxy = await MOCKNFTProxy.deploy(implementation, owner);
+          console.log(
+            "https://goerli.etherscan.io/tx/" + mocknftproxy.deploymentTransaction().hash
+          );
+          await mocknftproxy.waitForDeployment();
+          console.log(collection.name, "deployed to", await mocknftproxy.getAddress());
+          deployedConf[collection.mainnetAddress] = {};
+          deployedConf[collection.mainnetAddress].mirrorAddress = await mocknftproxy.getAddress();
+          i++;
+          saveDeployed(deployedConf);
+        }
 
-    if (!deployedConf[collection.mainnetAddress].initialize) {
-      const mocknft = await ethers.getContractAt(
-        "MOCKNFT",
-        deployedConf[collection.mainnetAddress].mirrorAddress
-      );
-      const tx = await mocknft.initialize(
-        collection.name,
-        collection.symbol,
-        owner,
-        collection.baseURI,
-        collection.extURI
-      );
-      console.log("https://goerli.etherscan.io/tx/" + tx.hash);
-      await tx.wait();
-      deployedConf[collection.mainnetAddress].initialize = true;
-      saveDeployed(deployedConf);
+        if (!deployedConf[collection.mainnetAddress].initialize) {
+          const mocknft = await ethers.getContractAt(
+            "MOCKNFT",
+            deployedConf[collection.mainnetAddress].mirrorAddress
+          );
+          const tx = await mocknft.initialize(
+            collection.name,
+            collection.symbol,
+            owner,
+            collection.baseURI,
+            collection.extURI
+          );
+          console.log("https://goerli.etherscan.io/tx/" + tx.hash);
+          await tx.wait();
+          deployedConf[collection.mainnetAddress].initialize = true;
+          saveDeployed(deployedConf);
+        }
+      } else {
+        console.log(collectionAddress, "not found");
+      }
     }
   }
   console.log("deploy finish");
@@ -73,6 +83,19 @@ async function main() {
   }
 
   console.log("all contracts verifed");
+}
+
+function loadMainnetWhiteCollections() {
+  const deployConf = JSON.parse(fs.readFileSync("./src/preprod/whitecollections/mainnet.json"));
+
+  if (!deployConf) {
+    console.log("no mainnet nfts");
+    console.error(error);
+    process.exitCode = 1;
+    return;
+  }
+
+  return deployConf;
 }
 
 function loadCollectionsMetadata() {
