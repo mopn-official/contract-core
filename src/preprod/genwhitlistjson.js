@@ -8,12 +8,14 @@ async function main() {
 
   const collections = loadWhiteCollections(network);
 
+  const namemap = {};
   const whitlist = [];
   const opentotalmopnpointmap = [0, 3000000, 10000000];
   let i = 0;
   for (const key in collections) {
     for (const collection of collections[key]) {
-      whitlist.push([collection, opentotalmopnpointmap[i]]);
+      whitlist.push([collection.collectionAddress, opentotalmopnpointmap[i]]);
+      namemap[collection.collectionAddress] = collection.collectionName;
     }
     i++;
   }
@@ -28,6 +30,7 @@ async function main() {
       if (v[0] === white[0]) {
         const proof = merkleTree.getProof(i);
         whitetree.push({
+          name: namemap[white[0]],
           collectionAddress: white[0],
           opentotalmopnpoint: white[1],
           merkleProof: proof,

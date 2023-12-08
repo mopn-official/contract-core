@@ -10,12 +10,15 @@ async function main() {
   let collections = [[], [], []];
   let i = 0;
   for (const collectionstage of mainnetcollections) {
-    for (const collectionAddress of collectionstage) {
-      const collection = deployedConf[collectionAddress];
+    for (const mainnetcollection of collectionstage) {
+      const collection = deployedConf[mainnetcollection.collectionAddress];
       if (collection) {
-        collections[i].push(collection.mirrorAddress);
+        collections[i].push({
+          collectionAddress: collection.mirrorAddress,
+          collectionName: mainnetcollection.collectionName,
+        });
       } else {
-        console.log(collectionAddress, "not found");
+        console.log(mainnetcollection.collectionAddress, "not found");
       }
     }
     i++;

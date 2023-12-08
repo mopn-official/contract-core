@@ -22,7 +22,11 @@ async function main() {
     if (collection.stages != "#4") {
       let collectionAddress = collection.collection.match(/href="([^"]*)/)[1];
       collectionAddress = collectionAddress.replace("https://etherscan.io/address/", "");
-      collections[collectionstagemapping[collection.stages]].push(collectionAddress);
+      let collectionName = collection.collection.replace(/(<\/?a.*?>)/g, "");
+      collections[collectionstagemapping[collection.stages]].push({
+        collectionAddress: collectionAddress,
+        collectionName: collectionName,
+      });
     }
   }
   console.log(collections);

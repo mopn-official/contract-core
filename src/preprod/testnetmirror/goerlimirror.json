@@ -1708,6 +1708,111 @@
         "initialize": true
     },
     "0x12dd66366d45f44128083233c6fbadfe7cbae221": {
-        "mirrorAddress": "0x799DA1e86592f685249A36Db47D44b08B1722d91"
+        "mirrorAddress": "0x799DA1e86592f685249A36Db47D44b08B1722d91",
+        "initialize": true
+    },
+    "0x7f312a75b62846033bc5471c5bcb94b1abfaf06d": {
+        "mirrorAddress": "0xB60Fdb3a18c1400Bf725aCd2B2A465A5FECBEb4d",
+        "initialize": true
+    },
+    "0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d": {
+        "mirrorAddress": "0x3ca134321FD78CE512613947299bB4e38c3ce537",
+        "initialize": true
+    },
+    "0x9772f5df100bba0d4e637ab866b17f94fcac0cf8": {
+        "mirrorAddress": "0x991307Aab4e5a01fE9BBAB20AebEc6322DA2D190",
+        "initialize": true
+    },
+    "0x13303b4ee819fac204be5ef77523cfcd558c082f": {
+        "mirrorAddress": "0x2B40c726369B71dc11C88Bd9f141a4284464979A",
+        "initialize": true
+    },
+    "0x08ba8cbbefa64aaf9df25e57fe3f15ecc277af74": {
+        "mirrorAddress": "0xa74C4C7907b7b1FFAAc93336Ed681cb8D4147145",
+        "initialize": true
+    },
+    "0x2ced5bc349d9241a314d3739f12f5f6f2bda6a68": {
+        "mirrorAddress": "0xF78B316ecBFd54E317f53885e84370c4B9307902",
+        "initialize": true
+    },
+    "0xb4e570232d3e55d2ee850047639dc74da83c7067": {
+        "mirrorAddress": "0xC075E7f74270e8af54034Ca34307c83f6c322397",
+        "initialize": true
+    },
+    "0xccc1825cf04cae4d497b202d1434ec0f79ee535f": {
+        "mirrorAddress": "0xA6Ab74d3d65c821ee257aC4395E9df8aeA4bA6d9",
+        "initialize": true
+    },
+    "0xa74ae2c6fca0cedbaef30a8ceef834b247186bcf": {
+        "mirrorAddress": "0x2a212cd69F59bE6054Ae9477011e5F5240c6AFa4",
+        "initialize": true
+    },
+    "0x49c3fb5ed059e3960898ede11cd9a0151460c3b8": {
+        "mirrorAddress": "0x9257dE22f64F539303FAD687FDF9ec21CA6b44CD",
+        "initialize": true
+    },
+    "0x3bf99d504e67a977f88b417ab68d34915f3a1209": {
+        "mirrorAddress": "0x67D90E166ca629B24f2d57493E03eBB12D3f1A6E",
+        "initialize": true
+    },
+    "0x67405cadb820c2d89b8d6da3e42ef6a39089c831": {
+        "mirrorAddress": "0x694BDE001662025B760D7c140b83F7dcd5496D78",
+        "initialize": true
+    },
+    "0x4ca8dc8d6468a57dcf42254e5266a3a66e82b4c1": {
+        "mirrorAddress": "0xd57207d4b47580bc3E0332577ba459179F96e81D",
+        "initialize": true
+    },
+    "0x77654e7e579b3c817a3672c1c66c050058b92b85": {
+        "mirrorAddress": "0x5C6a83bb7Dcc6168C1826c4a4312DBD8716F0a25",
+        "initialize": true
+    },
+    "0xffa60cd831374f40358de1aa0489123935a8287d": {
+        "mirrorAddress": "0x6d0731e14585A8eb9239A2eC9a3901016aCF7A93",
+        "initialize": true
+    },
+    "0x1d9a1491924c1847e669dafde86341ad92a87fe2": {
+        "mirrorAddress": "0x1C9bAF46097652795212aEE6c846AC53e66C9eEf",
+        "initialize": true
+    },
+    "0x1b894ad527896027bced83e1bdbfef1f8b057b1b": {
+        "mirrorAddress": "0x9B000722319cB2F615AB7Cb235F951A9d7058817",
+        "initialize": true
+    },
+    "0x2308742aa28cc460522ff855d24a365f99deba7b": {
+        "mirrorAddress": "0x32FEaAbb05e379eA66e0abf31Da429d509A5a587",
+        "initialize": true
+    },
+    "0x575ec01a9e70bf3e192a774eb265c46ec993e4cc": {
+        "mirrorAddress": "0x51Dd41006A77FcF5658e31DBB42E78f74f6Ab155",
+        "initialize": true
+    },
+    "0xe106c63e655df0e300b78336af587f300cff9e76": {
+        "mirrorAddress": "0x07157b6d27161A691E3795Dd48A8cCB455B008b8",
+        "initialize": true
+    },
+    "0x46ac8540d698167fcbb9e846511beb8cf8af9bd8": {
+        "mirrorAddress": "0x33F4928b2C96879c763F90BFF378E49c79CD60C4",
+        "initialize": true
+    },
+    "0x703e54bb5e5e03db13678af8fd6357348fa35d15": {
+        "mirrorAddress": "0xEf172edc915Db36483755c48a940E1Eb72476072",
+        "initialize": true
+    },
+    "0x4b61413d4392c806e6d0ff5ee91e6073c21d6430": {
+        "mirrorAddress": "0xD271fbb8E883A853a8376d25E72CFaecC571E8e9",
+        "initialize": true
+    },
+    "0xa1de9f93c56c290c48849b1393b09eb616d55dbb": {
+        "mirrorAddress": "0x4F228B2a077bAaaCf10e68a90F13E54dc62606e9",
+        "initialize": true
+    },
+    "0x6d1b09ae12adeaa3aa5d6b574dbcfaf7343a0b04": {
+        "mirrorAddress": "0xE17fD00FBa58f861b449e028b0D97E6cfE45af12",
+        "initialize": true
+    },
+    "0x503a3039e9ce236e9a12e4008aecbb1fd8b384a3": {
+        "mirrorAddress": "0x47D8E22D538E658Ad9A18C25B367f104B679e4ec",
+        "initialize": true
     }
 }
