@@ -9,4 +9,8 @@ interface IMOPNLand is IERC721 {
     function nextTokenId() external view returns (uint256);
 
     function MAX_SUPPLY() external view returns (uint256);
+
+    function name() external view returns (string memory);
+
+    function symbol() external view returns (string memory);
 }

@@ -1,60 +1,19 @@
-const { ethers } = require("hardhat");
+const hre = require("hardhat");
+const { loadFixture, time } = require("@nomicfoundation/hardhat-network-helpers");
+const fs = require("fs");
 
-describe("AuctionHouse", function () {
-  let tileMath, auctionHouse, map;
+describe("MOPN", function () {
+  let mopnauctionHouse;
 
-  it("deploy ", async function () {
-    const TileMath = await ethers.getContractFactory("TileMath");
-    tileMath = await TileMath.deploy();
-    await tileMath.deployed();
-    console.log("TileMath", tileMath.address);
-
-    const AuctionHouse = await ethers.getContractFactory("AuctionHouse");
-    auctionHouse = await AuctionHouse.deploy(1677184081, 1677184081);
-    await auctionHouse.deployed();
-    console.log("AuctionHouse", auctionHouse.address);
-
-    const Map = await ethers.getContractFactory("Map", {
-      libraries: {
-        TileMath: tileMath.address,
-      },
-    });
-    map = await Map.deploy(0);
-    await map.deployed();
-    console.log("Map", map.address);
+  it("deploy AuctionHouse", async function () {
+    mopnauctionHouse = await hre.ethers.deployContract("MOPNAuctionHouse", [
+      "0x3ffe98b5c1c61cc93b684b44aa2373e1263dd4a4",
+      1,
+    ]);
+    console.log("MOPNAuctionHouse", await mopnauctionHouse.getAddress());
   });
 
-  it("getLandPrice", async function () {
-    console.log(await auctionHouse.getLandPrice(32));
-  });
-
-  it("getBombPrice", async function () {
-    console.log(await auctionHouse.getBombPrice(0));
-    console.log(await auctionHouse.getBombPrice(300));
-    console.log(await auctionHouse.getBombPrice(600));
-    console.log(await auctionHouse.getBombPrice(900));
-    console.log(await auctionHouse.getBombPrice(1200));
-    console.log(await auctionHouse.getBombPrice(1500));
-    console.log(await auctionHouse.getBombPrice(1800));
-  });
-
-  it("currentMTPPB", async function () {
-    console.log(await map.currentMTPPB(0));
-    console.log(await map.currentMTPPB(300));
-    console.log(await map.currentMTPPB(600));
-    console.log(await map.currentMTPPB(900));
-    console.log(await map.currentMTPPB(1200));
-    console.log(await map.currentMTPPB(1500));
-    console.log(await map.currentMTPPB(1800));
-  });
-
-  it("currentMTPPB1", async function () {
-    console.log(await map.currentMTPPB1(0));
-    console.log(await map.currentMTPPB1(300));
-    console.log(await map.currentMTPPB1(600));
-    console.log(await map.currentMTPPB1(900));
-    console.log(await map.currentMTPPB1(1200));
-    console.log(await map.currentMTPPB1(1500));
-    console.log(await map.currentMTPPB1(1800));
+  it("test ", async function () {
+    console.log(await mopnauctionHouse.testBombPrice());
   });
 });

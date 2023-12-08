@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("hardhat-change-network");
 require("solidity-docgen");
 const dotenv = require("dotenv");
 
@@ -7,15 +8,37 @@ dotenv.config();
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.19",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 1000,
+    compilers: [
+      {
+        version: "0.8.19",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 10000,
+          },
+        },
       },
-    },
+      {
+        version: "0.4.18",
+      },
+      {
+        version: "0.4.11",
+      },
+    ],
   },
   networks: {
+    // hardhat: {
+    //   mining: {
+    //     auto: false,
+    //     interval: 0
+    //   }
+    // },
+    hardhat: {
+      forking: {
+        url: process.env.GOERLI_URL,
+        blockNumber: 10081379,
+      },
+    },
     localhost: {
       url: `http://127.0.0.1:7545`,
       chainId: 1337,
@@ -28,11 +51,26 @@ module.exports = {
 
     goerli: {
       url: process.env.GOERLI_URL,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      chainId: 5,
+      etherscanHost: "https://goerli.etherscan.io/",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined
+          ? [
+              process.env.PRIVATE_KEY,
+              process.env.PRIVATE_KEY_1,
+              process.env.PRIVATE_KEY_2,
+              process.env.PRIVATE_KEY_3,
+            ]
+          : [],
     },
     goerli_dev: {
       url: process.env.GOERLI_URL,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      chainId: 5,
+      etherscanHost: "https://goerli.etherscan.io/",
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+        count: 100,
+      },
     },
     sepolia: {
       url: process.env.SEPOLIA_URL,

@@ -2,107 +2,127 @@
 pragma solidity ^0.8.19;
 
 interface IMOPN {
-    function getNFTAvatarId(
-        address contractAddress,
-        uint256 tokenId
-    ) external view returns (uint256);
-
-    /**
-     * @notice get avatar collection id
-     * @param avatarId avatar Id
-     * @return COID colletion id
-     */
-    function getAvatarCOID(uint256 avatarId) external view returns (uint256);
-
-    function getAvatarTokenId(uint256 avatarId) external view returns (uint256);
-
-    /**
-     * @notice get avatar bomb used number
-     * @param avatarId avatar Id
-     * @return bomb used number
-     */
-    function getAvatarBombUsed(
-        uint256 avatarId
-    ) external view returns (uint256);
-
-    /**
-     * @notice get avatar on map coordinate
-     * @param avatarId avatar Id
-     * @return tileCoordinate tile coordinate
-     */
-    function getAvatarCoordinate(
-        uint256 avatarId
-    ) external view returns (uint32);
-
-    /**
-     * @notice Avatar On Map Action Params
-     * @param collectionContract the collection contract address of a nft
-     * @param tokenId the token Id of a nft
-     * @param proofs nft whitelist proofs
-     */
-    struct WhiteListNFTParams {
-        address collectionContract;
-        uint256 tokenId;
-        bytes32[] proofs;
+    struct CollectionDataStruct {
+        uint24 CollectionMOPNPoint;
+        uint48 OnMapMOPNPoints;
+        uint16 OnMapNftNumber;
+        uint16 OnMapAgentPlaceNftNumber;
+        uint48 PerCollectionNFTMinted;
+        uint48 PerMOPNPointMinted;
+        uint48 SettledMT;
     }
 
-    struct NFTParams {
-        address collectionContract;
-        uint256 tokenId;
+    struct AccountDataStruct {
+        uint16 LandId;
+        uint24 Coordinate;
+        uint48 PerMOPNPointMinted;
+        uint48 SettledMT;
+        uint48 PerCollectionNFTMinted;
+        uint16 AgentAssignPercentage;
+        address AgentPlacer;
     }
 
-    function ownerOf(uint256 avatarId) external view returns (address);
+    /**
+     * @notice This event emit when an avatar jump into the map
+     * @param account account wallet address
+     * @param LandId MOPN Land Id
+     * @param tileCoordinate tile coordinate
+     */
+    event AccountJumpIn(
+        address indexed account,
+        uint16 indexed LandId,
+        uint24 tileCoordinate,
+        address agentPlacer,
+        uint16 AgentAssignPercentage
+    );
 
     /**
-     * @notice an on map avatar move to a new tile
-     * @param params NFTParams
+     * @notice This event emit when an avatar move on map
+     * @param account account wallet address
+     * @param LandId MOPN Land Id
+     * @param fromCoordinate tile coordinate
+     * @param toCoordinate tile coordinate
      */
-    function moveTo(
-        NFTParams calldata params,
-        uint32 tileCoordinate,
-        uint256 linkedAvatarId,
-        uint32 LandId
+    event AccountMove(
+        address indexed account,
+        uint16 indexed LandId,
+        uint24 fromCoordinate,
+        uint24 toCoordinate
+    );
+
+    /**
+     * @notice BombUse Event emit when a Bomb is used at a coordinate by an avatar
+     * @param account account wallet address
+     * @param victim the victim that bombed out of the map
+     * @param tileCoordinate the tileCoordinate
+     */
+    event BombUse(
+        address indexed account,
+        address victim,
+        uint24 tileCoordinate
+    );
+
+    event CollectionPointChange(
+        address collectionAddress,
+        uint256 CollectionPoint
+    );
+
+    event AccountMTMinted(
+        address indexed account,
+        uint256 amount,
+        uint16 AgentAssignPercentage
+    );
+
+    event CollectionMTMinted(address indexed collectionAddress, uint256 amount);
+
+    event LandHolderMTMinted(uint16 indexed LandId, uint256 amount);
+
+    function MTOutputPerBlock() external view returns (uint32);
+
+    function MTStepStartBlock() external view returns (uint32);
+
+    function MTReduceInterval() external view returns (uint256);
+
+    function TotalMOPNPoints() external view returns (uint48);
+
+    function LastTickBlock() external view returns (uint32);
+
+    function PerMOPNPointMinted() external view returns (uint48);
+
+    function MTTotalMinted() external view returns (uint64);
+
+    function currentMTPPB() external view returns (uint256);
+
+    function currentMTPPB(uint256 reduceTimes) external view returns (uint256);
+
+    function MTReduceTimes() external view returns (uint256);
+
+    function settlePerMOPNPointMinted() external;
+
+    function getCollectionData(
+        address collectionAddress
+    ) external view returns (CollectionDataStruct memory);
+
+    function settleCollectionMT(address collectionAddress) external;
+
+    function claimCollectionMT(address collectionAddress) external;
+
+    function settleCollectionMOPNPoint(
+        address collectionAddress,
+        uint24 point
     ) external;
 
-    /**
-     * @notice throw a bomb to a tile
-     * @param params NFTParams
-     */
-    function bomb(NFTParams calldata params, uint32 tileCoordinate) external;
+    function getAccountData(
+        address account
+    ) external view returns (AccountDataStruct memory);
 
-    function getCollectionAdditionalNFTPoints(
-        uint256 COID
-    ) external view returns (uint256);
+    function getAccountCollection(
+        address account
+    ) external view returns (address collectionAddress);
 
-    function getCollectionOnMapNum(
-        uint256 COID
-    ) external view returns (uint256);
+    function getAccountOnMapMOPNPoint(
+        address account
+    ) external view returns (uint256 OnMapMOPNPoint);
 
-    function getCollectionAvatarNum(
-        uint256 COID
-    ) external view returns (uint256);
-
-    function getCollectionMintedMT(
-        uint256 COID
-    ) external view returns (uint256);
-
-    function addCollectionMintedMT(uint256 COID, uint256 amount) external;
-
-    function clearCollectionMintedMT(uint256 COID) external;
-
-    function getCollectionContract(
-        uint256 COID
-    ) external view returns (address);
-
-    function getCollectionCOID(
-        address collectionContract
-    ) external view returns (uint256);
-
-    function getCollectionsCOIDs(
-        address[] memory collectionContracts
-    ) external view returns (uint256[] memory COIDs);
-
-    function generateCOID(
-        address collectionContract
-    ) external returns (uint256);
+    function claimAccountMT(address account) external;
 }

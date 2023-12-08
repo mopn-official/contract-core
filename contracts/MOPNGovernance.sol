@@ -2,14 +2,13 @@
 pragma solidity ^0.8.19;
 
 import "./interfaces/IMOPN.sol";
-import "./interfaces/IMOPNMiningData.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
-import "./interfaces/IERC20Receiver.sol";
-import "./InitializedProxy.sol";
+import "./libraries/CollectionVaultBytecodeLib.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
+import "@openzeppelin/contracts/utils/Create2.sol";
 
 /*
 .___  ___.   ______   .______   .__   __. 
@@ -24,142 +23,127 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 /// @author Cyanface<cyanface@outlook.com>
 /// @dev Governance is all other MOPN contract's owner
 contract MOPNGovernance is Multicall, Ownable {
-    bytes32 public whiteListRoot;
-
     event CollectionVaultCreated(
-        uint256 indexed COID,
+        address indexed collectionAddress,
         address indexed collectionVault
     );
 
-    mapping(uint256 => address) public CollectionVaults;
+    uint256 public vaultIndex;
 
-    /**
-     * @notice update whitelist root
-     * @param whiteListRoot_ white list merkle tree root
-     */
-    function updateWhiteList(bytes32 whiteListRoot_) public onlyOwner {
-        whiteListRoot = whiteListRoot_;
-    }
+    /// uint160 vaultAdderss + uint96 vaultIndex
+    mapping(address => uint256) public CollectionVaults;
 
-    address public auctionHouseContract;
     address public mopnContract;
     address public bombContract;
-    address public mtContract;
-    address public mapContract;
+    address public tokenContract;
+    address public pointContract;
     address public landContract;
-    address public miningDataContract;
-    address public mopnCollectionVaultContract;
+    address public dataContract;
+    address public collectionVaultContract;
+    address public auctionHouseContract;
+
+    address public ERC6551Registry;
+    address public ERC6551AccountProxy;
+    address public ERC6551AccountHelper;
+
+    modifier onlyMOPN() {
+        require(msg.sender == mopnContract, "not allowed");
+        _;
+    }
+
+    modifier onlyCollectionVault(address collectionAddress) {
+        require(
+            msg.sender == getCollectionVault(collectionAddress),
+            "only collection vault allowed"
+        );
+        _;
+    }
+
+    function updateERC6551Contract(
+        address ERC6551Registry_,
+        address ERC6551AccountProxy_,
+        address ERC6551AccountHelper_
+    ) public onlyOwner {
+        ERC6551Registry = ERC6551Registry_;
+        ERC6551AccountProxy = ERC6551AccountProxy_;
+        ERC6551AccountHelper = ERC6551AccountHelper_;
+    }
 
     function updateMOPNContracts(
         address auctionHouseContract_,
         address mopnContract_,
         address bombContract_,
-        address mtContract_,
-        address mapContract_,
+        address tokenContract_,
+        address pointContract_,
         address landContract_,
-        address miningDataContract_,
-        address mopnCollectionVaultContract_
+        address dataContract_,
+        address collectionVaultContract_
     ) public onlyOwner {
         auctionHouseContract = auctionHouseContract_;
         mopnContract = mopnContract_;
         bombContract = bombContract_;
-        mtContract = mtContract_;
-        mapContract = mapContract_;
+        tokenContract = tokenContract_;
+        pointContract = pointContract_;
         landContract = landContract_;
-        miningDataContract = miningDataContract_;
-        mopnCollectionVaultContract = mopnCollectionVaultContract_;
+        dataContract = dataContract_;
+        collectionVaultContract = collectionVaultContract_;
     }
 
-    function mintMT(address to, uint256 amount) public onlyMiningData {
-        IMOPNToken(mtContract).mint(to, amount);
-    }
-
-    // Bomb
-    function mintBomb(address to, uint256 amount) public onlyAuctionHouse {
-        IMOPNBomb(bombContract).mint(to, 1, amount);
-    }
-
-    function burnBomb(address from, uint256 amount) public onlyAvatar {
-        IMOPNBomb(bombContract).burn(from, 1, amount);
-    }
-
-    function closeWhiteList() public onlyOwner {
-        IMOPNMiningData(miningDataContract).closeWhiteList();
-    }
-
-    modifier onlyAuctionHouse() {
-        require(msg.sender == auctionHouseContract, "not allowed");
-        _;
-    }
-
-    modifier onlyAvatar() {
-        require(msg.sender == mopnContract, "not allowed");
-        _;
-    }
-
-    modifier onlyMiningData() {
-        require(msg.sender == miningDataContract, "not allowed");
-        _;
-    }
-
-    function createCollectionVault(uint256 COID) public returns (address) {
+    function createCollectionVault(
+        address collectionAddress
+    ) public returns (address) {
         require(
-            IMOPN(mopnContract).getCollectionContract(COID) != address(0),
-            "collection not exist"
+            CollectionVaults[collectionAddress] == 0,
+            "collection vault exist"
         );
-        require(CollectionVaults[COID] == address(0), "collection vault exist");
 
-        bytes memory _initializationCalldata = abi.encodeWithSignature(
-            "initialize(uint256)",
-            COID
-        );
-        address vaultAddress = address(
-            new InitializedProxy(address(this), _initializationCalldata)
-        );
-        CollectionVaults[COID] = vaultAddress;
-        emit CollectionVaultCreated(COID, vaultAddress);
-
+        address vaultAddress = _createCollectionVault(collectionAddress);
+        CollectionVaults[collectionAddress] =
+            (uint256(uint160(vaultAddress)) << 96) |
+            vaultIndex;
+        emit CollectionVaultCreated(collectionAddress, vaultAddress);
+        vaultIndex++;
         return vaultAddress;
     }
 
-    function getCollectionVault(uint256 COID) public view returns (address) {
-        return CollectionVaults[COID];
+    function _createCollectionVault(
+        address collectionAddress
+    ) internal returns (address) {
+        bytes memory code = CollectionVaultBytecodeLib.getCreationCode(
+            collectionVaultContract,
+            collectionAddress,
+            0
+        );
+
+        address _account = Create2.computeAddress(bytes32(0), keccak256(code));
+
+        if (_account.code.length != 0) return _account;
+
+        _account = Create2.deploy(0, bytes32(0), code);
+        return _account;
     }
 
-    function onERC20Received(
-        address,
-        address from,
-        uint256 value,
-        bytes memory data
-    ) public returns (bytes4) {
-        require(msg.sender == mtContract, "only accept mopn token");
+    function getCollectionVault(
+        address collectionAddress
+    ) public view returns (address) {
+        return address(uint160(CollectionVaults[collectionAddress] >> 96));
+    }
 
-        address collectionAddress;
-        assembly {
-            collectionAddress := mload(add(data, 20))
-        }
+    function getCollectionVaultIndex(
+        address collectionAddress
+    ) public view returns (uint256) {
+        return uint96(CollectionVaults[collectionAddress]);
+    }
 
-        uint256 COID = IMOPN(mopnContract).getCollectionCOID(collectionAddress);
-        if (COID == 0) {
-            COID = IMOPN(mopnContract).generateCOID(collectionAddress);
-        }
-        address collectionVault = getCollectionVault(COID);
-        if (collectionVault == address(0)) {
-            collectionVault = createCollectionVault(COID);
-        }
-
-        IMOPNToken(mtContract).safeTransferFrom(
-            address(this),
-            collectionVault,
-            value,
-            "0x"
+    function computeCollectionVault(
+        address collectionAddress
+    ) public view returns (address) {
+        bytes memory code = CollectionVaultBytecodeLib.getCreationCode(
+            collectionVaultContract,
+            collectionAddress,
+            0
         );
 
-        IERC20(collectionVault).transfer(
-            from,
-            IERC20(collectionVault).balanceOf(address(this))
-        );
-
-        return IERC20Receiver.onERC20Received.selector;
+        return Create2.computeAddress(bytes32(0), keccak256(code));
     }
 }

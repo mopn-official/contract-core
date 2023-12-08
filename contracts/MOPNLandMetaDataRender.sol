@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "./interfaces/IMOPNLandMetaDataRender.sol";
-import "./interfaces/IMOPNMap.sol";
-import "./interfaces/IMOPNMiningData.sol";
+import "./interfaces/ILandMetaDataRender.sol";
+import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./libraries/NFTMetaData.sol";
 
-contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
+contract MOPNLandMetaDataRender is ILandMetaDataRender {
     IMOPNGovernance public governance;
 
     /**
@@ -21,9 +20,7 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
 
     function constructTokenURI(
         uint256 LandId_
-    ) public view returns (string memory) {
-        IMOPNMap map = IMOPNMap(governance.mapContract());
-
+    ) public pure returns (string memory) {
         uint32 LandId = uint32(LandId_);
         NFTSVG.tileData[] memory tileDatas = new NFTSVG.tileData[](91);
         uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
@@ -31,8 +28,9 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
             tileCoordinate
         );
 
-        tileDatas[0].tileNFTPoint = TileMath.getTileNFTPoint(tileCoordinate);
-        uint256 COID = map.getTileCOID(tileCoordinate);
+        uint256 COID;
+        tileDatas[0].tileMOPNPoint = TileMath.getTileMOPNPoint(tileCoordinate);
+
         if (COID > 0) {
             tileDatas[0].color = COID;
             tileDatas[1].color = COID;
@@ -51,10 +49,20 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
                     index = preringblocks + j * i + k + 1;
-                    tileDatas[index].tileNFTPoint = TileMath.getTileNFTPoint(
+                    tileDatas[index].tileMOPNPoint = TileMath.getTileMOPNPoint(
                         tileCoordinate
                     );
-                    COID = map.getTileCOID(tileCoordinate);
+
+                    // tileAccount = mopn.getTileAccount(tileCoordinate);
+                    // if (tileAccount != address(0)) {
+                    //     collection = mopn.getAccountCollection(tileAccount);
+                    //     COID = exists(collections, collection);
+                    //     if (COID == 0) {
+                    //         COID++;
+                    //         collections[COID] = collection;
+                    //     }
+                    // }
+
                     if (COID > 0) {
                         uint32[3] memory tileCoordinateArr = TileMath
                             .coordinateIntToArr(tileCoordinate);
@@ -124,15 +132,19 @@ contract MOPNLandMetaDataRender is IMOPNLandMetaDataRender {
             }
         }
 
-        IMOPNMiningData miningData = IMOPNMiningData(
-            governance.miningDataContract()
-        );
-        return
-            NFTMetaData.constructTokenURI(
-                LandId,
-                tileDatas,
-                ((miningData.getLandHolderTotalMinted(LandId) +
-                    miningData.getLandHolderInboxMT(LandId)) / 10 ** 8)
-            );
+        return NFTMetaData.constructTokenURI(LandId, tileDatas, 0);
+    }
+
+    function exists(
+        address[] memory arr,
+        address item
+    ) public pure returns (uint256) {
+        for (uint i = 1; i < arr.length; i++) {
+            if (arr[i] == item) {
+                return i;
+            }
+        }
+
+        return 0;
     }
 }

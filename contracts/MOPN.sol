@@ -1,16 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "hardhat/console.sol";
+
+import "./erc6551/interfaces/IMOPNERC6551Account.sol";
+import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNGovernance.sol";
-import "./interfaces/IMOPNMap.sol";
-import "./interfaces/IMOPNMiningData.sol";
-import "./libraries/TileMath.sol";
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts/interfaces/IERC721.sol";
+import "./interfaces/IMOPNAuctionHouse.sol";
+import "./interfaces/IMOPNCollectionVault.sol";
+import "./interfaces/IMOPNBomb.sol";
+import "./interfaces/IMOPNToken.sol";
+import "./interfaces/IMOPNLand.sol";
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
-import "@openzeppelin/contracts/utils/math/SignedMath.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /*
 .___  ___.   ______   .______   .__   __. 
@@ -21,508 +27,819 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 |__|  |__|  \______/  | _|      |__| \__| 
 */
 
-/// @title MOPN Avatar Contract
+/// @title MOPN Contract
 /// @author Cyanface <cyanface@outlook.com>
-/// @dev This Contract's owner must transfer to Governance Contract once it's deployed
-contract MOPN is IMOPN, Multicall, Ownable {
-    struct AvatarData {
-        uint256 tokenId;
-        /// @notice uint64 avatar bomb used number + uint 64 avatar nft collection id + uint32 avatar on map coordinate
-        uint256 setData;
-    }
+contract MOPN is IMOPN, Multicall {
+    using BitMaps for BitMaps.BitMap;
 
-    using TileMath for uint32;
+    uint256 public constant MTReduceInterval = 50000;
+    uint256 public constant MaxCollectionOnMapNum = 10000;
+    uint48 public constant whiteListOffTotalMOPNPoint = 30000000;
 
-    event AvatarMint(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        address collectionContract,
-        uint256 tokenId
-    );
+    bytes32 private whiteListRoot;
 
-    /**
-     * @notice This event emit when an avatar jump into the map
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     * @param LandId MOPN Land Id
-     * @param tileCoordinate tile coordinate
-     */
-    event AvatarJumpIn(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        uint32 indexed LandId,
-        uint32 tileCoordinate
-    );
+    BitMaps.BitMap private tilesbitmap;
 
-    /**
-     * @notice This event emit when an avatar move on map
-     * @param avatarId avatar Id
-     * @param COID collection Id
-     * @param LandId MOPN Land Id
-     * @param fromCoordinate tile coordinate
-     * @param toCoordinate tile coordinate
-     */
-    event AvatarMove(
-        uint256 indexed avatarId,
-        uint256 indexed COID,
-        uint32 indexed LandId,
-        uint32 fromCoordinate,
-        uint32 toCoordinate
-    );
+    uint48 public TotalMOPNPoints;
+    uint32 public LastTickBlock;
+    uint48 public PerMOPNPointMinted;
+    uint64 public MTTotalMinted;
+    uint32 public MTOutputPerBlock;
+    uint32 public MTStepStartBlock;
+    uint16 public nextLandId;
 
-    /**
-     * @notice BombUse Event emit when a Bomb is used at a coordinate by an avatar
-     * @param avatarId avatarId that has indexed
-     * @param tileCoordinate the tileCoordinate
-     * @param victims thje victims that bombed out of the map
-     */
-    event BombUse(
-        uint256 indexed avatarId,
-        uint32 tileCoordinate,
-        uint256[] victims,
-        uint32[] victimsCoordinates
-    );
+    //total uint bits of above
 
-    // Collection Id
-    uint256 COIDCounter;
+    mapping(address => CollectionDataStruct) public CDs;
 
-    mapping(uint256 => address) public COIDMap;
+    mapping(address => AccountDataStruct) public ADs;
 
-    /**
-     * @notice record the collection's COID and number of collection nfts which is standing on the map with last 6 digit
-     *
-     * Collection address => uint64 mintedMT + uint48 additionalNFTPoints + uint48 COID + uint48 minted avatar num + uint48 on map nft number
-     */
-    mapping(address => uint256) public collectionMap;
+    IMOPNGovernance public immutable governance;
 
-    /** 
-        avatar storage map
-        avatarId => AvatarData
-    */
-    mapping(uint256 => AvatarData) public avatarNoumenon;
-
-    // token map of Collection => tokenId => avatarId
-    mapping(address => mapping(uint256 => uint256)) public tokenMap;
-
-    uint256 public currentAvatarId;
-
-    IMOPNGovernance public governance;
-
-    constructor(address governance_) {
-        governance = IMOPNGovernance(governance_);
-    }
-
-    function getNFTAvatarId(
-        address contractAddress,
-        uint256 tokenId
-    ) public view returns (uint256) {
-        return tokenMap[contractAddress][tokenId];
-    }
-
-    function getAvatarTokenId(uint256 avatarId) public view returns (uint256) {
-        return avatarNoumenon[avatarId].tokenId;
-    }
-
-    /**
-     * @notice get avatar bomb used number
-     * @param avatarId avatar Id
-     * @return bomb used number
-     */
-    function getAvatarBombUsed(uint256 avatarId) public view returns (uint256) {
-        return uint64(avatarNoumenon[avatarId].setData >> 96);
-    }
-
-    function addAvatarBombUsed(uint256 avatarId) internal {
-        avatarNoumenon[avatarId].setData += 1 << 96;
-    }
-
-    /**
-     * @notice get avatar collection id
-     * @param avatarId avatar Id
-     * @return COID colletion id
-     */
-    function getAvatarCOID(uint256 avatarId) public view returns (uint256) {
-        return uint64(avatarNoumenon[avatarId].setData >> 32);
-    }
-
-    /**
-     * @notice get avatar on map coordinate
-     * @param avatarId avatar Id
-     * @return tileCoordinate tile coordinate
-     */
-    function getAvatarCoordinate(
-        uint256 avatarId
-    ) public view returns (uint32) {
-        return uint32(avatarNoumenon[avatarId].setData);
-    }
-
-    function setAvatarCoordinate(
-        uint256 avatarId,
-        uint32 tileCoordinate
-    ) internal {
-        uint256 mask = uint256(uint32(0xFFFFFFFF));
-        avatarNoumenon[avatarId].setData =
-            (avatarNoumenon[avatarId].setData & ~mask) |
-            (uint256(tileCoordinate) & mask);
-    }
-
-    /**
-     * @notice get the original owner of a NFT
-     * MOPN Avatar support hot wallet protocol https://delegate.cash/ and https://warm.xyz/ to verify your NFTs
-     * @param collectionContract NFT collection Contract Address
-     * @param tokenId NFT tokenId
-     * @return owner nft owner or nft delegate hot wallet
-     */
-    function ownerOf(
-        address collectionContract,
-        uint256 tokenId
-    ) public view returns (address owner) {
-        return IERC721(collectionContract).ownerOf(tokenId);
-    }
-
-    /**
-     * @notice get the original owner of a avatar linked nft
-     * @param avatarId avatar Id
-     * @return owner nft owner or nft delegate hot wallet
-     */
-    function ownerOf(uint256 avatarId) public view returns (address) {
-        uint256 COID = getAvatarCOID(avatarId);
-        require(COID > 0, "avatar not exist");
-        return
-            ownerOf(
-                getCollectionContract(COID),
-                avatarNoumenon[avatarId].tokenId
-            );
-    }
-
-    /**
-     * @notice mint an avatar for a NFT
-     * @param params NFTParams
-     */
-    function mintAvatar(NFTParams calldata params) internal returns (uint256) {
-        uint256 COID = getCollectionCOID(params.collectionContract);
-        if (COID == 0) {
-            COID = generateCOID(params.collectionContract);
-        } else {
-            addCollectionAvatarNum(COID);
-        }
-
-        currentAvatarId++;
-
-        avatarNoumenon[currentAvatarId].setData = COID << 32;
-        avatarNoumenon[currentAvatarId].tokenId = params.tokenId;
-
-        tokenMap[params.collectionContract][params.tokenId] = currentAvatarId;
-        emit AvatarMint(
-            currentAvatarId,
-            COID,
-            params.collectionContract,
-            params.tokenId
-        );
-        return currentAvatarId;
-    }
-
-    /**
-     * @notice an on map avatar move to a new tile
-     * @param params NFTParams
-     */
-    function moveTo(
-        NFTParams calldata params,
-        uint32 tileCoordinate,
-        uint256 linkedAvatarId,
-        uint32 LandId
-    )
-        public
-        tileCheck(tileCoordinate)
-        ownerCheck(params.collectionContract, params.tokenId)
-    {
-        uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
-        if (avatarId == 0) {
-            avatarId = mintAvatar(params);
-        }
-        linkCheck(avatarId, linkedAvatarId, tileCoordinate);
-
-        uint256 COID = getAvatarCOID(avatarId);
-        uint32 orgCoordinate = getAvatarCoordinate(avatarId);
-        if (orgCoordinate > 0) {
-            IMOPNMap(governance.mapContract()).avatarRemove(orgCoordinate, 0);
-
-            emit AvatarMove(
-                avatarId,
-                COID,
-                LandId,
-                orgCoordinate,
-                tileCoordinate
-            );
-        } else {
-            addCollectionOnMapNum(COID);
-            emit AvatarJumpIn(avatarId, COID, LandId, tileCoordinate);
-        }
-
-        IMOPNMap(governance.mapContract()).avatarSet(
-            avatarId,
-            COID,
-            tileCoordinate,
-            LandId
-        );
-
-        setAvatarCoordinate(avatarId, tileCoordinate);
-    }
-
-    /**
-     * @notice throw a bomb to a tile
-     * @param params NFTParams
-     */
-    function bomb(
-        NFTParams calldata params,
-        uint32 tileCoordinate
-    )
-        public
-        tileCheck(tileCoordinate)
-        ownerCheck(params.collectionContract, params.tokenId)
-    {
-        uint256 avatarId = tokenMap[params.collectionContract][params.tokenId];
-        if (avatarId == 0) {
-            avatarId = mintAvatar(params);
-        }
-        addAvatarBombUsed(avatarId);
-
-        if (getAvatarCoordinate(avatarId) > 0) {
-            IMOPNMiningData(governance.miningDataContract()).addNFTPoint(
-                avatarId,
-                getAvatarCOID(avatarId),
-                1
-            );
-        }
-
-        governance.burnBomb(msg.sender, 1);
-
-        uint256[] memory attackAvatarIds = new uint256[](7);
-        uint32[] memory victimsCoordinates = new uint32[](7);
-        uint32 orgTileCoordinate = tileCoordinate;
-
-        for (uint256 i = 0; i < 7; i++) {
-            uint256 attackAvatarId = IMOPNMap(governance.mapContract())
-                .avatarRemove(tileCoordinate, avatarId);
-
-            if (attackAvatarId > 0) {
-                setAvatarCoordinate(attackAvatarId, 0);
-                subCollectionOnMapNum(getAvatarCOID(attackAvatarId));
-                attackAvatarIds[i] = attackAvatarId;
-                victimsCoordinates[i] = tileCoordinate;
-            }
-
-            if (i == 0) {
-                tileCoordinate = tileCoordinate.neighbor(4);
-            } else {
-                tileCoordinate = tileCoordinate.neighbor(i - 1);
-            }
-        }
-
-        emit BombUse(
-            avatarId,
-            orgTileCoordinate,
-            attackAvatarIds,
-            victimsCoordinates
-        );
-    }
-
-    /**
-     * @notice use collection Id to get collection contract address
-     * @param COID collection Id
-     * @return contractAddress collection contract address
-     */
-    function getCollectionContract(uint256 COID) public view returns (address) {
-        return COIDMap[COID];
-    }
-
-    /**
-     * @notice use collection contract address to get collection Id
-     * @param collectionContract collection contract address
-     * @return COID collection Id
-     */
-    function getCollectionCOID(
-        address collectionContract
-    ) public view returns (uint256) {
-        return uint48(collectionMap[collectionContract] >> 96);
-    }
-
-    /**
-     * @notice batch call for {getCollectionCOID}
-     * @param collectionContracts multi collection contracts
-     */
-    function getCollectionsCOIDs(
-        address[] memory collectionContracts
-    ) public view returns (uint256[] memory COIDs) {
-        COIDs = new uint256[](collectionContracts.length);
-        for (uint256 i = 0; i < collectionContracts.length; i++) {
-            COIDs[i] = uint64(collectionMap[collectionContracts[i]] >> 96);
-        }
-    }
-
-    /**
-     * Generate a collection id for new collection
-     * @param collectionContract collection contract adddress
-     */
-    function generateCOID(
-        address collectionContract
-    ) public returns (uint256 COID) {
-        COID = getCollectionCOID(collectionContract);
-        require(COID == 0, "COID exist");
-
+    modifier onlyCollectionVault(address collectionAddress) {
         require(
-            IERC165(collectionContract).supportsInterface(
-                type(IERC721).interfaceId
-            ),
-            "not a erc721 compatible nft"
+            msg.sender == governance.getCollectionVault(collectionAddress),
+            "only collection vault allowed"
         );
-
-        COIDCounter++;
-        COIDMap[COIDCounter] = collectionContract;
-        collectionMap[collectionContract] =
-            (COIDCounter << 96) |
-            (uint256(1) << 48);
-        COID = COIDCounter;
+        _;
     }
 
-    /**
-     * @notice check if this collection is in white list
-     * @param collectionContract collection contract address
-     * @param additionalNFTPoints additional NFT Points
-     * @param proofs collection whitelist proofs
-     */
-    function setCollectionAdditionalNFTPoints(
-        address collectionContract,
-        uint256 additionalNFTPoints,
-        bytes32[] memory proofs
+    modifier onlyToken() {
+        require(msg.sender == governance.tokenContract(), "only token allowed");
+        _;
+    }
+
+    constructor(
+        address governance_,
+        uint32 MTStepStartBlock_,
+        bytes32 whiteListRoot_
+    ) {
+        governance = IMOPNGovernance(governance_);
+        LastTickBlock = MTStepStartBlock_;
+        MTOutputPerBlock = 60000000;
+        MTStepStartBlock = MTStepStartBlock_;
+        whiteListRoot = whiteListRoot_;
+        PerMOPNPointMinted = 1;
+    }
+
+    function getGovernance() external view returns (address) {
+        return address(governance);
+    }
+
+    function whiteListRootUpdate(bytes32 root) public {
+        require(governance.owner() == msg.sender, "not owner");
+        whiteListRoot = root;
+    }
+
+    function checkAccountQualification(
+        address account
+    ) public view returns (address collectionAddress) {
+        try IMOPNERC6551Account(payable(account)).token() returns (
+            uint256 chainId,
+            address collectionAddress_,
+            uint256 tokenId
+        ) {
+            if (ADs[account].PerMOPNPointMinted == 0) {
+                require(
+                    chainId == block.chainid,
+                    "not support cross chain account"
+                );
+                require(
+                    account == computeMOPNAccount(collectionAddress, tokenId),
+                    "not a mopn Account Implementation"
+                );
+            }
+            collectionAddress = collectionAddress_;
+        } catch (bytes memory) {
+            require(false, "account error");
+        }
+    }
+
+    function computeMOPNAccount(
+        address tokenContract,
+        uint256 tokenId
+    ) public view returns (address) {
+        return
+            IERC6551Registry(governance.ERC6551Registry()).account(
+                governance.ERC6551AccountProxy(),
+                block.chainid,
+                tokenContract,
+                tokenId,
+                0
+            );
+    }
+
+    function collectionWhiteListRegistry(
+        address collectionAddress,
+        uint48 OpenTotalMOPNPoint,
+        bytes32[] memory proof
     ) public {
         require(
-            MerkleProof.verify(
-                proofs,
-                governance.whiteListRoot(),
-                keccak256(
-                    bytes.concat(
-                        keccak256(
-                            abi.encode(collectionContract, additionalNFTPoints)
-                        )
-                    )
-                )
-            ),
-            "collection additionalNFTPoints can't verify"
+            OpenTotalMOPNPoint <= TotalMOPNPoints,
+            "your collection is not open yet"
         );
-        uint256 COID = getCollectionCOID(collectionContract);
-        if (COID == 0) {
-            COID = generateCOID(collectionContract);
+        bytes32 leaf = keccak256(
+            bytes.concat(
+                keccak256(abi.encode(collectionAddress, OpenTotalMOPNPoint))
+            )
+        );
+        require(
+            MerkleProof.verify(proof, whiteListRoot, leaf),
+            "Invalid proof"
+        );
+
+        if (CDs[collectionAddress].PerMOPNPointMinted == 0) {
+            CDs[collectionAddress].PerMOPNPointMinted = PerMOPNPointMinted;
+        }
+    }
+
+    function buyBomb(uint256 amount) external {
+        IMOPNAuctionHouse(governance.auctionHouseContract()).buyBombFrom(
+            msg.sender,
+            amount
+        );
+    }
+
+    /**
+     * @notice an on map NFT move to a new tile
+     * @param tileCoordinate move To coordinate
+     */
+    function moveTo(
+        address account,
+        uint24 tileCoordinate,
+        uint16 LandId,
+        address[] memory tileAccounts
+    ) external {
+        _moveTo(
+            account,
+            tileCoordinate,
+            LandId,
+            tileAccounts,
+            checkAccountQualification(account)
+        );
+    }
+
+    function moveToNFT(
+        address collectionAddress,
+        uint256 tokenId,
+        uint24 tileCoordinate,
+        uint16 LandId,
+        address[] memory tileAccounts,
+        bytes calldata initData
+    ) external {
+        address account = IERC6551Registry(governance.ERC6551Registry())
+            .createAccount(
+                governance.ERC6551AccountProxy(),
+                block.chainid,
+                collectionAddress,
+                tokenId,
+                0,
+                initData
+            );
+        _moveTo(
+            account,
+            tileCoordinate,
+            LandId,
+            tileAccounts,
+            collectionAddress
+        );
+    }
+
+    function _moveTo(
+        address account,
+        uint24 tileCoordinate,
+        uint16 LandId,
+        address[] memory tileAccounts,
+        address collectionAddress
+    ) internal {
+        bool isOwner;
+        try IMOPNERC6551Account(payable(account)).isOwner(msg.sender) returns (
+            bool isOwner_
+        ) {
+            isOwner = isOwner_;
+            if (ADs[account].Coordinate > 0) {
+                require(isOwner, "not account owner");
+            }
+        } catch (bytes memory) {
+            require(false, "account owner error");
         }
 
-        collectionMap[collectionContract] =
-            (getCollectionMintedMT(COID) << 192) |
-            (additionalNFTPoints << 144) |
-            uint144(collectionMap[collectionContract]);
+        require(block.number >= MTStepStartBlock, "mopn is not open yet");
+        tilecheck(tileCoordinate);
 
-        IMOPNMiningData(governance.miningDataContract())
-            .settleCollectionNFTPoint(COID);
-    }
-
-    function getCollectionAdditionalNFTPoints(
-        uint256 COID
-    ) public view returns (uint256) {
-        return uint48(collectionMap[getCollectionContract(COID)] >> 144);
-    }
-
-    /**
-     * @notice get NFT collection On map avatar number
-     * @param COID collection Id
-     */
-    function getCollectionOnMapNum(uint256 COID) public view returns (uint256) {
-        return uint48(collectionMap[getCollectionContract(COID)]);
-    }
-
-    function addCollectionOnMapNum(uint256 COID) internal {
-        collectionMap[getCollectionContract(COID)]++;
-    }
-
-    function subCollectionOnMapNum(uint256 COID) internal {
-        collectionMap[getCollectionContract(COID)]--;
-    }
-
-    /**
-     * @notice get NFT collection minted avatar number
-     * @param COID collection Id
-     */
-    function getCollectionAvatarNum(
-        uint256 COID
-    ) public view returns (uint256) {
-        return uint48(collectionMap[getCollectionContract(COID)] >> 48);
-    }
-
-    function addCollectionAvatarNum(uint256 COID) internal {
-        collectionMap[getCollectionContract(COID)] += uint256(1) << 48;
-    }
-
-    function getCollectionMintedMT(uint256 COID) public view returns (uint256) {
-        return uint64(collectionMap[getCollectionContract(COID)] >> 192);
-    }
-
-    function addCollectionMintedMT(
-        uint256 COID,
-        uint256 amount
-    ) public onlyMiningData {
-        collectionMap[getCollectionContract(COID)] += amount << 192;
-    }
-
-    function clearCollectionMintedMT(uint256 COID) public onlyMiningData {
-        collectionMap[getCollectionContract(COID)] = uint192(
-            collectionMap[getCollectionContract(COID)]
+        require(
+            tiledistance(tileCoordinate, tileAtLandCenter(LandId)) < 6,
+            "LandId error"
         );
-    }
+        if (LandId > nextLandId) {
+            unchecked {
+                nextLandId = uint16(
+                    IMOPNLand(governance.landContract()).nextTokenId()
+                );
+            }
+            require(nextLandId > LandId, "Land Not Open");
+        }
 
-    function linkCheck(
-        uint256 avatarId,
-        uint256 linkedAvatarId,
-        uint32 tileCoordinate
-    ) internal view {
-        uint256 COID = getAvatarCOID(avatarId);
-        require(COID > 0, "avatar not exist");
-
-        if (linkedAvatarId > 0) {
-            require(COID == getAvatarCOID(linkedAvatarId), "link to enemy");
-            require(linkedAvatarId != avatarId, "link to yourself");
+        if (whiteListOffTotalMOPNPoint > TotalMOPNPoints) {
             require(
-                tileCoordinate.distance(getAvatarCoordinate(linkedAvatarId)) <
-                    3,
-                "linked avatar too far away"
+                CDs[collectionAddress].PerMOPNPointMinted > 0,
+                "collection not register white list"
             );
+        }
+
+        settlePerMOPNPointMinted();
+        settleCollectionMT(collectionAddress);
+        settleAccountMT(account, collectionAddress);
+        uint256 dstBitMap;
+
+        unchecked {
+            if (tilesbitmap.get(tileCoordinate)) {
+                require(
+                    tileCoordinate == ADs[tileAccounts[0]].Coordinate,
+                    "tile accounts error"
+                );
+                address tileAccountCollection = getAccountCollection(
+                    tileAccounts[0]
+                );
+                require(
+                    collectionAddress != tileAccountCollection,
+                    "dst has ally"
+                );
+
+                dstBitMap += 1 << 100;
+                bombATile(
+                    account,
+                    tileCoordinate,
+                    tileAccounts[0],
+                    tileAccountCollection
+                );
+            }
+
+            tileCoordinate++;
+            for (uint256 i = 0; i < 18; i++) {
+                if (
+                    !get256bitmap(dstBitMap, i) &&
+                    tilesbitmap.get(tileCoordinate)
+                ) {
+                    require(
+                        tileCoordinate == ADs[tileAccounts[i + 1]].Coordinate,
+                        "tile accounts error"
+                    );
+                    if (tileAccounts[i + 1] != account) {
+                        address tileAccountCollection = getAccountCollection(
+                            tileAccounts[i + 1]
+                        );
+                        if (tileAccountCollection == collectionAddress) {
+                            dstBitMap = set256bitmap(dstBitMap, 50);
+                            uint256 k = i;
+                            if (i < 5) {
+                                k++;
+                                while (k < 6) {
+                                    dstBitMap = set256bitmap(dstBitMap, k);
+                                    k++;
+                                }
+                                k = 3 + i * 2;
+
+                                dstBitMap |= (127 << k);
+                            } else {
+                                dstBitMap = set256bitmap(dstBitMap, k + 1);
+                                dstBitMap = set256bitmap(dstBitMap, k + 2);
+                            }
+                        } else {
+                            dstBitMap += 1 << 100;
+
+                            bombATile(
+                                account,
+                                tileCoordinate,
+                                tileAccounts[i + 1],
+                                tileAccountCollection
+                            );
+                        }
+                    }
+                }
+                if (i == 5) {
+                    tileCoordinate += 10001;
+                } else if (i < 5) {
+                    tileCoordinate = tileneighbor(tileCoordinate, i);
+                } else {
+                    tileCoordinate = tileneighbor(tileCoordinate, (i - 6) / 2);
+                }
+            }
+            if ((dstBitMap >> 100) > 0) {
+                IMOPNBomb(governance.bombContract()).burn(
+                    msg.sender,
+                    1,
+                    dstBitMap >> 100
+                );
+            }
+            tileCoordinate -= 2;
+        }
+
+        require(
+            get256bitmap(dstBitMap, 50) ||
+                (CDs[collectionAddress].OnMapNftNumber == 0 ||
+                    (ADs[account].Coordinate > 0 &&
+                        CDs[collectionAddress].OnMapNftNumber == 1)),
+            "linked account missing"
+        );
+
+        uint48 tileMOPNPoint = tilepoint(tileCoordinate);
+        if (ADs[account].Coordinate > 0) {
+            emit AccountMove(
+                account,
+                LandId,
+                ADs[account].Coordinate,
+                tileCoordinate
+            );
+            tilesbitmap.unset(ADs[account].Coordinate);
+            uint48 orgMOPNPoint = tilepoint(ADs[account].Coordinate);
+
+            unchecked {
+                if (tileMOPNPoint > orgMOPNPoint) {
+                    tileMOPNPoint -= orgMOPNPoint;
+                    TotalMOPNPoints += tileMOPNPoint;
+                    CDs[collectionAddress].OnMapMOPNPoints += tileMOPNPoint;
+                } else if (tileMOPNPoint < orgMOPNPoint) {
+                    tileMOPNPoint = orgMOPNPoint - tileMOPNPoint;
+                    TotalMOPNPoints -= tileMOPNPoint;
+                    CDs[collectionAddress].OnMapMOPNPoints -= tileMOPNPoint;
+                }
+            }
         } else {
-            uint256 collectionOnMapNum = getCollectionOnMapNum(COID);
             require(
-                collectionOnMapNum == 0 ||
-                    (getAvatarCoordinate(avatarId) > 0 &&
-                        collectionOnMapNum == 1),
-                "linked avatar missing"
+                CDs[collectionAddress].OnMapNftNumber < MaxCollectionOnMapNum,
+                "collection on map nft number overflow"
             );
+
+            if (!isOwner) {
+                ADs[account].AgentPlacer = msg.sender;
+                ADs[account]
+                    .AgentAssignPercentage = getCollectionAgentAssignPercentage(
+                    collectionAddress
+                );
+                CDs[collectionAddress].OnMapAgentPlaceNftNumber++;
+
+                emit AccountJumpIn(
+                    account,
+                    LandId,
+                    tileCoordinate,
+                    msg.sender,
+                    ADs[account].AgentAssignPercentage
+                );
+            } else {
+                emit AccountJumpIn(
+                    account,
+                    LandId,
+                    tileCoordinate,
+                    address(0),
+                    0
+                );
+            }
+            unchecked {
+                TotalMOPNPoints +=
+                    tileMOPNPoint +
+                    CDs[collectionAddress].CollectionMOPNPoint;
+
+                CDs[collectionAddress].OnMapMOPNPoints += tileMOPNPoint;
+                CDs[collectionAddress].OnMapNftNumber++;
+            }
+        }
+
+        ADs[account].LandId = LandId;
+        ADs[account].Coordinate = tileCoordinate;
+
+        tilesbitmap.set(tileCoordinate);
+    }
+
+    function bombATile(
+        address account,
+        uint24 tileCoordinate,
+        address tileAccount,
+        address tileAccountCollection
+    ) internal {
+        tilesbitmap.unset(tileCoordinate);
+
+        settleCollectionMT(tileAccountCollection);
+        settleAccountMT(tileAccount, tileAccountCollection);
+
+        uint48 accountOnMapMOPNPoint = tilepoint(tileCoordinate);
+
+        unchecked {
+            TotalMOPNPoints -=
+                accountOnMapMOPNPoint +
+                CDs[tileAccountCollection].CollectionMOPNPoint;
+
+            CDs[tileAccountCollection].OnMapMOPNPoints -= accountOnMapMOPNPoint;
+            CDs[tileAccountCollection].OnMapNftNumber--;
+
+            ADs[tileAccount].LandId = 0;
+            ADs[tileAccount].Coordinate = 0;
+        }
+        emit BombUse(account, tileAccount, tileCoordinate);
+    }
+
+    /**
+     * get current mt produce per block
+     * @param reduceTimes reduce times
+     */
+    function currentMTPPB(
+        uint256 reduceTimes
+    ) public view returns (uint256 MTPPB) {
+        int128 reducePercentage = ABDKMath64x64.divu(997, 1000);
+        int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
+        return ABDKMath64x64.mulu(reducePower, MTOutputPerBlock);
+    }
+
+    function currentMTPPB() public view returns (uint256 MTPPB) {
+        if (MTStepStartBlock > block.number) {
+            return 0;
+        }
+        return currentMTPPB(MTReduceTimes());
+    }
+
+    function MTReduceTimes() public view returns (uint256) {
+        return (block.number - MTStepStartBlock) / MTReduceInterval;
+    }
+
+    function settlePerMOPNPointMinted() public {
+        if (block.number > LastTickBlock) {
+            uint256 reduceTimes = MTReduceTimes();
+            unchecked {
+                if (TotalMOPNPoints > 0) {
+                    uint256 perMOPNPointMintDiff;
+                    if (reduceTimes == 0) {
+                        perMOPNPointMintDiff +=
+                            ((block.number - LastTickBlock) *
+                                MTOutputPerBlock) /
+                            TotalMOPNPoints;
+                    } else {
+                        uint256 nextReduceBlock = MTStepStartBlock +
+                            MTReduceInterval;
+                        uint256 lastTickBlock = LastTickBlock;
+                        for (uint256 i = 0; i <= reduceTimes; i++) {
+                            perMOPNPointMintDiff +=
+                                ((nextReduceBlock - lastTickBlock) *
+                                    currentMTPPB(i)) /
+                                TotalMOPNPoints;
+                            lastTickBlock = nextReduceBlock;
+                            nextReduceBlock += MTReduceInterval;
+                            if (nextReduceBlock > block.number) {
+                                nextReduceBlock = block.number;
+                            }
+                        }
+
+                        MTOutputPerBlock = uint32(currentMTPPB(reduceTimes));
+                        MTStepStartBlock += uint32(
+                            reduceTimes * MTReduceInterval
+                        );
+                    }
+                    PerMOPNPointMinted += uint48(perMOPNPointMintDiff);
+                    MTTotalMinted += uint64(
+                        perMOPNPointMintDiff * TotalMOPNPoints
+                    );
+                }
+
+                LastTickBlock = uint32(block.number);
+            }
         }
     }
 
-    modifier tileCheck(uint32 tileCoordinate) {
-        tileCoordinate.check();
-        _;
+    function getCollectionAgentAssignPercentage(
+        address collectionAddress
+    ) public view returns (uint16) {
+        int128 reducePercentage = ABDKMath64x64.divu(9994, 10000);
+        int128 reducePower = ABDKMath64x64.pow(
+            reducePercentage,
+            CDs[collectionAddress].OnMapAgentPlaceNftNumber
+        );
+        return uint16(ABDKMath64x64.mulu(reducePower, 6000));
     }
 
-    modifier ownerCheck(address collectionContract, uint256 tokenId) {
-        require(
-            ownerOf(collectionContract, tokenId) == msg.sender,
-            "not your nft"
-        );
-        _;
+    function settleCollectionMT(address collectionAddress) public {
+        unchecked {
+            uint48 collectionPerMOPNPointMintedDiff = PerMOPNPointMinted -
+                CDs[collectionAddress].PerMOPNPointMinted;
+            if (collectionPerMOPNPointMintedDiff > 0) {
+                if (CDs[collectionAddress].OnMapNftNumber > 0) {
+                    uint48 collectionMOPNPoints = CDs[collectionAddress]
+                        .OnMapNftNumber *
+                        CDs[collectionAddress].CollectionMOPNPoint;
+
+                    uint48 amount = (collectionPerMOPNPointMintedDiff *
+                        (CDs[collectionAddress].OnMapMOPNPoints +
+                            collectionMOPNPoints)) / 20;
+
+                    if (collectionMOPNPoints > 0) {
+                        CDs[collectionAddress].PerCollectionNFTMinted +=
+                            (collectionPerMOPNPointMintedDiff *
+                                collectionMOPNPoints) /
+                            CDs[collectionAddress].OnMapNftNumber;
+                    }
+
+                    CDs[collectionAddress].SettledMT += amount;
+                    emit CollectionMTMinted(collectionAddress, amount);
+                }
+                CDs[collectionAddress].PerMOPNPointMinted = PerMOPNPointMinted;
+            }
+        }
     }
 
-    modifier onlyMiningData() {
+    function claimCollectionMT(
+        address collectionAddress
+    ) external onlyCollectionVault(collectionAddress) {
+        settlePerMOPNPointMinted();
+        settleCollectionMT(collectionAddress);
+        if (CDs[collectionAddress].SettledMT > 0) {
+            address collectionVault = governance.getCollectionVault(
+                collectionAddress
+            );
+            require(
+                collectionVault != address(0),
+                "collection vault not created"
+            );
+            IMOPNToken(governance.tokenContract()).mint(
+                collectionVault,
+                CDs[collectionAddress].SettledMT
+            );
+
+            CDs[collectionAddress].SettledMT = 0;
+        }
+    }
+
+    function settleCollectionMOPNPoint(
+        address collectionAddress,
+        uint24 point
+    ) external onlyCollectionVault(collectionAddress) {
+        if (point > CDs[collectionAddress].CollectionMOPNPoint) {
+            TotalMOPNPoints +=
+                (point - CDs[collectionAddress].CollectionMOPNPoint) *
+                CDs[collectionAddress].OnMapNftNumber;
+        } else if (point < CDs[collectionAddress].CollectionMOPNPoint) {
+            TotalMOPNPoints -=
+                (CDs[collectionAddress].CollectionMOPNPoint - point) *
+                CDs[collectionAddress].OnMapNftNumber;
+        }
+
+        CDs[collectionAddress].CollectionMOPNPoint = point;
+        emit CollectionPointChange(collectionAddress, point);
+    }
+
+    /**
+     * @notice get avatar on map mining mopn token allocation weight
+     * @param account account wallet address
+     */
+    function getAccountOnMapMOPNPoint(
+        address account
+    ) public view returns (uint256 OnMapMOPNPoint) {
+        OnMapMOPNPoint = tilepoint(ADs[account].Coordinate);
+    }
+
+    function getAccountCollection(
+        address account
+    ) public view returns (address collectionAddress) {
+        (, collectionAddress, ) = IMOPNERC6551Account(payable(account)).token();
+    }
+
+    /**
+     * @notice mint avatar mopn token
+     * @param account account wallet address
+     */
+    function settleAccountMT(
+        address account,
+        address collectionAddress
+    ) internal {
+        unchecked {
+            uint48 accountPerMOPNPointMintedDiff = CDs[collectionAddress]
+                .PerMOPNPointMinted - ADs[account].PerMOPNPointMinted;
+            if (accountPerMOPNPointMintedDiff > 0) {
+                if (ADs[account].Coordinate > 0) {
+                    uint48 accountOnMapMOPNPoint = tilepoint(
+                        ADs[account].Coordinate
+                    );
+
+                    uint48 amount = accountPerMOPNPointMintedDiff *
+                        accountOnMapMOPNPoint +
+                        (CDs[collectionAddress].PerCollectionNFTMinted -
+                            ADs[account].PerCollectionNFTMinted);
+
+                    IMOPNToken(governance.tokenContract()).mint(
+                        IMOPNLand(governance.landContract()).ownerOf(
+                            ADs[account].LandId
+                        ),
+                        amount / 20
+                    );
+                    emit LandHolderMTMinted(ADs[account].LandId, amount / 20);
+
+                    amount = (amount * 9) / 10;
+                    if (ADs[account].AgentPlacer != address(0)) {
+                        IMOPNToken(governance.tokenContract()).mint(
+                            ADs[account].AgentPlacer,
+                            (amount * ADs[account].AgentAssignPercentage) /
+                                10000
+                        );
+
+                        amount -=
+                            (amount * ADs[account].AgentAssignPercentage) /
+                            10000;
+                        ADs[account].AgentPlacer = address(0);
+                        CDs[collectionAddress].OnMapAgentPlaceNftNumber--;
+                    }
+
+                    emit AccountMTMinted(
+                        account,
+                        amount,
+                        ADs[account].AgentAssignPercentage
+                    );
+                    ADs[account].AgentAssignPercentage = 0;
+                    ADs[account].SettledMT += amount;
+                }
+                ADs[account].PerMOPNPointMinted = CDs[collectionAddress]
+                    .PerMOPNPointMinted;
+                ADs[account].PerCollectionNFTMinted = CDs[collectionAddress]
+                    .PerCollectionNFTMinted;
+            }
+        }
+    }
+
+    function batchClaimAccountMT(address[][] memory accounts) public {
+        settlePerMOPNPointMinted();
+        uint256 amount;
+        IMOPNToken mt = IMOPNToken(governance.tokenContract());
+        for (uint256 i = 0; i < accounts.length; i++) {
+            for (uint256 k = 0; k < accounts[i].length; k++) {
+                if (k == 0) {
+                    settleCollectionMT(getAccountCollection(accounts[i][k]));
+                }
+
+                if (
+                    IMOPNERC6551Account(payable(accounts[i][k])).isOwner(
+                        msg.sender
+                    )
+                ) {
+                    if (ADs[accounts[i][k]].Coordinate > 0) {
+                        settleAccountMT(
+                            accounts[i][k],
+                            getAccountCollection(accounts[i][k])
+                        );
+                    }
+                    if (ADs[accounts[i][k]].SettledMT > 0) {
+                        amount += ADs[accounts[i][k]].SettledMT;
+                        ADs[accounts[i][k]].SettledMT = 0;
+                    }
+                }
+            }
+        }
+        if (amount > 0) mt.mint(msg.sender, amount);
+    }
+
+    function claimAccountMT(address account) external {
+        if (IMOPNERC6551Account(payable(account)).isOwner(msg.sender)) {
+            if (ADs[account].Coordinate > 0) {
+                settlePerMOPNPointMinted();
+                address collectionAddress = getAccountCollection(account);
+                settleCollectionMT(collectionAddress);
+                settleAccountMT(account, collectionAddress);
+            }
+
+            if (ADs[account].SettledMT > 0) {
+                IMOPNToken(governance.tokenContract()).mint(
+                    msg.sender,
+                    ADs[account].SettledMT
+                );
+                ADs[account].SettledMT = 0;
+            }
+        }
+    }
+
+    /// CollectionData
+    function getCollectionData(
+        address collectionAddress
+    ) public view returns (CollectionDataStruct memory) {
+        return CDs[collectionAddress];
+    }
+
+    function getAccountData(
+        address account
+    ) public view returns (AccountDataStruct memory) {
+        return ADs[account];
+    }
+
+    uint24[] neighbors = [9999, 1, 10000, 9999, 1, 10000];
+
+    function tileneighbor(
+        uint24 tileCoordinate,
+        uint256 direction
+    ) public view returns (uint24) {
+        unchecked {
+            if (direction < 1 || direction > 3) {
+                return tileCoordinate + neighbors[direction];
+            }
+            return tileCoordinate - neighbors[direction];
+        }
+    }
+
+    function tilecheck(uint24 tileCoordinate) public pure {
+        tileCoordinate = tileCoordinate / 10000 + (tileCoordinate % 10000);
         require(
-            msg.sender == governance.miningDataContract() ||
-                msg.sender == address(this),
-            "not allowed"
+            3000 > tileCoordinate && tileCoordinate > 1000,
+            "coordinate  overflow"
         );
-        _;
+    }
+
+    function tilepoint(uint24 tileCoordinate) public pure returns (uint48) {
+        if (tileCoordinate == 0) {
+            return 0;
+        }
+        unchecked {
+            if ((tileCoordinate / 10000) % 10 == 0) {
+                if (tileCoordinate % 10 == 0) {
+                    return 1500;
+                }
+                return 500;
+            } else if (tileCoordinate % 10 == 0) {
+                return 500;
+            }
+            return 100;
+        }
+    }
+
+    function tiledistance(uint24 a, uint24 b) public pure returns (uint24 d) {
+        unchecked {
+            uint24 at = a / 10000;
+            uint24 bt = b / 10000;
+            d += at > bt ? at - bt : bt - at;
+            at = a % 10000;
+            bt = b % 10000;
+            d += at > bt ? at - bt : bt - at;
+            at = 3000 - a / 10000 - at;
+            bt = 3000 - b / 10000 - bt;
+            d += at > bt ? at - bt : bt - at;
+            d /= 2;
+        }
+    }
+
+    function tileAtLandCenter(uint256 LandId) public pure returns (uint24) {
+        if (LandId == 0) {
+            return 10001000;
+        }
+        unchecked {
+            uint256 n = (Math.sqrt(9 + 12 * LandId) - 3) / 6;
+            if ((3 * n * n + 3 * n) != LandId) {
+                n++;
+            }
+
+            uint256 startTile = 10001000 - n * 49989;
+            uint256 z = 3000 - startTile / 10000 - (startTile % 10000);
+
+            n--;
+            uint256 LandIdRingPos_ = LandId - (3 * n * n + 3 * n);
+            n++;
+
+            uint256 side = Math.ceilDiv(LandIdRingPos_, n);
+
+            uint256 sidepos = 0;
+            if (n > 1) {
+                sidepos = (LandIdRingPos_ - 1) % n;
+            }
+            if (side == 1) {
+                startTile = startTile + sidepos * 110000 - sidepos * 6;
+            } else if (side == 2) {
+                startTile = (2000 - z) * 10000 + (2000 - startTile / 10000);
+                startTile = startTile + sidepos * 49989;
+            } else if (side == 3) {
+                startTile = (startTile % 10000) * 10000 + z;
+                startTile = startTile - sidepos * 60005;
+            } else if (side == 4) {
+                startTile = 20002000 - startTile;
+                startTile = startTile - sidepos * 109994;
+            } else if (side == 5) {
+                startTile = z * 10000 + startTile / 10000;
+                startTile = startTile - sidepos * 49989;
+            } else if (side == 6) {
+                startTile = (2000 - (startTile % 10000)) * 10000 + (2000 - z);
+                startTile = startTile + sidepos * 60005;
+            }
+
+            return uint24(startTile);
+        }
+    }
+
+    function get256bitmap(
+        uint256 bitmap,
+        uint256 index
+    ) public pure returns (bool) {
+        unchecked {
+            return bitmap & (1 << index) != 0;
+        }
+    }
+
+    function set256bitmap(
+        uint256 bitmap,
+        uint256 index
+    ) public pure returns (uint256) {
+        unchecked {
+            bitmap |= (1 << index);
+            return bitmap;
+        }
     }
 }

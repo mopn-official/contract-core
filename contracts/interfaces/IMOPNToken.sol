@@ -10,6 +10,8 @@ interface IMOPNToken is IERC20 {
 
     function burnFrom(address account, uint256 amount) external;
 
+    function mopnburn(address account, uint256 amount) external;
+
     function safeTransferFrom(
         address _from,
         address _to,

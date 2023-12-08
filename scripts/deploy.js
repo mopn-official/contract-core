@@ -34,20 +34,19 @@ async function main() {
             constructparams[j] = deployConf[constructparams[j]].address;
           }
         }
-        contract = await Contract.deploy(...constructparams);
+        contract = await Contract.deploy(...constructparams, { gasPrice: 3000000000 });
       } else {
-        contract = await Contract.deploy();
+        contract = await Contract.deploy({ gasPrice: 3000000000 });
       }
 
-      console.log(deployConf["blockScanUrl"] + "tx/" + contract.deployTransaction.hash);
-      await contract.deployed();
-      deployConf[contractName].address = contract.address;
+      await contract.waitForDeployment();
+      deployConf[contractName].address = await contract.getAddress();
       deployConf[contractName].verified = false;
-      console.log(contractName, ":", contract.address, " deployed.");
+      console.log(contractName, ":", await contract.getAddress(), " deployed.");
       saveConf(deployConf);
     } else {
       contract = await ethers.getContractAt(contractName, deployConf[contractName].address);
-      console.log(contractName, ":", contract.address, " exist. No need to deploy");
+      console.log(contractName, ":", await contract.getAddress(), " exist. No need to deploy");
     }
   }
   console.log("deploy finish");
@@ -109,6 +108,7 @@ async function main() {
               deployConf[contractName].attributesCheck[j].updateMethod +
               "(...updateParams)"
           );
+          console.log(deployConf["blockScanUrl"] + updatetx.hash);
           await updatetx.wait();
           console.log("update succeed");
           saveConf(deployConf);

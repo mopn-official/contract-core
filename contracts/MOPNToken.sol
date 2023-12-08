@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "hardhat/console.sol";
+
+import "./interfaces/IMOPNGovernance.sol";
+import "./interfaces/IMOPN.sol";
+import "./interfaces/IMOPNData.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MOPNToken is ERC20Burnable, Ownable {
+contract MOPNToken is ERC20Burnable, Multicall {
     /**
      * @dev Magic value to be returned by ERC20Receiver upon successful reception of token(s)
      * @dev Equal to `bytes4(keccak256("onERC20Received(address,address,uint256,bytes)"))`,
@@ -13,14 +18,35 @@ contract MOPNToken is ERC20Burnable, Ownable {
      */
     bytes4 private constant ERC20_RECEIVED = 0x4fc35859;
 
-    constructor() ERC20("MOPN Token", "MT") {}
+    IMOPNGovernance governance;
+
+    modifier onlyMOPN() {
+        require(
+            msg.sender == governance.mopnContract() ||
+                msg.sender == governance.auctionHouseContract(),
+            "MOPNToken: Only MOPN contract can call this function"
+        );
+        _;
+    }
+
+    constructor(address governance_) ERC20("MOPN Token", "MT") {
+        governance = IMOPNGovernance(governance_);
+    }
 
     function decimals() public view virtual override returns (uint8) {
         return 6;
     }
 
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) public onlyMOPN {
         _mint(to, amount);
+    }
+
+    function mopnburn(address from, uint256 amount) public onlyMOPN {
+        _burn(from, amount);
+    }
+
+    function createCollectionVault(address collectionAddress) public {
+        governance.createCollectionVault(collectionAddress);
     }
 
     function safeTransferFrom(
@@ -50,6 +76,34 @@ contract MOPNToken is ERC20Burnable, Ownable {
 
             // expected response is ERC20_RECEIVED
             require(response == ERC20_RECEIVED);
+        }
+    }
+
+    function totalSupply() public view override returns (uint256) {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        return
+            mopn.MTTotalMinted() +
+            (IMOPNData(governance.dataContract()).calcPerMOPNPointMinted() -
+                mopn.PerMOPNPointMinted()) *
+            mopn.TotalMOPNPoints();
+    }
+
+    function balanceOf(
+        address account
+    ) public view virtual override returns (uint256 balance) {
+        balance = super.balanceOf(account);
+        balance += IMOPNData(governance.dataContract()).calcAccountMT(account);
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address,
+        uint256
+    ) internal virtual override {
+        IMOPN mopn = IMOPN(governance.mopnContract());
+        IMOPN.AccountDataStruct memory accountData = mopn.getAccountData(from);
+        if (accountData.Coordinate > 0) {
+            mopn.claimAccountMT(from);
         }
     }
 }

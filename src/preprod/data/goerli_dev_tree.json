@@ -1,0 +1,64 @@
+{
+    "format": "standard-v1",
+    "tree": [
+        "0x4968379e63cd07ec65d2bcb3092d121e5f533c4c864b3d3a1ce197384f3466a1",
+        "0xd4ecc12ee1d1a1e90ed54819b502bac5d4ada3a0da3293b79bada5f7af37e9e4",
+        "0xd8794106cc4e2ec3201a47d64290c81fcf57e97e12d231da28ac185fc7a9f462",
+        "0x0907015a50d51d0f9a6070a67ed26318352c25074e1cc5f71f632b21b1f4fac5",
+        "0x85ab1964779fd84cf99c7726094e070951483466963ae0440de4c13afa867805",
+        "0xd7a7ba6275d77010e3775e6fb7c27a7694b52e74f33f8851ada2fe6a2e0fca7c",
+        "0xb54dbbcbe29a74197b7b019c7338988100aa63700a1e3f5c3bf372788fde9e46",
+        "0xb277da810be46eebee1e91459f7e2f8ddd146c1d86389c954c216449b137e6df",
+        "0x8177ba6b397bfada0d305528b2c203a70dcdce62a6bc6c7808a04d60e5ccb450",
+        "0x6cebad840d832969075216c8907f6a768adf9cf36698dcc3ef01a547ebaa5303",
+        "0x6a31284f78921fe2bc680cbf710906cc1bc515058a0038903f189ec6f5698dc9"
+    ],
+    "values": [
+        {
+            "value": [
+                "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+                0
+            ],
+            "treeIndex": 6
+        },
+        {
+            "value": [
+                "0x9bA6e2D3c9c1e7C1648C5cFC8c99c4b271eDaBc3",
+                0
+            ],
+            "treeIndex": 8
+        },
+        {
+            "value": [
+                "0x82e33ddC22F38A3BeF5541073dF84106B09f04cE",
+                0
+            ],
+            "treeIndex": 5
+        },
+        {
+            "value": [
+                "0x82C46C4EA58B7D6D87704ecD459ee9EfBf458B26",
+                0
+            ],
+            "treeIndex": 9
+        },
+        {
+            "value": [
+                "0x0f25e56443330242F3a70dC101D1Cd42bd12F629",
+                0
+            ],
+            "treeIndex": 7
+        },
+        {
+            "value": [
+                "0x4dEE0017ade1484D203C7CBE32f3BB79aEd7F66A",
+                0
+            ],
+            "treeIndex": 10
+        }
+    ],
+    "leafEncoding": [
+        "address",
+        "uint256"
+    ]
+}
