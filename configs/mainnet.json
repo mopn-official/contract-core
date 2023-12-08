@@ -1,0 +1,23 @@
+{
+    "thegraph": "https://api.thegraph.com/subgraphs/name/cyanface/mopn-mainnet",
+    "network": "mainnet",
+    "contracts": {
+        "ERC6551Registry": "0x02101dfB77FDE026414827Fdc604ddAF224F0921",
+        "TileMath": "0x7b565ff42a1e7c8479c8129efadc438e55f0f062",
+        "NFTSVG": "0x41e4573c274fd34493d1fd5f7973c2bb038669fb",
+        "NFTMetaData": "0x243bc385be3bef872931cb6e80f9e85e1a0650bd",
+        "MOPNGovernance": "0xf2DDf4151ca1719418454150a19Cd86a6faD7705",
+        "MOPNToken": "0x2A6aE93c75D762646eA641cD5B955FB09dc59A77",
+        "MOPNERC6551Account": "0xa1760379e1e623c3cfdd050c7f6f7958f210ed0c",
+        "MOPNERC6551AccountProxy": "0xbbae0f0dBb890099dac1b5281e64F7b8CbAF8568",
+        "MOPNERC6551AccountHelper": "0x94927D6628386f495edCdd28813188A7E7b29D6f",
+        "MOPN": "0x802074b8a4aDA6420811c9ec368349fd3204002F",
+        "MOPNData": "0x4E271c67DeB30267C74a12b1Cfd25b5782BCf21c",
+        "MOPNCollectionVault": "0xA598fC3379ed517EA94DCf3350Fcb11001dcE47c",
+        "MOPNAuctionHouse": "0x0cd48695aDe155B79d8CCdC17eCE1C89B3CAFA8C",
+        "MOPNBomb": "0x058Bf43a0b7eEd6Cc7e9A032d418B7B95E9A5371",
+        "MOPNPoint": "0x34043B263AC3c865E4FfF222A2C46022c27cE9bE",
+        "MOPNLandMetaDataRender": "0x6B7462bcA8f1b6B1366CF170EAF71b1e81560f82",
+        "MOPNLand": "0x29ec6f235b1d7cb6ab501ae8e5428974baf90e56"
+    }
+}
