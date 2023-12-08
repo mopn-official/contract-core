@@ -194,9 +194,10 @@ contract MOPNGovernance is Multicall, Ownable {
 
         address _account = Create2.computeAddress(bytes32(0), keccak256(code));
 
-        if (_account.code.length != 0) return _account;
+        if (_account.code.length == 0) {
+            _account = Create2.deploy(0, bytes32(0), code);
+        }
 
-        _account = Create2.deploy(0, bytes32(0), code);
         return _account;
     }
 

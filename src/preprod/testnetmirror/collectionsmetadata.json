@@ -862,5 +862,37 @@
         "baseURI": "ipfs://",
         "extURI": "",
         "tokenURIexample": "ipfs://QmUAxmbemeotbsyXwtEpdR2ytP9EnHVkcAdjFdJdh8PkM3"
+    },
+    "0x6efc003d3f3658383f06185503340c2cf27a57b6": {
+        "mainnetAddress": "0x6efc003d3f3658383f06185503340c2cf27a57b6",
+        "name": "YOU THE REAL MVP",
+        "symbol": "MVP",
+        "baseURI": "https://api.memeland.com/metadata/",
+        "extURI": "",
+        "tokenURIexample": "https://api.memeland.com/metadata/245"
+    },
+    "0xda7e6010618cf782280dd7eb107fd57c27d13035": {
+        "mainnetAddress": "0xda7e6010618cf782280dd7eb107fd57c27d13035",
+        "name": "GEN1 Pass Holders",
+        "symbol": "GEN1PASS",
+        "baseURI": "https://beaigen1.s3.amazonaws.com/nft/metadata/",
+        "extURI": "",
+        "tokenURIexample": "https://beaigen1.s3.amazonaws.com/nft/metadata/364"
+    },
+    "0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d": {
+        "mainnetAddress": "0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d",
+        "name": "Sothebys Gen Art",
+        "symbol": "STBYS",
+        "baseURI": "https://token.artblocks.io/0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d/",
+        "extURI": "",
+        "tokenURIexample": "https://token.artblocks.io/0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d/254"
+    },
+    "0x294fed5f1d3d30cfa6fe86a937dc3141eec8bc6d": {
+        "mainnetAddress": "0x294fed5f1d3d30cfa6fe86a937dc3141eec8bc6d",
+        "name": "PROOF Blocks 2",
+        "symbol": "PRFBLCKS2",
+        "baseURI": "https://token.artblocks.io/0x294fed5f1d3d30cfa6fe86a937dc3141eec8bc6d/",
+        "extURI": "",
+        "tokenURIexample": "https://token.artblocks.io/0x294fed5f1d3d30cfa6fe86a937dc3141eec8bc6d/5000117"
     }
 }

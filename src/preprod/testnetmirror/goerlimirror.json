@@ -342,5 +342,13 @@
     "0xa38b204ce561eb5af49614944e0129d9c8d43354": {
         "mirrorAddress": "0x77a9a333C4c362286a845469222E94667b773320",
         "initialize": true
+    },
+    "0x9a87a43ac0b50984cd20964cb4978e6d9b3cbe5d": {
+        "mirrorAddress": "0x33950d94f6a1296AE08f2BA65beeC039ABF9a10f",
+        "initialize": true
+    },
+    "0xeb2dfc54ebafca8f50efcc1e21a9d100b5aeb349": {
+        "mirrorAddress": "0xBF74Afb30036ce0Fab0e15ceb0836bD52BF4144D",
+        "initialize": true
     }
 }

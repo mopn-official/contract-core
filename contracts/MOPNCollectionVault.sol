@@ -327,7 +327,9 @@ contract MOPNCollectionVault is
             );
 
             if (
-                collectionAddress_ == 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB
+                collectionAddress_ ==
+                0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB ||
+                collectionAddress_ == 0x4dEE0017ade1484D203C7CBE32f3BB79aEd7F66A
             ) {
                 ICryptoPunks(collectionAddress_).transferPunk(
                     from,

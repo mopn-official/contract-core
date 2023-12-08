@@ -48,8 +48,6 @@ contract MOPN is IMOPN, Multicall {
     uint32 public MTStepStartBlock;
     uint16 public nextLandId;
 
-    //total uint bits of above
-
     mapping(address => CollectionDataStruct) public CDs;
 
     mapping(address => AccountDataStruct) public ADs;
