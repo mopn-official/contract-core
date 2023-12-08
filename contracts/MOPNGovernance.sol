@@ -18,15 +18,6 @@ import "@openzeppelin/contracts/utils/Create2.sol";
 |  |  |  | |  `--'  | |  |      |  |\   | 
 |__|  |__|  \______/  | _|      |__| \__| 
 */
-
-/*
-.___  ___.   ______   .______   .__   __. 
-|   \/   |  /  __  \  |   _  \  |  \ |  | 
-|  \  /  | |  |  |  | |  |_)  | |   \|  | 
-|  |\/|  | |  |  |  | |   ___/  |  . `  | 
-|  |  |  | |  `--'  | |  |      |  |\   | 
-|__|  |__|  \______/  | _|      |__| \__| 
-*/
 contract MOPNGovernance is Multicall, Ownable {
     event CollectionVaultCreated(
         address indexed collectionAddress,
