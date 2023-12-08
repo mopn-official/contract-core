@@ -56,21 +56,9 @@ module.exports = {
       accounts:
         process.env.PRIVATE_KEY !== undefined
           ? [
-              process.env.PRIVATE_KEY,
-              process.env.PRIVATE_KEY_1,
-              process.env.PRIVATE_KEY_2,
-              process.env.PRIVATE_KEY_3,
+              process.env.PRIVATE_KEY
             ]
           : [],
-    },
-    goerli_dev: {
-      url: process.env.GOERLI_URL,
-      chainId: 5,
-      etherscanHost: "https://goerli.etherscan.io/",
-      accounts: {
-        mnemonic: process.env.MNEMONIC,
-        count: 100,
-      },
     },
     sepolia: {
       url: process.env.SEPOLIA_URL,

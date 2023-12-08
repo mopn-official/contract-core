@@ -8,7 +8,8 @@ async function main() {
   const deployConf = loadConf();
 
   let contractName, Contract, contract;
-
+  const feeData = await ethers.provider.getFeeData();
+  console.log("feeData", feeData);
   console.log("deploy start");
   for (let i = 0; i < deployConf.contracts.length; i++) {
     contractName = deployConf.contracts[i];
@@ -34,9 +35,9 @@ async function main() {
             constructparams[j] = deployConf[constructparams[j]].address;
           }
         }
-        contract = await Contract.deploy(...constructparams, { gasPrice: 3000000000 });
+        contract = await Contract.deploy(...constructparams);
       } else {
-        contract = await Contract.deploy({ gasPrice: 3000000000 });
+        contract = await Contract.deploy();
       }
 
       await contract.waitForDeployment();
