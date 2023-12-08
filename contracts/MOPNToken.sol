@@ -10,6 +10,14 @@ import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
+/*
+.___  ___.   ______   .______   .__   __. 
+|   \/   |  /  __  \  |   _  \  |  \ |  | 
+|  \  /  | |  |  |  | |  |_)  | |   \|  | 
+|  |\/|  | |  |  |  | |   ___/  |  . `  | 
+|  |  |  | |  `--'  | |  |      |  |\   | 
+|__|  |__|  \______/  | _|      |__| \__| 
+*/
 contract MOPNToken is ERC20Burnable, Multicall {
     /**
      * @dev Magic value to be returned by ERC20Receiver upon successful reception of token(s)

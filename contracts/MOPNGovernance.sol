@@ -19,9 +19,14 @@ import "@openzeppelin/contracts/utils/Create2.sol";
 |__|  |__|  \______/  | _|      |__| \__| 
 */
 
-/// @title Governance of MOPN
-/// @author Cyanface<cyanface@outlook.com>
-/// @dev Governance is all other MOPN contract's owner
+/*
+.___  ___.   ______   .______   .__   __. 
+|   \/   |  /  __  \  |   _  \  |  \ |  | 
+|  \  /  | |  |  |  | |  |_)  | |   \|  | 
+|  |\/|  | |  |  |  | |   ___/  |  . `  | 
+|  |  |  | |  `--'  | |  |      |  |\   | 
+|__|  |__|  \______/  | _|      |__| \__| 
+*/
 contract MOPNGovernance is Multicall, Ownable {
     event CollectionVaultCreated(
         address indexed collectionAddress,

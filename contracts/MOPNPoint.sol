@@ -6,6 +6,14 @@ import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNBomb.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
+/*
+.___  ___.   ______   .______   .__   __. 
+|   \/   |  /  __  \  |   _  \  |  \ |  | 
+|  \  /  | |  |  |  | |  |_)  | |   \|  | 
+|  |\/|  | |  |  |  | |   ___/  |  . `  | 
+|  |  |  | |  `--'  | |  |      |  |\   | 
+|__|  |__|  \______/  | _|      |__| \__| 
+*/
 contract MOPNPoint is ERC20 {
     IMOPNGovernance governance;
 

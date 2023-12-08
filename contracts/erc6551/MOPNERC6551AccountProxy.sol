@@ -15,11 +15,9 @@ interface ICryptoPunks {
 }
 
 contract MOPNERC6551AccountProxy is Proxy, ERC1967Upgrade {
-    address public immutable governance;
     address public immutable defaultImplementation;
 
-    constructor(address governance_, address defaultImplementation_) {
-        governance = governance_;
+    constructor(address defaultImplementation_) {
         defaultImplementation = defaultImplementation_;
     }
 

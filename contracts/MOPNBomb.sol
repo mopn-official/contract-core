@@ -9,6 +9,14 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/*
+.___  ___.   ______   .______   .__   __. 
+|   \/   |  /  __  \  |   _  \  |  \ |  | 
+|  \  /  | |  |  |  | |  |_)  | |   \|  | 
+|  |\/|  | |  |  |  | |   ___/  |  . `  | 
+|  |  |  | |  `--'  | |  |      |  |\   | 
+|__|  |__|  \______/  | _|      |__| \__| 
+*/
 contract MOPNBomb is ERC1155, Multicall, Ownable {
     string public name;
     string public symbol;

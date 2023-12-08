@@ -98,7 +98,6 @@ describe("MOPN", function () {
     console.log("MOPNERC6551Account", await erc6551account.getAddress());
 
     erc6551accountproxy = await hre.ethers.deployContract("MOPNERC6551AccountProxy", [
-      await mopngovernance.getAddress(),
       await erc6551account.getAddress(),
     ]);
     await erc6551accountproxy.waitForDeployment();
@@ -260,8 +259,8 @@ describe("MOPN", function () {
       }
     }
 
-    await deployAccountNFT(await testpunk.getAddress(), 0, 10000997, 0);
-    await deployAccountNFT(await testpunk.getAddress(), 1, 10000996, 0);
+    await deployAccountNFT(await testwow.getAddress(), 0, 10000997, 0);
+    await deployAccountNFT(await testwow.getAddress(), 1, 10000996, 0);
 
     await avatarInfo();
     await collectionInfo();
@@ -277,7 +276,7 @@ describe("MOPN", function () {
     await collectionInfo();
     await showWalletBalance();
 
-    await buyBombAnddeployAccount(1, await testpunk.getAddress(), 2, 10000998, 0);
+    await buyBombAnddeployAccount(1, await testwow.getAddress(), 2, 10000998, 0);
 
     await avatarInfo();
     await collectionInfo();
@@ -287,7 +286,7 @@ describe("MOPN", function () {
   it("test stakingMT", async function () {
     await loadFixture(deployAndSetInitialNFTS);
 
-    const collection1 = collections[2];
+    const collection1 = collections[0];
 
     console.log("create collection", collection1, "vault");
     const tx1 = await mopngovernance.createCollectionVault(collection1);
@@ -312,15 +311,13 @@ describe("MOPN", function () {
 
     console.log("vault1 nft bid price", formatUnits(await vault1.getBidCurrentPrice(), mtdecimals));
 
-    console.log("nft owner", await testpunk.punkIndexToAddress(1), "owner0", owners[0].address);
+    console.log("nft owner", await testazuki.ownerOf(1), "owner0", owners[0].address);
 
-    const tx4 = await testpunk
-      .connect(owners[0])
-      .offerPunkForSaleToAddress(1, 0, await vault1.getAddress());
+    const tx4 = await testazuki.connect(owner).approve(await vault1.getAddress(), 1);
     await tx4.wait();
 
     console.log("accept vault1 nft offer");
-    const tx5 = await vault1.connect(owners[0]).acceptBid(1);
+    const tx5 = await vault1.connect(owner).acceptBid(1);
     await tx5.wait();
 
     await showWalletBalance();

@@ -13,8 +13,14 @@ import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-/// @title Arsenal for Bomb
-/// @author Cyanface<cyanface@outlook.com>
+/*
+.___  ___.   ______   .______   .__   __. 
+|   \/   |  /  __  \  |   _  \  |  \ |  | 
+|  \  /  | |  |  |  | |  |_)  | |   \|  | 
+|  |\/|  | |  |  |  | |   ___/  |  . `  | 
+|  |  |  | |  `--'  | |  |      |  |\   | 
+|__|  |__|  \______/  | _|      |__| \__| 
+*/
 contract MOPNAuctionHouse is Multicall {
     IMOPNGovernance public governance;
 

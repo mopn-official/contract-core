@@ -22,6 +22,14 @@ interface ICryptoPunks {
     function transferPunk(address to, uint punkIndex) external;
 }
 
+/*
+.___  ___.   ______   .______   .__   __. 
+|   \/   |  /  __  \  |   _  \  |  \ |  | 
+|  \  /  | |  |  |  | |  |_)  | |   \|  | 
+|  |\/|  | |  |  |  | |   ___/  |  . `  | 
+|  |  |  | |  `--'  | |  |      |  |\   | 
+|__|  |__|  \______/  | _|      |__| \__| 
+*/
 contract MOPNCollectionVault is
     IMOPNCollectionVault,
     ERC20,

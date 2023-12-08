@@ -28,6 +28,6 @@ interface IERC6551Executable {
         address to,
         uint256 value,
         bytes calldata data,
-        uint256 operation
+        uint8 operation
     ) external payable returns (bytes memory);
 }

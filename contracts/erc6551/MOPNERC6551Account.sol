@@ -4,7 +4,6 @@ pragma solidity ^0.8.19;
 import "hardhat/console.sol";
 
 import "./interfaces/IMOPNERC6551Account.sol";
-import "../interfaces/IMOPN.sol";
 import "../interfaces/IMOPNGovernance.sol";
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -47,9 +46,9 @@ contract MOPNERC6551Account is
         address to,
         uint256 value,
         bytes calldata data,
-        uint256 operation
+        uint8 operation
     ) external payable returns (bytes memory result) {
-        require(isOwner(msg.sender), "Not token owner");
+        require(_isValidSigner(msg.sender), "Invalid signer");
         require(operation == 0, "Only call operations are supported");
         ++state;
         return _call(to, value, data);
@@ -62,7 +61,7 @@ contract MOPNERC6551Account is
         uint256 operation,
         address msgsender
     ) external payable onlyHelper returns (bytes memory result) {
-        require(isOwner(msgsender), "Not token owner");
+        require(_isValidSigner(msgsender), "Invalid signer");
         require(operation == 0, "Only call operations are supported");
         ++state;
         return _call(to, value, data);
@@ -89,7 +88,13 @@ contract MOPNERC6551Account is
         view
         returns (uint256 chainId, address tokenContract, uint256 tokenId)
     {
-        return ERC6551AccountLib.token();
+        bytes memory footer = new bytes(0x60);
+
+        assembly {
+            extcodecopy(address(), add(footer, 0x20), 0x4d, 0x60)
+        }
+
+        return abi.decode(footer, (uint256, address, uint256));
     }
 
     function owner() public view returns (address) {
@@ -104,14 +109,6 @@ contract MOPNERC6551Account is
         }
     }
 
-    function isOwner(address caller) public view returns (bool) {
-        address owner_ = owner();
-        if (caller == owner_) return true;
-        if (caller == address(this)) return true;
-        if (owner_ == address(0)) revert OwnerNotExist();
-        return false;
-    }
-
     function supportsInterface(
         bytes4 interfaceId
     ) external pure returns (bool) {
@@ -123,8 +120,8 @@ contract MOPNERC6551Account is
     function isValidSigner(
         address signer,
         bytes calldata
-    ) external view returns (bytes4) {
-        if (isOwner(signer)) {
+    ) external view virtual returns (bytes4) {
+        if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
 
@@ -146,6 +143,12 @@ contract MOPNERC6551Account is
         }
 
         return "";
+    }
+
+    function _isValidSigner(
+        address signer
+    ) internal view virtual returns (bool) {
+        return signer == owner();
     }
 
     /// @dev Allows ERC-1155 tokens to be received. This function can be overriden.

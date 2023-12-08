@@ -26,9 +26,6 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 |  |  |  | |  `--'  | |  |      |  |\   | 
 |__|  |__|  \______/  | _|      |__| \__| 
 */
-
-/// @title MOPN Contract
-/// @author Cyanface <cyanface@outlook.com>
 contract MOPN is IMOPN, Multicall {
     using BitMaps for BitMaps.BitMap;
 
@@ -212,16 +209,18 @@ contract MOPN is IMOPN, Multicall {
         address[] memory tileAccounts,
         address collectionAddress
     ) internal {
-        bool isOwner;
-        try IMOPNERC6551Account(payable(account)).isOwner(msg.sender) returns (
-            bool isOwner_
-        ) {
-            isOwner = isOwner_;
-            if (ADs[account].Coordinate > 0) {
-                require(isOwner, "not account owner");
+        bool isOwner = msg.sender == account;
+        if (!isOwner) {
+            try IMOPNERC6551Account(payable(account)).owner() returns (
+                address accountOwner
+            ) {
+                isOwner = msg.sender == accountOwner;
+                if (ADs[account].Coordinate > 0) {
+                    require(isOwner, "not account owner");
+                }
+            } catch (bytes memory) {
+                require(false, "account owner error");
             }
-        } catch (bytes memory) {
-            require(false, "account owner error");
         }
 
         require(block.number >= MTStepStartBlock, "mopn is not open yet");
@@ -671,11 +670,17 @@ contract MOPN is IMOPN, Multicall {
                     settleCollectionMT(getAccountCollection(accounts[i][k]));
                 }
 
-                if (
-                    IMOPNERC6551Account(payable(accounts[i][k])).isOwner(
-                        msg.sender
-                    )
-                ) {
+                bool isOwner = msg.sender == accounts[i][k];
+                if (!isOwner) {
+                    try
+                        IMOPNERC6551Account(payable(accounts[i][k])).owner()
+                    returns (address accountOwner) {
+                        isOwner = msg.sender == accountOwner;
+                    } catch (bytes memory) {
+                        require(false, "account owner error");
+                    }
+                }
+                if (isOwner) {
                     if (ADs[accounts[i][k]].Coordinate > 0) {
                         settleAccountMT(
                             accounts[i][k],
@@ -693,7 +698,17 @@ contract MOPN is IMOPN, Multicall {
     }
 
     function claimAccountMT(address account) external {
-        if (IMOPNERC6551Account(payable(account)).isOwner(msg.sender)) {
+        bool isOwner = msg.sender == account;
+        if (!isOwner) {
+            try IMOPNERC6551Account(payable(account)).owner() returns (
+                address accountOwner
+            ) {
+                isOwner = msg.sender == accountOwner;
+            } catch (bytes memory) {
+                require(false, "account owner error");
+            }
+        }
+        if (isOwner) {
             if (ADs[account].Coordinate > 0) {
                 settlePerMOPNPointMinted();
                 address collectionAddress = getAccountCollection(account);
