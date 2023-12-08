@@ -3926,5 +3926,365 @@
         "baseURI": "ipfs://QmTDw49hJRhKXX9g8fyNuj1sdzVB4ku1xBBHWmQxtTr9jp/",
         "extURI": ".json",
         "tokenURIexample": "ipfs://QmTDw49hJRhKXX9g8fyNuj1sdzVB4ku1xBBHWmQxtTr9jp/wumbopass.json"
+    },
+    "0x9772f5df100bba0d4e637ab866b17f94fcac0cf8": {
+        "mainnetAddress": "0x9772f5df100bba0d4e637ab866b17f94fcac0cf8",
+        "name": "Sybil Samurai",
+        "symbol": "Sybil Samurai",
+        "baseURI": "ipfs://bafybeifnek24coy5xj5qabdwh24dlp5omq34nzgvazkfyxgnqms4eidsiq/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://bafybeifnek24coy5xj5qabdwh24dlp5omq34nzgvazkfyxgnqms4eidsiq/3.json"
+    },
+    "0x7f312a75b62846033bc5471c5bcb94b1abfaf06d": {
+        "mainnetAddress": "0x7f312a75b62846033bc5471c5bcb94b1abfaf06d",
+        "name": "Ethlizards",
+        "symbol": "LIZARD",
+        "baseURI": "https://ipfs.io/ipfs/QmR29if4Kk4YKGAeC2kLzyd5nwcnEMpa645kxsDUC4uqbt/",
+        "extURI": ".json",
+        "tokenURIexample": "https://ipfs.io/ipfs/QmR29if4Kk4YKGAeC2kLzyd5nwcnEMpa645kxsDUC4uqbt/4370.json"
+    },
+    "0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d": {
+        "mainnetAddress": "0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d",
+        "name": "Sothebys Gen Art",
+        "symbol": "STBYS",
+        "baseURI": "https://token.artblocks.io/0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d/",
+        "extURI": "",
+        "tokenURIexample": "https://token.artblocks.io/0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d/254"
+    },
+    "0x13303b4ee819fac204be5ef77523cfcd558c082f": {
+        "mainnetAddress": "0x13303b4ee819fac204be5ef77523cfcd558c082f",
+        "name": "Mythics: Egg",
+        "symbol": "EGG",
+        "baseURI": "https://metadata.proof.xyz/mythics/egg/",
+        "extURI": "",
+        "tokenURIexample": "https://metadata.proof.xyz/mythics/egg/6909"
+    },
+    "0x08ba8cbbefa64aaf9df25e57fe3f15ecc277af74": {
+        "mainnetAddress": "0x08ba8cbbefa64aaf9df25e57fe3f15ecc277af74",
+        "name": "LaserCat",
+        "symbol": "Cat",
+        "baseURI": "https://api.lasercat.co/metadata/",
+        "extURI": "",
+        "tokenURIexample": "https://api.lasercat.co/metadata/367"
+    },
+    "0x2ced5bc349d9241a314d3739f12f5f6f2bda6a68": {
+        "mainnetAddress": "0x2ced5bc349d9241a314d3739f12f5f6f2bda6a68",
+        "name": "PROOF Pass",
+        "symbol": "PP",
+        "baseURI": "ipfs://",
+        "extURI": "",
+        "tokenURIexample": "ipfs://bafkreibmx4uvaz4czw4no23fzbz7nebbbekw65w32zylngbxtgyg2cbobe"
+    },
+    "0xa74ae2c6fca0cedbaef30a8ceef834b247186bcf": {
+        "mainnetAddress": "0xa74ae2c6fca0cedbaef30a8ceef834b247186bcf",
+        "name": "Gh0stlyGh0sts",
+        "symbol": "gg",
+        "baseURI": "ipfs://QmQ8p1Re7zYWnyU6g6cez62MDqi9mTBJZPaNvfbuJ8yWNQ/eth/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmQ8p1Re7zYWnyU6g6cez62MDqi9mTBJZPaNvfbuJ8yWNQ/eth/5291"
+    },
+    "0xccc1825cf04cae4d497b202d1434ec0f79ee535f": {
+        "mainnetAddress": "0xccc1825cf04cae4d497b202d1434ec0f79ee535f",
+        "name": "Kagami",
+        "symbol": "KAGAMI",
+        "baseURI": "https://media.10ktf.com/kagami/metadata/",
+        "extURI": "",
+        "tokenURIexample": "https://media.10ktf.com/kagami/metadata/495"
+    },
+    "0xb4e570232d3e55d2ee850047639dc74da83c7067": {
+        "mainnetAddress": "0xb4e570232d3e55d2ee850047639dc74da83c7067",
+        "name": "Band Bears",
+        "symbol": "BANDB",
+        "baseURI": "ipfs://QmNPDmViVc4mojbGwo9f5tAiAhaJ2vUicxkAZiYCfWNopT/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmNPDmViVc4mojbGwo9f5tAiAhaJ2vUicxkAZiYCfWNopT/153"
+    },
+    "0x49c3fb5ed059e3960898ede11cd9a0151460c3b8": {
+        "mainnetAddress": "0x49c3fb5ed059e3960898ede11cd9a0151460c3b8",
+        "name": "EatCollective",
+        "symbol": "EAT",
+        "baseURI": "ipfs://bafybeicfa767rkktu7kspufgwz27xwbzlq3r2vhefxuqjsflnmgph4u73e/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://bafybeicfa767rkktu7kspufgwz27xwbzlq3r2vhefxuqjsflnmgph4u73e/577"
+    },
+    "0x67405cadb820c2d89b8d6da3e42ef6a39089c831": {
+        "mainnetAddress": "0x67405cadb820c2d89b8d6da3e42ef6a39089c831",
+        "name": "Element Genesis",
+        "symbol": "ELEG",
+        "baseURI": "ipfs://QmZgCvuTBKmsE2LJYJvRf3eqpnLXR8qtyWEKtSHLyy6vvL/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmZgCvuTBKmsE2LJYJvRf3eqpnLXR8qtyWEKtSHLyy6vvL/396"
+    },
+    "0x3bf99d504e67a977f88b417ab68d34915f3a1209": {
+        "mainnetAddress": "0x3bf99d504e67a977f88b417ab68d34915f3a1209",
+        "name": "HENI Editions Deed - The Empresses",
+        "symbol": "HEDE",
+        "baseURI": "ipfs://QmYcvQ8VGoP62udrEJyTxWeTniNvh7i4W8m9Xxn7d9QTuK/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://QmYcvQ8VGoP62udrEJyTxWeTniNvh7i4W8m9Xxn7d9QTuK/1032432.json"
+    },
+    "0x2308742aa28cc460522ff855d24a365f99deba7b": {
+        "mainnetAddress": "0x2308742aa28cc460522ff855d24a365f99deba7b",
+        "name": "FLUF World: Buzzies",
+        "symbol": "BUZZIES",
+        "baseURI": "https://hni-pots-api.fluf.world/token/",
+        "extURI": "",
+        "tokenURIexample": "https://hni-pots-api.fluf.world/token/1104"
+    },
+    "0xffa60cd831374f40358de1aa0489123935a8287d": {
+        "mainnetAddress": "0xffa60cd831374f40358de1aa0489123935a8287d",
+        "name": "InfiniGods: Elder Gods",
+        "symbol": "GODS",
+        "baseURI": "https://elder-images.s3.amazonaws.com/json/",
+        "extURI": ".json",
+        "tokenURIexample": "https://elder-images.s3.amazonaws.com/json/4413.json"
+    },
+    "0x1d9a1491924c1847e669dafde86341ad92a87fe2": {
+        "mainnetAddress": "0x1d9a1491924c1847e669dafde86341ad92a87fe2",
+        "name": "AltLayer OG Badge",
+        "symbol": "ALTOG",
+        "baseURI": "https://altlayer.mypinata.cloud/ipfs/QmbkA9YsVPmNGVgdKMfWJrhqsmcJBEW4pZkRjfXHBqcwD2/",
+        "extURI": "",
+        "tokenURIexample": "https://altlayer.mypinata.cloud/ipfs/QmbkA9YsVPmNGVgdKMfWJrhqsmcJBEW4pZkRjfXHBqcwD2/139"
+    },
+    "0x77654e7e579b3c817a3672c1c66c050058b92b85": {
+        "mainnetAddress": "0x77654e7e579b3c817a3672c1c66c050058b92b85",
+        "name": "TCG World Dragons",
+        "symbol": "TCGD",
+        "baseURI": "https://tcgdragons.mypinata.cloud/ipfs/QmabRELoaGDH7axM1hfz76AjSSUwFenUqVXuUeCbSE9t5H/",
+        "extURI": "",
+        "tokenURIexample": "https://tcgdragons.mypinata.cloud/ipfs/QmabRELoaGDH7axM1hfz76AjSSUwFenUqVXuUeCbSE9t5H/4274/"
+    },
+    "0x575ec01a9e70bf3e192a774eb265c46ec993e4cc": {
+        "mainnetAddress": "0x575ec01a9e70bf3e192a774eb265c46ec993e4cc",
+        "name": "FLUF World: EGGs",
+        "symbol": "EGGs",
+        "baseURI": "https://eggs-api.fluf.world/api/token/",
+        "extURI": "",
+        "tokenURIexample": "https://eggs-api.fluf.world/api/token/9990"
+    },
+    "0x46ac8540d698167fcbb9e846511beb8cf8af9bd8": {
+        "mainnetAddress": "0x46ac8540d698167fcbb9e846511beb8cf8af9bd8",
+        "name": "Quantum Art",
+        "symbol": "QART",
+        "baseURI": "ipfs://QmQXwTakTM2BGPiCe1fpvxTx4LUJQiyiUSBtnWCktaXS5F/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmQXwTakTM2BGPiCe1fpvxTx4LUJQiyiUSBtnWCktaXS5F/206"
+    },
+    "0xe106c63e655df0e300b78336af587f300cff9e76": {
+        "mainnetAddress": "0xe106c63e655df0e300b78336af587f300cff9e76",
+        "name": "OxyaOriginProject",
+        "symbol": "OXYA",
+        "baseURI": "ipfs://QmV9A6h8nj5o4WzUZPSJf4zt5cktsGYAQZSFbJCowab6rW/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmV9A6h8nj5o4WzUZPSJf4zt5cktsGYAQZSFbJCowab6rW/3068"
+    },
+    "0x703e54bb5e5e03db13678af8fd6357348fa35d15": {
+        "mainnetAddress": "0x703e54bb5e5e03db13678af8fd6357348fa35d15",
+        "name": "Fatzuki",
+        "symbol": "Fatzuki",
+        "baseURI": "https://fatzuki.io/metadata/item/",
+        "extURI": "",
+        "tokenURIexample": "https://fatzuki.io/metadata/item/9322 "
+    },
+    "0x4b61413d4392c806e6d0ff5ee91e6073c21d6430": {
+        "mainnetAddress": "0x4b61413d4392c806e6d0ff5ee91e6073c21d6430",
+        "name": "MURI",
+        "symbol": "MURI",
+        "baseURI": "ipfs://QmcZxHhwRoW5erreJX8haNrQm4EzcTZDXXCBFEi9X1kgq6/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmcZxHhwRoW5erreJX8haNrQm4EzcTZDXXCBFEi9X1kgq6/8217"
+    },
+    "0x6d1b09ae12adeaa3aa5d6b574dbcfaf7343a0b04": {
+        "mainnetAddress": "0x6d1b09ae12adeaa3aa5d6b574dbcfaf7343a0b04",
+        "name": "Space Eggs",
+        "symbol": "SPACE EGGS",
+        "baseURI": "ipfs://bafybeiakyhkm6yc2t4pjlp7anafxvly6dlyhrxdc5brcufxhej4qn7jyj4/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://bafybeiakyhkm6yc2t4pjlp7anafxvly6dlyhrxdc5brcufxhej4qn7jyj4/1130.json"
+    },
+    "0xb452ff31b35dee74f2fdfd5194b91af1bad07b91": {
+        "mainnetAddress": "0xb452ff31b35dee74f2fdfd5194b91af1bad07b91",
+        "name": "XBorg",
+        "symbol": "XBORG",
+        "baseURI": " https://xborg.vispx.io/xborg/json/",
+        "extURI": ".json",
+        "tokenURIexample": " https://xborg.vispx.io/xborg/json/448.json"
+    },
+    "0x07d6b4db5dec392220cd52b026f9b78d9966c661": {
+        "mainnetAddress": "0x07d6b4db5dec392220cd52b026f9b78d9966c661",
+        "name": "GRIDS By Tristan Rettich",
+        "symbol": "GRID",
+        "baseURI": "ipfs://bafybeigqgy2ghnx2ds6iwccrddji35lirkemekmawp4giykc3hmykva5iu/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://bafybeigqgy2ghnx2ds6iwccrddji35lirkemekmawp4giykc3hmykva5iu/237"
+    },
+    "0x720786231ddf158ebd23bd590f73b29bff78d783": {
+        "mainnetAddress": "0x720786231ddf158ebd23bd590f73b29bff78d783",
+        "name": "Strands of Solitude by William Mapan",
+        "symbol": "STRANDS",
+        "baseURI": "https://tonic.xyz/nfts/0x720786231DDF158EbD23bD590F73b29BFF78D783/",
+        "extURI": "",
+        "tokenURIexample": "https://tonic.xyz/nfts/0x720786231DDF158EbD23bD590F73b29BFF78D783/170"
+    },
+    "0x8d609bd201beaea7dccbfbd9c22851e23da68691": {
+        "mainnetAddress": "0x8d609bd201beaea7dccbfbd9c22851e23da68691",
+        "name": "Dour Darcels",
+        "symbol": "DARCEL",
+        "baseURI": "ipfs://QmUHL7cgQFbqaf4LTWgdrQg2q7HUx4RvQ9YoyhPXAMVhq9/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmUHL7cgQFbqaf4LTWgdrQg2q7HUx4RvQ9YoyhPXAMVhq9/8361"
+    },
+    "0x0b22fe0a2995c5389ac093400e52471dca8bb48a": {
+        "mainnetAddress": "0x0b22fe0a2995c5389ac093400e52471dca8bb48a",
+        "name": "Little Lemon Friends",
+        "symbol": "LEMON",
+        "baseURI": "ipfs://QmYFXRu7pjj9KEGcMm6u7n8WCH8nAHamethtPrkoQS8zGq/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmYFXRu7pjj9KEGcMm6u7n8WCH8nAHamethtPrkoQS8zGq/2441"
+    },
+    "0x543d43f390b7d681513045e8a85707438c463d80": {
+        "mainnetAddress": "0x543d43f390b7d681513045e8a85707438c463d80",
+        "name": "Webaverse Genesis Pass",
+        "symbol": "WEBA",
+        "baseURI": "https://arweave.net/VkxhdXt3mfe89S1ueZo-QOnxyJKdFIBVZgiEG6GWrS8/",
+        "extURI": ".json",
+        "tokenURIexample": "https://arweave.net/VkxhdXt3mfe89S1ueZo-QOnxyJKdFIBVZgiEG6GWrS8/15607.json"
+    },
+    "0xeb6c5accafd8515c1b9e4c794bdc41532c5543ec": {
+        "mainnetAddress": "0xeb6c5accafd8515c1b9e4c794bdc41532c5543ec",
+        "name": "DGFamily",
+        "symbol": "DGFAM",
+        "baseURI": "https://nfts.unxd.com/nfts/dgfamily/",
+        "extURI": "",
+        "tokenURIexample": "https://nfts.unxd.com/nfts/dgfamily/63"
+    },
+    "0x620b70123fb810f6c653da7644b5dd0b6312e4d8": {
+        "mainnetAddress": "0x620b70123fb810f6c653da7644b5dd0b6312e4d8",
+        "name": "Space Doodles",
+        "symbol": "SDOODLE",
+        "baseURI": "https://api.spacedoodles.xyz/",
+        "extURI": "",
+        "tokenURIexample": "https://api.spacedoodles.xyz/6145"
+    },
+    "0xe127ce638293fa123be79c25782a5652581db234": {
+        "mainnetAddress": "0xe127ce638293fa123be79c25782a5652581db234",
+        "name": "The Llamas",
+        "symbol": "LLAMA",
+        "baseURI": "https://pks8zk7zt8.execute-api.us-east-1.amazonaws.com/prod/metadata/",
+        "extURI": "",
+        "tokenURIexample": "https://pks8zk7zt8.execute-api.us-east-1.amazonaws.com/prod/metadata/872"
+    },
+    "0xd900381f15ca67be1895a3626df210e33c8d7590": {
+        "mainnetAddress": "0xd900381f15ca67be1895a3626df210e33c8d7590",
+        "name": "Runicore V1",
+        "symbol": "RUNI",
+        "baseURI": "https://runi.splinterlands.com/metadata/",
+        "extURI": ".json",
+        "tokenURIexample": "https://runi.splinterlands.com/metadata/220.json"
+    },
+    "0xd532b88607b1877fe20c181cba2550e3bbd6b31c": {
+        "mainnetAddress": "0xd532b88607b1877fe20c181cba2550e3bbd6b31c",
+        "name": "SuperNormalbyZipcy",
+        "symbol": "SUPERNORMAL",
+        "baseURI": "ipfs://QmfMjK37DkqrVUjNPYYbJHDdspMM1T4vpvWhwpaRVPJjcP/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmfMjK37DkqrVUjNPYYbJHDdspMM1T4vpvWhwpaRVPJjcP/3148"
+    },
+    "0x78a5e2b8c280fa5580fbe1e1ed546183f959d305": {
+        "mainnetAddress": "0x78a5e2b8c280fa5580fbe1e1ed546183f959d305",
+        "name": "AlphaSharks",
+        "symbol": "ALPHASHARKS",
+        "baseURI": "ipfs://QmXPesTBCEqXQSy2mWrFfe31KW9dozJJ49Nuf39U4GP4Ly/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmXPesTBCEqXQSy2mWrFfe31KW9dozJJ49Nuf39U4GP4Ly/5390"
+    },
+    "0x94638cbf3c54c1f956a5f05cbc0f9afb6822020d": {
+        "mainnetAddress": "0x94638cbf3c54c1f956a5f05cbc0f9afb6822020d",
+        "name": "inbetweeners",
+        "symbol": "IBNS",
+        "baseURI": "ipfs://QmdgCXPAMR1SJ9JRogcR1hKqeb7Nfx8CXvjpA3TvHwTLDM/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://QmdgCXPAMR1SJ9JRogcR1hKqeb7Nfx8CXvjpA3TvHwTLDM/3886.json"
+    },
+    "0xe6115ada0452d6c48b292971e656bc07901b53f6": {
+        "mainnetAddress": "0xe6115ada0452d6c48b292971e656bc07901b53f6",
+        "name": "The Mounts of Seedworld",
+        "symbol": "TheMounts",
+        "baseURI": "ipfs://bafybeic56cn533ko66qt46aeqa3tipiy2gqlijo3xj2bebx4ny5sfoxany/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://bafybeic56cn533ko66qt46aeqa3tipiy2gqlijo3xj2bebx4ny5sfoxany/3005.json"
+    },
+    "0x49c36afa15c7fdbd57ce3d61d80f39b6615a76ef": {
+        "mainnetAddress": "0x49c36afa15c7fdbd57ce3d61d80f39b6615a76ef",
+        "name": "Invisible Friends 3D",
+        "symbol": "INVSBLE3D",
+        "baseURI": "https://invisiblefriends.io/api/metadata/3d/",
+        "extURI": "",
+        "tokenURIexample": "https://invisiblefriends.io/api/metadata/3d/4949"
+    },
+    "0x0616a2ef54bad0b37dce41c8d8e35cce17a926f3": {
+        "mainnetAddress": "0x0616a2ef54bad0b37dce41c8d8e35cce17a926f3",
+        "name": "BYOLand",
+        "symbol": "BYOLAND",
+        "baseURI": "https://landmeta.byoverse.io/meta/",
+        "extURI": "",
+        "tokenURIexample": "https://landmeta.byoverse.io/meta/9317"
+    },
+    "0x23f0dcecfe50f70d0c87578fd6a14f59900ab5e1": {
+        "mainnetAddress": "0x23f0dcecfe50f70d0c87578fd6a14f59900ab5e1",
+        "name": "Cel Mates",
+        "symbol": "CELMATES",
+        "baseURI": "https://judgement.celmates.wtf/api/prison/",
+        "extURI": "",
+        "tokenURIexample": "https://judgement.celmates.wtf/api/prison/3402"
+    },
+    "0x9c80777cae192e5031c38a0d951c55730ecc3f5e": {
+        "mainnetAddress": "0x9c80777cae192e5031c38a0d951c55730ecc3f5e",
+        "name": "ZombieClub Token",
+        "symbol": "ZCT",
+        "baseURI": "ipfs://",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmYjSK7o4ZBzuGQyEV7pbCs4cvFPiSGwCpaVwift4ehhpC"
+    },
+    "0xbce6d2aa86934af4317ab8615f89e3f9430914cb": {
+        "mainnetAddress": "0xbce6d2aa86934af4317ab8615f89e3f9430914cb",
+        "name": "VaynerSports Pass",
+        "symbol": "VSP",
+        "baseURI": "ipfs://QmcG9ThTZxYEQoH5BFv8tm8QsCR5eNC7praxHzAt1WwhvK/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmcG9ThTZxYEQoH5BFv8tm8QsCR5eNC7praxHzAt1WwhvK/6990"
+    },
+    "0x12dd66366d45f44128083233c6fbadfe7cbae221": {
+        "mainnetAddress": "0x12dd66366d45f44128083233c6fbadfe7cbae221",
+        "name": "Fijis",
+        "symbol": "FIJI",
+        "baseURI": "https://fijis.io/metadata/",
+        "extURI": "",
+        "tokenURIexample": "https://fijis.io/metadata/2131"
+    },
+    "0x4ca8dc8d6468a57dcf42254e5266a3a66e82b4c1": {
+        "mainnetAddress": "0x4ca8dc8d6468a57dcf42254e5266a3a66e82b4c1",
+        "name": "Burn Ghost Bounty Box",
+        "symbol": "BGBB",
+        "baseURI": "https://metadata.burnghost.com/bountybox/metadata-revealed/",
+        "extURI": ".json",
+        "tokenURIexample": "https://metadata.burnghost.com/bountybox/metadata-revealed/999.json"
+    },
+    "0x1b894ad527896027bced83e1bdbfef1f8b057b1b": {
+        "mainnetAddress": "0x1b894ad527896027bced83e1bdbfef1f8b057b1b",
+        "name": "DFA: Keys",
+        "symbol": "DFAKEY",
+        "baseURI": "\thttps://ipfs.io/ipfs/QmZQxEWMWGzSBvTevkyjiwc6Sj2hYNhw1b4hBhYhQjTd66/",
+        "extURI": ".json",
+        "tokenURIexample": "\thttps://ipfs.io/ipfs/QmZQxEWMWGzSBvTevkyjiwc6Sj2hYNhw1b4hBhYhQjTd66/100.json"
+    },
+    "0x2b982108cc8174b8bca73802470a6cd493473157": {
+        "mainnetAddress": "0x2b982108cc8174b8bca73802470a6cd493473157",
+        "name": "House of cards",
+        "symbol": "HOC",
+        "baseURI": "https://cdn-api.niftykit.com/reveal/clookt4k40001l90fhclwzgw2/",
+        "extURI": "",
+        "tokenURIexample": "https://cdn-api.niftykit.com/reveal/clookt4k40001l90fhclwzgw2/151"
     }
 }

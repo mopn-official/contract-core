@@ -9,7 +9,7 @@ async function main() {
   const collections = loadWhiteCollections(network);
 
   const whitlist = [];
-  const opentotalmopnpointmap = [0, 500000, 1000000];
+  const opentotalmopnpointmap = [0, 3000000, 10000000];
   let i = 0;
   for (const key in collections) {
     for (const collection of collections[key]) {

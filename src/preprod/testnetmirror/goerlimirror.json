@@ -1706,5 +1706,8 @@
     "0x762bc5880f128dcac29cffdde1cf7ddf4cfc39ee": {
         "mirrorAddress": "0xdC91D91eA127D9DdDAB188c8Bd54EF6EBE0fF1A5",
         "initialize": true
+    },
+    "0x12dd66366d45f44128083233c6fbadfe7cbae221": {
+        "mirrorAddress": "0x799DA1e86592f685249A36Db47D44b08B1722d91"
     }
 }
