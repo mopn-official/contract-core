@@ -204,10 +204,6 @@ describe("MOPN", function () {
     await tx.wait();
     console.log("updateERC6551Contract sent");
 
-    tx = await mopngovernance.add6551AccountImplementation(await erc6551account.getAddress());
-    await tx.wait();
-    console.log("add6551AccountImplementation sent");
-
     collections[0] = "0x82C46C4EA58B7D6D87704ecD459ee9EfBf458B26";
     collections[1] = "0x0f25e56443330242F3a70dC101D1Cd42bd12F629";
     collections[2] = "0x4dEE0017ade1484D203C7CBE32f3BB79aEd7F66A";

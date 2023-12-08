@@ -46,8 +46,6 @@ contract MOPNGovernance is Multicall, Ownable {
     address public ERC6551AccountProxy;
     address public ERC6551AccountHelper;
 
-    address[] public ERC6551AccountImplementations;
-
     modifier onlyMOPN() {
         require(msg.sender == mopnContract, "not allowed");
         _;
@@ -69,81 +67,6 @@ contract MOPNGovernance is Multicall, Ownable {
         ERC6551Registry = ERC6551Registry_;
         ERC6551AccountProxy = ERC6551AccountProxy_;
         ERC6551AccountHelper = ERC6551AccountHelper_;
-    }
-
-    function getDefault6551AccountImplementation()
-        public
-        view
-        returns (address implementation)
-    {
-        if (ERC6551AccountImplementations.length > 0)
-            implementation = ERC6551AccountImplementations[0];
-    }
-
-    function setDefault6551AccountImplementation(
-        address implementation
-    ) public onlyOwner {
-        address[] memory temps;
-        if (checkImplementationExist(implementation)) {
-            temps = new address[](ERC6551AccountImplementations.length);
-            uint256 i = 0;
-            temps[i] = implementation;
-            for (uint256 k = 0; k < ERC6551AccountImplementations.length; k++) {
-                if (ERC6551AccountImplementations[k] == implementation)
-                    continue;
-                i++;
-                temps[i] = ERC6551AccountImplementations[k];
-            }
-        } else {
-            temps = new address[](ERC6551AccountImplementations.length + 1);
-            temps[0] = implementation;
-            for (uint256 k = 0; k < ERC6551AccountImplementations.length; k++) {
-                temps[k + 1] = ERC6551AccountImplementations[k];
-            }
-        }
-        ERC6551AccountImplementations = temps;
-    }
-
-    function add6551AccountImplementation(
-        address implementation
-    ) public onlyOwner {
-        require(
-            !checkImplementationExist(implementation),
-            "implementation exist"
-        );
-
-        ERC6551AccountImplementations.push(implementation);
-    }
-
-    function del6551AccountImplementation(
-        address implementation
-    ) public onlyOwner {
-        require(
-            checkImplementationExist(implementation),
-            "implementation not exist"
-        );
-
-        address[] memory temps;
-        if (ERC6551AccountImplementations.length > 1) {
-            temps = new address[](ERC6551AccountImplementations.length - 1);
-            uint256 i = 0;
-            for (uint256 k = 0; k < ERC6551AccountImplementations.length; k++) {
-                if (ERC6551AccountImplementations[k] == implementation)
-                    continue;
-                temps[i] = ERC6551AccountImplementations[k];
-                i++;
-            }
-        }
-        ERC6551AccountImplementations = temps;
-    }
-
-    function checkImplementationExist(
-        address implementation
-    ) public view returns (bool) {
-        for (uint256 i = 0; i < ERC6551AccountImplementations.length; i++) {
-            if (ERC6551AccountImplementations[i] == implementation) return true;
-        }
-        return false;
     }
 
     function updateMOPNContracts(

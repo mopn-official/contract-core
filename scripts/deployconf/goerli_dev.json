@@ -88,15 +88,6 @@
                     "ERC6551AccountHelper"
                 ],
                 "updateMethod": "updateERC6551Contract"
-            },
-            {
-                "expectValue": [
-                    "MOPNERC6551Account"
-                ],
-                "attributes": [
-                    "getDefault6551AccountImplementation"
-                ],
-                "updateMethod": "setDefault6551AccountImplementation"
             }
         ]
     },

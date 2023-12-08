@@ -57,7 +57,6 @@ describe("MOPN", function () {
     mopn = await MOPN.deploy(
       mopngovernance.getAddress(),
       60000000,
-      0,
       "0x7e53a927cd6ec3af3b9bb0b1aec96074c82344674a0d328ab20431416cccb45f"
     );
     await mopn.waitForDeployment();
@@ -71,11 +70,6 @@ describe("MOPN", function () {
       await erc6551accounthelper.getAddress()
     );
     await governanceset6551tx.wait();
-
-    const governancesetaccounttx = await mopngovernance.add6551AccountImplementation(
-      await erc6551account.getAddress()
-    );
-    await governancesetaccounttx.wait();
   });
 
   it("test try cache", async function () {

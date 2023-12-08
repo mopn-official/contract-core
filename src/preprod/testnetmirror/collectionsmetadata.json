@@ -4286,5 +4286,21 @@
         "baseURI": "https://cdn-api.niftykit.com/reveal/clookt4k40001l90fhclwzgw2/",
         "extURI": "",
         "tokenURIexample": "https://cdn-api.niftykit.com/reveal/clookt4k40001l90fhclwzgw2/151"
+    },
+    "0x812f5cf0d10539ef9534929940f3aeede3d3d967": {
+        "mainnetAddress": "0x812f5cf0d10539ef9534929940f3aeede3d3d967",
+        "name": "DigiDaigakuMaskedVillains",
+        "symbol": "DIDMV",
+        "baseURI": "https://digidaigaku.com/masked-villains/metadata/",
+        "extURI": ".json",
+        "tokenURIexample": "https://digidaigaku.com/masked-villains/metadata/5231.json"
+    },
+    "0x05f08b01971cf70bcd4e743a8906790cfb9a8fb8": {
+        "mainnetAddress": "0x05f08b01971cf70bcd4e743a8906790cfb9a8fb8",
+        "name": "Wonders of the First",
+        "symbol": "WOTF",
+        "baseURI": "ipfs://bafybeibygb3isqz62iiqbftyps67wy73m5yhqj5vbvclcnzgmgmhn6yuyi/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://bafybeibygb3isqz62iiqbftyps67wy73m5yhqj5vbvclcnzgmgmhn6yuyi/1742"
     }
 }
