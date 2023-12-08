@@ -184,7 +184,7 @@ contract MOPNCollectionVault is
         IMOPN mopn = IMOPN(IMOPNGovernance(governance).mopnContract());
         mopn.claimCollectionMT(collectionAddress_);
         uint256 mtAmount = V2MTAmount(amount);
-        require(mtAmount > 0, "zero to withdraw");
+        require(amount > 0 && mtAmount > 0, "zero to withdraw");
         IMOPNToken(IMOPNGovernance(governance).tokenContract()).transfer(
             msg.sender,
             mtAmount
@@ -220,13 +220,14 @@ contract MOPNCollectionVault is
 
     function getBidPrice(uint256 increaseTimes) public view returns (uint256) {
         uint256 max = MTBalanceRealtime() / 5;
-        if (AskAcceptPrice == 0) return max;
+        uint64 AskAcceptPrice_ = (AskAcceptPrice * 3) / 4;
+        if (AskAcceptPrice_ == 0 || AskAcceptPrice_ >= max) return max;
         uint256 maxIncreaseTimes = ABDKMath64x64.toUInt(
             ABDKMath64x64.div(
                 ABDKMath64x64.ln(
                     ABDKMath64x64.div(
                         ABDKMath64x64.fromUInt(max),
-                        ABDKMath64x64.fromUInt(AskAcceptPrice)
+                        ABDKMath64x64.fromUInt(AskAcceptPrice_)
                     )
                 ),
                 ABDKMath64x64.ln(ABDKMath64x64.div(10005, 10000))
@@ -239,12 +240,12 @@ contract MOPNCollectionVault is
             increasePercentage,
             increaseTimes
         );
-        return ABDKMath64x64.mulu(increasePower, (AskAcceptPrice * 3) / 4);
+        return ABDKMath64x64.mulu(increasePower, AskAcceptPrice_);
     }
 
     function getBidInfo() public view returns (BidStruct memory bid) {
         bid.vaultStatus = VaultStatus;
-        bid.startBlock = AskStartBlock;
+        bid.startBlock = BidStartBlock;
         bid.askAcceptPrice = AskAcceptPrice;
         bid.currentPrice = getBidCurrentPrice();
     }
