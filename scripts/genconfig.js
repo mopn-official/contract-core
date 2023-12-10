@@ -7,7 +7,7 @@ async function main() {
   if (network == "goerli_dev") realnetwork = "goerli";
 
   const blockdata = await axios.get(
-    "https://api.etherscan.io/api?module=proxy&action=eth_blockNumber"
+    "https://api-goerli.etherscan.io/api?module=proxy&action=eth_blockNumber"
   );
   if (typeof blockdata.data.status == undefined) {
     console.log("get blocknumber error");

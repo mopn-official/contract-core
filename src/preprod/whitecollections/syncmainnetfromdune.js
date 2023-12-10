@@ -5,7 +5,7 @@ const path = require("path");
 
 async function main() {
   const apidata = await axios.get(
-    "https://api.dune.com/api/v1/query/3240812/results?api_key=6Gcnsizht126Di5dxEs0970D58i7ZM3h"
+    "https://api.dune.com/api/v1/query/3240812/results?api_key=UZw007HOG3HREmlcByj4xXVbwRVsJpMh"
   );
   const collectionsdata = apidata.data.result.rows;
   // const collectionsdata = loadDuneCache().result.rows;
