@@ -21,18 +21,20 @@ async function getCurrentAccount() {
 async function getContractAddress(contractName) {
   if (contractAddresses == null) {
     try {
-      const response = await axios.get(
-        "https://raw.githubusercontent.com/mopn-official/contract-core/pre-prod/configs/" +
-          hre.network.name +
-          ".json"
-      );
-      contractAddresses = response.data.contracts;
+      contractAddresses = getContractConfig(hre.network.name);
     } catch (error) {
       console.error(error);
     }
   }
   // console.log(contractName, contractAddresses[contractName]);
   return contractAddresses[contractName];
+}
+
+function getContractConfig(network) {
+  if (fs.existsSync("./config/" + network + ".json")) {
+    const deployConf = JSON.parse(fs.readFileSync("./config/" + network + ".json"));
+    return deployConf.contracts;
+  }
 }
 
 async function getContractObj(contractName, address) {

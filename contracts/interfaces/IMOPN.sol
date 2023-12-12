@@ -125,4 +125,8 @@ interface IMOPN {
     ) external view returns (uint256 OnMapMOPNPoint);
 
     function claimAccountMT(address account) external;
+
+    function tiledistance(uint24 a, uint24 b) external pure returns (uint24 d);
+
+    function tileAtLandCenter(uint256 LandId) external pure returns (uint24);
 }

@@ -10,8 +10,6 @@ import "./interfaces/IMOPNData.sol";
 import "./interfaces/IMOPNGovernance.sol";
 import "./interfaces/IMOPNToken.sol";
 import "./interfaces/IMOPNBomb.sol";
-import "./libraries/TileMath.sol";
-import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 /*
@@ -159,12 +157,12 @@ contract MOPNData is IMOPNData, Multicall {
         address[] memory tileAccounts
     ) public view returns (uint256 amount) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        uint32 tileCoordinate = TileMath.LandCenterTile(LandId);
+        uint24 tileCoordinate = mopn.tileAtLandCenter(LandId);
         for (uint256 i; i < tileAccounts.length; i++) {
             IMOPN.AccountDataStruct memory accountData = mopn.getAccountData(
                 tileAccounts[i]
             );
-            if (TileMath.distance(tileCoordinate, accountData.Coordinate) < 6) {
+            if (mopn.tiledistance(tileCoordinate, accountData.Coordinate) < 6) {
                 amount += calcLandAccountMT(tileAccounts[i]);
             }
         }

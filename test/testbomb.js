@@ -98,7 +98,6 @@ describe("MOPN", function () {
     console.log("MOPNERC6551Account", await erc6551account.getAddress());
 
     erc6551accountproxy = await hre.ethers.deployContract("MOPNERC6551AccountProxy", [
-      await mopngovernance.getAddress(),
       await erc6551account.getAddress(),
     ]);
     await erc6551accountproxy.waitForDeployment();
@@ -110,7 +109,7 @@ describe("MOPN", function () {
     await erc6551accounthelper.waitForDeployment();
     console.log("MOPNERC6551AccountHelper", await erc6551accounthelper.getAddress());
 
-    const startBlock = await hre.ethers.provider.getBlockNumber();
+    const startBlock = (await hre.ethers.provider.getBlockNumber()) + 1000000;
     console.log("mopn start block ", startBlock);
 
     mopnauctionHouse = await hre.ethers.deployContract("MOPNAuctionHouse", [
@@ -204,88 +203,6 @@ describe("MOPN", function () {
     await tx.wait();
     console.log("updateERC6551Contract sent");
 
-    tx = await mopngovernance.add6551AccountImplementation(await erc6551account.getAddress());
-    await tx.wait();
-    console.log("add6551AccountImplementation sent");
-
-    collections[0] = "0x82C46C4EA58B7D6D87704ecD459ee9EfBf458B26";
-    collections[1] = "0x0f25e56443330242F3a70dC101D1Cd42bd12F629";
-    collections[2] = "0x4dEE0017ade1484D203C7CBE32f3BB79aEd7F66A";
-
-    tx = await mopn.collectionWhiteListRegistry(collections[0], 0, [
-      "0x6a31284f78921fe2bc680cbf710906cc1bc515058a0038903f189ec6f5698dc9",
-      "0x0907015a50d51d0f9a6070a67ed26318352c25074e1cc5f71f632b21b1f4fac5",
-      "0xd8794106cc4e2ec3201a47d64290c81fcf57e97e12d231da28ac185fc7a9f462",
-    ]);
-    await tx.wait();
-    console.log("collectionWhiteListRegistry Azuki sent");
-
-    tx = await mopn.collectionWhiteListRegistry(collections[1], 0, [
-      "0x8177ba6b397bfada0d305528b2c203a70dcdce62a6bc6c7808a04d60e5ccb450",
-      "0x85ab1964779fd84cf99c7726094e070951483466963ae0440de4c13afa867805",
-      "0xd8794106cc4e2ec3201a47d64290c81fcf57e97e12d231da28ac185fc7a9f462",
-    ]);
-    await tx.wait();
-    console.log("collectionWhiteListRegistry Doodles sent");
-
-    tx = await mopn.collectionWhiteListRegistry(collections[2], 0, [
-      "0x6cebad840d832969075216c8907f6a768adf9cf36698dcc3ef01a547ebaa5303",
-      "0x0907015a50d51d0f9a6070a67ed26318352c25074e1cc5f71f632b21b1f4fac5",
-      "0xd8794106cc4e2ec3201a47d64290c81fcf57e97e12d231da28ac185fc7a9f462",
-    ]);
-    await tx.wait();
-    console.log("collectionWhiteListRegistry punks sent");
-
-    tx = await testpunk.allInitialOwnersAssigned();
-    await tx.wait();
-
-    tx = await testpunk.getPunk(0);
-    await tx.wait();
-
-    tx = await testpunk.getPunk(1);
-    await tx.wait();
-
-    tx = await testpunk.getPunk(2);
-    await tx.wait();
-
-    tx = await testpunk.getPunk(3);
-    await tx.wait();
-
-    // tx = await mopntoken.mint(owners[0].address, "1000000000000");
-    // await tx.wait();
-
-    promises = [];
-    const coordinates = [
-      9991003, 9991002, 10001003, 10001002, 10001001, 10011002, 10011001, 10001000,
-    ];
-
-    for (let i = 0; i < 8; i++) {
-      if (i == 0) {
-        await deployAccountNFT(await testazuki.getAddress(), i, coordinates[i], 0);
-      } else {
-        await deployAccountNFT(await testazuki.getAddress(), i, coordinates[i], 0);
-      }
-    }
-
-    await deployAccountNFT(await testpunk.getAddress(), 0, 10000997, 0);
-    await deployAccountNFT(await testpunk.getAddress(), 1, 10000996, 0);
-
-    await avatarInfo();
-    await collectionInfo();
-
-    await mineBlock(10000);
-
-    await avatarInfo();
-    await collectionInfo();
-
-    await claimAccountsMT();
-
-    await avatarInfo();
-    await collectionInfo();
-    await showWalletBalance();
-
-    await buyBombAnddeployAccount(1, await testpunk.getAddress(), 2, 10000998, 0);
-
     await avatarInfo();
     await collectionInfo();
     await showWalletBalance();
@@ -295,8 +212,8 @@ describe("MOPN", function () {
     await loadFixture(deployAndSetInitialNFTS);
 
     let tx;
-    // tx = await mopntoken.mint(owners[0].address, "1000000000000");
-    // await tx.wait();
+    tx = await mopntoken.mint(owners[0].address, "1000000000000");
+    await tx.wait();
 
     console.log("bomb price", await mopnauctionHouse.getBombCurrentPrice());
     console.log("bomb QAct", await mopnauctionHouse.getQAct());

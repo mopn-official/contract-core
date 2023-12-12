@@ -127,11 +127,7 @@ describe("MOPN", function () {
     await mopn.waitForDeployment();
     console.log("MOPN", await mopn.getAddress());
 
-    mopnData = await hre.ethers.deployContract("MOPNData", [await mopngovernance.getAddress()], {
-      libraries: {
-        TileMath: await tileMath.getAddress(),
-      },
-    });
+    mopnData = await hre.ethers.deployContract("MOPNData", [await mopngovernance.getAddress()]);
     await mopnData.waitForDeployment();
     console.log("MOPNData", await mopnData.getAddress());
 
@@ -370,6 +366,8 @@ describe("MOPN", function () {
     // await tx7.wait();
 
     mineBlock(100);
+
+    console.log("land mt", await mopnData.calcLandsMT([0], [accounts]));
 
     await claimAccountsMT();
 
