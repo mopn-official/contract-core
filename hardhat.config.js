@@ -48,8 +48,13 @@ module.exports = {
       url: process.env.MAINNET_URL,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
-
     goerli: {
+      url: process.env.GOERLI_URL,
+      chainId: 5,
+      etherscanHost: "https://goerli.etherscan.io/",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    goerli_dev: {
       url: process.env.GOERLI_URL,
       chainId: 5,
       etherscanHost: "https://goerli.etherscan.io/",
@@ -57,7 +62,10 @@ module.exports = {
     },
     sepolia: {
       url: process.env.SEPOLIA_URL,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+      },
+      etherscanHost: "https://sepolia.etherscan.io/",
     },
     mumbai: {
       url: process.env.POLYGON_MUMBAI_URL,

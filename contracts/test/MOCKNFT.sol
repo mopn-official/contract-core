@@ -31,7 +31,7 @@ contract MOCKNFT is ERC721AUpgradeable {
 
     function mint(uint256 quantity) external {
         require(
-            (quantity + _numberMinted(msg.sender) <= 10) || msg.sender == owner,
+            (quantity + _numberMinted(msg.sender) <= 20) || msg.sender == owner,
             "wallet mint limit reached"
         );
         _mint(msg.sender, quantity);

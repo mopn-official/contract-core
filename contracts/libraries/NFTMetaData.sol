@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.9;
 
 import "./TileMath.sol";
-import "./NFTSVG.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "base64-sol/base64.sol";
 
 library NFTMetaData {
@@ -10,23 +10,11 @@ library NFTMetaData {
 
     function constructTokenURI(
         uint32 LandId,
-        NFTSVG.tileData[] memory tileDatas,
+        uint32 totalMTAW,
         uint256 MTMinted
     ) public pure returns (string memory) {
         uint32 blockCoordinate = TileMath.LandCenterTile(LandId);
         uint32 ringNum = TileMath.LandRingNum(LandId);
-        string memory coordinateStr = string(
-            abi.encodePacked(
-                _int2str(blockCoordinate / 10000),
-                ", ",
-                _int2str(blockCoordinate % 10000)
-            )
-        );
-
-        uint32 totalMOPNPoint;
-        for (uint256 i = 0; i < tileDatas.length; i++) {
-            totalMOPNPoint += uint32(tileDatas[i].tileMOPNPoint);
-        }
 
         return
             string(
@@ -42,15 +30,11 @@ library NFTMetaData {
                                 LandId,
                                 blockCoordinate,
                                 ringNum,
-                                totalMOPNPoint,
+                                totalMTAW,
                                 MTMinted
                             ),
-                            ', "image": "',
-                            constructTokenImage(
-                                LandId,
-                                coordinateStr,
-                                tileDatas
-                            ),
+                            ', "image": "https://landsvg.mopn.xyz/',
+                            LandId.toString(),
                             '"}'
                         )
                     )
@@ -62,13 +46,13 @@ library NFTMetaData {
         uint32 LandId,
         uint32 blockCoordinate,
         uint32 ringNum,
-        uint32 totalMOPNPoint,
+        uint32 totalMTAW,
         uint256 MTMinted
     ) public pure returns (bytes memory) {
         return
             abi.encodePacked(
                 '[{"trait_type": "Weights", "value": "',
-                totalMOPNPoint.toString(),
+                totalMTAW.toString(),
                 '"}',
                 getIntAttributesRangeBytes(blockCoordinate),
                 ',{"trait_type": "Tax Revenue ($MT)", "display_type": "boost_number", "value": ',
@@ -78,30 +62,6 @@ library NFTMetaData {
                 '"},{"trait_type": "Land ID", "display_type": "number", "max_value": 10980, "value":',
                 LandId.toString(),
                 "}]"
-            );
-    }
-
-    function constructTokenImage(
-        uint32 LandId,
-        string memory coordinateStr,
-        NFTSVG.tileData[] memory tileDatas
-    ) public pure returns (string memory) {
-        string memory defs = NFTSVG.generateDefs(landBgColor(LandId));
-        string memory background = NFTSVG.generateBackground(
-            LandId,
-            coordinateStr
-        );
-
-        string memory blocks = NFTSVG.generateBlocks(tileDatas);
-
-        return
-            string(
-                abi.encodePacked(
-                    "data:image/svg+xml;base64,",
-                    Base64.encode(
-                        bytes(NFTSVG.getImage(defs, background, blocks))
-                    )
-                )
             );
     }
 

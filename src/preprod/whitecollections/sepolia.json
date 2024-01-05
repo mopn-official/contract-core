@@ -1,0 +1,248 @@
+[
+    [
+        {
+            "collectionAddress": "0x5550726ae1BA7E38ED335930e4fBfe6B01D60468",
+            "collectionName": "Bored Ape Yacht Club"
+        },
+        {
+            "collectionAddress": "0x5e96234DB24987c2be8a8d1a072676d80cc3b869",
+            "collectionName": "MutantApeYachtClub"
+        },
+        {
+            "collectionAddress": "0x3E3DC127782D3a8e8d52eFe2F9D7D5c3E3623C63",
+            "collectionName": "PudgyPenguins"
+        },
+        {
+            "collectionAddress": "0x1875131749bEC43743288C725E767c9eb51E99D5",
+            "collectionName": "Azuki"
+        },
+        {
+            "collectionAddress": "0x56ca6944407D9de07730B9c13D4e0538a9100855",
+            "collectionName": "DeGods"
+        },
+        {
+            "collectionAddress": "0x5A9eae18ecE26B1397F57d091a9f6926e3B11607",
+            "collectionName": "The Captainz"
+        },
+        {
+            "collectionAddress": "0x09a20A2C8AF8Df934BA5A5c4c37789730547ed27",
+            "collectionName": "Doodles"
+        },
+        {
+            "collectionAddress": "0x95D9974AbAD09423D8270fc3E919503AA4C84Fc8",
+            "collectionName": "CloneX"
+        },
+        {
+            "collectionAddress": "0xEeCA09e33aa5F9db65F19c0B9A2e2e7F8b6F29C8",
+            "collectionName": "Bored Ape Kennel Club"
+        },
+        {
+            "collectionAddress": "0x251aeC74022E5A404181e40BdE6E9963286550C5",
+            "collectionName": "Milady"
+        },
+        {
+            "collectionAddress": "0xaeaed94bEF3334b5560ba76b1e5375dD48c0EBf1",
+            "collectionName": "LilPudgys"
+        },
+        {
+            "collectionAddress": "0x2077e7EE7723C17E4302a438028746a3fb108F19",
+            "collectionName": "The Potatoz"
+        },
+        {
+            "collectionAddress": "0x7155cCCc8C7727A9F6cE5EebB3Fabe1AdA009347",
+            "collectionName": "The Grapes"
+        }
+    ],
+    [
+        {
+            "collectionAddress": "0xAac57eF60f472c049233cBAD5141457fd6f0A2b7",
+            "collectionName": "BlockGames Dice"
+        },
+        {
+            "collectionAddress": "0x43BE121c7d9406A7F31a9686AfF04Fd3a781F610",
+            "collectionName": "Opepen Edition"
+        },
+        {
+            "collectionAddress": "0xdFD9316530fF3f1334067AD3e0b5a7e283De3C34",
+            "collectionName": "Cool Cats"
+        },
+        {
+            "collectionAddress": "0xbAb242b6E3519e37405C6d0fE8EC852a191eE616",
+            "collectionName": "Azuki Elementals"
+        },
+        {
+            "collectionAddress": "0xedfcBaA0DcE15De93B37933AFac386F5703B6c16",
+            "collectionName": "Yogapetz"
+        },
+        {
+            "collectionAddress": "0x5814651F05Ec84093A323dAE52cB42bc0eEcf1e1",
+            "collectionName": "Meebits"
+        },
+        {
+            "collectionAddress": "0x3FAD758B442C8B7CD7cD5Fb6dE721BF1347990F1",
+            "collectionName": "Pixelmon"
+        },
+        {
+            "collectionAddress": "0xaFf78598c4A0C2F3118580Bc8AaC3F4920b1B2e2",
+            "collectionName": "Matr1x 2061"
+        },
+        {
+            "collectionAddress": "0xC39B2f8E712337DF72F0D471F386B211CFEd43Ec",
+            "collectionName": "BEANZ Official"
+        },
+        {
+            "collectionAddress": "0xD4F6806428e6c322d602021CE762380518c6036C",
+            "collectionName": "Cryptoadz"
+        },
+        {
+            "collectionAddress": "0x65118a1F896B6984aF5DF77A9A6136D105434B0f",
+            "collectionName": "Otherdeed for Otherside"
+        },
+        {
+            "collectionAddress": "0x8b8502667be28D26203527f77113c49Fac6D0408",
+            "collectionName": "Creepz by OVERLORD"
+        },
+        {
+            "collectionAddress": "0x5554a43Be8F8244eeCe3259d75526a45844d599e",
+            "collectionName": "y00ts"
+        },
+        {
+            "collectionAddress": "0xc2090d21f2fDc3bbF854a5EeA07ebb800E0686A8",
+            "collectionName": "Sofa Maker"
+        },
+        {
+            "collectionAddress": "0x9e76C19065e4Ab63913C564a05dA79f1C2C14ecd",
+            "collectionName": "Sappy Seals"
+        },
+        {
+            "collectionAddress": "0xc6f2a4878820Dcd21d573B6cF6bB77A7a52b64C6",
+            "collectionName": "Art Blocks Curated"
+        },
+        {
+            "collectionAddress": "0xAc533454Aa767253e517530f1aB8eBeffc69D774",
+            "collectionName": "Art Blocks"
+        },
+        {
+            "collectionAddress": "0x249B621A526dfE5D54b82d2A541E1053F36d9114",
+            "collectionName": "Mocaverse"
+        },
+        {
+            "collectionAddress": "0x93e1aAc24199aA32D5E3CE3C8DAF7c92AFcF7eAD",
+            "collectionName": "Farm Land by Pixels"
+        },
+        {
+            "collectionAddress": "0xD0f8Ed5fD55Cb02C80727841280441550c51b7eF",
+            "collectionName": "Balthazar raW Pass"
+        },
+        {
+            "collectionAddress": "0x306a6913053eaee62775B508941adaC1ab29999A",
+            "collectionName": "Art Blocks"
+        },
+        {
+            "collectionAddress": "0x0A4678D8463dbF3D5F15D5b08b51F9723a1fDb1D",
+            "collectionName": "mfer"
+        },
+        {
+            "collectionAddress": "0xcDF6DB9d2B01d695357e56125Bf93Caf93727c7A",
+            "collectionName": "Redacted Remilio Babies"
+        },
+        {
+            "collectionAddress": "0x7e9d519EE92EF4FACF09DC5F8A0CD51D01cbC9a8",
+            "collectionName": "ANOMALY A.I. by Star Im"
+        },
+        {
+            "collectionAddress": "0xA3dd03ea6328443bF9bFB394Bb9C414Cd0829043",
+            "collectionName": "Kanpai Pandas"
+        },
+        {
+            "collectionAddress": "0xF4b9a32b5CFc3E74a4d6eC226221Fc33e0CB274F",
+            "collectionName": "Azuki Elemental Beans"
+        },
+        {
+            "collectionAddress": "0x1Df2E07a03F99f7b855f6d64d21c0F606C574152",
+            "collectionName": "World Of Women"
+        },
+        {
+            "collectionAddress": "0x5ebb73fFe3e819f8B6C63643411D0C9e522230a6",
+            "collectionName": "Wrapped Cryptopunks"
+        },
+        {
+            "collectionAddress": "0x003E83A2d565F7A4F2E6681ebe171363a426390f",
+            "collectionName": "Otherside Koda"
+        },
+        {
+            "collectionAddress": "0xB81645E72B6732ecD6b0E359cB6401EefD9D986b",
+            "collectionName": "0N1 Force"
+        },
+        {
+            "collectionAddress": "0x612b9Af7956202b390F3e23c6a286F145D3CEb8B",
+            "collectionName": "Sugartown Oras by Zynga"
+        },
+        {
+            "collectionAddress": "0xde1e78224C5D80cF723Bd903877e306A801c0C00",
+            "collectionName": "Parallel Avatars"
+        },
+        {
+            "collectionAddress": "0x04b58F7a7Cb15Ec15055e9DC2b0E0C3FF126732D",
+            "collectionName": "My Pet Hooligan"
+        },
+        {
+            "collectionAddress": "0x9Cc9faC8B4387F06d63D93add578E83265646eD2",
+            "collectionName": "HYTOPIA Worlds"
+        },
+        {
+            "collectionAddress": "0xf1fBe443766C96B4AfFC3c85FbB6159B98406C78",
+            "collectionName": "Shrapnel Operators Collection"
+        },
+        {
+            "collectionAddress": "0xA38671003126481968B827d3353984dcEA2544e3",
+            "collectionName": "PudgyPresent"
+        },
+        {
+            "collectionAddress": "0xF62A7D19466ba5b1EDE597e6dAA3dADC97b8cce4",
+            "collectionName": "IO: Imaginary Ones"
+        },
+        {
+            "collectionAddress": "0x014a8F924a6787030dad383149Ed96A2efB64087",
+            "collectionName": "Nakamigos"
+        },
+        {
+            "collectionAddress": "0x5fA760E774A22d05577e4383D16f2B243108b667",
+            "collectionName": "Nounish Punk"
+        },
+        {
+            "collectionAddress": "0x7E3BAf42Ec4dae4FC55C09B4AE63A3A210252Fc8",
+            "collectionName": "BrainDrops"
+        },
+        {
+            "collectionAddress": "0xE12192F31E819fF7dA722349C188B8ae0F0594E2",
+            "collectionName": "Winds of Yawanawa by Yawanawa and Refik Anadol"
+        },
+        {
+            "collectionAddress": "0xba7Bf786C4fBCC35EE6Dc427895ad0DeaD6EE1Cf",
+            "collectionName": "V1 Cryptopunks (Wrapped)"
+        },
+        {
+            "collectionAddress": "0xE1624cb293611233a1746Ee01442DD1eaA095b5F",
+            "collectionName": "Treeverse"
+        }
+    ],
+    [
+        {
+            "collectionAddress": "0xeB28B7cA92c100E12ef76e582Fd84c2b68E45671",
+            "collectionName": "rektguy"
+        },
+        {
+            "collectionAddress": "0x3286F7dA84493014C4bCC8Dfea59dce37B32B6bb",
+            "collectionName": "Otherdeed Expanded"
+        },
+        {
+            "collectionAddress": "0xdd5c4eE5d59B87b713bD93E6C54C14eb0CDF67D6",
+            "collectionName": "DigiDaigaku Genesis"
+        },
+        {
+            "collectionAddress": "0xA4281Ef90283Cb8DeD6C2b5c0aC13Bf77013A022",
+            "collectionName": "Kubz"
+        }
+    ]
+]

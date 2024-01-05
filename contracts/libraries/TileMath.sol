@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
@@ -9,22 +9,13 @@ library TileMath {
         int32 y;
     }
 
-    struct XYZCoordinate {
-        uint32 x;
-        uint32 y;
-        uint32 z;
-    }
+    error TileCoordinateError();
 
     function check(uint32 tileCoordinate) public pure {
-        require(
-            tileCoordinate > 3000000 && tileCoordinate < 17000000,
-            "coordinate x overflow"
-        );
-        tileCoordinate = tileCoordinate % 10000;
-        require(
-            tileCoordinate > 300 && tileCoordinate < 1700,
-            "coordinate y overflow"
-        );
+        uint32[3] memory coodinateArr = coordinateIntToArr(tileCoordinate);
+        if (coodinateArr[0] + coodinateArr[1] + coodinateArr[2] != 3000) {
+            revert TileCoordinateError();
+        }
     }
 
     function LandRingNum(uint32 LandId) public pure returns (uint32 n) {
@@ -103,41 +94,37 @@ library TileMath {
         return (xrange, yrange);
     }
 
-    function getLandTilesMOPNPoint(
+    function getLandTilesMTAW(
         uint32 LandId
     ) public pure returns (uint256[] memory) {
         uint32 tileCoordinate = LandCenterTile(LandId);
-        uint256[] memory TilesMOPNPoint = new uint256[](91);
-        TilesMOPNPoint[0] = getTileMOPNPoint(tileCoordinate);
+        uint256[] memory TilesMTAW = new uint256[](91);
+        TilesMTAW[0] = getTileMTAW(tileCoordinate);
         for (uint256 i = 1; i <= 5; i++) {
             tileCoordinate++;
             uint256 preringblocks = 3 * (i - 1) * (i - 1) + 3 * (i - 1);
             for (uint256 j = 0; j < 6; j++) {
                 for (uint256 k = 0; k < i; k++) {
-                    TilesMOPNPoint[
-                        preringblocks + j * i + k + 1
-                    ] = getTileMOPNPoint(tileCoordinate);
+                    TilesMTAW[preringblocks + j * i + k + 1] = getTileMTAW(
+                        tileCoordinate
+                    );
                     tileCoordinate = neighbor(tileCoordinate, j);
                 }
             }
         }
-        return TilesMOPNPoint;
+        return TilesMTAW;
     }
 
-    function getTileMOPNPoint(
-        uint32 tileCoordinate
-    ) public pure returns (uint256 tile) {
-        unchecked {
-            if ((tileCoordinate / 10000) % 10 == 0) {
-                if (tileCoordinate % 10 == 0) {
-                    return 1500;
-                }
-                return 500;
-            } else if (tileCoordinate % 10 == 0) {
-                return 500;
+    function getTileMTAW(uint32 tileCoordinate) public pure returns (uint256) {
+        if ((tileCoordinate / 10000) % 10 == 0) {
+            if (tileCoordinate % 10 == 0) {
+                return 15;
             }
-            return 100;
+            return 5;
+        } else if (tileCoordinate % 10 == 0) {
+            return 5;
         }
+        return 1;
     }
 
     function coordinateIntToArr(
@@ -146,14 +133,6 @@ library TileMath {
         coordinateArr[0] = tileCoordinate / 10000;
         coordinateArr[1] = tileCoordinate % 10000;
         coordinateArr[2] = 3000 - (coordinateArr[0] + coordinateArr[1]);
-    }
-
-    function coordinateIntToStuct(
-        uint32 tileCoordinate
-    ) public pure returns (XYZCoordinate memory coordinate) {
-        coordinate.x = tileCoordinate / 10000;
-        coordinate.y = tileCoordinate % 10000;
-        coordinate.z = 3000 - (coordinate.x + coordinate.y);
     }
 
     function spiralRingTiles(
@@ -229,30 +208,15 @@ library TileMath {
         uint32 tileCoordinate,
         uint256 direction_
     ) public pure returns (uint32) {
-        if (direction_ == 0) {
-            return tileCoordinate + 9999;
-        } else if (direction_ == 1) {
-            return tileCoordinate - 1;
-        } else if (direction_ == 2) {
-            return tileCoordinate - 10000;
-        } else if (direction_ == 3) {
-            return tileCoordinate - 9999;
-        } else if (direction_ == 4) {
-            return tileCoordinate + 1;
-        } else if (direction_ == 5) {
-            return tileCoordinate + 10000;
-        } else {
-            revert();
-        }
+        return uint32(int32(tileCoordinate) + direction(direction_));
     }
 
     function distance(uint32 a, uint32 b) public pure returns (uint32 d) {
-        XYZCoordinate memory aarr = coordinateIntToStuct(a);
-        XYZCoordinate memory barr = coordinateIntToStuct(b);
-
-        d += aarr.x > barr.x ? aarr.x - barr.x : barr.x - aarr.x;
-        d += aarr.y > barr.y ? aarr.y - barr.y : barr.y - aarr.y;
-        d += aarr.z > barr.z ? aarr.z - barr.z : barr.z - aarr.z;
+        uint32[3] memory aarr = coordinateIntToArr(a);
+        uint32[3] memory barr = coordinateIntToArr(b);
+        for (uint256 i = 0; i < 3; i++) {
+            d += aarr[i] > barr[i] ? aarr[i] - barr[i] : barr[i] - aarr[i];
+        }
 
         return d / 2;
     }
@@ -262,30 +226,5 @@ library TileMath {
     ) public pure returns (XYCoordinate memory xycoordinate) {
         xycoordinate.x = int32(tileCoordinate / 10000) - 1000;
         xycoordinate.y = int32(tileCoordinate % 10000) - 1000;
-    }
-
-    function tileToBitIndex(
-        uint32 tileCoordinate
-    ) public pure returns (uint256 index) {
-        uint32 x = tileCoordinate / 10000;
-        uint32 y = tileCoordinate % 10000;
-        if (x >= 1000 && y >= 1000) {
-            x = x - 1000;
-            y = y - 1000;
-        } else if (x >= 1000 && y < 1000) {
-            x = x - 1000;
-            y = 1000 - y;
-            index = 640000;
-        } else if (x < 1000 && y <= 1000) {
-            x = 1000 - x;
-            y = 1000 - y;
-            index = 1280000;
-        } else {
-            x = 1000 - x;
-            y = y - 1000;
-            index = 1920000;
-        }
-
-        index += ((y / 16) * 50 + x / 16) * 256 + (y % 16) * 16 + (x % 16);
     }
 }

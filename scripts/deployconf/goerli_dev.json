@@ -34,15 +34,15 @@
         "verified": true
     },
     "TileMath": {
-        "address": "0xc317e801c5860D3E7A527AA84EE041A0575E379C",
+        "address": "0x0e9a3429e91DF6eA12964618ec1d9Bd31bE6De59",
         "verified": true
     },
     "NFTSVG": {
-        "address": "0x971ca171AF59B394750B7A545e75F4563B80Fb03",
+        "address": "0x5CDb2803185584D25964711BB0108B2497f7bA09",
         "verified": true
     },
     "NFTMetaData": {
-        "address": "0x3DC4868e6a053F4DC1575b809cA69B50723dE4e0",
+        "address": "0x883De19FBf18A64Ca136c92D44f0b2e6C91aF653",
         "verified": true,
         "libraries": [
             "TileMath",
@@ -169,7 +169,7 @@
         ]
     },
     "MOPNLand": {
-        "address": "0xBAdd22c701A6b782Ea47E9b759bA2cfD15f6615f",
+        "address": "0x0604D2C266167b9B6400721C993070d0538b50b7",
         "verified": true,
         "attributesCheck": [
             {
@@ -201,14 +201,11 @@
         ]
     },
     "MOPNLandMetaDataRender": {
-        "address": "0xf16835C062B0c0a957C1cb6ce8c1E6D82bE45c77",
+        "address": "0xB5BD334Fa88e79f9f1E4ec44A2D113Db4770C263",
         "verified": true,
         "libraries": [
             "TileMath",
             "NFTMetaData"
-        ],
-        "constructparams": [
-            "MOPNGovernance"
         ]
     }
 }

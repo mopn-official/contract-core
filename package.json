@@ -28,6 +28,7 @@
     "@openzeppelin/contracts": "^4.9.3",
     "@openzeppelin/contracts-upgradeable": "^4.9.3",
     "@openzeppelin/merkle-tree": "^1.0.5",
+    "@tatumio/tatum": "^4.1.33",
     "abdk-libraries-solidity": "^3.2.0",
     "alchemy-sdk": "^3.0.0",
     "axios": "^1.5.1",

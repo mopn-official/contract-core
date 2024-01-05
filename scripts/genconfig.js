@@ -6,9 +6,12 @@ async function main() {
   let realnetwork = network;
   if (network == "goerli_dev") realnetwork = "goerli";
 
-  const blockdata = await axios.get(
-    "https://api-goerli.etherscan.io/api?module=proxy&action=eth_blockNumber"
-  );
+  let etherscanapihost = "https://api-" + realnetwork + ".etherscan.io/";
+  if (realnetwork == "mainnet") {
+    etherscanapihost = "https://api.etherscan.io/";
+  }
+
+  const blockdata = await axios.get(etherscanapihost + "api?module=proxy&action=eth_blockNumber");
   if (typeof blockdata.data.status == undefined) {
     console.log("get blocknumber error");
     return;
@@ -16,7 +19,10 @@ async function main() {
   const blocknumber = eval(blockdata.data.result).toString(10);
   console.log("blocknumber: " + blocknumber);
 
-  const thegraphbase = "https://api.thegraph.com/subgraphs/name/cyanface/mopn-";
+  let thegraph = "https://api.thegraph.com/subgraphs/name/cyanface/mopn";
+  if (realnetwork != "mainnet") {
+    thegraph = thegraph + "-" + network;
+  }
 
   const deployConf = loadConf(network);
   if (!deployConf) {
@@ -25,7 +31,7 @@ async function main() {
   }
 
   let config = {
-    thegraph: thegraphbase + network,
+    thegraph: thegraph,
     network: network,
     contracts: {},
   };

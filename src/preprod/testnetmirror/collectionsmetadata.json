@@ -4302,5 +4302,229 @@
         "baseURI": "ipfs://bafybeibygb3isqz62iiqbftyps67wy73m5yhqj5vbvclcnzgmgmhn6yuyi/",
         "extURI": "",
         "tokenURIexample": "ipfs://bafybeibygb3isqz62iiqbftyps67wy73m5yhqj5vbvclcnzgmgmhn6yuyi/1742"
+    },
+    "0x2b6df7f8389e6ecf97a0f06b189349c409a24083": {
+        "mainnetAddress": "0x2b6df7f8389e6ecf97a0f06b189349c409a24083",
+        "name": "Sofa Maker",
+        "symbol": "Sofa Maker",
+        "baseURI": "ipfs://bafybeih5zpcpkok4spbzzekcc5552go6zo2fkymxhk75kz32qghwnylv3q/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://bafybeih5zpcpkok4spbzzekcc5552go6zo2fkymxhk75kz32qghwnylv3q/4968"
+    },
+    "0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0": {
+        "mainnetAddress": "0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0",
+        "name": "SuperRare",
+        "symbol": "SUPR",
+        "baseURI": "https://ipfs.pixura.io/ipfs/QmTVfgXFqJiskTZKgh99kmcLnzrgGq5aLeVhMN8Ajncy1i/",
+        "extURI": ".json",
+        "tokenURIexample": "https://ipfs.pixura.io/ipfs/QmTVfgXFqJiskTZKgh99kmcLnzrgGq5aLeVhMN8Ajncy1i/metadata.json"
+    },
+    "0x00723c39194f7f449be736da0d1c4ec809dde793": {
+        "mainnetAddress": "0x00723c39194f7f449be736da0d1c4ec809dde793",
+        "name": "YouAreTheChampion",
+        "symbol": "YATC",
+        "baseURI": "ipfs://bafybeif2pnyq5gi7vqd2iumgly6sb2v2z3ordjpijzmqfvetxwohtx2zwa/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://bafybeif2pnyq5gi7vqd2iumgly6sb2v2z3ordjpijzmqfvetxwohtx2zwa/394"
+    },
+    "0xfbeef911dc5821886e1dda71586d90ed28174b7d": {
+        "mainnetAddress": "0xfbeef911dc5821886e1dda71586d90ed28174b7d",
+        "name": "KnownOriginDigitalAsset",
+        "symbol": "KODA",
+        "baseURI": "https://ipfs.infura.io/ipfs/",
+        "extURI": "",
+        "tokenURIexample": "https://ipfs.infura.io/ipfs/QmX1rY7gvrph5rRPvzKgn25hrSaShw9e6sudJg8Qi3rHFG"
+    },
+    "0xea698596b6009a622c3ed00dd5a8b5d1cae4fc36": {
+        "mainnetAddress": "0xea698596b6009a622c3ed00dd5a8b5d1cae4fc36",
+        "name": "Art Blocks x Pace",
+        "symbol": "ABXPACE",
+        "baseURI": "https://token.artblocks.io/0xea698596b6009a622c3ed00dd5a8b5d1cae4fc36/",
+        "extURI": "",
+        "tokenURIexample": "https://token.artblocks.io/0xea698596b6009a622c3ed00dd5a8b5d1cae4fc36/7000095"
+    },
+    "0xd9c036e9eef725e5aca4a22239a23feb47c3f05d": {
+        "mainnetAddress": "0xd9c036e9eef725e5aca4a22239a23feb47c3f05d",
+        "name": "MidnightBreeze",
+        "symbol": "MNB",
+        "baseURI": "https://midnightbreeze.mypinata.cloud/ipfs/QmQgqB5hFVfVddk7BpA2vfW1MyaFhHrZpvjKyc3DKpM3iv/",
+        "extURI": "",
+        "tokenURIexample": "https://midnightbreeze.mypinata.cloud/ipfs/QmQgqB5hFVfVddk7BpA2vfW1MyaFhHrZpvjKyc3DKpM3iv/3010"
+    },
+    "0x70b4178ba7894286357267036d835ae5790358b6": {
+        "mainnetAddress": "0x70b4178ba7894286357267036d835ae5790358b6",
+        "name": "MemeWhales",
+        "symbol": "MEMEWHALES",
+        "baseURI": "https://ipfs.io/ipfs/QmWZCAjzanTWrQBJsk4zbDqTrWrDTE5zYBhvsrHLZD431D/",
+        "extURI": ".json",
+        "tokenURIexample": "https://ipfs.io/ipfs/QmWZCAjzanTWrQBJsk4zbDqTrWrDTE5zYBhvsrHLZD431D/566.json"
+    },
+    "0x0ffa87cd27ae121b10b3f044dda4d28f9fb8f079": {
+        "mainnetAddress": "0x0ffa87cd27ae121b10b3f044dda4d28f9fb8f079",
+        "name": "Sidus NFT Heroes",
+        "symbol": "Sidus",
+        "baseURI": "https://dev.nftstars.app/backend/api/v1/nfts/metadata/0x0ffa87cd27ae121b10b3f044dda4d28f9fb8f079/",
+        "extURI": "",
+        "tokenURIexample": "https://dev.nftstars.app/backend/api/v1/nfts/metadata/0x0ffa87cd27ae121b10b3f044dda4d28f9fb8f079/1910"
+    },
+    "0x44d19b72d0767451e758a270a0aaaadad3e36d4c": {
+        "mainnetAddress": "0x44d19b72d0767451e758a270a0aaaadad3e36d4c",
+        "name": "Big Hugs ",
+        "symbol": "BH",
+        "baseURI": "https://app.bueno.art/api/contract/na6IbyOE1knbJpbhG5yUO/chain/1/metadata/",
+        "extURI": "",
+        "tokenURIexample": "https://app.bueno.art/api/contract/na6IbyOE1knbJpbhG5yUO/chain/1/metadata/794"
+    },
+    "0xb18380485f7ba9c23deb729bedd3a3499dbd4449": {
+        "mainnetAddress": "0xb18380485f7ba9c23deb729bedd3a3499dbd4449",
+        "name": "SmallBrosNFT Official",
+        "symbol": "SBNFT",
+        "baseURI": "ipfs://QmZpWP5EDGofZzWGQwKSDVHUMFQ59b9jjEoG6mu1haeQay/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://QmZpWP5EDGofZzWGQwKSDVHUMFQ59b9jjEoG6mu1haeQay/258.json"
+    },
+    "0x96be46c50e882dbd373081d08e0cde2b055adf6c": {
+        "mainnetAddress": "0x96be46c50e882dbd373081d08e0cde2b055adf6c",
+        "name": "ASMAIFAAllStarsCharacter",
+        "symbol": "AIFACharacter",
+        "baseURI": "ipfs://",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmPvgPezdbVCogLSSbCUJRWPT8rw2XqYgiatYRoHkcDJyD"
+    },
+    "0xd92e44ac213b9ebda0178e1523cc0ce177b7fa96": {
+        "mainnetAddress": "0xd92e44ac213b9ebda0178e1523cc0ce177b7fa96",
+        "name": "Beeple Round 2 Open Edition",
+        "symbol": "BEEPLE2",
+        "baseURI": "1. Deploy new contract for edition of 100 - base URI should be [https://api.niftygateway.com/](https://api.niftygateway.com/beeple/)beepletwoedition/",
+        "extURI": "",
+        "tokenURIexample": "1. Deploy new contract for edition of 100 - base URI should be [https://api.niftygateway.com/](https://api.niftygateway.com/beeple/)beepletwoedition/100020100"
+    },
+    "0x056bd39f301ca675df4514cc05bc2d7417599de6": {
+        "mainnetAddress": "0x056bd39f301ca675df4514cc05bc2d7417599de6",
+        "name": "Synchronicity",
+        "symbol": "SLANDER",
+        "baseURI": "ipfs://QmeW7DJV1UULW8R8hrDnt5M2ptRUgPQy1yatEg4JjnF5E4/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://QmeW7DJV1UULW8R8hrDnt5M2ptRUgPQy1yatEg4JjnF5E4/102"
+    },
+    "0x5bd815fd6c096bab38b4c6553cfce3585194dff9": {
+        "mainnetAddress": "0x5bd815fd6c096bab38b4c6553cfce3585194dff9",
+        "name": "The Art of Seasons",
+        "symbol": "TAOS",
+        "baseURI": "https://nfts.renga.app/taos/",
+        "extURI": "",
+        "tokenURIexample": "https://nfts.renga.app/taos/11582"
+    },
+    "0x2c889a24af0d0ec6337db8feb589fa6368491146": {
+        "mainnetAddress": "0x2c889a24af0d0ec6337db8feb589fa6368491146",
+        "name": "Boo Bears",
+        "symbol": "BOOBR",
+        "baseURI": "ipfs://QmdbysQUW6trUSQRZjnsax8qNGPRHDsz2rdTKztJWWaag7/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://QmdbysQUW6trUSQRZjnsax8qNGPRHDsz2rdTKztJWWaag7/7.json"
+    },
+    "0x84ab624180b71093340f9b088fa30d0bc214dfb4": {
+        "mainnetAddress": "0x84ab624180b71093340f9b088fa30d0bc214dfb4",
+        "name": "Being B00",
+        "symbol": "B00",
+        "baseURI": "ipfs://QmXapiHxEj93RmF56gXvew124zoybm6ZbzY9FqoMsagYpz/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://QmXapiHxEj93RmF56gXvew124zoybm6ZbzY9FqoMsagYpz/682.json"
+    },
+    "0xb6329bd2741c4e5e91e26c4e653db643e74b2b19": {
+        "mainnetAddress": "0xb6329bd2741c4e5e91e26c4e653db643e74b2b19",
+        "name": "PROOF Collective Grails",
+        "symbol": "GRAIL",
+        "baseURI": "https://live---grails-metadata-5covpqijaa-uc.a.run.app/metadata/1/9/",
+        "extURI": "",
+        "tokenURIexample": "https://live---grails-metadata-5covpqijaa-uc.a.run.app/metadata/1/9/378"
+    },
+    "0xf4a7c105cfdc6aabe9ae65bdf2d0df0a567a7ade": {
+        "mainnetAddress": "0xf4a7c105cfdc6aabe9ae65bdf2d0df0a567a7ade",
+        "name": "ARCStellars",
+        "symbol": "ARS",
+        "baseURI": "https://metadata.arccommunity.com/stellars/token/",
+        "extURI": "",
+        "tokenURIexample": "https://metadata.arccommunity.com/stellars/token/549"
+    },
+    "0x7a15b36cb834aea88553de69077d3777460d73ac": {
+        "mainnetAddress": "0x7a15b36cb834aea88553de69077d3777460d73ac",
+        "name": "Feral File — Unsupervised",
+        "symbol": "FF009",
+        "baseURI": "https://ipfs.bitmark.com/ipfs/QmNqUhmcEX53AjU2vXAgTB4KpBkBxs3cH3qutnVLRdMbFY/",
+        "extURI": ".json",
+        "tokenURIexample": "https://ipfs.bitmark.com/ipfs/QmNqUhmcEX53AjU2vXAgTB4KpBkBxs3cH3qutnVLRdMbFY/metadata.json"
+    },
+    "0x35e1402fa69c60851ea8b86f04d823ff41796a51": {
+        "mainnetAddress": "0x35e1402fa69c60851ea8b86f04d823ff41796a51",
+        "name": "ZodiacCapsule",
+        "symbol": "ZODIACCAPSULE",
+        "baseURI": "ipfs://Qmbt8Sf11eF3fTXbUMnupC4bHhJjPkAJeTQ89sCdwk1Lpw/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://Qmbt8Sf11eF3fTXbUMnupC4bHhJjPkAJeTQ89sCdwk1Lpw/6287"
+    },
+    "0x0f4129e27b759f7ca4ad854dd41b961a073fe089": {
+        "mainnetAddress": "0x0f4129e27b759f7ca4ad854dd41b961a073fe089",
+        "name": "Overworld Key",
+        "symbol": "overworld_key",
+        "baseURI": "https://api.ovrwrld.net/keys/",
+        "extURI": ".json",
+        "tokenURIexample": "https://api.ovrwrld.net/keys/75.json"
+    },
+    "0xdd012153e008346591153fff28b0dd6724f0c256": {
+        "mainnetAddress": "0xdd012153e008346591153fff28b0dd6724f0c256",
+        "name": "Beeple Spring Collection",
+        "symbol": "BEEPLESPRINGCOLLECTION",
+        "baseURI": "https://api.niftygateway.com/beeplespringcollection/",
+        "extURI": "",
+        "tokenURIexample": "https://api.niftygateway.com/beeplespringcollection/100030038"
+    },
+    "0x3acefd60d589187bc437a5dd455ef1688f722dd5": {
+        "mainnetAddress": "0x3acefd60d589187bc437a5dd455ef1688f722dd5",
+        "name": "Springfield Apes",
+        "symbol": "SAPES",
+        "baseURI": "https://s3.us-east-2.amazonaws.com/meta.springfieldapes.com/",
+        "extURI": ".json",
+        "tokenURIexample": "https://s3.us-east-2.amazonaws.com/meta.springfieldapes.com/566.json"
+    },
+    "0x026224a2940bfe258d0dbe947919b62fe321f042": {
+        "mainnetAddress": "0x026224a2940bfe258d0dbe947919b62fe321f042",
+        "name": "lobsterdao",
+        "symbol": "LOBS",
+        "baseURI": "ipfs://bafybeib3dl2qk36t4ylr65txcshlg4tr4yr72a5af3s6jo247qbk4mv2eu/",
+        "extURI": "",
+        "tokenURIexample": "ipfs://bafybeib3dl2qk36t4ylr65txcshlg4tr4yr72a5af3s6jo247qbk4mv2eu/147"
+    },
+    "0x203be535b865b357dbca1aeefcad88a675fd321f": {
+        "mainnetAddress": "0x203be535b865b357dbca1aeefcad88a675fd321f",
+        "name": "Carpetdiem - 1001 Magic Carpets",
+        "symbol": "CARPETDIEM",
+        "baseURI": "https://ipfs.carpetdiem.art/ipfs/Qmb15XgemyHycsFByBWyyBR5PX71DcHZoAheoZtq3L8tPc/",
+        "extURI": "",
+        "tokenURIexample": "https://ipfs.carpetdiem.art/ipfs/Qmb15XgemyHycsFByBWyyBR5PX71DcHZoAheoZtq3L8tPc/488"
+    },
+    "0xff98c58fbb5ea3263d68b555029471d5bd8b55a8": {
+        "mainnetAddress": "0xff98c58fbb5ea3263d68b555029471d5bd8b55a8",
+        "name": "INUS PLANET",
+        "symbol": "PLANET",
+        "baseURI": "ipfs://bafybeif5eba2b7lhvi5hbsg5ncbnfowhgopywxgcvn7dvhowl63uixptsi/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://bafybeif5eba2b7lhvi5hbsg5ncbnfowhgopywxgcvn7dvhowl63uixptsi/34.json"
+    },
+    "0x1c410e4c1701f88a2a504f4506251624e8166419": {
+        "mainnetAddress": "0x1c410e4c1701f88a2a504f4506251624e8166419",
+        "name": "Ey3k0n",
+        "symbol": "Ey3",
+        "baseURI": "http://nfts.ey3k0n.io/metadata/",
+        "extURI": "",
+        "tokenURIexample": "http://nfts.ey3k0n.io/metadata/3662"
+    },
+    "0xd1a4221358dbbcfb0eb575258ecf8972a700613d": {
+        "mainnetAddress": "0xd1a4221358dbbcfb0eb575258ecf8972a700613d",
+        "name": "Tribe Diamonds",
+        "symbol": "TRIBE DMNDS",
+        "baseURI": "ipfs://QmX6sVioYiYcuXidCnVxCLDZhQZPZFe2jjWsah6QS76ecb/",
+        "extURI": ".json",
+        "tokenURIexample": "ipfs://QmX6sVioYiYcuXidCnVxCLDZhQZPZFe2jjWsah6QS76ecb/148.json"
     }
 }

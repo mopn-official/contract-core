@@ -7,13 +7,13 @@ async function main() {
   const provider = new ethers.JsonRpcProvider(config.networks["mainnet"].url);
   const wallet = new ethers.Wallet(config.networks["mainnet"].accounts[0], provider);
 
-  const mopndata = await ethers.getContractAt(
-    "MOPNData",
-    "0x4E271c67DeB30267C74a12b1Cfd25b5782BCf21c",
+  const vault = await ethers.getContractAt(
+    "MOPNCollectionVault",
+    "0x21a18221579afb0d6d4de6ef7cc0bf50ceda4ca9",
     wallet
   );
 
-  console.log(await mopndata.calcLandsMT([39], [["0x706a4e2466cea5e3af81fb3b620980fc3f5e0c7d"]]));
+  console.log(await vault.balanceOf("0x4648AFC8392Cefb2Bef07fB9A9fcFD2DE714A3F3"));
 }
 
 main().catch((error) => {

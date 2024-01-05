@@ -4,7 +4,7 @@ const axios = require("axios");
 const path = require("path");
 
 async function main() {
-  const mainnetnfts = loadMainnetWhiteCollections();
+  const collections = loadMainnetWhiteCollections();
   let collectionsmetadata = loadCollectionsMetadata();
 
   const provider = new ethers.JsonRpcProvider(config.networks["mainnet"].url);
@@ -15,10 +15,14 @@ async function main() {
   /// IERC721 0x80ac58cd
   /// IERC721Metadata 0x5b5e139f
 
-  for (const mainnetnft of mainnetnfts) {
-    for (const mainnetAddress of mainnetnft) {
-      if (!collectionsmetadata[mainnetAddress]) {
-        const contract = await ethers.getContractAt("IERC721Metadata", mainnetAddress, wallet);
+  for (const collectionstage of collections) {
+    for (const collection of collectionstage) {
+      if (!collectionsmetadata[collection.collectionAddress]) {
+        const contract = await ethers.getContractAt(
+          "IERC721Metadata",
+          collection.collectionAddress,
+          wallet
+        );
         try {
           const is721 = await contract.supportsInterface("0x80ac58cd");
           if (is721) {
@@ -31,7 +35,7 @@ async function main() {
               const transfer = transfers.pop();
               const tokenURI = await contract.tokenURI(transfer.args.tokenId);
               if (!tokenURI.length || tokenURI.length > 255) {
-                console.log(mainnetAddress, "tokenURI error1");
+                console.log(collection.collectionAddress, "tokenURI error1");
                 continue;
               }
               const pathinfo = path.parse(tokenURI);
@@ -40,10 +44,10 @@ async function main() {
               const name = await contract.name();
               const symbol = await contract.symbol();
 
-              console.log(mainnetAddress, name, symbol, baseURI, extURI);
+              console.log(collection.collectionAddress, name, symbol, baseURI, extURI);
 
-              collectionsmetadata[mainnetAddress] = {
-                mainnetAddress: mainnetAddress,
+              collectionsmetadata[collection.collectionAddress] = {
+                mainnetAddress: collection.collectionAddress,
                 name: name,
                 symbol: symbol,
                 baseURI: baseURI,
@@ -53,11 +57,10 @@ async function main() {
               saveCollectionsmetadata(collectionsmetadata);
             }
           } else {
-            console.log(mainnetAddress, "not 721");
+            console.log(collection.collectionAddress, "not 721");
           }
         } catch (e) {
-          console.log(e);
-          console.log(mainnetAddress, "jumped");
+          console.log(collection.collectionAddress, "jumped");
         }
       }
     }

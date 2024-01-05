@@ -1,0 +1,242 @@
+{
+    "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d": {
+        "mirrorAddress": "0x5550726ae1BA7E38ED335930e4fBfe6B01D60468",
+        "initialize": true
+    },
+    "0x60e4d786628fea6478f785a6d7e704777c86a7c6": {
+        "mirrorAddress": "0x5e96234DB24987c2be8a8d1a072676d80cc3b869",
+        "initialize": true
+    },
+    "0xbd3531da5cf5857e7cfaa92426877b022e612cf8": {
+        "mirrorAddress": "0x3E3DC127782D3a8e8d52eFe2F9D7D5c3E3623C63",
+        "initialize": true
+    },
+    "0xed5af388653567af2f388e6224dc7c4b3241c544": {
+        "mirrorAddress": "0x1875131749bEC43743288C725E767c9eb51E99D5",
+        "initialize": true
+    },
+    "0x8821bee2ba0df28761afff119d66390d594cd280": {
+        "mirrorAddress": "0x56ca6944407D9de07730B9c13D4e0538a9100855",
+        "initialize": true
+    },
+    "0x769272677fab02575e84945f03eca517acc544cc": {
+        "mirrorAddress": "0x5A9eae18ecE26B1397F57d091a9f6926e3B11607",
+        "initialize": true
+    },
+    "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e": {
+        "mirrorAddress": "0x09a20A2C8AF8Df934BA5A5c4c37789730547ed27",
+        "initialize": true
+    },
+    "0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b": {
+        "mirrorAddress": "0x95D9974AbAD09423D8270fc3E919503AA4C84Fc8",
+        "initialize": true
+    },
+    "0xba30e5f9bb24caa003e9f2f0497ad287fdf95623": {
+        "mirrorAddress": "0xEeCA09e33aa5F9db65F19c0B9A2e2e7F8b6F29C8",
+        "initialize": true
+    },
+    "0x5af0d9827e0c53e4799bb226655a1de152a425a5": {
+        "mirrorAddress": "0x251aeC74022E5A404181e40BdE6E9963286550C5",
+        "initialize": true
+    },
+    "0x524cab2ec69124574082676e6f654a18df49a048": {
+        "mirrorAddress": "0xaeaed94bEF3334b5560ba76b1e5375dD48c0EBf1",
+        "initialize": true
+    },
+    "0x39ee2c7b3cb80254225884ca001f57118c8f21b6": {
+        "mirrorAddress": "0x2077e7EE7723C17E4302a438028746a3fb108F19",
+        "initialize": true
+    },
+    "0xe1dc516b1486aba548eecd2947a11273518434a4": {
+        "mirrorAddress": "0x7155cCCc8C7727A9F6cE5EebB3Fabe1AdA009347",
+        "initialize": true
+    },
+    "0x0581ddf7a136c6837429a46c6cb7b388a3e52971": {
+        "mirrorAddress": "0xAac57eF60f472c049233cBAD5141457fd6f0A2b7",
+        "initialize": true
+    },
+    "0x6339e5e072086621540d0362c4e3cea0d643e114": {
+        "mirrorAddress": "0x43BE121c7d9406A7F31a9686AfF04Fd3a781F610",
+        "initialize": true
+    },
+    "0x1a92f7381b9f03921564a437210bb9396471050c": {
+        "mirrorAddress": "0xdFD9316530fF3f1334067AD3e0b5a7e283De3C34",
+        "initialize": true
+    },
+    "0xb6a37b5d14d502c3ab0ae6f3a0e058bc9517786e": {
+        "mirrorAddress": "0xbAb242b6E3519e37405C6d0fE8EC852a191eE616",
+        "initialize": true
+    },
+    "0x142e03367ede17cd851477a4287d1f35676e6dc2": {
+        "mirrorAddress": "0xedfcBaA0DcE15De93B37933AFac386F5703B6c16",
+        "initialize": true
+    },
+    "0x7bd29408f11d2bfc23c34f18275bbf23bb716bc7": {
+        "mirrorAddress": "0x5814651F05Ec84093A323dAE52cB42bc0eEcf1e1",
+        "initialize": true
+    },
+    "0x32973908faee0bf825a343000fe412ebe56f802a": {
+        "mirrorAddress": "0x3FAD758B442C8B7CD7cD5Fb6dE721BF1347990F1",
+        "initialize": true
+    },
+    "0x9a27d13a4896baa03843a0728dff6007d665f8ee": {
+        "mirrorAddress": "0xaFf78598c4A0C2F3118580Bc8AaC3F4920b1B2e2",
+        "initialize": true
+    },
+    "0x306b1ea3ecdf94ab739f1910bbda052ed4a9f949": {
+        "mirrorAddress": "0xC39B2f8E712337DF72F0D471F386B211CFEd43Ec",
+        "initialize": true
+    },
+    "0x1cb1a5e65610aeff2551a50f76a87a7d3fb649c6": {
+        "mirrorAddress": "0xD4F6806428e6c322d602021CE762380518c6036C",
+        "initialize": true
+    },
+    "0x34d85c9cdeb23fa97cb08333b511ac86e1c4e258": {
+        "mirrorAddress": "0x65118a1F896B6984aF5DF77A9A6136D105434B0f",
+        "initialize": true
+    },
+    "0x5946aeaab44e65eb370ffaa6a7ef2218cff9b47d": {
+        "mirrorAddress": "0x8b8502667be28D26203527f77113c49Fac6D0408",
+        "initialize": true
+    },
+    "0xfd1b0b0dfa524e1fd42e7d51155a663c581bbd50": {
+        "mirrorAddress": "0x5554a43Be8F8244eeCe3259d75526a45844d599e",
+        "initialize": true
+    },
+    "0x2b6df7f8389e6ecf97a0f06b189349c409a24083": {
+        "mirrorAddress": "0xc2090d21f2fDc3bbF854a5EeA07ebb800E0686A8",
+        "initialize": true
+    },
+    "0x364c828ee171616a39897688a831c2499ad972ec": {
+        "mirrorAddress": "0x9e76C19065e4Ab63913C564a05dA79f1C2C14ecd",
+        "initialize": true
+    },
+    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270": {
+        "mirrorAddress": "0xc6f2a4878820Dcd21d573B6cF6bB77A7a52b64C6",
+        "initialize": true
+    },
+    "0x99a9b7c1116f9ceeb1652de04d5969cce509b069": {
+        "mirrorAddress": "0xAc533454Aa767253e517530f1aB8eBeffc69D774",
+        "initialize": true
+    },
+    "0x59325733eb952a92e069c87f0a6168b29e80627f": {
+        "mirrorAddress": "0x249B621A526dfE5D54b82d2A541E1053F36d9114",
+        "initialize": true
+    },
+    "0x5c1a0cc6dadf4d0fb31425461df35ba80fcbc110": {
+        "mirrorAddress": "0x93e1aAc24199aA32D5E3CE3C8DAF7c92AFcF7eAD",
+        "initialize": true
+    },
+    "0x18b9db07cf194aac853daaa076d421b1dd0c75b0": {
+        "mirrorAddress": "0xD0f8Ed5fD55Cb02C80727841280441550c51b7eF",
+        "initialize": true
+    },
+    "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a": {
+        "mirrorAddress": "0x306a6913053eaee62775B508941adaC1ab29999A",
+        "initialize": true
+    },
+    "0x79fcdef22feed20eddacbb2587640e45491b757f": {
+        "mirrorAddress": "0x0A4678D8463dbF3D5F15D5b08b51F9723a1fDb1D",
+        "initialize": true
+    },
+    "0xd3d9ddd0cf0a5f0bfb8f7fceae075df687eaebab": {
+        "mirrorAddress": "0xcDF6DB9d2B01d695357e56125Bf93Caf93727c7A",
+        "initialize": true
+    },
+    "0x7a31c6726f358fad0783110a46ef489372fbfc65": {
+        "mirrorAddress": "0x7e9d519EE92EF4FACF09DC5F8A0CD51D01cbC9a8",
+        "initialize": true
+    },
+    "0xacf63e56fd08970b43401492a02f6f38b6635c91": {
+        "mirrorAddress": "0xA3dd03ea6328443bF9bFB394Bb9C414Cd0829043",
+        "initialize": true
+    },
+    "0x3af2a97414d1101e2107a70e7f33955da1346305": {
+        "mirrorAddress": "0xF4b9a32b5CFc3E74a4d6eC226221Fc33e0CB274F",
+        "initialize": true
+    },
+    "0xe785e82358879f061bc3dcac6f0444462d4b5330": {
+        "mirrorAddress": "0x1Df2E07a03F99f7b855f6d64d21c0F606C574152",
+        "initialize": true
+    },
+    "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6": {
+        "mirrorAddress": "0x5ebb73fFe3e819f8B6C63643411D0C9e522230a6",
+        "initialize": true
+    },
+    "0xe012baf811cf9c05c408e879c399960d1f305903": {
+        "mirrorAddress": "0x003E83A2d565F7A4F2E6681ebe171363a426390f",
+        "initialize": true
+    },
+    "0x3bf2922f4520a8ba0c2efc3d2a1539678dad5e9d": {
+        "mirrorAddress": "0xB81645E72B6732ecD6b0E359cB6401EefD9D986b",
+        "initialize": true
+    },
+    "0xd564c25b760cb278a55bdd98831f4ff4b6c97b38": {
+        "mirrorAddress": "0x612b9Af7956202b390F3e23c6a286F145D3CEb8B",
+        "initialize": true
+    },
+    "0x0fc3dd8c37880a297166bed57759974a157f0e74": {
+        "mirrorAddress": "0xde1e78224C5D80cF723Bd903877e306A801c0C00",
+        "initialize": true
+    },
+    "0x09233d553058c2f42ba751c87816a8e9fae7ef10": {
+        "mirrorAddress": "0x04b58F7a7Cb15Ec15055e9DC2b0E0C3FF126732D",
+        "initialize": true
+    },
+    "0x8d9710f0e193d3f95c0723eaaf1a81030dc9116d": {
+        "mirrorAddress": "0x9Cc9faC8B4387F06d63D93add578E83265646eD2",
+        "initialize": true
+    },
+    "0xfc8a98c22a9e32948ab028414d67c62c49b16864": {
+        "mirrorAddress": "0xf1fBe443766C96B4AfFC3c85FbB6159B98406C78",
+        "initialize": true
+    },
+    "0x062e691c2054de82f28008a8ccc6d7a1c8ce060d": {
+        "mirrorAddress": "0xA38671003126481968B827d3353984dcEA2544e3",
+        "initialize": true
+    },
+    "0x716f29b8972d551294d9e02b3eb0fc1107fbf4aa": {
+        "mirrorAddress": "0xF62A7D19466ba5b1EDE597e6dAA3dADC97b8cce4",
+        "initialize": true
+    },
+    "0xd774557b647330c91bf44cfeab205095f7e6c367": {
+        "mirrorAddress": "0x014a8F924a6787030dad383149Ed96A2efB64087",
+        "initialize": true
+    },
+    "0x5f36809a7c15ebcc00221217cd17914ffd3e4762": {
+        "mirrorAddress": "0x5fA760E774A22d05577e4383D16f2B243108b667",
+        "initialize": true
+    },
+    "0xdfde78d2baec499fe18f2be74b6c287eed9511d7": {
+        "mirrorAddress": "0x7E3BAf42Ec4dae4FC55C09B4AE63A3A210252Fc8",
+        "initialize": true
+    },
+    "0x7a63d17f5a59bca04b6702f461b1f1a1c59b100b": {
+        "mirrorAddress": "0xE12192F31E819fF7dA722349C188B8ae0F0594E2",
+        "initialize": true
+    },
+    "0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d": {
+        "mirrorAddress": "0xba7Bf786C4fBCC35EE6Dc427895ad0DeaD6EE1Cf",
+        "initialize": true
+    },
+    "0x1b829b926a14634d36625e60165c0770c09d02b2": {
+        "mirrorAddress": "0xE1624cb293611233a1746Ee01442DD1eaA095b5F",
+        "initialize": true
+    },
+    "0xb852c6b5892256c264cc2c888ea462189154d8d7": {
+        "mirrorAddress": "0xeB28B7cA92c100E12ef76e582Fd84c2b68E45671",
+        "initialize": true
+    },
+    "0x790b2cf29ed4f310bf7641f013c65d4560d28371": {
+        "mirrorAddress": "0x3286F7dA84493014C4bCC8Dfea59dce37B32B6bb",
+        "initialize": true
+    },
+    "0xd1258db6ac08eb0e625b75b371c023da478e94a9": {
+        "mirrorAddress": "0xdd5c4eE5d59B87b713bD93E6C54C14eb0CDF67D6",
+        "initialize": true
+    },
+    "0xeb2dfc54ebafca8f50efcc1e21a9d100b5aeb349": {
+        "mirrorAddress": "0xA4281Ef90283Cb8DeD6C2b5c0aC13Bf77013A022",
+        "initialize": true
+    }
+}
