@@ -77,15 +77,15 @@ interface IMOPN {
 
     event LandHolderMTMinted(uint16 indexed LandId, uint256 amount);
 
-    function MTOutputPerBlock() external view returns (uint32);
+    function MTOutputPerTimestamp() external view returns (uint32);
 
-    function MTStepStartBlock() external view returns (uint32);
+    function MTStepStartTimestamp() external view returns (uint32);
+
+    function LastTickTimestamp() external view returns (uint32);
 
     function MTReduceInterval() external view returns (uint256);
 
     function TotalMOPNPoints() external view returns (uint48);
-
-    function LastTickBlock() external view returns (uint32);
 
     function PerMOPNPointMinted() external view returns (uint48);
 

@@ -62,10 +62,8 @@ module.exports = {
     },
     sepolia: {
       url: process.env.SEPOLIA_URL,
-      accounts: {
-        mnemonic: process.env.MNEMONIC,
-      },
       etherscanHost: "https://sepolia.etherscan.io/",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     mumbai: {
       url: process.env.POLYGON_MUMBAI_URL,

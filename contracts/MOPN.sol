@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "hardhat/console.sol";
-
 import "./erc6551/interfaces/IMOPNERC6551Account.sol";
 import "./erc6551/interfaces/IERC6551Registry.sol";
 import "./interfaces/IMOPN.sol";
@@ -29,27 +27,23 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 contract MOPN is IMOPN, Multicall {
     using BitMaps for BitMaps.BitMap;
 
-    uint256 public constant MTReduceInterval = 50000;
+    uint256 public constant MTReduceInterval = 600000;
     uint256 public constant MaxCollectionOnMapNum = 10000;
-    uint48 public constant whiteListOffTotalMOPNPoint = 30000000;
-
-    bytes32 private whiteListRoot;
 
     BitMaps.BitMap private tilesbitmap;
 
     uint48 public TotalMOPNPoints;
-    uint32 public LastTickBlock;
     uint48 public PerMOPNPointMinted;
     uint64 public MTTotalMinted;
-    uint32 public MTOutputPerBlock;
-    uint32 public MTStepStartBlock;
-    uint16 public nextLandId;
-
-    //total uint bits of above
+    uint32 public LastTickTimestamp;
+    uint32 public MTOutputPerTimestamp;
+    uint32 public MTStepStartTimestamp;
 
     mapping(address => CollectionDataStruct) public CDs;
 
     mapping(address => AccountDataStruct) public ADs;
+
+    mapping(uint32 => uint256) public Lands;
 
     IMOPNGovernance public immutable governance;
 
@@ -66,26 +60,15 @@ contract MOPN is IMOPN, Multicall {
         _;
     }
 
-    constructor(
-        address governance_,
-        uint32 MTStepStartBlock_,
-        bytes32 whiteListRoot_
-    ) {
+    constructor(address governance_, uint32 MTStepStartTimestamp_) {
         governance = IMOPNGovernance(governance_);
-        LastTickBlock = MTStepStartBlock_;
-        MTOutputPerBlock = 60000000;
-        MTStepStartBlock = MTStepStartBlock_;
-        whiteListRoot = whiteListRoot_;
-        PerMOPNPointMinted = 1;
+        LastTickTimestamp = MTStepStartTimestamp_;
+        MTOutputPerTimestamp = 5000000;
+        MTStepStartTimestamp = MTStepStartTimestamp_;
     }
 
     function getGovernance() external view returns (address) {
         return address(governance);
-    }
-
-    function whiteListRootUpdate(bytes32 root) public {
-        require(governance.owner() == msg.sender, "not owner");
-        whiteListRoot = root;
     }
 
     function checkAccountQualification(
@@ -124,30 +107,6 @@ contract MOPN is IMOPN, Multicall {
                 tokenId,
                 0
             );
-    }
-
-    function collectionWhiteListRegistry(
-        address collectionAddress,
-        uint48 OpenTotalMOPNPoint,
-        bytes32[] memory proof
-    ) public {
-        require(
-            OpenTotalMOPNPoint <= TotalMOPNPoints,
-            "your collection is not open yet"
-        );
-        bytes32 leaf = keccak256(
-            bytes.concat(
-                keccak256(abi.encode(collectionAddress, OpenTotalMOPNPoint))
-            )
-        );
-        require(
-            MerkleProof.verify(proof, whiteListRoot, leaf),
-            "Invalid proof"
-        );
-
-        if (CDs[collectionAddress].PerMOPNPointMinted == 0) {
-            CDs[collectionAddress].PerMOPNPointMinted = PerMOPNPointMinted;
-        }
     }
 
     function buyBomb(uint256 amount) external {
@@ -223,28 +182,17 @@ contract MOPN is IMOPN, Multicall {
             }
         }
 
-        require(block.number >= MTStepStartBlock, "mopn is not open yet");
+        require(
+            block.timestamp >= MTStepStartTimestamp,
+            "mopn is not open yet"
+        );
         tilecheck(tileCoordinate);
 
         require(
             tiledistance(tileCoordinate, tileAtLandCenter(LandId)) < 6,
             "LandId error"
         );
-        if (LandId > nextLandId) {
-            unchecked {
-                nextLandId = uint16(
-                    IMOPNLand(governance.landContract()).nextTokenId()
-                );
-            }
-            require(nextLandId > LandId, "Land Not Open");
-        }
-
-        if (whiteListOffTotalMOPNPoint > TotalMOPNPoints) {
-            require(
-                CDs[collectionAddress].PerMOPNPointMinted > 0,
-                "collection not register white list"
-            );
-        }
+        require(LandId < 10981, "LandId error");
 
         settlePerMOPNPointMinted();
         settleCollectionMT(collectionAddress);
@@ -446,49 +394,51 @@ contract MOPN is IMOPN, Multicall {
     ) public view returns (uint256 MTPPB) {
         int128 reducePercentage = ABDKMath64x64.divu(997, 1000);
         int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, MTOutputPerBlock);
+        return ABDKMath64x64.mulu(reducePower, MTOutputPerTimestamp);
     }
 
     function currentMTPPB() public view returns (uint256 MTPPB) {
-        if (MTStepStartBlock > block.number) {
+        if (MTStepStartTimestamp > block.timestamp) {
             return 0;
         }
         return currentMTPPB(MTReduceTimes());
     }
 
     function MTReduceTimes() public view returns (uint256) {
-        return (block.number - MTStepStartBlock) / MTReduceInterval;
+        return (block.timestamp - MTStepStartTimestamp) / MTReduceInterval;
     }
 
     function settlePerMOPNPointMinted() public {
-        if (block.number > LastTickBlock) {
+        if (block.timestamp > LastTickTimestamp) {
             uint256 reduceTimes = MTReduceTimes();
             unchecked {
                 if (TotalMOPNPoints > 0) {
                     uint256 perMOPNPointMintDiff;
                     if (reduceTimes == 0) {
                         perMOPNPointMintDiff +=
-                            ((block.number - LastTickBlock) *
-                                MTOutputPerBlock) /
+                            ((block.timestamp - LastTickTimestamp) *
+                                MTOutputPerTimestamp) /
                             TotalMOPNPoints;
                     } else {
-                        uint256 nextReduceBlock = MTStepStartBlock +
+                        uint256 nextReduceTimestamp = MTStepStartTimestamp +
                             MTReduceInterval;
-                        uint256 lastTickBlock = LastTickBlock;
+                        uint256 lastTickTimestamp = LastTickTimestamp;
                         for (uint256 i = 0; i <= reduceTimes; i++) {
                             perMOPNPointMintDiff +=
-                                ((nextReduceBlock - lastTickBlock) *
+                                ((nextReduceTimestamp - lastTickTimestamp) *
                                     currentMTPPB(i)) /
                                 TotalMOPNPoints;
-                            lastTickBlock = nextReduceBlock;
-                            nextReduceBlock += MTReduceInterval;
-                            if (nextReduceBlock > block.number) {
-                                nextReduceBlock = block.number;
+                            lastTickTimestamp = nextReduceTimestamp;
+                            nextReduceTimestamp += MTReduceInterval;
+                            if (nextReduceTimestamp > block.timestamp) {
+                                nextReduceTimestamp = block.timestamp;
                             }
                         }
 
-                        MTOutputPerBlock = uint32(currentMTPPB(reduceTimes));
-                        MTStepStartBlock += uint32(
+                        MTOutputPerTimestamp = uint32(
+                            currentMTPPB(reduceTimes)
+                        );
+                        MTStepStartTimestamp += uint32(
                             reduceTimes * MTReduceInterval
                         );
                     }
@@ -498,7 +448,7 @@ contract MOPN is IMOPN, Multicall {
                     );
                 }
 
-                LastTickBlock = uint32(block.number);
+                LastTickTimestamp = uint32(block.timestamp);
             }
         }
     }
@@ -621,12 +571,7 @@ contract MOPN is IMOPN, Multicall {
                         (CDs[collectionAddress].PerCollectionNFTMinted -
                             ADs[account].PerCollectionNFTMinted);
 
-                    IMOPNToken(governance.tokenContract()).mint(
-                        IMOPNLand(governance.landContract()).ownerOf(
-                            ADs[account].LandId
-                        ),
-                        amount / 20
-                    );
+                    Lands[ADs[account].LandId] += amount / 20;
                     emit LandHolderMTMinted(ADs[account].LandId, amount / 20);
 
                     amount = (amount * 9) / 10;
