@@ -29,30 +29,31 @@ contract MOPNData is IMOPNData, Multicall {
 
     function calcPerMOPNPointMinted() public view returns (uint256) {
         IMOPN mopn = IMOPN(governance.mopnContract());
-        if (mopn.MTStepStartBlock() > block.number) {
+        if (mopn.MTStepStartTimestamp() > block.timestamp) {
             return 0;
         }
         uint256 totalMOPNPoints = mopn.TotalMOPNPoints();
         uint256 perMOPNPointMinted = mopn.PerMOPNPointMinted();
         if (totalMOPNPoints > 0) {
-            uint256 lastTickBlock = mopn.LastTickBlock();
+            uint256 lastTickTimestamp = mopn.LastTickTimestamp();
             uint256 reduceTimes = mopn.MTReduceTimes();
             if (reduceTimes == 0) {
                 perMOPNPointMinted +=
-                    ((block.number - lastTickBlock) * mopn.MTOutputPerBlock()) /
+                    ((block.timestamp - lastTickTimestamp) *
+                        mopn.MTOutputPerTimestamp()) /
                     totalMOPNPoints;
             } else {
-                uint256 nextReduceBlock = mopn.MTStepStartBlock() +
+                uint256 nextReduceTimestamp = mopn.MTStepStartTimestamp() +
                     mopn.MTReduceInterval();
                 for (uint256 i = 0; i <= reduceTimes; i++) {
                     perMOPNPointMinted +=
-                        ((nextReduceBlock - lastTickBlock) *
+                        ((nextReduceTimestamp - lastTickTimestamp) *
                             mopn.currentMTPPB(i)) /
                         totalMOPNPoints;
-                    lastTickBlock = nextReduceBlock;
-                    nextReduceBlock += mopn.MTReduceInterval();
-                    if (nextReduceBlock > block.number) {
-                        nextReduceBlock = block.number;
+                    lastTickTimestamp = nextReduceTimestamp;
+                    nextReduceTimestamp += mopn.MTReduceInterval();
+                    if (nextReduceTimestamp > block.timestamp) {
+                        nextReduceTimestamp = block.timestamp;
                     }
                 }
             }

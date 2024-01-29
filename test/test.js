@@ -15,12 +15,9 @@ describe("MOPN", function () {
 
   it("deply Governance", async function () {
     const accounts = config.networks.hardhat.accounts;
-    console.log(accounts);
     const hdNodeWallet = ethers.HDNodeWallet.fromPhrase(accounts.mnemonic);
     let wallet = hdNodeWallet.derivePath(accounts.path + "/0");
-    console.log(wallet);
     wallet = hdNodeWallet.derivePath(accounts.path + "/1");
-    console.log(wallet);
     const MOPNGovernance = await ethers.getContractFactory("MOPNGovernance");
     mopngovernance = await MOPNGovernance.deploy();
     await mopngovernance.waitForDeployment();
@@ -39,10 +36,7 @@ describe("MOPN", function () {
     console.log("MOPNERC6551Account", await erc6551account.getAddress());
 
     const MOPNERC6551AccountProxy = await ethers.getContractFactory("MOPNERC6551AccountProxy");
-    erc6551accountproxy = await MOPNERC6551AccountProxy.deploy(
-      await mopngovernance.getAddress(),
-      await erc6551account.getAddress()
-    );
+    erc6551accountproxy = await MOPNERC6551AccountProxy.deploy(await erc6551account.getAddress());
     await erc6551accountproxy.waitForDeployment();
     console.log("MOPNERC6551AccountProxy", await erc6551accountproxy.getAddress());
 
@@ -54,11 +48,7 @@ describe("MOPN", function () {
 
   it("deploy MOPN contracts", async function () {
     const MOPN = await ethers.getContractFactory("MOPN");
-    mopn = await MOPN.deploy(
-      mopngovernance.getAddress(),
-      60000000,
-      "0x7e53a927cd6ec3af3b9bb0b1aec96074c82344674a0d328ab20431416cccb45f"
-    );
+    mopn = await MOPN.deploy(mopngovernance.getAddress(), 1706498916);
     await mopn.waitForDeployment();
     console.log("MOPN", await mopn.getAddress());
   });
@@ -73,20 +63,6 @@ describe("MOPN", function () {
   });
 
   it("test try cache", async function () {
-    console.log(await mopn.getCollectionAgentAssignPercentage(1));
-    console.log(await mopn.getCollectionAgentAssignPercentage(10));
-    console.log(await mopn.getCollectionAgentAssignPercentage(100));
-    console.log(await mopn.getCollectionAgentAssignPercentage(500));
-    console.log(await mopn.getCollectionAgentAssignPercentage(1000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(2000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(3000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(4000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(5000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(6000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(7000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(8000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(9000));
-    console.log(await mopn.getCollectionAgentAssignPercentage(10000));
     const tx = await erc6551registry.createAccount(
       await erc6551accountproxy.getAddress(),
       31337,
