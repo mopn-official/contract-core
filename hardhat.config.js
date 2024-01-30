@@ -69,6 +69,12 @@ module.exports = {
       url: process.env.POLYGON_MUMBAI_URL,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    blast_test: {
+      url: process.env.BLAST_TEST_URL,
+      chainId: 168587773,
+      etherscanHost: "https://testnet.blastscan.io/",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
