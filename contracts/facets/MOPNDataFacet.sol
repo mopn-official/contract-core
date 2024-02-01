@@ -3,7 +3,8 @@ pragma solidity ^0.8.21;
 
 import "hardhat/console.sol";
 
-import {MOPNBase, NFTParams, AccountDataOutput, CollectionDataOutput} from "../libraries/LibMOPN.sol";
+import {FacetCommons} from "./FacetCommons.sol";
+import {LibMOPN} from "../libraries/LibMOPN.sol";
 import {Constants} from "contracts/libraries/Constants.sol";
 import {Errors} from "contracts/libraries/Errors.sol";
 import {Events} from "contracts/libraries/Events.sol";
@@ -14,43 +15,44 @@ import "../interfaces/IMOPNBomb.sol";
 import "../interfaces/IMOPNToken.sol";
 import "../interfaces/IMOPNLand.sol";
 
-contract MOPNDataFacet is MOPNBase {
+contract MOPNDataFacet is FacetCommons {
     function MTTotalMinted() public view returns (uint256) {
-        return s.MTTotalMinted;
+        return LibMOPN.mopnStorage().MTTotalMinted;
     }
 
     function TotalMOPNPoints() public view returns (uint256) {
-        return s.TotalMOPNPoints;
+        return LibMOPN.mopnStorage().TotalMOPNPoints;
     }
 
     function PerMOPNPointMinted() public view returns (uint256) {
-        return s.PerMOPNPointMinted;
+        return LibMOPN.mopnStorage().PerMOPNPointMinted;
     }
 
     function tokenContract() public view returns (address) {
-        return s.tokenContract;
+        return LibMOPN.mopnStorage().tokenContract;
     }
 
     function landContract() public view returns (address) {
-        return s.landContract;
+        return LibMOPN.mopnStorage().landContract;
     }
 
     function ERC6551AccountHelper() public view returns (address) {
-        return s.ERC6551AccountHelper;
+        return LibMOPN.mopnStorage().ERC6551AccountHelper;
     }
 
     function ERC6551AccountProxy() public view returns (address) {
-        return s.ERC6551AccountProxy;
+        return LibMOPN.mopnStorage().ERC6551AccountProxy;
     }
 
     function currentMTPPB() public view returns (uint256 MTPPB) {
-        if (s.MTStepStartTimestamp > block.timestamp) {
+        if (LibMOPN.mopnStorage().MTStepStartTimestamp > block.timestamp) {
             return 0;
         }
         return currentMTPPB(MTReduceTimes());
     }
 
     function calcPerMOPNPointMinted() public view returns (uint256) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         if (s.MTStepStartTimestamp > block.timestamp) {
             return 0;
         }
@@ -80,6 +82,7 @@ contract MOPNDataFacet is MOPNBase {
      * @param collectionAddress collection contract address
      */
     function calcCollectionSettledMT(address collectionAddress) public view returns (uint256 inbox) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         inbox = s.CDs[collectionAddress].SettledMT;
         uint256 perMOPNPointMinted = calcPerMOPNPointMinted();
         uint256 CollectionPerMOPNPointMinted = s.CDs[collectionAddress].PerMOPNPointMinted;
@@ -92,6 +95,7 @@ contract MOPNDataFacet is MOPNBase {
     }
 
     function calcPerCollectionNFTMintedMT(address collectionAddress) public view returns (uint256 result) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         result = s.CDs[collectionAddress].PerCollectionNFTMinted;
 
         uint256 CollectionMOPNPoints = s.CDs[collectionAddress].CollectionMOPNPoint * s.CDs[collectionAddress].OnMapNftNumber;
@@ -109,13 +113,14 @@ contract MOPNDataFacet is MOPNBase {
      * @param account account wallet address
      */
     function calcAccountMT(address account) public view returns (uint256 inbox) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         inbox = s.ADs[account].SettledMT;
-        uint256 AccountOnMapMOPNPoint = tilepoint(s.ADs[account].Coordinate);
+        uint256 AccountOnMapMOPNPoint = LibMOPN.tilepoint(s.ADs[account].Coordinate);
         uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() - s.ADs[account].PerMOPNPointMinted;
 
         if (AccountPerMOPNPointMintedDiff > 0 && AccountOnMapMOPNPoint > 0) {
             inbox += ((AccountPerMOPNPointMintedDiff * AccountOnMapMOPNPoint) * 9) / 10;
-            uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(getAccountCollection(account)) -
+            uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(LibMOPN.getAccountCollection(account)) -
                 s.ADs[account].PerCollectionNFTMinted;
 
             if (AccountPerCollectionNFTMintedDiff > 0) {
@@ -132,22 +137,24 @@ contract MOPNDataFacet is MOPNBase {
     }
 
     function calcLandMT(uint32 LandId, address[] memory tileAccounts) public view returns (uint256 amount) {
-        uint24 tileCoordinate = tileAtLandCenter(LandId);
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
+        uint24 tileCoordinate = LibMOPN.tileAtLandCenter(LandId);
         for (uint256 i; i < tileAccounts.length; i++) {
-            if (tiledistance(tileCoordinate, s.ADs[tileAccounts[i]].Coordinate) < 6) {
+            if (LibMOPN.tiledistance(tileCoordinate, s.ADs[tileAccounts[i]].Coordinate) < 6) {
                 amount += calcLandAccountMT(tileAccounts[i]);
             }
         }
     }
 
     function calcLandAccountMT(address account) public view returns (uint256 amount) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         if (account != address(0)) {
             uint256 AccountPerMOPNPointMintedDiff = calcPerMOPNPointMinted() - s.ADs[account].PerMOPNPointMinted;
 
             if (AccountPerMOPNPointMintedDiff > 0) {
-                address collectionAddress = getAccountCollection(account);
+                address collectionAddress = LibMOPN.getAccountCollection(account);
                 uint256 AccountPerCollectionNFTMintedDiff = calcPerCollectionNFTMintedMT(collectionAddress) - s.ADs[account].PerCollectionNFTMinted;
-                uint256 AccountOnMapMOPNPoint = tilepoint(s.ADs[account].Coordinate);
+                uint256 AccountOnMapMOPNPoint = LibMOPN.tilepoint(s.ADs[account].Coordinate);
                 amount += (AccountPerMOPNPointMintedDiff * AccountOnMapMOPNPoint) / 20;
                 if (AccountPerCollectionNFTMintedDiff > 0) {
                     amount += AccountPerCollectionNFTMintedDiff / 20;
@@ -156,7 +163,8 @@ contract MOPNDataFacet is MOPNBase {
         }
     }
 
-    function getAccountData(address account) public view returns (AccountDataOutput memory accountData) {
+    function getAccountData(address account) public view returns (LibMOPN.AccountDataOutput memory accountData) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         accountData.account = account;
         (, address collectionAddress, uint256 tokenId) = IMOPNERC6551Account(payable(account)).token();
 
@@ -166,21 +174,28 @@ contract MOPNDataFacet is MOPNBase {
         accountData.AgentAssignPercentage = s.ADs[account].AgentAssignPercentage;
         accountData.owner = IMOPNERC6551Account(payable(account)).owner();
         accountData.MTBalance = IMOPNToken(s.tokenContract).balanceOf(account);
-        accountData.OnMapMOPNPoint = tilepoint(s.ADs[account].Coordinate);
+        accountData.OnMapMOPNPoint = LibMOPN.tilepoint(s.ADs[account].Coordinate);
         accountData.CollectionMOPNPoint = s.CDs[collectionAddress].CollectionMOPNPoint;
         accountData.TotalMOPNPoint = accountData.OnMapMOPNPoint + accountData.CollectionMOPNPoint;
         accountData.tileCoordinate = s.ADs[account].Coordinate;
     }
 
-    function getAccountsData(address[] memory accounts) public view returns (AccountDataOutput[] memory accountDatas) {
-        accountDatas = new AccountDataOutput[](accounts.length);
+    function getAccountsData(address[] memory accounts) public view returns (LibMOPN.AccountDataOutput[] memory accountDatas) {
+        accountDatas = new LibMOPN.AccountDataOutput[](accounts.length);
         for (uint256 i = 0; i < accounts.length; i++) {
             accountDatas[i] = getAccountData(accounts[i]);
         }
     }
 
-    function getAccountByNFT(NFTParams calldata params) public view returns (address) {
-        return IERC6551Registry(s.ERC6551Registry).account(s.ERC6551AccountProxy, block.chainid, params.collectionAddress, params.tokenId, 0);
+    function getAccountByNFT(LibMOPN.NFTParams calldata params) public view returns (address) {
+        return
+            IERC6551Registry(LibMOPN.mopnStorage().ERC6551Registry).account(
+                LibMOPN.mopnStorage().ERC6551AccountProxy,
+                block.chainid,
+                params.collectionAddress,
+                params.tokenId,
+                0
+            );
     }
 
     /**
@@ -188,7 +203,7 @@ contract MOPNDataFacet is MOPNBase {
      * @param params  collection contract address and tokenId
      * @return accountData avatar data format struct AvatarDataOutput
      */
-    function getAccountDataByNFT(NFTParams calldata params) public view returns (AccountDataOutput memory accountData) {
+    function getAccountDataByNFT(LibMOPN.NFTParams calldata params) public view returns (LibMOPN.AccountDataOutput memory accountData) {
         accountData = getAccountData(getAccountByNFT(params));
     }
 
@@ -197,14 +212,15 @@ contract MOPNDataFacet is MOPNBase {
      * @param params array of collection contract address and token ids
      * @return accountDatas avatar datas format struct AvatarDataOutput
      */
-    function getAccountsDataByNFTs(NFTParams[] calldata params) public view returns (AccountDataOutput[] memory accountDatas) {
-        accountDatas = new AccountDataOutput[](params.length);
+    function getAccountsDataByNFTs(LibMOPN.NFTParams[] calldata params) public view returns (LibMOPN.AccountDataOutput[] memory accountDatas) {
+        accountDatas = new LibMOPN.AccountDataOutput[](params.length);
         for (uint256 i = 0; i < params.length; i++) {
             accountDatas[i] = getAccountData(getAccountByNFT(params[i]));
         }
     }
 
     function getBatchAccountMTBalance(address[] memory accounts) public view returns (uint256[] memory MTBalances) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         MTBalances = new uint256[](accounts.length);
         for (uint256 i = 0; i < accounts.length; i++) {
             MTBalances[i] = IMOPNToken(s.tokenContract).balanceOf(accounts[i]);
@@ -212,6 +228,7 @@ contract MOPNDataFacet is MOPNBase {
     }
 
     function getWalletStakingMTs(address[] memory collections, address wallet) public view returns (uint256 amount) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         for (uint256 i = 0; i < collections.length; i++) {
             amount += IMOPNCollectionVault(s.CDs[collections[i]].vaultAddress).V2MTAmountRealtime(
                 IMOPNCollectionVault(s.CDs[collections[i]].vaultAddress).balanceOf(wallet)
@@ -222,7 +239,8 @@ contract MOPNDataFacet is MOPNBase {
     /**
      * get collection contract, on map num, avatar num etc from IGovernance.
      */
-    function getCollectionData(address collectionAddress) public view returns (CollectionDataOutput memory cData) {
+    function getCollectionData(address collectionAddress) public view returns (LibMOPN.CollectionDataOutput memory cData) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         cData.contractAddress = collectionAddress;
         cData.collectionVault = s.CDs[collectionAddress].vaultAddress;
         cData.OnMapNum = s.CDs[collectionAddress].OnMapNftNumber;
@@ -242,18 +260,19 @@ contract MOPNDataFacet is MOPNBase {
         }
     }
 
-    function getCollectionsData(address[] memory collectionAddresses) public view returns (CollectionDataOutput[] memory cDatas) {
-        cDatas = new CollectionDataOutput[](collectionAddresses.length);
+    function getCollectionsData(address[] memory collectionAddresses) public view returns (LibMOPN.CollectionDataOutput[] memory cDatas) {
+        cDatas = new LibMOPN.CollectionDataOutput[](collectionAddresses.length);
         for (uint256 i = 0; i < collectionAddresses.length; i++) {
             cDatas[i] = getCollectionData(collectionAddresses[i]);
         }
     }
 
     function getCollectionVaultIndex(address collectionAddress) public view returns (uint256) {
-        return s.CDs[collectionAddress].vaultIndex;
+        return LibMOPN.mopnStorage().CDs[collectionAddress].vaultIndex;
     }
 
     function getTotalCollectionVaultMinted() public view returns (uint256) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         return ((s.MTTotalMinted + (calcPerMOPNPointMinted() - s.PerMOPNPointMinted) * s.TotalMOPNPoints) / 20);
     }
 }

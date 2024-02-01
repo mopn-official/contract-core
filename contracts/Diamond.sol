@@ -9,19 +9,14 @@ pragma solidity ^0.8.0;
 /******************************************************************************/
 
 import {LibDiamond} from "./libraries/LibDiamond.sol";
+import {LibMOPN} from "./libraries/LibMOPN.sol";
 import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
-import {IBlast} from "./interfaces/IBlast.sol";
 
 contract Diamond {
-    IBlast public constant BLAST = IBlast(0x4300000000000000000000000000000000000002);
+    constructor(address _contractOwner, address _diamondCutFacet) payable {
+        //LibMOPN.BLAST.configureClaimableGas(); //@todo open when deploy real network
+        //LibMOPN.BLAST.configureAutomaticYield();
 
-    address payable public halfgasrecipient;
-
-    constructor(address _contractOwner, address payable halfgasrecipient_, address _diamondCutFacet) payable {
-        BLAST.configureClaimableGas(); //@todo open when deploy real network
-        BLAST.configureAutomaticYield();
-
-        halfgasrecipient = halfgasrecipient_;
         LibDiamond.setContractOwner(_contractOwner);
 
         // Add the diamondCut external function from the diamondCutFacet
@@ -66,11 +61,11 @@ contract Diamond {
     receive() external payable {
         require(address(this).balance >= msg.value, "Insufficient balance");
         uint256 half = msg.value / 2;
-        (bool sent, ) = halfgasrecipient.call{value: half}("");
+        (bool sent, ) = LibMOPN.mopnStorage().halfgasrecipient.call{value: half}("");
         require(sent, "Failed to send Ether");
     }
 
     function claimMaxGas() external {
-        BLAST.claimMaxGas(address(this), address(this));
+        LibMOPN.BLAST.claimMaxGas(address(this), address(this));
     }
 }

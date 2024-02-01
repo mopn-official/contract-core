@@ -3,9 +3,10 @@ pragma solidity ^0.8.21;
 
 import "hardhat/console.sol";
 
+import {FacetCommons} from "./FacetCommons.sol";
 import {Constants} from "../libraries/Constants.sol";
 import {Events} from "../libraries/Events.sol";
-import {MOPNBase, BombSoldStruct} from "../libraries/LibMOPN.sol";
+import {LibMOPN} from "../libraries/LibMOPN.sol";
 import "../interfaces/IMOPNBomb.sol";
 import "../interfaces/IMOPNToken.sol";
 import "../interfaces/IMOPNLand.sol";
@@ -15,7 +16,7 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 /// @title Arsenal for Bomb
 /// @author Cyanface<cyanface@outlook.com>
-contract MOPNAuctionHouseFacet is MOPNBase {
+contract MOPNAuctionHouseFacet is FacetCommons {
     /**
      * @notice buy the amount of bombs at current block's price
      * @param amount the amount of bombs
@@ -24,7 +25,7 @@ contract MOPNAuctionHouseFacet is MOPNBase {
         uint256 price = getBombCurrentPrice();
 
         if (price > 0) {
-            IMOPNToken(s.tokenContract).mopnburn(msg.sender, price * amount);
+            IMOPNToken(LibMOPN.mopnStorage().tokenContract).mopnburn(msg.sender, price * amount);
         }
 
         _buyBomb(msg.sender, amount, price);
@@ -32,15 +33,16 @@ contract MOPNAuctionHouseFacet is MOPNBase {
 
     function _buyBomb(address buyer, uint256 amount, uint256 price) internal {
         increaseBombSold(amount);
-        IMOPNBomb(s.bombContract).mint(buyer, 1, amount);
+        IMOPNBomb(LibMOPN.mopnStorage().bombContract).mint(buyer, 1, amount);
         emit Events.BombSold(buyer, amount, price);
     }
 
-    function getBombSold() public view returns (BombSoldStruct memory) {
-        return s.bombsold;
+    function getBombSold() public view returns (LibMOPN.BombSoldStruct memory) {
+        return LibMOPN.mopnStorage().bombsold;
     }
 
     function getLast24BombSold() public view returns (uint256 sold) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         uint256 qactgap = block.timestamp - s.bombsold.lastSellTimestamp;
         if (qactgap < 86400) {
             uint256 currentIndex = (block.timestamp % 86400) / 3600;
@@ -58,6 +60,7 @@ contract MOPNAuctionHouseFacet is MOPNBase {
     }
 
     function increaseBombSold(uint256 amount) internal {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         uint256 qactgap = block.timestamp - s.bombsold.lastSellTimestamp;
         uint256 lastIndex = (s.bombsold.lastSellTimestamp % 86400) / 3600;
         uint256 currentIndex = (block.timestamp % 86400) / 3600;
@@ -95,7 +98,7 @@ contract MOPNAuctionHouseFacet is MOPNBase {
      */
     function getBombCurrentPrice() public view returns (uint256) {
         uint256 pmt = currentMTPPB(MTReduceTimes()) * 7200;
-        uint256 pexp = (pmt * 7) / (s.TotalMOPNPoints / 5);
+        uint256 pexp = (pmt * 7) / (LibMOPN.mopnStorage().TotalMOPNPoints / 5);
         int256 qexp = int256(pmt / (2 * pexp));
 
         return ABDKMath64x64.mulu(ABDKMath64x64.exp(ABDKMath64x64.divi(int256(getLast24BombSold()) - qexp, qexp)), pexp);

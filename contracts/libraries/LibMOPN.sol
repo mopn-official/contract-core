@@ -5,139 +5,108 @@ import "hardhat/console.sol";
 
 import {Constants} from "contracts/libraries/Constants.sol";
 import {Errors} from "contracts/libraries/Errors.sol";
-import {Events} from "contracts/libraries/Events.sol";
 import "../erc6551/interfaces/IMOPNERC6551Account.sol";
-import "../erc6551/interfaces/IERC6551Registry.sol";
+import {IBlast} from "../interfaces/IBlast.sol";
 import "../interfaces/IMOPNCollectionVault.sol";
-import "../interfaces/IMOPNBomb.sol";
-import "../interfaces/IMOPNToken.sol";
-import "../interfaces/IMOPNLand.sol";
-import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 
-struct AccountDataStruct {
-    uint16 LandId;
-    uint24 Coordinate;
-    uint48 PerMOPNPointMinted;
-    uint48 SettledMT;
-    uint48 PerCollectionNFTMinted;
-    uint16 AgentAssignPercentage;
-    address AgentPlacer;
-}
+library LibMOPN {
+    IBlast public constant BLAST = IBlast(0x4300000000000000000000000000000000000002);
+    bytes32 constant MOPN_STORAGE_POSITION = keccak256("diamond.standard.mopn.storage");
 
-struct CollectionDataStruct {
-    uint24 CollectionMOPNPoint;
-    uint48 OnMapMOPNPoints;
-    uint16 OnMapNftNumber;
-    uint16 OnMapAgentPlaceNftNumber;
-    uint48 PerCollectionNFTMinted;
-    uint48 PerMOPNPointMinted;
-    uint48 SettledMT;
-    address vaultAddress;
-    uint48 vaultIndex;
-}
-
-struct BombSoldStruct {
-    uint16[24] hourSolds;
-    uint32 lastSellTimestamp;
-}
-
-struct NFTParams {
-    address collectionAddress;
-    uint256 tokenId;
-}
-
-struct AccountDataOutput {
-    address account;
-    address contractAddress;
-    uint256 tokenId;
-    uint256 CollectionMOPNPoint;
-    uint256 MTBalance;
-    uint256 OnMapMOPNPoint;
-    uint256 TotalMOPNPoint;
-    uint32 tileCoordinate;
-    address owner;
-    address AgentPlacer;
-    uint256 AgentAssignPercentage;
-}
-
-struct CollectionDataOutput {
-    address contractAddress;
-    address collectionVault;
-    uint256 OnMapNum;
-    uint256 MTBalance;
-    uint256 UnclaimMTBalance;
-    uint256 CollectionMOPNPoints;
-    uint256 OnMapMOPNPoints;
-    uint256 CollectionMOPNPoint;
-    uint256 PMTTotalSupply;
-    uint256 OnMapAgentPlaceNftNumber;
-    IMOPNCollectionVault.AskStruct AskStruct;
-    IMOPNCollectionVault.BidStruct BidStruct;
-}
-
-struct MOPNStorage {
-    uint32 LastTickTimestamp;
-    uint48 TotalMOPNPoints;
-    uint48 PerMOPNPointMinted;
-    uint64 MTTotalMinted;
-    uint32 MTOutputPerTimestamp;
-    uint32 MTStepStartTimestamp;
-    uint16 nextLandId;
-    uint48 vaultIndex;
-    uint8 reentrantStatus;
-    address bombContract;
-    address tokenContract;
-    address landContract;
-    address vaultContract;
-    address ERC6551Registry;
-    address ERC6551AccountProxy;
-    address ERC6551AccountHelper;
-    BombSoldStruct bombsold;
-    BitMaps.BitMap tilesbitmap;
-    mapping(address => AccountDataStruct) ADs;
-    mapping(address => CollectionDataStruct) CDs;
-    mapping(uint32 => uint256) Lands;
-}
-
-function mopnStorage() pure returns (MOPNStorage storage ms) {
-    assembly {
-        ms.slot := 0
-    }
-}
-
-contract MOPNBase {
-    MOPNStorage internal s;
-
-    modifier onlyDiamond() {
-        if (msg.sender != address(this)) revert Errors.NotDiamond();
-        _;
+    struct AccountDataStruct {
+        uint16 LandId;
+        uint24 Coordinate;
+        uint48 PerMOPNPointMinted;
+        uint48 SettledMT;
+        uint48 PerCollectionNFTMinted;
+        uint16 AgentAssignPercentage;
+        address AgentPlacer;
     }
 
-    modifier onlyCollectionVault(address collectionAddress) {
-        require(msg.sender == s.CDs[collectionAddress].vaultAddress, "only collection vault allowed");
-        _;
+    struct CollectionDataStruct {
+        uint24 CollectionMOPNPoint;
+        uint48 OnMapMOPNPoints;
+        uint16 OnMapNftNumber;
+        uint16 OnMapAgentPlaceNftNumber;
+        uint48 PerCollectionNFTMinted;
+        uint48 PerMOPNPointMinted;
+        uint48 SettledMT;
+        address vaultAddress;
+        uint48 vaultIndex;
     }
 
-    modifier onlyToken() {
-        require(msg.sender == s.tokenContract, "only token allowed");
-        _;
+    struct BombSoldStruct {
+        uint16[24] hourSolds;
+        uint32 lastSellTimestamp;
     }
 
-    modifier nonReentrant() {
-        if (s.reentrantStatus == Constants.ENTERED) revert Errors.ReentrantCall();
-        s.reentrantStatus = Constants.ENTERED;
-        _;
-        s.reentrantStatus = Constants.NOT_ENTERED;
+    struct NFTParams {
+        address collectionAddress;
+        uint256 tokenId;
     }
 
-    modifier nonReentrantView() {
-        if (s.reentrantStatus == Constants.ENTERED) revert Errors.ReentrantCallView();
-        _;
+    struct AccountDataOutput {
+        address account;
+        address contractAddress;
+        uint256 tokenId;
+        uint256 CollectionMOPNPoint;
+        uint256 MTBalance;
+        uint256 OnMapMOPNPoint;
+        uint256 TotalMOPNPoint;
+        uint32 tileCoordinate;
+        address owner;
+        address AgentPlacer;
+        uint256 AgentAssignPercentage;
     }
 
-    uint24[] internal neighbors = [9999, 1, 10000, 9999, 1, 10000];
+    struct CollectionDataOutput {
+        address contractAddress;
+        address collectionVault;
+        uint256 OnMapNum;
+        uint256 MTBalance;
+        uint256 UnclaimMTBalance;
+        uint256 CollectionMOPNPoints;
+        uint256 OnMapMOPNPoints;
+        uint256 CollectionMOPNPoint;
+        uint256 PMTTotalSupply;
+        uint256 OnMapAgentPlaceNftNumber;
+        IMOPNCollectionVault.AskStruct AskStruct;
+        IMOPNCollectionVault.BidStruct BidStruct;
+    }
+
+    struct MOPNStorage {
+        uint32 LastTickTimestamp;
+        uint48 TotalMOPNPoints;
+        uint48 PerMOPNPointMinted;
+        uint64 MTTotalMinted;
+        uint32 MTOutputPerTimestamp;
+        uint32 MTStepStartTimestamp;
+        uint16 nextLandId;
+        uint48 vaultIndex;
+        uint8 reentrantStatus;
+        address bombContract;
+        address tokenContract;
+        address landContract;
+        address vaultContract;
+        address ERC6551Registry;
+        address ERC6551AccountProxy;
+        address ERC6551AccountHelper;
+        address halfgasrecipient;
+        BombSoldStruct bombsold;
+        BitMaps.BitMap tilesbitmap;
+        mapping(address => AccountDataStruct) ADs;
+        mapping(address => CollectionDataStruct) CDs;
+        mapping(uint32 => uint256) Lands;
+    }
+
+    function mopnStorage() internal pure returns (MOPNStorage storage ms) {
+        bytes32 position = MOPN_STORAGE_POSITION;
+        assembly {
+            ms.slot := position
+        }
+    }
 
     function tileneighbor(uint24 tileCoordinate, uint256 direction) internal pure returns (uint24) {
         unchecked {
@@ -235,113 +204,26 @@ contract MOPNBase {
         }
     }
 
-    /**
-     * get current mt produce per block
-     * @param reduceTimes reduce times
-     */
-    function currentMTPPB(uint256 reduceTimes) internal view returns (uint256 MTPPB) {
-        int128 reducePercentage = ABDKMath64x64.divu(997, 1000);
-        int128 reducePower = ABDKMath64x64.pow(reducePercentage, reduceTimes);
-        return ABDKMath64x64.mulu(reducePower, s.MTOutputPerTimestamp);
-    }
-
-    function MTReduceTimes() internal view returns (uint256) {
-        return (block.timestamp - s.MTStepStartTimestamp) / Constants.MTReduceInterval;
-    }
-
-    function settlePerMOPNPointMinted() internal {
-        if (block.timestamp > s.LastTickTimestamp) {
-            uint256 reduceTimes = MTReduceTimes();
-            unchecked {
-                if (s.TotalMOPNPoints > 0) {
-                    uint256 perMOPNPointMintDiff;
-                    if (reduceTimes == 0) {
-                        perMOPNPointMintDiff += ((block.timestamp - s.LastTickTimestamp) * s.MTOutputPerTimestamp) / s.TotalMOPNPoints;
-                    } else {
-                        uint256 nextReduceTimestamp = s.MTStepStartTimestamp + Constants.MTReduceInterval;
-                        uint256 lastTickTimestamp = s.LastTickTimestamp;
-                        for (uint256 i = 0; i <= reduceTimes; i++) {
-                            perMOPNPointMintDiff += ((nextReduceTimestamp - lastTickTimestamp) * currentMTPPB(i)) / s.TotalMOPNPoints;
-                            lastTickTimestamp = nextReduceTimestamp;
-                            nextReduceTimestamp += Constants.MTReduceInterval;
-                            if (nextReduceTimestamp > block.timestamp) {
-                                nextReduceTimestamp = block.timestamp;
-                            }
-                        }
-
-                        s.MTOutputPerTimestamp = uint32(currentMTPPB(reduceTimes));
-                        s.MTStepStartTimestamp += uint32(reduceTimes * Constants.MTReduceInterval);
-                    }
-                    s.PerMOPNPointMinted += uint48(perMOPNPointMintDiff);
-                    s.MTTotalMinted += uint64(perMOPNPointMintDiff * s.TotalMOPNPoints);
-                }
-
-                s.LastTickTimestamp = uint32(block.timestamp);
-            }
-        }
-    }
-
-    function settleCollectionMT(address collectionAddress) internal {
-        unchecked {
-            uint48 collectionPerMOPNPointMintedDiff = s.PerMOPNPointMinted - s.CDs[collectionAddress].PerMOPNPointMinted;
-            if (collectionPerMOPNPointMintedDiff > 0) {
-                if (s.CDs[collectionAddress].OnMapNftNumber > 0) {
-                    uint48 collectionMOPNPoints = s.CDs[collectionAddress].OnMapNftNumber * s.CDs[collectionAddress].CollectionMOPNPoint;
-
-                    uint48 amount = (collectionPerMOPNPointMintedDiff * (s.CDs[collectionAddress].OnMapMOPNPoints + collectionMOPNPoints)) / 20;
-
-                    if (collectionMOPNPoints > 0) {
-                        s.CDs[collectionAddress].PerCollectionNFTMinted +=
-                            (collectionPerMOPNPointMintedDiff * collectionMOPNPoints) /
-                            s.CDs[collectionAddress].OnMapNftNumber;
-                    }
-
-                    s.CDs[collectionAddress].SettledMT += amount;
-                    emit Events.CollectionMTMinted(collectionAddress, amount);
-                }
-                s.CDs[collectionAddress].PerMOPNPointMinted = s.PerMOPNPointMinted;
-            }
-        }
-    }
-
-    /**
-     * @notice mint avatar mopn token
-     * @param account account wallet address
-     */
-    function settleAccountMT(address account, address collectionAddress) internal {
-        unchecked {
-            uint48 accountPerMOPNPointMintedDiff = s.CDs[collectionAddress].PerMOPNPointMinted - s.ADs[account].PerMOPNPointMinted;
-            if (accountPerMOPNPointMintedDiff > 0) {
-                if (s.ADs[account].Coordinate > 0) {
-                    uint48 accountOnMapMOPNPoint = tilepoint(s.ADs[account].Coordinate);
-
-                    uint48 amount = accountPerMOPNPointMintedDiff *
-                        accountOnMapMOPNPoint +
-                        (s.CDs[collectionAddress].PerCollectionNFTMinted - s.ADs[account].PerCollectionNFTMinted);
-
-                    s.Lands[s.ADs[account].LandId] += amount / 20;
-                    emit Events.LandHolderMTMinted(s.ADs[account].LandId, amount / 20);
-
-                    amount = (amount * 9) / 10;
-                    if (s.ADs[account].AgentPlacer != address(0)) {
-                        IMOPNToken(s.tokenContract).mint(s.ADs[account].AgentPlacer, (amount * s.ADs[account].AgentAssignPercentage) / 10000);
-
-                        amount -= (amount * s.ADs[account].AgentAssignPercentage) / 10000;
-                        s.ADs[account].AgentPlacer = address(0);
-                        s.CDs[collectionAddress].OnMapAgentPlaceNftNumber--;
-                    }
-
-                    emit Events.AccountMTMinted(account, amount, s.ADs[account].AgentAssignPercentage);
-                    s.ADs[account].AgentAssignPercentage = 0;
-                    s.ADs[account].SettledMT += amount;
-                }
-                s.ADs[account].PerMOPNPointMinted = s.CDs[collectionAddress].PerMOPNPointMinted;
-                s.ADs[account].PerCollectionNFTMinted = s.CDs[collectionAddress].PerCollectionNFTMinted;
-            }
-        }
-    }
-
     function getAccountCollection(address account) internal view returns (address collectionAddress) {
         (, collectionAddress, ) = IMOPNERC6551Account(payable(account)).token();
+    }s
+}
+
+contract Modifiers {
+    modifier onlyCollectionVault(address collectionAddress) {
+        require(msg.sender == LibMOPN.mopnStorage().CDs[collectionAddress].vaultAddress, "only collection vault allowed");
+        _;
+    }
+
+    modifier nonReentrant() {
+        if (LibMOPN.mopnStorage().reentrantStatus == Constants.ENTERED) revert Errors.ReentrantCall();
+        LibMOPN.mopnStorage().reentrantStatus = Constants.ENTERED;
+        _;
+        LibMOPN.mopnStorage().reentrantStatus = Constants.NOT_ENTERED;
+    }
+
+    modifier nonReentrantView() {
+        if (LibMOPN.mopnStorage().reentrantStatus == Constants.ENTERED) revert Errors.ReentrantCallView();
+        _;
     }
 }

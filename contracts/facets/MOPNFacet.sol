@@ -3,7 +3,8 @@ pragma solidity ^0.8.21;
 
 import "hardhat/console.sol";
 
-import {MOPNBase, BitMaps} from "../libraries/LibMOPN.sol";
+import {FacetCommons} from "./FacetCommons.sol";
+import {LibMOPN, Modifiers, BitMaps} from "../libraries/LibMOPN.sol";
 import {Constants} from "contracts/libraries/Constants.sol";
 import {Errors} from "contracts/libraries/Errors.sol";
 import {Events} from "contracts/libraries/Events.sol";
@@ -26,10 +27,11 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 /// @title MOPN Contract
 /// @author Cyanface <cyanface@outlook.com>
-contract MOPNFacet is MOPNBase {
+contract MOPNFacet is Modifiers, FacetCommons {
     using BitMaps for BitMaps.BitMap;
 
     function checkAccountQualification(address account) public view returns (address collectionAddress) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         try IMOPNERC6551Account(payable(account)).token() returns (uint256 chainId, address collectionAddress_, uint256 tokenId) {
             if (s.ADs[account].PerMOPNPointMinted == 0) {
                 require(chainId == block.chainid, "not support cross chain account");
@@ -60,6 +62,7 @@ contract MOPNFacet is MOPNBase {
         address[] memory tileAccounts,
         bytes calldata initData
     ) external {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         address account = IERC6551Registry(s.ERC6551Registry).createAccount(
             s.ERC6551AccountProxy,
             block.chainid,
@@ -72,6 +75,7 @@ contract MOPNFacet is MOPNBase {
     }
 
     function _moveTo(address account, uint24 tileCoordinate, uint16 LandId, address[] memory tileAccounts, address collectionAddress) internal {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         bool isOwner;
         try IMOPNERC6551Account(payable(account)).isOwner(msg.sender) returns (bool isOwner_) {
             isOwner = isOwner_;
@@ -85,7 +89,7 @@ contract MOPNFacet is MOPNBase {
 
         require(block.timestamp >= s.MTStepStartTimestamp, "mopn is not open yet");
 
-        require(tiledistance(tileCoordinate, tileAtLandCenter(LandId)) < 6, "LandId error");
+        require(LibMOPN.tiledistance(tileCoordinate, LibMOPN.tileAtLandCenter(LandId)) < 6, "LandId error");
 
         require(LandId < 10981, "Land Overflow");
 
@@ -97,7 +101,7 @@ contract MOPNFacet is MOPNBase {
         unchecked {
             if (s.tilesbitmap.get(tileCoordinate)) {
                 require(tileCoordinate == s.ADs[tileAccounts[0]].Coordinate, "tile accounts error");
-                address tileAccountCollection = getAccountCollection(tileAccounts[0]);
+                address tileAccountCollection = LibMOPN.getAccountCollection(tileAccounts[0]);
                 require(collectionAddress != tileAccountCollection, "dst has ally");
 
                 dstBitMap += 1 << 100;
@@ -109,7 +113,7 @@ contract MOPNFacet is MOPNBase {
                 if (!get256bitmap(dstBitMap, i) && s.tilesbitmap.get(tileCoordinate)) {
                     require(tileCoordinate == s.ADs[tileAccounts[i + 1]].Coordinate, "tile accounts error");
                     if (tileAccounts[i + 1] != account) {
-                        address tileAccountCollection = getAccountCollection(tileAccounts[i + 1]);
+                        address tileAccountCollection = LibMOPN.getAccountCollection(tileAccounts[i + 1]);
                         if (tileAccountCollection == collectionAddress) {
                             dstBitMap = set256bitmap(dstBitMap, 50);
                             uint256 k = i;
@@ -136,9 +140,9 @@ contract MOPNFacet is MOPNBase {
                 if (i == 5) {
                     tileCoordinate += 10001;
                 } else if (i < 5) {
-                    tileCoordinate = tileneighbor(tileCoordinate, i);
+                    tileCoordinate = LibMOPN.tileneighbor(tileCoordinate, i);
                 } else {
-                    tileCoordinate = tileneighbor(tileCoordinate, (i - 6) / 2);
+                    tileCoordinate = LibMOPN.tileneighbor(tileCoordinate, (i - 6) / 2);
                 }
             }
             if ((dstBitMap >> 100) > 0) {
@@ -153,11 +157,11 @@ contract MOPNFacet is MOPNBase {
             "linked account missing"
         );
 
-        uint48 tileMOPNPoint = tilepoint(tileCoordinate);
+        uint48 tileMOPNPoint = LibMOPN.tilepoint(tileCoordinate);
         if (s.ADs[account].Coordinate > 0) {
             emit Events.AccountMove(account, LandId, s.ADs[account].Coordinate, tileCoordinate);
             s.tilesbitmap.unset(s.ADs[account].Coordinate);
-            uint48 orgMOPNPoint = tilepoint(s.ADs[account].Coordinate);
+            uint48 orgMOPNPoint = LibMOPN.tilepoint(s.ADs[account].Coordinate);
 
             unchecked {
                 if (tileMOPNPoint > orgMOPNPoint) {
@@ -194,15 +198,20 @@ contract MOPNFacet is MOPNBase {
         s.ADs[account].Coordinate = tileCoordinate;
 
         s.tilesbitmap.set(tileCoordinate);
+
+        if (dstBitMap >> 100 > 0) {
+            gasDraw(dstBitMap >> 100);
+        }
     }
 
     function bombATile(address account, uint24 tileCoordinate, address tileAccount, address tileAccountCollection) internal {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         s.tilesbitmap.unset(tileCoordinate);
 
         settleCollectionMT(tileAccountCollection);
         settleAccountMT(tileAccount, tileAccountCollection);
 
-        uint48 accountOnMapMOPNPoint = tilepoint(tileCoordinate);
+        uint48 accountOnMapMOPNPoint = LibMOPN.tilepoint(tileCoordinate);
 
         unchecked {
             s.TotalMOPNPoints -= accountOnMapMOPNPoint + s.CDs[tileAccountCollection].CollectionMOPNPoint;
@@ -216,9 +225,29 @@ contract MOPNFacet is MOPNBase {
         emit Events.BombUse(account, tileAccount, tileCoordinate);
     }
 
+    function gasDraw(uint256 times) internal nonReentrant {
+        uint256 gasdraw = generateRandomNumber(10000);
+        for (uint256 i = 0; i < times; i++) {
+            gasdraw += i;
+            if (gasdraw == 10000) {
+                uint256 half = address(this).balance / 2;
+                if (half > 0) {
+                    (bool sent, ) = msg.sender.call{value: half}("");
+                    require(sent, "Failed to send Ether");
+                }
+                break;
+            }
+        }
+    }
+
+    function generateRandomNumber(uint _modulus) public view returns (uint256) {
+        uint256 randomHash = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, block.prevrandao)));
+        return (randomHash % _modulus) + 1;
+    }
+
     function getCollectionAgentAssignPercentage(address collectionAddress) public view returns (uint16) {
         int128 reducePercentage = ABDKMath64x64.divu(9994, 10000);
-        int128 reducePower = ABDKMath64x64.pow(reducePercentage, s.CDs[collectionAddress].OnMapAgentPlaceNftNumber);
+        int128 reducePower = ABDKMath64x64.pow(reducePercentage, LibMOPN.mopnStorage().CDs[collectionAddress].OnMapAgentPlaceNftNumber);
         return uint16(ABDKMath64x64.mulu(reducePower, 6000));
     }
 

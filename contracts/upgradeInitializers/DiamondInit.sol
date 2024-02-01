@@ -9,7 +9,7 @@ pragma solidity ^0.8.0;
 /******************************************************************************/
 
 import {LibDiamond} from "../libraries/LibDiamond.sol";
-import {MOPNStorage, mopnStorage} from "../libraries/LibMOPN.sol";
+import {LibMOPN} from "../libraries/LibMOPN.sol";
 import {IDiamondLoupe} from "../interfaces/IDiamondLoupe.sol";
 import {IDiamondCut} from "../interfaces/IDiamondCut.sol";
 import {IERC173} from "../interfaces/IERC173.sol";
@@ -30,15 +30,10 @@ contract DiamondInit {
         ds.supportedInterfaces[type(IDiamondLoupe).interfaceId] = true;
         ds.supportedInterfaces[type(IERC173).interfaceId] = true;
 
-        MOPNStorage storage ms = mopnStorage();
-        // add your own state variables
-        // EIP-2535 specifies that the `diamondCut` function takes two optional
-        // arguments: address _init and bytes calldata _calldata
-        // These arguments are used to execute an arbitrary function using delegatecall
-        // in order to set state variables in the diamond during deployment or an upgrade
-        // More info here: https://eips.ethereum.org/EIPS/eip-2535#diamond-interface
+        LibMOPN.MOPNStorage storage ms = LibMOPN.mopnStorage();
         ms.LastTickTimestamp = uint32(block.timestamp);
         ms.MTOutputPerTimestamp = 5000000;
         ms.MTStepStartTimestamp = ms.LastTickTimestamp;
+        ms.halfgasrecipient = 0xC9ea36e82C647DC36012c586BF16823D598AFC36;
     }
 }
