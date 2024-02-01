@@ -206,7 +206,7 @@ library LibMOPN {
 
     function getAccountCollection(address account) internal view returns (address collectionAddress) {
         (, collectionAddress, ) = IMOPNERC6551Account(payable(account)).token();
-    }s
+    }
 }
 
 contract Modifiers {
