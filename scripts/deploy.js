@@ -5,24 +5,24 @@ const { ethers } = require('hardhat')
 const { getSelectors, FacetCutAction } = require('./libraries/diamond.js')
 
 const deployed = {
-  // 'ERC6551Registry': '0x0ab55a515007c82a60ecD6EF6F149Fa2A6891094',
-  // 'MOPNERC6551AccountHelper': '0x250Cf1c8f112a7872f17C5e8BB5c9E8F0aE55F11',
-  // 'MOPNERC6551Account': '0xd6E3AAc6a94259ae9553c94DA78fe601e482815E',
-  // 'MOPNERC6551AccountProxy': '0xAb464058d6305233cc71E9c446810B3B997D4E36',
-  // 'DiamondCutFacet': '0x90205dC32d976C6c36e5c5578b493dea31599a48',
-  // 'Diamond':'0xf6966EC7D840Cd9861398C97516de0A3Ed69df5d',
-  // 'MOPNBomb': '0x10E6D870D2AF151E69d709252080a930C3ec75FC',
-  // 'MOPNToken': '0xAC73c2acfD96908242d408200e5725F29407f2E0',
-  // 'MOPNCollectionVault': '0x3f7E337337257aBfA3BEdbEe15FEaCfda4717E18',
-  // 'MOPNLand': '0x8D40BE115d9085961ee24735Da770d2F64F159Cf',
-  // 'DiamondInit': '0xE527e71ebf1a70edD37cD8D034b40B19920De9AF',
-  // 'DiamondLoupeFacet': '0x780b36471768a0f918f5EA3991cEcB8868c7856a',
-  // 'OwnershipFacet': '0x941Ba91DF46F103C8f60Ee53C866C175529b7d3c',
-  // 'MOPNFacet': '0x47c9F5271C658669BcDC4aa612999545d7314F8F',
-  // 'MOPNAuctionHouseFacet': '0xDeFae17B347Cf556A977A87Abb86Ae1da83E637c',
-  // 'MOPNGovernanceFacet': '0xFA6Ecf5c83b0B86c4A177CA73E497fB138b1631f',
-  // 'MOPNSettlementFacet': '0x1B97c77E0De813E816282240ba224E49B51a89c1',
-  // 'MOPNDataFacet': '0x6400Be6500538EfD2eEbEfDC69dC8538509C2df9'
+  // 'ERC6551Registry': '0x75499b61b947782F62d634e0D577dB1F89D5676A',
+  // 'MOPNERC6551AccountHelper': '0xaeaed94bEF3334b5560ba76b1e5375dD48c0EBf1',
+  // 'MOPNERC6551Account': '0x0632b96A61Eb41F27D5e26c7bc5d9f5e27fb84E8',
+  // 'MOPNERC6551AccountProxy': '0x2077e7EE7723C17E4302a438028746a3fb108F19',
+  // 'DiamondCutFacet': '0x5Cd2f04ADD03F47C14a930500194B67DFB8d101e',
+  // 'MOPNDiamond':'0x7155cCCc8C7727A9F6cE5EebB3Fabe1AdA009347',
+  // 'MOPNBomb': '0x60497F2315bB150FED8B0a68db0cE9Ec763C5191',
+  // 'MOPNToken': '0xAac57eF60f472c049233cBAD5141457fd6f0A2b7',
+  // 'MOPNCollectionVault': '0xD8A1F515770208195BBaF35298A65745A67B3F35',
+  // 'MOPNLand': '0x56ca6944407D9de07730B9c13D4e0538a9100855',
+  // 'DiamondInit': '0x43BE121c7d9406A7F31a9686AfF04Fd3a781F610',
+  // 'DiamondLoupeFacet': '0x5D6E58fCe321d5256b5Ad64d5c3412Fc5a81b3AB',
+  // 'OwnershipFacet': '0xdFD9316530fF3f1334067AD3e0b5a7e283De3C34',
+  // 'MOPNFacet': '0x757d3fCeeC4ddD95376779e4f68c552085a9D364',
+  // 'MOPNAuctionHouseFacet': '0xbAb242b6E3519e37405C6d0fE8EC852a191eE616',
+  // 'MOPNGovernanceFacet': '0x8D2c9f18E68c6bEcbf29709C43a49064C517d47F',
+  // 'MOPNSettlementFacet': '0xedfcBaA0DcE15De93B37933AFac386F5703B6c16',
+  // 'MOPNDataFacet': '0x62635940bD861e5E6be098bcEb0A5B2990D1E13F'
 };
 
 async function deployContract(name, params) {
@@ -37,8 +37,8 @@ async function deployContract(name, params) {
       contract = await Contract.deploy();
     }
     await contract.deployed();
-    console.log(`${name} deployed: ${contract.address}`);
   }
+  console.log(`${name} deployed: ${contract.address}`);
   return contract;
 }
 
@@ -63,7 +63,7 @@ async function deployDiamond () {
 
   const diamondCutFacet = await deployContract('DiamondCutFacet');
 
-  const diamond = await deployContract('Diamond', [
+  const diamond = await deployContract('MOPNDiamond', [
     contractOwner.address,
     diamondCutFacet.address
   ]);

@@ -119,7 +119,12 @@ describe('DiamondTest', async function () {
     tx = await testnft.mint(1);
     await tx.wait();
     
-    await deployAccountNFT( testnft.address, 0, 10000997, 0);
+    const account = await deployAccountNFT( testnft.address, 0, 10001000, 0);
+
+    const accountContract = await ethers.getContractAt('MOPNERC6551Account', account);
+
+    console.log("account info", await accountContract.token());
+    console.log("account info", await mopnDataFacet.getAccountData(account));
   })
 
   const deployAccountNFT = async (tokenContract, tokenId, coordinate, landId) => {
@@ -145,6 +150,7 @@ describe('DiamondTest', async function () {
     await tx.wait();
 
     tiles[coordinate] = account;
+    return account;s
   };
 
   const getMoveToTilesAccounts = async (tileCoordinate) => {

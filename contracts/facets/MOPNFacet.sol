@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-import "hardhat/console.sol";
-
 import {FacetCommons} from "./FacetCommons.sol";
 import {LibMOPN, Modifiers, BitMaps} from "../libraries/LibMOPN.sol";
 import {Constants} from "contracts/libraries/Constants.sol";
@@ -82,8 +80,7 @@ contract MOPNFacet is Modifiers, FacetCommons {
             if (s.ADs[account].Coordinate > 0) {
                 require(isOwner, "not account owner");
             }
-        } catch (bytes memory errors) {
-            console.logBytes(errors);
+        } catch (bytes memory) {
             require(false, "account owner error");
         }
 

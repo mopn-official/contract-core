@@ -119,7 +119,7 @@ library LibMOPN {
             } else if (direction == 4) {
                 return tileCoordinate + 1;
             } else if (direction == 5) {
-                return tileCoordinate + 100000;
+                return tileCoordinate + 10000;
             } else {
                 return tileCoordinate + 9999;
             }

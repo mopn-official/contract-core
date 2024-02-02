@@ -11,8 +11,9 @@ pragma solidity ^0.8.0;
 import {LibDiamond} from "./libraries/LibDiamond.sol";
 import {LibMOPN} from "./libraries/LibMOPN.sol";
 import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
+import {Events} from "./libraries/Events.sol";
 
-contract Diamond {
+contract MOPNDiamond {
     constructor(address _contractOwner, address _diamondCutFacet) payable {
         //LibMOPN.BLAST.configureClaimableGas(); //@todo open when deploy real network
         //LibMOPN.BLAST.configureAutomaticYield();
@@ -66,6 +67,8 @@ contract Diamond {
     }
 
     function claimMaxGas() external {
+        (, uint256 amount, , ) = LibMOPN.BLAST.readGasParams(address(this));
         LibMOPN.BLAST.claimMaxGas(address(this), address(this));
+        emit Events.ManualClaimGas(msg.sender, amount);
     }
 }

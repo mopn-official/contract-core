@@ -28,12 +28,20 @@ contract MOPNDataFacet is FacetCommons {
         return LibMOPN.mopnStorage().PerMOPNPointMinted;
     }
 
+    function bombContract() public view returns (address) {
+        return LibMOPN.mopnStorage().bombContract;
+    }
+
     function tokenContract() public view returns (address) {
         return LibMOPN.mopnStorage().tokenContract;
     }
 
     function landContract() public view returns (address) {
         return LibMOPN.mopnStorage().landContract;
+    }
+
+    function ERC6551Registry() public view returns (address) {
+        return LibMOPN.mopnStorage().ERC6551Registry;
     }
 
     function ERC6551AccountHelper() public view returns (address) {

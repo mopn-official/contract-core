@@ -38,4 +38,6 @@ library Events {
     event CollectionVaultCreated(address indexed collectionAddress, address indexed collectionVault);
 
     event BombSold(address indexed buyer, uint256 amount, uint256 price);
+
+    event ManualClaimGas(address indexed wallet, uint256 amount);
 }
