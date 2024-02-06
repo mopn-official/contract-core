@@ -21,7 +21,6 @@ const deployed = {
   // 'MOPNFacet': '0x757d3fCeeC4ddD95376779e4f68c552085a9D364',
   // 'MOPNAuctionHouseFacet': '0xbAb242b6E3519e37405C6d0fE8EC852a191eE616',
   // 'MOPNGovernanceFacet': '0x8D2c9f18E68c6bEcbf29709C43a49064C517d47F',
-  // 'MOPNSettlementFacet': '0xedfcBaA0DcE15De93B37933AFac386F5703B6c16',
   // 'MOPNDataFacet': '0x62635940bD861e5E6be098bcEb0A5B2990D1E13F'
 };
 
@@ -81,12 +80,9 @@ async function deployDiamond () {
   ]);
   
   const mopnland = await deployContract('MOPNLand', [
-    1,
-    200000000000000,
-    1001,
-    contractOwner.address,
     diamond.address,
-    diamond.address
+    diamond.address,
+    contractOwner.address,
   ]);
 
   const diamondInit = await deployContract('DiamondInit');
@@ -100,7 +96,6 @@ async function deployDiamond () {
     'MOPNFacet',
     'MOPNAuctionHouseFacet',
     'MOPNGovernanceFacet',
-    'MOPNSettlementFacet',
     'MOPNDataFacet',
   ]
   const cut = []

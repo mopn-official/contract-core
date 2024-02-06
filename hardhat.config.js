@@ -45,7 +45,6 @@ module.exports = {
       "MOPNDataFacet",
       "MOPNFacet",
       "MOPNGovernanceFacet",
-      "MOPNSettlementFacet",
     ],
     strict: false,
   },
