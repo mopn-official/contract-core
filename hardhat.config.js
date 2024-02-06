@@ -50,6 +50,10 @@ module.exports = {
     strict: false,
   },
   networks: {
+    "sepolia": {
+      url: process.env.SEPOLIA_URL,
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     "blast_sepolia": {
       url: "https://sepolia.blast.io",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
@@ -57,6 +61,7 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
+      sepolia: process.env.ETHERSCAN_API_KEY,
       blast_sepolia: "blast_sepolia", // apiKey is not required, just set a placeholder
     },
     customChains: [

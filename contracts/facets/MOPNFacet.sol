@@ -223,6 +223,7 @@ contract MOPNFacet is Modifiers, FacetCommons {
     }
 
     function gasDraw(uint256 times) internal nonReentrant {
+        LibMOPN.BLAST.claimMaxGas(address(this), address(this));
         uint256 gasdraw = generateRandomNumber(10000);
         for (uint256 i = 0; i < times; i++) {
             gasdraw += i;
