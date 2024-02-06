@@ -15,8 +15,8 @@ import {Events} from "./libraries/Events.sol";
 
 contract MOPNDiamond {
     constructor(address _contractOwner, address _diamondCutFacet) payable {
-        //LibMOPN.BLAST.configureClaimableGas(); //@todo open when deploy real network
-        //LibMOPN.BLAST.configureAutomaticYield();
+        LibMOPN.BLAST.configureClaimableGas(); //@todo open when deploy real network
+        LibMOPN.BLAST.configureAutomaticYield();
 
         LibDiamond.setContractOwner(_contractOwner);
 
