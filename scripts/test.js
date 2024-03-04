@@ -30,7 +30,7 @@ async function test() {
 
     console.log(await mopnDataFacet.getAccountData('0x354F0397BE4476aa3Fb6d5F8497355ddb8d705C4'));
     
-
+    
   
 }
 
