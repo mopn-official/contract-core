@@ -20,7 +20,8 @@
         "MOPNLandMetaDataRender",
         "MOPNLand",
         "CryptoPunksMarket",
-        "MOCKNFT"
+        "MOCKNFT",
+        "BlastLandClaim"
     ],
     "WETH9": {
         "address": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
@@ -207,5 +208,14 @@
     "MOCKNFT": {
         "address": "0x2CC76117EE3070aC049dEEF4d704cE4F26a79240",
         "verified": true
+    },
+    "BlastLandClaim": {
+        "address": "",
+        "verified": true,
+        "constructparams": [
+            "0x9338F298F29D3918D5D1Feb209aeB9915CC96333",
+            "MOPNLand",
+            "MOPNLand"
+        ]
     }
 }
