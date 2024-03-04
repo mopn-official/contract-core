@@ -18,7 +18,7 @@ async function move() {
     const signers = await ethers.getSigners()
     contractOwner = signers[0]
 
-    diamondAddress = '0xF4b9a32b5CFc3E74a4d6eC226221Fc33e0CB274F';
+    diamondAddress = '0xa249b58E29eC529cF0374Cb292BdD28F9095e1c6';
     mopnFacet = await ethers.getContractAt('MOPNFacet', diamondAddress)
     mopnDataFacet = await ethers.getContractAt('MOPNDataFacet', diamondAddress)
     mopnerc6551accountproxy = await ethers.getContractAt('MOPNERC6551AccountProxy', await mopnDataFacet.ERC6551AccountProxy())

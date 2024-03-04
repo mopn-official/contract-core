@@ -18,7 +18,7 @@ async function test() {
     const signers = await ethers.getSigners()
     contractOwner = signers[0]
 
-    diamondAddress = '0xde1e78224C5D80cF723Bd903877e306A801c0C00';
+    diamondAddress = '0xa249b58E29eC529cF0374Cb292BdD28F9095e1c6';
     mopnFacet = await ethers.getContractAt('MOPNFacet', diamondAddress)
     mopnDataFacet = await ethers.getContractAt('MOPNDataFacet', diamondAddress)
     mopnerc6551accountproxy = await ethers.getContractAt('MOPNERC6551AccountProxy', await mopnDataFacet.ERC6551AccountProxy())
@@ -28,7 +28,7 @@ async function test() {
     console.log("mopnerc6551accounthelper", mopnerc6551accounthelper.address);
     console.log("erc6551accountproxy", mopnerc6551accountproxy.address);
 
-    console.log(await mopnDataFacet.calcCollectionSettledMT('0xf1c90054fce8109854124b0c5f2c5de2b982b96a'));
+    console.log(await mopnDataFacet.getAccountData('0x354F0397BE4476aa3Fb6d5F8497355ddb8d705C4'));
     
 
   
