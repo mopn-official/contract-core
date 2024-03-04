@@ -195,10 +195,6 @@ contract MOPNFacet is Modifiers, FacetCommons {
         s.ADs[account].Coordinate = tileCoordinate;
 
         s.tilesbitmap.set(tileCoordinate);
-
-        if (dstBitMap >> 100 > 0) {
-            gasDraw(dstBitMap >> 100);
-        }
     }
 
     function bombATile(address account, uint24 tileCoordinate, address tileAccount, address tileAccountCollection) internal {
@@ -220,22 +216,6 @@ contract MOPNFacet is Modifiers, FacetCommons {
             s.ADs[tileAccount].Coordinate = 0;
         }
         emit Events.BombUse(account, tileAccount, tileCoordinate);
-    }
-
-    function gasDraw(uint256 times) internal nonReentrant {
-        // LibMOPN.BLAST.claimMaxGas(address(this), address(this));
-        uint256 gasdraw = generateRandomNumber(10000);
-        for (uint256 i = 0; i < times; i++) {
-            gasdraw += i;
-            if (gasdraw == 10000) {
-                uint256 half = address(this).balance / 2;
-                if (half > 0) {
-                    (bool sent, ) = msg.sender.call{value: half}("");
-                    require(sent, "Failed to send Ether");
-                }
-                break;
-            }
-        }
     }
 
     function generateRandomNumber(uint _modulus) public view returns (uint256) {

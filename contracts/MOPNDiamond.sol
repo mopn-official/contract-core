@@ -12,8 +12,9 @@ import {LibDiamond} from "./libraries/LibDiamond.sol";
 import {LibMOPN} from "./libraries/LibMOPN.sol";
 import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
 import {Events} from "./libraries/Events.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MOPNDiamond {
+contract MOPNDiamond is Multicall {
     constructor(address _contractOwner, address _diamondCutFacet) payable {
         // LibMOPN.BLAST.configureClaimableGas(); //@todo open when deploy real network
         // LibMOPN.BLAST.configureAutomaticYield();
@@ -60,9 +61,7 @@ contract MOPNDiamond {
     }
 
     receive() external payable {
-        require(address(this).balance >= msg.value, "Insufficient balance");
-        uint256 half = msg.value / 2;
-        (bool sent, ) = LibMOPN.mopnStorage().halfgasrecipient.call{value: half}("");
+        (bool sent, ) = LibMOPN.mopnStorage().gasrecipient.call{value: msg.value}("");
         require(sent, "Failed to send Ether");
     }
 

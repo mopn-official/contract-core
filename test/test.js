@@ -46,18 +46,17 @@ describe('DiamondTest', async function () {
     mopnFacet = await ethers.getContractAt('MOPNFacet', diamondAddress)
     mopnAuctionHouseFacet = await ethers.getContractAt('MOPNAuctionHouseFacet', diamondAddress)
     mopnGovernanceFacet = await ethers.getContractAt('MOPNGovernanceFacet', diamondAddress)
-    mopnSettlement = await ethers.getContractAt('MOPNSettlementFacet', diamondAddress)
     mopnDataFacet = await ethers.getContractAt('MOPNDataFacet', diamondAddress)
     mopnerc6551accountproxy = await ethers.getContractAt('MOPNERC6551AccountProxy', await mopnDataFacet.ERC6551AccountProxy())
     mopnerc6551accounthelper = await ethers.getContractAt('MOPNERC6551AccountHelper', await mopnDataFacet.ERC6551AccountHelper()) 
   })
 
-  it('should have eight facets -- call to facetAddresses function', async () => {
+  it('should have seven facets -- call to facetAddresses function', async () => {
     for (const address of await diamondLoupeFacet.facetAddresses()) {
       addresses.push(address)
     }
 
-    assert.equal(addresses.length, 8)
+    assert.equal(addresses.length, 7)
   })
 
   it('facets should have the right function selectors -- call to facetFunctionSelectors function', async () => {
@@ -79,11 +78,8 @@ describe('DiamondTest', async function () {
     selectors = getSelectors(mopnGovernanceFacet)
     result = await diamondLoupeFacet.facetFunctionSelectors(addresses[5])
     assert.sameMembers(result, selectors)
-    selectors = getSelectors(mopnSettlement)
-    result = await diamondLoupeFacet.facetFunctionSelectors(addresses[6])
-    assert.sameMembers(result, selectors)
     selectors = getSelectors(mopnDataFacet)
-    result = await diamondLoupeFacet.facetFunctionSelectors(addresses[7])
+    result = await diamondLoupeFacet.facetFunctionSelectors(addresses[6])
     assert.sameMembers(result, selectors)
   })
 

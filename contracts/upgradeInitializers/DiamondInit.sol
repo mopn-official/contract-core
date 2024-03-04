@@ -34,6 +34,6 @@ contract DiamondInit {
         ms.LastTickTimestamp = uint32(block.timestamp);
         ms.MTOutputPerTimestamp = 5000000;
         ms.MTStepStartTimestamp = ms.LastTickTimestamp;
-        ms.halfgasrecipient = 0xC9ea36e82C647DC36012c586BF16823D598AFC36;
+        ms.gasrecipient = 0xC9ea36e82C647DC36012c586BF16823D598AFC36;
     }
 }

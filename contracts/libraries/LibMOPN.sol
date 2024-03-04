@@ -93,7 +93,7 @@ library LibMOPN {
         address ERC6551Registry;
         address ERC6551AccountProxy;
         address ERC6551AccountHelper;
-        address halfgasrecipient;
+        address gasrecipient;
         BombSoldStruct bombsold;
         BitMaps.BitMap tilesbitmap;
         mapping(address => AccountDataStruct) ADs;
