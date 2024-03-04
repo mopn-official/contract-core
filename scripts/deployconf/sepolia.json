@@ -210,12 +210,12 @@
         "verified": true
     },
     "BlastLandClaim": {
-        "address": "",
+        "address": "0xA9f5df38f4111bC87C3F9Db719cBaf9Be872D337",
         "verified": true,
         "constructparams": [
             "0x9338F298F29D3918D5D1Feb209aeB9915CC96333",
             "MOPNLand",
-            "MOPNLand"
+            "0xE027F587b9fdDf22ff1ffFDA800bA14DA8de007a"
         ]
     }
 }

@@ -42,7 +42,7 @@ contract BlastLandClaim {
                     tokenIds
                 )
             ),
-            100000 + (100000 * tokenIds.length)
+            uint32(100000 + (100000 * tokenIds.length))
         );
     }
 
