@@ -67,7 +67,7 @@ contract MOPNDiamond is Multicall {
 
     function claimMaxGas() external {
         (, uint256 amount, , ) = LibMOPN.BLAST.readGasParams(address(this));
-        LibMOPN.BLAST.claimMaxGas(address(this), address(this));
+        LibMOPN.BLAST.claimMaxGas(address(this), LibMOPN.mopnStorage().gasrecipient);
         emit Events.ManualClaimGas(msg.sender, amount);
     }
 }
