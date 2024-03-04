@@ -50,7 +50,6 @@ describe("MOPN", function () {
 
     nftmetadata = await hre.ethers.deployContract("NFTMetaData", {
       libraries: {
-        NFTSVG: await nftsvg.getAddress(),
         TileMath: await tileMath.getAddress(),
       },
     });
@@ -137,16 +136,12 @@ describe("MOPN", function () {
     await mopncollectionVault.waitForDeployment();
     console.log("MOPNCollectionVault", await mopncollectionVault.getAddress());
 
-    mopnlandMetaDataRender = await hre.ethers.deployContract(
-      "MOPNLandMetaDataRender",
-      [await mopngovernance.getAddress()],
-      {
-        libraries: {
-          NFTMetaData: await nftmetadata.getAddress(),
-          TileMath: await tileMath.getAddress(),
-        },
-      }
-    );
+    mopnlandMetaDataRender = await hre.ethers.deployContract("MOPNLandMetaDataRender", {
+      libraries: {
+        NFTMetaData: await nftmetadata.getAddress(),
+        TileMath: await tileMath.getAddress(),
+      },
+    });
     await mopnlandMetaDataRender.waitForDeployment();
     console.log("MOPNLandMetaDataRender", await mopnlandMetaDataRender.getAddress());
 
