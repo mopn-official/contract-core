@@ -38,7 +38,7 @@ contract MOPNLand is ERC721, Ownable, ReentrancyGuard {
         metadataRenderAddress = _metadataRenderAddress;
     }
 
-    function claim(address _sender, uint256 tokenId) external  {
+    function claim(address _sender, uint256[] memory tokenIds) external  {
         require(
             msg.sender == address(MESSENGER),
             "Greeter: Direct sender must be the CrossDomainMessenger"
@@ -49,7 +49,9 @@ contract MOPNLand is ERC721, Ownable, ReentrancyGuard {
             "Greeter: Remote sender must be the other Greeter contract"
         );
 
-        _mint(_sender, tokenId);
+        for(uint256 i = 0; i < tokenIds.length; i++){
+            _mint(_sender, tokenIds[i]);
+        }
     }
 
     function tokenURI(uint256 id) public view override returns (string memory tokenuri) {

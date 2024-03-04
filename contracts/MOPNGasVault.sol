@@ -9,10 +9,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 // each NFT share 1/1000 of the collected eth of the collection vault
 // vault has a function to let token owner claim eth
 // for safety, key functions should has reentrancy guard
-contract MOPNGasVault is ERC721, Ownable {
-    using Address for address;
-    using SafeMath for uint256;
-
+contract MOPNGasVault is ERC721, Ownable, ReentrancyGuard {
     mapping(uint256 => uint256) private _claimed;
 
     uint256 public totalShares;
@@ -30,7 +27,7 @@ contract MOPNGasVault is ERC721, Ownable {
 
     receive() external payable  {
         uint256 shares = msg.value / 1000;
-        totalShares = totalShares.add(shares);
+        totalShares += shares;
     }
 
     function claim(uint256 tokenId) public nonReentrant {
@@ -41,7 +38,7 @@ contract MOPNGasVault is ERC721, Ownable {
         payable(msg.sender).transfer(payment);
     }
 
-    function claimableBalanceOf(uint256) public view returns (uint256) {
+    function claimableBalanceOf(uint256 tokenId) public view returns (uint256) {
         require(ownerOf(tokenId) != address(0), "Token does not exist");
         return totalShares - _claimed[tokenId];
     }

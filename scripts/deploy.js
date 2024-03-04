@@ -5,23 +5,24 @@ const { ethers } = require('hardhat')
 const { getSelectors, FacetCutAction } = require('./libraries/diamond.js')
 
 const deployed = {
-    // "ERC6551Registry": "0xdFA4Aa5E394AC48b64ef3D4D80F05aA6ee8456d4",
-    // "MOPNERC6551AccountHelper": "0x038828FA4bFaB1275397ABBAbf54456e76C34083",
-    // "MOPNERC6551Account": "0x45231c9668289A0C7C434660146eCF48Ef872F4c",
-    // "MOPNERC6551AccountProxy": "0xD6e06BBcffdf88aa40D1116Afa42EF1457B0029E",
-    // "DiamondCutFacet": "0x3817Ee5BfA85d1f895136918B9D77E4304C7D642",
-    // "MOPNDiamond": "0xC99764F086BC5B4Cd140E4723414335738916706",
-    // "MOPNBomb": "0xbc25d37Cfea02E78DeD904c02081AA0B524d26F2",
-    // "MOPNToken": "0xb12c0b1d96Dc3F4FbD72FE80ace1433c5C500dA0",
-    // "MOPNCollectionVault": "0xef92ca528c8B98707704c69619E3c9537FcbBB97",
-    // "MOPNLand": "0x0aa51F0109341858B2652Dd616FdFd488e304152",
-    // "DiamondInit": "0x447B7C4Bd81b9BaD499748D94eA3B826a4cbA0b2",
-    // "DiamondLoupeFacet": "0x5634C5E6aBA379933389B5bd1f4B40273DFAc9E5",
-    // "OwnershipFacet": "0x68cA187194073A7949DC9f0160d9e09839A35520",
-    // "MOPNFacet": "0xc5496d128cB6f6229f8f2Aebc3cD9D1900750055",
-    // "MOPNAuctionHouseFacet": "0x7B1463EE215DD027BeCa91a23a07Db6aB595B577",
-    // "MOPNGovernanceFacet": "0x7817D25c94cD2176C6b476179314DBa63ca6eb70",
-    // "MOPNDataFacet": "0x830CeA4BBb37479491700093C38d9A8084914AFe"
+  "ERC6551Registry": "0x7E3BAf42Ec4dae4FC55C09B4AE63A3A210252Fc8",
+  "MOPNERC6551AccountHelper": "0xa7180bC0BCcDEaa2cBd9384C0216f8D8Acb8fC55",
+  "MOPNERC6551Account": "0xE12192F31E819fF7dA722349C188B8ae0F0594E2",
+  "MOPNERC6551AccountProxy": "0x344E053688ED3a0c061E610172705380AC32Ce7A",
+  "DiamondCutFacet": "0xba7Bf786C4fBCC35EE6Dc427895ad0DeaD6EE1Cf",
+  "MOPNDiamond": "0xa249b58E29eC529cF0374Cb292BdD28F9095e1c6",
+  "MOPNBomb": "0xE1624cb293611233a1746Ee01442DD1eaA095b5F",
+  "MOPNToken": "0x694bE0de186CB5C9e08246d4b4a956387e258238",
+  "MOPNCollectionVault": "0xeB28B7cA92c100E12ef76e582Fd84c2b68E45671",
+  "MOPNLand": "0xE027F587b9fdDf22ff1ffFDA800bA14DA8de007a",
+  "MOPNGasVault": "0x9E13161295d3bE7236bb3f476881A64f6Be47C57",
+  "DiamondInit": "0x3286F7dA84493014C4bCC8Dfea59dce37B32B6bb",
+  "DiamondLoupeFacet": "0x797059Baa33DcFCD613397d6EfD5D3af074B3c3B",
+  "OwnershipFacet": "0xdd5c4eE5d59B87b713bD93E6C54C14eb0CDF67D6",
+  "MOPNFacet": "0xC9AaF151E2229D97963e1ea29B3Ff5431d81A6c9",
+  "MOPNAuctionHouseFacet": "0xA4281Ef90283Cb8DeD6C2b5c0aC13Bf77013A022",
+  "MOPNGovernanceFacet": "0xB0c7F4BfC701040A350eCDe91155Be1aa4DDbbDd",
+  "MOPNDataFacet": "0xb57889BEF0AE7bbCDC8d05A587601FA6ae8E1544"
 };
 
 async function deployContract(name, params) {
@@ -82,6 +83,10 @@ async function deployDiamond () {
   const mopnland = await deployContract('MOPNLand', [
     '0x4200000000000000000000000000000000000007',
     diamond.address,
+    contractOwner.address,
+  ]);
+
+  const mopngasvault = await deployContract('MOPNGasVault', [
     contractOwner.address,
   ]);
 
