@@ -1,0 +1,2268 @@
+[
+    [
+        {
+            "collectionAddress": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d",
+            "collectionName": "Bored Ape Yacht Club"
+        },
+        {
+            "collectionAddress": "0x60e4d786628fea6478f785a6d7e704777c86a7c6",
+            "collectionName": "MutantApeYachtClub"
+        },
+        {
+            "collectionAddress": "0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
+            "collectionName": "PudgyPenguins"
+        },
+        {
+            "collectionAddress": "0xed5af388653567af2f388e6224dc7c4b3241c544",
+            "collectionName": "Azuki"
+        },
+        {
+            "collectionAddress": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
+            "collectionName": "CryptoPunks"
+        },
+        {
+            "collectionAddress": "0x8821bee2ba0df28761afff119d66390d594cd280",
+            "collectionName": "DeGods"
+        },
+        {
+            "collectionAddress": "0x23581767a106ae21c074b2276d25e5c3e136a68b",
+            "collectionName": "Moonbirds"
+        },
+        {
+            "collectionAddress": "0x769272677fab02575e84945f03eca517acc544cc",
+            "collectionName": "The Captainz"
+        },
+        {
+            "collectionAddress": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
+            "collectionName": "Doodles"
+        },
+        {
+            "collectionAddress": "0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b",
+            "collectionName": "CloneX"
+        },
+        {
+            "collectionAddress": "0xba30e5f9bb24caa003e9f2f0497ad287fdf95623",
+            "collectionName": "Bored Ape Kennel Club"
+        },
+        {
+            "collectionAddress": "0x5af0d9827e0c53e4799bb226655a1de152a425a5",
+            "collectionName": "Milady"
+        },
+        {
+            "collectionAddress": "0x524cab2ec69124574082676e6f654a18df49a048",
+            "collectionName": "LilPudgys"
+        },
+        {
+            "collectionAddress": "0x39ee2c7b3cb80254225884ca001f57118c8f21b6",
+            "collectionName": "The Potatoz"
+        },
+        {
+            "collectionAddress": "0xe1dc516b1486aba548eecd2947a11273518434a4",
+            "collectionName": "The Grapes"
+        }
+    ],
+    [
+        {
+            "collectionAddress": "0x0581ddf7a136c6837429a46c6cb7b388a3e52971",
+            "collectionName": "BlockGames Dice"
+        },
+        {
+            "collectionAddress": "0x6339e5e072086621540d0362c4e3cea0d643e114",
+            "collectionName": "Opepen Edition"
+        },
+        {
+            "collectionAddress": "0x1a92f7381b9f03921564a437210bb9396471050c",
+            "collectionName": "Cool Cats"
+        },
+        {
+            "collectionAddress": "0xb6a37b5d14d502c3ab0ae6f3a0e058bc9517786e",
+            "collectionName": "Azuki Elementals"
+        },
+        {
+            "collectionAddress": "0x142e03367ede17cd851477a4287d1f35676e6dc2",
+            "collectionName": "Yogapetz"
+        },
+        {
+            "collectionAddress": "0x7bd29408f11d2bfc23c34f18275bbf23bb716bc7",
+            "collectionName": "Meebits"
+        },
+        {
+            "collectionAddress": "0x32973908faee0bf825a343000fe412ebe56f802a",
+            "collectionName": "Pixelmon"
+        },
+        {
+            "collectionAddress": "0x9a27d13a4896baa03843a0728dff6007d665f8ee",
+            "collectionName": "Matr1x 2061"
+        },
+        {
+            "collectionAddress": "0x306b1ea3ecdf94ab739f1910bbda052ed4a9f949",
+            "collectionName": "BEANZ Official"
+        },
+        {
+            "collectionAddress": "0x1cb1a5e65610aeff2551a50f76a87a7d3fb649c6",
+            "collectionName": "Cryptoadz"
+        },
+        {
+            "collectionAddress": "0x34d85c9cdeb23fa97cb08333b511ac86e1c4e258",
+            "collectionName": "Otherdeed for Otherside"
+        },
+        {
+            "collectionAddress": "0x960b7a6bcd451c9968473f7bbfd9be826efd549a",
+            "collectionName": "OnChainMonkey"
+        },
+        {
+            "collectionAddress": "0x5946aeaab44e65eb370ffaa6a7ef2218cff9b47d",
+            "collectionName": "Creepz by OVERLORD"
+        },
+        {
+            "collectionAddress": "0xfd1b0b0dfa524e1fd42e7d51155a663c581bbd50",
+            "collectionName": "y00ts"
+        },
+        {
+            "collectionAddress": "0x2b6df7f8389e6ecf97a0f06b189349c409a24083",
+            "collectionName": "Sofa Maker"
+        },
+        {
+            "collectionAddress": "0x814c3ab3c08b6e10845706680d03e7306dd21491",
+            "collectionName": "Springfield Punks"
+        },
+        {
+            "collectionAddress": "0x364c828ee171616a39897688a831c2499ad972ec",
+            "collectionName": "Sappy Seals"
+        },
+        {
+            "collectionAddress": "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+            "collectionName": "Art Blocks Curated"
+        },
+        {
+            "collectionAddress": "0x99a9b7c1116f9ceeb1652de04d5969cce509b069",
+            "collectionName": "Art Blocks"
+        },
+        {
+            "collectionAddress": "0x59325733eb952a92e069c87f0a6168b29e80627f",
+            "collectionName": "Mocaverse"
+        },
+        {
+            "collectionAddress": "0x5c1a0cc6dadf4d0fb31425461df35ba80fcbc110",
+            "collectionName": "Farm Land by Pixels"
+        },
+        {
+            "collectionAddress": "0x18b9db07cf194aac853daaa076d421b1dd0c75b0",
+            "collectionName": "Balthazar raW Pass"
+        },
+        {
+            "collectionAddress": "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a",
+            "collectionName": "Art Blocks"
+        },
+        {
+            "collectionAddress": "0x79fcdef22feed20eddacbb2587640e45491b757f",
+            "collectionName": "mfer"
+        },
+        {
+            "collectionAddress": "0xd3d9ddd0cf0a5f0bfb8f7fceae075df687eaebab",
+            "collectionName": "Redacted Remilio Babies"
+        },
+        {
+            "collectionAddress": "0x7a31c6726f358fad0783110a46ef489372fbfc65",
+            "collectionName": "ANOMALY A.I. by Star Im"
+        },
+        {
+            "collectionAddress": "0xacf63e56fd08970b43401492a02f6f38b6635c91",
+            "collectionName": "Kanpai Pandas"
+        },
+        {
+            "collectionAddress": "0x3af2a97414d1101e2107a70e7f33955da1346305",
+            "collectionName": "Azuki Elemental Beans"
+        },
+        {
+            "collectionAddress": "0xe785e82358879f061bc3dcac6f0444462d4b5330",
+            "collectionName": "World Of Women"
+        },
+        {
+            "collectionAddress": "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6",
+            "collectionName": "Wrapped Cryptopunks"
+        },
+        {
+            "collectionAddress": "0xe012baf811cf9c05c408e879c399960d1f305903",
+            "collectionName": "Otherside Koda"
+        },
+        {
+            "collectionAddress": "0x3bf2922f4520a8ba0c2efc3d2a1539678dad5e9d",
+            "collectionName": "0N1 Force"
+        },
+        {
+            "collectionAddress": "0x4481507cc228fa19d203bd42110d679571f7912e",
+            "collectionName": "Neo Tokyo Outer Citizens"
+        },
+        {
+            "collectionAddress": "0xd564c25b760cb278a55bdd98831f4ff4b6c97b38",
+            "collectionName": "Sugartown Oras by Zynga"
+        },
+        {
+            "collectionAddress": "0x0fc3dd8c37880a297166bed57759974a157f0e74",
+            "collectionName": "Parallel Avatars"
+        },
+        {
+            "collectionAddress": "0x09233d553058c2f42ba751c87816a8e9fae7ef10",
+            "collectionName": "My Pet Hooligan"
+        },
+        {
+            "collectionAddress": "0xb9951b43802dcf3ef5b14567cb17adf367ed1c0f",
+            "collectionName": "Neo Tokyo Citizens"
+        },
+        {
+            "collectionAddress": "0x8d9710f0e193d3f95c0723eaaf1a81030dc9116d",
+            "collectionName": "HYTOPIA Worlds"
+        },
+        {
+            "collectionAddress": "0xfc8a98c22a9e32948ab028414d67c62c49b16864",
+            "collectionName": "Shrapnel Operators Collection"
+        },
+        {
+            "collectionAddress": "0x34eebee6942d8def3c125458d1a86e0a897fd6f9",
+            "collectionName": "Checks - VV Edition"
+        },
+        {
+            "collectionAddress": "0x062e691c2054de82f28008a8ccc6d7a1c8ce060d",
+            "collectionName": "PudgyPresent"
+        },
+        {
+            "collectionAddress": "0x036721e5a769cc48b3189efbb9cce4471e8a48b1",
+            "collectionName": "Checks - VV Originals"
+        },
+        {
+            "collectionAddress": "0x716f29b8972d551294d9e02b3eb0fc1107fbf4aa",
+            "collectionName": "IO: Imaginary Ones"
+        },
+        {
+            "collectionAddress": "0xd774557b647330c91bf44cfeab205095f7e6c367",
+            "collectionName": "Nakamigos"
+        },
+        {
+            "collectionAddress": "0x4e1f41613c9084fdb9e34e11fae9412427480e56",
+            "collectionName": "Terraforms"
+        },
+        {
+            "collectionAddress": "0x5f36809a7c15ebcc00221217cd17914ffd3e4762",
+            "collectionName": "Nounish Punk"
+        },
+        {
+            "collectionAddress": "0xdfde78d2baec499fe18f2be74b6c287eed9511d7",
+            "collectionName": "BrainDrops"
+        },
+        {
+            "collectionAddress": "0x7a63d17f5a59bca04b6702f461b1f1a1c59b100b",
+            "collectionName": "Winds of Yawanawa by Yawanawa and Refik Anadol"
+        },
+        {
+            "collectionAddress": "0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d",
+            "collectionName": "V1 Cryptopunks (Wrapped)"
+        },
+        {
+            "collectionAddress": "0x1b829b926a14634d36625e60165c0770c09d02b2",
+            "collectionName": "Treeverse"
+        }
+    ],
+    [
+        {
+            "collectionAddress": "0xb852c6b5892256c264cc2c888ea462189154d8d7",
+            "collectionName": "rektguy"
+        },
+        {
+            "collectionAddress": "0x790b2cf29ed4f310bf7641f013c65d4560d28371",
+            "collectionName": "Otherdeed Expanded"
+        },
+        {
+            "collectionAddress": "0xd1258db6ac08eb0e625b75b371c023da478e94a9",
+            "collectionName": "DigiDaigaku Genesis"
+        },
+        {
+            "collectionAddress": "0xeb2dfc54ebafca8f50efcc1e21a9d100b5aeb349",
+            "collectionName": "Kubz"
+        },
+        {
+            "collectionAddress": "0x8ff2e72f8faf05384aeb501ba9644c9759d2fd5f",
+            "collectionName": "Mittaria Genesis"
+        },
+        {
+            "collectionAddress": "0x3110ef5f612208724ca51f5761a69081809f03b7",
+            "collectionName": "Impostors Genesis Aliens"
+        },
+        {
+            "collectionAddress": "0x4a537f61ef574153664c0dbc8c8f4b900cacbe5d",
+            "collectionName": "Mavia Land"
+        },
+        {
+            "collectionAddress": "0x394e3d3044fc89fcdd966d3cb35ac0b32b0cda91",
+            "collectionName": "RENGA"
+        },
+        {
+            "collectionAddress": "0xccc441ac31f02cd96c153db6fd5fe0a2f4e6a68d",
+            "collectionName": "FLUF"
+        },
+        {
+            "collectionAddress": "0xeeca64ea9fcf99a22806cd99b3d29cf6e8d54925",
+            "collectionName": "Sproto Gremlins"
+        },
+        {
+            "collectionAddress": "0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03",
+            "collectionName": "Nouns"
+        },
+        {
+            "collectionAddress": "0x12dd66366d45f44128083233c6fbadfe7cbae221",
+            "collectionName": "Fijis"
+        },
+        {
+            "collectionAddress": "0x6864cc3b8cfdcfa8cfb22e9fe732cc6feff4e740",
+            "collectionName": "Velocity Series: Velocity Pass"
+        },
+        {
+            "collectionAddress": "0x6efc003d3f3658383f06185503340c2cf27a57b6",
+            "collectionName": "YOU THE REAL MVP"
+        },
+        {
+            "collectionAddress": "0x521f9c7505005cfa19a8e5786a9c3c9c9f5e6f42",
+            "collectionName": "ForgottenRunesWizardsCult"
+        },
+        {
+            "collectionAddress": "0x77372a4cc66063575b05b44481f059be356964a4",
+            "collectionName": "a KID called BEAST"
+        },
+        {
+            "collectionAddress": "0x17ed38f5f519c6ed563be6486e629041bed3dfbc",
+            "collectionName": "PXQuest Adventurer"
+        },
+        {
+            "collectionAddress": "0x2acab3dea77832c09420663b0e1cb386031ba17b",
+            "collectionName": "DeadFellaz"
+        },
+        {
+            "collectionAddress": "0x52cd55e331931f14191e1f7a068421d89ade730b",
+            "collectionName": "San FranTokyo Genesis Pass"
+        },
+        {
+            "collectionAddress": "0xa3aee8bce55beea1951ef834b99f3ac60d1abeeb",
+            "collectionName": "VeeFriends"
+        },
+        {
+            "collectionAddress": "0x5b1085136a811e55b2bb2ca1ea456ba82126a376",
+            "collectionName": "Otherside Vessels"
+        },
+        {
+            "collectionAddress": "0x57a204aa1042f6e66dd7730813f4024114d74f37",
+            "collectionName": "CyberKongz"
+        },
+        {
+            "collectionAddress": "0xc4973de5ee925b8219f1e74559fb217a8e355ecf",
+            "collectionName": "Azra Games - The Hopeful"
+        },
+        {
+            "collectionAddress": "0x86cc280d0bac0bd4ea38ba7d31e895aa20cceb4b",
+            "collectionName": "Karma Monkey"
+        },
+        {
+            "collectionAddress": "0xe6d48bf4ee912235398b96e16db6f310c21e82cb",
+            "collectionName": "God Hates NFTees"
+        },
+        {
+            "collectionAddress": "0x7d8820fa92eb1584636f4f5b8515b5476b75171a",
+            "collectionName": "Murakami.Flowers Official"
+        },
+        {
+            "collectionAddress": "0x5726c14663a1ead4a7d320e8a653c9710b2a2e89",
+            "collectionName": "Buterin Cards"
+        },
+        {
+            "collectionAddress": "0x9401518f4ebba857baa879d9f76e1cc8b31ed197",
+            "collectionName": "Weirdo Ghost Gang"
+        },
+        {
+            "collectionAddress": "0x7ff5601b0a434b52345c57a01a28d63f3e892ac0",
+            "collectionName": "Oh Ottie!"
+        },
+        {
+            "collectionAddress": "0x9a87a43ac0b50984cd20964cb4978e6d9b3cbe5d",
+            "collectionName": "TrekkiNFT"
+        },
+        {
+            "collectionAddress": "0x1b41d54b3f8de13d58102c50d7431fd6aa1a2c48",
+            "collectionName": "Pirate Nation - Founder's Pirates"
+        },
+        {
+            "collectionAddress": "0x8c6def540b83471664edc6d5cf75883986932674",
+            "collectionName": "goblintown.wtf"
+        },
+        {
+            "collectionAddress": "0x08d7c0242953446436f34b4c78fe9da38c73668d",
+            "collectionName": "PROOF Collective"
+        },
+        {
+            "collectionAddress": "0x4b15a9c28034dc83db40cd810001427d3bd7163d",
+            "collectionName": "HV-MTL"
+        },
+        {
+            "collectionAddress": "0xf9a42c357709dbb27c77109823d7f1641d86aee9",
+            "collectionName": "Binary: DEX"
+        },
+        {
+            "collectionAddress": "0x80336ad7a747236ef41f47ed2c7641828a480baa",
+            "collectionName": "Chimpers"
+        },
+        {
+            "collectionAddress": "0xc3f733ca98e0dad0386979eb96fb1722a1a05e69",
+            "collectionName": "Official MoonCats - Acclimated"
+        },
+        {
+            "collectionAddress": "0x6c410cf0b8c113dc6a7641b431390b11d5515082",
+            "collectionName": "RTFKT Animus Egg \u001a"
+        },
+        {
+            "collectionAddress": "0xc99c679c50033bbc5321eb88752e89a93e9e83c5",
+            "collectionName": "KILLABEARS"
+        },
+        {
+            "collectionAddress": "0x209e639a0ec166ac7a1a4ba41968fa967db30221",
+            "collectionName": "Genuine Undead"
+        },
+        {
+            "collectionAddress": "0x7ff771b03145770402918d8003e4c27141334a90",
+            "collectionName": "Sprotoladys"
+        },
+        {
+            "collectionAddress": "0xda7e6010618cf782280dd7eb107fd57c27d13035",
+            "collectionName": "GEN1 Pass Holders"
+        },
+        {
+            "collectionAddress": "0xc589770757cd0d372c54568bf7e5e1d56b958015",
+            "collectionName": "Ordinal Kubz"
+        },
+        {
+            "collectionAddress": "0x231d3559aa848bf10366fb9868590f01d34bf240",
+            "collectionName": "Valhalla"
+        },
+        {
+            "collectionAddress": "0x0c2e57efddba8c768147d1fdf9176a0a6ebd5d83",
+            "collectionName": "KaijuKingz"
+        },
+        {
+            "collectionAddress": "0xc143bbfcdbdbed6d454803804752a064a622c1f3",
+            "collectionName": "Async Blueprints"
+        },
+        {
+            "collectionAddress": "0x59468516a8259058bad1ca5f8f4bff190d30e066",
+            "collectionName": "Invisible Friends"
+        },
+        {
+            "collectionAddress": "0x7bfd9a55f4c00783b5a8ea18f7735e1a405dd520",
+            "collectionName": "Skyborne - Nexian Gems"
+        },
+        {
+            "collectionAddress": "0x5cc5b05a8a13e3fbdb0bb9fccd98d38e50f90c38",
+            "collectionName": "Sandbox's LANDs"
+        },
+        {
+            "collectionAddress": "0x892848074ddea461a15f337250da3ce55580ca85",
+            "collectionName": "CyberBrokers"
+        },
+        {
+            "collectionAddress": "0x42069abfe407c60cf4ae4112bedead391dba1cdb",
+            "collectionName": "CryptoDickbutts S3"
+        },
+        {
+            "collectionAddress": "0x81d6a3c844a9fb452ed069e9fc16cf37f137a58e",
+            "collectionName": "Ether"
+        },
+        {
+            "collectionAddress": "0x2d33bfe1c867346543ac245396dfc6c3ebc8534f",
+            "collectionName": "KPR"
+        },
+        {
+            "collectionAddress": "0x704bf12276f5c4bc9349d0e119027ead839b081b",
+            "collectionName": "Timeless"
+        },
+        {
+            "collectionAddress": "0xb6dae651468e9593e4581705a09c10a76ac1e0c8",
+            "collectionName": "Async Art"
+        },
+        {
+            "collectionAddress": "0xa88b82af76ecf08cf652846d10857eaeeca40c97",
+            "collectionName": "AnarKey by TradeAI"
+        },
+        {
+            "collectionAddress": "0x11450058d796b02eb53e65374be59cff65d3fe7f",
+            "collectionName": "SHIBOSHIS"
+        },
+        {
+            "collectionAddress": "0xf6ee484f82f28d69688f37fe90af514ce212b7c3",
+            "collectionName": "This Thing Of Ours - The NFT Gaming Collective"
+        },
+        {
+            "collectionAddress": "0x1c67d8f07d7ef2d637e61ed3fbc3fa9aaf7a6267",
+            "collectionName": "FRACTIONAL UPRISING STUDIOS MEMBERSHIP"
+        },
+        {
+            "collectionAddress": "0x123b30e25973fecd8354dd5f41cc45a3065ef88c",
+            "collectionName": "alien frens"
+        },
+        {
+            "collectionAddress": "0x6dc6001535e15b9def7b0f6a20a2111dfa9454e2",
+            "collectionName": "MetaHero"
+        },
+        {
+            "collectionAddress": "0xa521d258fb38842ba5a6ae3d2f1362bf024f4635",
+            "collectionName": "The Last Pepe"
+        },
+        {
+            "collectionAddress": "0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0",
+            "collectionName": "SuperRare"
+        },
+        {
+            "collectionAddress": "0x2358693f4faec9d658bb97fc9cd8885f62105dc1",
+            "collectionName": "10KTF G Tags"
+        },
+        {
+            "collectionAddress": "0xd0318da435dbce0b347cc6faa330b5a9889e3585",
+            "collectionName": "ASMBrain"
+        },
+        {
+            "collectionAddress": "0x8a3749936e723325c6b645a0901470cd9e790b94",
+            "collectionName": "Pixelmon Trainers - Generation 1"
+        },
+        {
+            "collectionAddress": "0x5d4aa6ff9de7963ead5a17b454dc1093ca9e98e7",
+            "collectionName": "Forgotten Runiverse Watcher's Rings"
+        },
+        {
+            "collectionAddress": "0x9772f5df100bba0d4e637ab866b17f94fcac0cf8",
+            "collectionName": "Sybil Samurai"
+        },
+        {
+            "collectionAddress": "0x942bc2d3e7a589fe5bd4a5c6ef9727dfd82f5c8a",
+            "collectionName": "Friendship Bracelets by Alexis André"
+        },
+        {
+            "collectionAddress": "0x0b4b2ba334f476c8f41bfe52a428d6891755554d",
+            "collectionName": "JRNY NFT Club"
+        },
+        {
+            "collectionAddress": "0xa38b204ce561eb5af49614944e0129d9c8d43354",
+            "collectionName": "SERAPH Priority Pass Official"
+        },
+        {
+            "collectionAddress": "0x7f312a75b62846033bc5471c5bcb94b1abfaf06d",
+            "collectionName": "Ethlizards"
+        },
+        {
+            "collectionAddress": "0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7",
+            "collectionName": "Loot"
+        },
+        {
+            "collectionAddress": "0xc379e535caff250a01caa6c3724ed1359fe5c29b",
+            "collectionName": "The Plague NFT"
+        },
+        {
+            "collectionAddress": "0x8c186802b1992f7650ac865d4ca94d55ff3c0d17",
+            "collectionName": "Ninja Squad"
+        },
+        {
+            "collectionAddress": "0xe51aac67b09eaed6d3d43e794d6bae679cbe09d8",
+            "collectionName": "FLUF World: Burrows"
+        },
+        {
+            "collectionAddress": "0xc0ffee8ff7e5497c2d6f7684859709225fcc5be8",
+            "collectionName": "Moonbirds: Mythics"
+        },
+        {
+            "collectionAddress": "0x3fd36d72f05fb1af76ee7ce9257ca850faba91ed",
+            "collectionName": "Ultiverse - Electric Sheep"
+        },
+        {
+            "collectionAddress": "0x12787526c03d626aac88e6edc4d0fb930d86c631",
+            "collectionName": "Supreme Kong"
+        },
+        {
+            "collectionAddress": "0x8943c7bac1914c9a7aba750bf2b6b09fd21037e0",
+            "collectionName": "Lazy Lions"
+        },
+        {
+            "collectionAddress": "0xa1d4657e0e6507d5a94d06da93e94dc7c8c44b51",
+            "collectionName": "WebbLand"
+        },
+        {
+            "collectionAddress": "0x8f6a4d8ad2493adfd7d1540ccdba11bde5c7eb9e",
+            "collectionName": "Degenheim"
+        },
+        {
+            "collectionAddress": "0xf07468ead8cf26c752c676e43c814fee9c8cf402",
+            "collectionName": "CryptoPhunksV2"
+        },
+        {
+            "collectionAddress": "0xe034bb2b1b9471e11cf1a0a9199a156fb227aa5d",
+            "collectionName": "Themes and Variations by Vera Molnár, in collaboration with Martin Grasser"
+        },
+        {
+            "collectionAddress": "0x8a1bbef259b00ced668a8c69e50d92619c672176",
+            "collectionName": "Habbo Avatars"
+        },
+        {
+            "collectionAddress": "0x740c178e10662bbb050bde257bfa318defe3cabc",
+            "collectionName": "8liens NFT"
+        },
+        {
+            "collectionAddress": "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5",
+            "collectionName": "SupDucks"
+        },
+        {
+            "collectionAddress": "0x3bcacb18f4d60c8cba68cd95860daf3e32bebcb6",
+            "collectionName": "Lost Miners of the Ether"
+        },
+        {
+            "collectionAddress": "0x9378368ba6b85c1fba5b131b530f5f5bedf21a18",
+            "collectionName": "VeeFriends Series 2"
+        },
+        {
+            "collectionAddress": "0x00723c39194f7f449be736da0d1c4ec809dde793",
+            "collectionName": "You Are The Champion"
+        },
+        {
+            "collectionAddress": "0xaadc2d4261199ce24a4b0a57370c4fcf43bb60aa",
+            "collectionName": "TheCurrency"
+        },
+        {
+            "collectionAddress": "0xbe9371326f91345777b04394448c23e2bfeaa826",
+            "collectionName": "Gemesis"
+        },
+        {
+            "collectionAddress": "0x8ff1523091c9517bc328223d50b52ef450200339",
+            "collectionName": "RugGenesis NFT"
+        },
+        {
+            "collectionAddress": "0x6e1404a557850551edaa9fd1311c9297baf7bd52",
+            "collectionName": "Defimons Apartments"
+        },
+        {
+            "collectionAddress": "0x7afe30cb3e53dba6801aa0ea647a0ecea7cbe18d",
+            "collectionName": "Realms (for Adventurers)"
+        },
+        {
+            "collectionAddress": "0x75e95ba5997eb235f40ecf8347cdb11f18ff640b",
+            "collectionName": "Psychedelics Anonymous Genesis"
+        },
+        {
+            "collectionAddress": "0xd70f41dd5875eee7fa9dd8048567bc932124a8d2",
+            "collectionName": "DeepBlack"
+        },
+        {
+            "collectionAddress": "0x466cfcd0525189b573e794f554b8a751279213ac",
+            "collectionName": "Dooplicator"
+        },
+        {
+            "collectionAddress": "0x67b8afddb494c16b779e6f23e1de5dbf3437f857",
+            "collectionName": "Mintify Genesis"
+        },
+        {
+            "collectionAddress": "0x05745e72fb8b4a9b51118a168d956760e4a36444",
+            "collectionName": "NFT Worlds Genesis Avatars"
+        },
+        {
+            "collectionAddress": "0x7ecb204fed7e386386cab46a1fcb823ec5067ad5",
+            "collectionName": "FULL SEND METACARD"
+        },
+        {
+            "collectionAddress": "0x138a5c693279b6cd82f48d4bef563251bc15adce",
+            "collectionName": "CNP / CryptoNinja Partners"
+        },
+        {
+            "collectionAddress": "0xf61f24c2d93bf2de187546b14425bf631f28d6dc",
+            "collectionName": "World of Women Galaxy"
+        },
+        {
+            "collectionAddress": "0x33eecbf908478c10614626a9d304bfe18b78dd73",
+            "collectionName": "Azimuth Points"
+        },
+        {
+            "collectionAddress": "0x7b9e0e62e3798ffb33326421a7d203ffd60b711c",
+            "collectionName": "InfiniGods - InfiniPass"
+        },
+        {
+            "collectionAddress": "0x8428cbdc4100fc7e1b14c2e4765a9a8133587f28",
+            "collectionName": "Nexus Gaming Lifetime Pass"
+        },
+        {
+            "collectionAddress": "0xffc1131dda0299b804c97c436bc8cfea019e00a0",
+            "collectionName": "Looki"
+        },
+        {
+            "collectionAddress": "0x518ba36f1ca6dfe3bb1b098b8dd0444030e79d9f",
+            "collectionName": "Wonky Stonks"
+        },
+        {
+            "collectionAddress": "0x916c6af08bf922eaf80c05975886c0a421c78a35",
+            "collectionName": "Steady Stack Titans"
+        },
+        {
+            "collectionAddress": "0xf8b37af2b5fe2ce1cc303a8472dedccca0953bb2",
+            "collectionName": "Great Expectations"
+        },
+        {
+            "collectionAddress": "0xc2bae2cdef63bcb0ba60bb02cd67d912f8371c3d",
+            "collectionName": "SuperCreators - Gen Z"
+        },
+        {
+            "collectionAddress": "0xc20e204606557cb98b305be605f924d8565fb700",
+            "collectionName": "pARticle pack"
+        },
+        {
+            "collectionAddress": "0x7c456f260cd07083a2c1e7f18acab9aa8ac1b478",
+            "collectionName": "KartParty-YKZ"
+        },
+        {
+            "collectionAddress": "0xcb45dce241a6f6f1e874e9925bea5840f3fd7d3a",
+            "collectionName": "LoudPunx"
+        },
+        {
+            "collectionAddress": "0x963590fabdc1333d03bc3af42a6b2ab33e21e2ee",
+            "collectionName": "Skyborne - Genesis Immortals"
+        },
+        {
+            "collectionAddress": "0xc92ceddfb8dd984a89fb494c376f9a48b999aafc",
+            "collectionName": "Creature World"
+        },
+        {
+            "collectionAddress": "0xea14fb44f85650d06d505966b1d02ca1f599b823",
+            "collectionName": "Steady Stack Legends"
+        },
+        {
+            "collectionAddress": "0x87ec044115cd9e0e09221031441640ee48b3a8f2",
+            "collectionName": "Michelin 3xplorer Club"
+        },
+        {
+            "collectionAddress": "0x32bb5a147b5371fd901aa4a72b7f82c58a87e36d",
+            "collectionName": "Bit Bears by Berachain"
+        },
+        {
+            "collectionAddress": "0xef0182dc0574cd5874494a120750fd222fdb909a",
+            "collectionName": "RumbleKongLeague"
+        },
+        {
+            "collectionAddress": "0xc9d198089d6c31d0ca5cc5b92c97a57a97bbfde2",
+            "collectionName": "Space Riders NFT"
+        },
+        {
+            "collectionAddress": "0x1792a96e5668ad7c167ab804a100ce42395ce54d",
+            "collectionName": "Moonbirds Oddities"
+        },
+        {
+            "collectionAddress": "0x749f5ddf5ab4c1f26f74560a78300563c34b417d",
+            "collectionName": "ALTS by adidas"
+        },
+        {
+            "collectionAddress": "0x0c56f29b8d90eea71d57cadeb3216b4ef7494abc",
+            "collectionName": "Nakamigos-CLOAKS"
+        },
+        {
+            "collectionAddress": "0xa7088ed1a460a154404adbfd7d6a3873e9f90340",
+            "collectionName": "Delabs Adventure Pass Official"
+        },
+        {
+            "collectionAddress": "0x294fed5f1d3d30cfa6fe86a937dc3141eec8bc6d",
+            "collectionName": "ZENTRUM by Herbert W. Franke"
+        },
+        {
+            "collectionAddress": "0x9f6dad7762ce8181efe3352cd1d1978ef143be72",
+            "collectionName": "Chameleon Travel Club"
+        },
+        {
+            "collectionAddress": "0xe0176ba60efddb29cac5b15338c9962daee9de0c",
+            "collectionName": "PREMINT Collector Pass - OFFICIAL"
+        },
+        {
+            "collectionAddress": "0x3b8420eb6ef77bc25025b32d8205cde2683f979e",
+            "collectionName": "Moonbears NFT"
+        },
+        {
+            "collectionAddress": "0xfbeef911dc5821886e1dda71586d90ed28174b7d",
+            "collectionName": "Known Origin"
+        },
+        {
+            "collectionAddress": "0x2187093a2736442d0b5c5d5464b98fc703e3b88d",
+            "collectionName": "Valeria Games Genesis Lands"
+        },
+        {
+            "collectionAddress": "0xea698596b6009a622c3ed00dd5a8b5d1cae4fc36",
+            "collectionName": "Art Blocks x Pace"
+        },
+        {
+            "collectionAddress": "0x13303b4ee819fac204be5ef77523cfcd558c082f",
+            "collectionName": "Mythics Eggs"
+        },
+        {
+            "collectionAddress": "0xbdde08bd57e5c9fd563ee7ac61618cb2ecdc0ce0",
+            "collectionName": "CryptoCitizens"
+        },
+        {
+            "collectionAddress": "0x9690b63eb85467be5267a3603f770589ab12dc95",
+            "collectionName": "Forgotten Runes Warriors Guild"
+        },
+        {
+            "collectionAddress": "0xc2e9678a71e50e5aed036e00e9c5caeb1ac5987d",
+            "collectionName": "Zero Name Service"
+        },
+        {
+            "collectionAddress": "0x77d4b54e91822e9799ab0900876d6b1cda752706",
+            "collectionName": "Elevate Heart by Daniel Calderon Arenas"
+        },
+        {
+            "collectionAddress": "0x39d3230c84efcb5559d22f499151934476b5c16d",
+            "collectionName": "Kitaro World"
+        },
+        {
+            "collectionAddress": "0x4db1f25d3d98600140dfc18deb7515be5bd293af",
+            "collectionName": "HAPE PRIME"
+        },
+        {
+            "collectionAddress": "0x0322f6f11a94cfb1b5b6e95e059d8deb2bf17d6a",
+            "collectionName": "CryptoonGoonz"
+        },
+        {
+            "collectionAddress": "0xf661d58cfe893993b11d53d11148c4650590c692",
+            "collectionName": "RTFKT x Nike Dunk Genesis CRYPTOKICKS"
+        },
+        {
+            "collectionAddress": "0xf76179bb0924ba7da8e7b7fc2779495d7a7939d8",
+            "collectionName": "VOX Series 2"
+        },
+        {
+            "collectionAddress": "0x8184a482a5038b124d933b779e0ea6e0fb72f54e",
+            "collectionName": "Wanderers"
+        },
+        {
+            "collectionAddress": "0xbad6186e92002e312078b5a1dafd5ddf63d3f731",
+            "collectionName": "Anonymice"
+        },
+        {
+            "collectionAddress": "0x4be3ad153f4c6b10f098e4270e77a434234c5493",
+            "collectionName": "Consortium Key"
+        },
+        {
+            "collectionAddress": "0x670d4dd2e6badfbbd372d0d37e06cd2852754a04",
+            "collectionName": "Nina's Super Cool World"
+        },
+        {
+            "collectionAddress": "0x08ba8cbbefa64aaf9df25e57fe3f15ecc277af74",
+            "collectionName": "LaserCat"
+        },
+        {
+            "collectionAddress": "0xcbeb9b45ba9fbfbbccc289ee48dadd6fb65ae2a7",
+            "collectionName": "Alpha Prestige - Fusionist"
+        },
+        {
+            "collectionAddress": "0x354634c4621cdfb7a25e6486cca1e019777d841b",
+            "collectionName": "Mutant Hounds"
+        },
+        {
+            "collectionAddress": "0xeea7c78b258bd908256a1afa4e2f311e26c992f3",
+            "collectionName": "WADE Friends & Family Official"
+        },
+        {
+            "collectionAddress": "0xf4ee95274741437636e748ddac70818b4ed7d043",
+            "collectionName": "The Doge Pound"
+        },
+        {
+            "collectionAddress": "0x98edba85dba119af60f8b7d02938c33315b9cdc1",
+            "collectionName": "SimpsPunks"
+        },
+        {
+            "collectionAddress": "0xc1caf0c19a8ac28c41fe59ba6c754e4b9bd54de9",
+            "collectionName": "CryptoSkulls"
+        },
+        {
+            "collectionAddress": "0x35471f47c3c0bc5fc75025b97a19ecdde00f78f8",
+            "collectionName": "Party Bears"
+        },
+        {
+            "collectionAddress": "0x0e8d5ad992b37f145ed1985d4bffcbc3d5bd6be3",
+            "collectionName": "The Plooshies"
+        },
+        {
+            "collectionAddress": "0xd9c036e9eef725e5aca4a22239a23feb47c3f05d",
+            "collectionName": "MidnightBreeze"
+        },
+        {
+            "collectionAddress": "0x878586da1ed007a4d19de3e7a59eca98814e2808",
+            "collectionName": "Imaginary Rides"
+        },
+        {
+            "collectionAddress": "0x72b1f41c1afc5cc7e68071753967902138b51bb2",
+            "collectionName": "Gruffters"
+        },
+        {
+            "collectionAddress": "0x6fefb647395e680339badc84dc774e3ca8bca7b9",
+            "collectionName": "MY BEAUTIFUL DARK TWISTED FANTASY BY BEEBLE"
+        },
+        {
+            "collectionAddress": "0xbee7cb80dfd21a9eaae714208f361601f68eb746",
+            "collectionName": "Women Unite - 10k Assemble"
+        },
+        {
+            "collectionAddress": "0x115662564b16da46cfe3f4356a49765f0815a2c2",
+            "collectionName": "The Joes"
+        },
+        {
+            "collectionAddress": "0xf7143ba42d40eaeb49b88dac0067e54af042e963",
+            "collectionName": "Metasaurs"
+        },
+        {
+            "collectionAddress": "0x9c8d2f53f6bff84458f1c84fdaa1e4852ca958e3",
+            "collectionName": "Super Creators By IAC"
+        },
+        {
+            "collectionAddress": "0x9df8aa7c681f33e442a0d57b838555da863504f3",
+            "collectionName": "Llamaverse Genesis"
+        },
+        {
+            "collectionAddress": "0x06cf70f6f90e0b1f17d19f3cb962a39e505d5b3f",
+            "collectionName": "Nouns Fork 0"
+        },
+        {
+            "collectionAddress": "0xa225632b2ebc32b9f4278fc8e3fe5c6f6496d970",
+            "collectionName": "DigiDaigaku Heroes"
+        },
+        {
+            "collectionAddress": "0xccdf1373040d9ca4b5be1392d1945c1dae4a862c",
+            "collectionName": "PORSCHΞ 911"
+        },
+        {
+            "collectionAddress": "0x4e76c23fe2a4e37b5e07b5625e17098baab86c18",
+            "collectionName": "Pixl Pets"
+        },
+        {
+            "collectionAddress": "0xbed2470ded2519c13eaaf3bd970015ef404d3d20",
+            "collectionName": "SAINTS of LA"
+        },
+        {
+            "collectionAddress": "0x7ab2352b1d2e185560494d5e577f9d3c238b78c5",
+            "collectionName": "Adam Bomb Squad"
+        },
+        {
+            "collectionAddress": "0x8b5dbc7fdecb07b03971e88b878f3159bb81e5c0",
+            "collectionName": "Zero Gravity Sculptures by Godwits"
+        },
+        {
+            "collectionAddress": "0xa5c0bd78d1667c13bfb403e2a3336871396713c5",
+            "collectionName": "CoolmansUniverse"
+        },
+        {
+            "collectionAddress": "0xefed2a58cc6a5b81f9158b231847f005cf086c01",
+            "collectionName": "Hedz by Matt Furie"
+        },
+        {
+            "collectionAddress": "0x1d81a6c7ddc15b1553d49987c0286faae6734877",
+            "collectionName": "UnusualWhales"
+        },
+        {
+            "collectionAddress": "0x412039ff52f96d18570395c4ddcaa2cac5707381",
+            "collectionName": "Blips"
+        },
+        {
+            "collectionAddress": "0x244fc4178fa685af909c88b4d4cd7eb9127edb0b",
+            "collectionName": "NetvrkLand"
+        },
+        {
+            "collectionAddress": "0xefaed650f1a94801806bb110019d9b0dc79531a8",
+            "collectionName": "SHIB YARD"
+        },
+        {
+            "collectionAddress": "0xc2c747e0f7004f9e8817db2ca4997657a7746928",
+            "collectionName": "Hashmasks"
+        },
+        {
+            "collectionAddress": "0xaa813f8691b10dc62bd616ae90b05a52f0c40c1d",
+            "collectionName": "MEME VIP PASS"
+        },
+        {
+            "collectionAddress": "0xd0a07a76746707f6d6d36d9d5897b14a8e9ed493",
+            "collectionName": "Pixel Vault Founder's DAO"
+        },
+        {
+            "collectionAddress": "0xa6cd272874ee7c872eb66801eff62784c0b13285",
+            "collectionName": "Seizon"
+        },
+        {
+            "collectionAddress": "0x7ea3cca10668b8346aec0bf1844a49e995527c8b",
+            "collectionName": "CyberKongz VX"
+        },
+        {
+            "collectionAddress": "0x7cb90567a118cd9f6ca326067a0813b289bdcb54",
+            "collectionName": "Apes Together Strong Official NFT"
+        },
+        {
+            "collectionAddress": "0x2ced5bc349d9241a314d3739f12f5f6f2bda6a68",
+            "collectionName": "PROOF Pass"
+        },
+        {
+            "collectionAddress": "0x70b4178ba7894286357267036d835ae5790358b6",
+            "collectionName": "Memewhales by tradeAI"
+        },
+        {
+            "collectionAddress": "0x9eeaecbe2884aa7e82f450e3fc174f30fc2a8de3",
+            "collectionName": "Edenhorde"
+        },
+        {
+            "collectionAddress": "0x76cc4742f7eaa89a93576505dec37c2c66a76ab7",
+            "collectionName": "Keungz Genesis"
+        },
+        {
+            "collectionAddress": "0x3c6fbc94288f5af5201085948ddb18aded2e6879",
+            "collectionName": "DeFi Apes"
+        },
+        {
+            "collectionAddress": "0xeaa4c58427c184413b04db47889b28b5c98ebb7b",
+            "collectionName": "NFTrees"
+        },
+        {
+            "collectionAddress": "0x6dab891db13a66e31579d95b71ca15280041b214",
+            "collectionName": "Cult"
+        },
+        {
+            "collectionAddress": "0xd78b76fcc33cd416da9d3d42f72649a23d7ac647",
+            "collectionName": "Lil Heroes"
+        },
+        {
+            "collectionAddress": "0x4d7d2e237d64d1484660b55c0a4cc092fa5e6716",
+            "collectionName": "DEGEN TOONZ"
+        },
+        {
+            "collectionAddress": "0xa74ae2c6fca0cedbaef30a8ceef834b247186bcf",
+            "collectionName": "Gh0stly Gh0sts"
+        },
+        {
+            "collectionAddress": "0xebb8cb5d88cc02f781fc23e40a558f177109226c",
+            "collectionName": "Metacene Apostle NFT"
+        },
+        {
+            "collectionAddress": "0x1d20a51f088492a0f1c57f047a9e30c9ab5c07ea",
+            "collectionName": "loomlocknft"
+        },
+        {
+            "collectionAddress": "0x63d48ed3f50aba950c17e37ca03356ccd6b6a280",
+            "collectionName": "Cozy Penguin"
+        },
+        {
+            "collectionAddress": "0xff2b4721f997c242ff406a626f17df083bd2c568",
+            "collectionName": "Alpha Gate - Space Nation"
+        },
+        {
+            "collectionAddress": "0x64ad353bc90a04361c4810ae7b3701f3beb48d7e",
+            "collectionName": "RENGA Black Box"
+        },
+        {
+            "collectionAddress": "0xafe12842e3703a3cc3a71d9463389b1bf2c5bc1c",
+            "collectionName": "Bored Milady Maker"
+        },
+        {
+            "collectionAddress": "0x0ffa87cd27ae121b10b3f044dda4d28f9fb8f079",
+            "collectionName": "Sidus NFT Heroes"
+        },
+        {
+            "collectionAddress": "0x1afef6b252cc35ec061efe6a9676c90915a73f18",
+            "collectionName": "FLUF World: Thingies"
+        },
+        {
+            "collectionAddress": "0x789e35a999c443fe6089544056f728239b8ffee7",
+            "collectionName": "Punks2023"
+        },
+        {
+            "collectionAddress": "0xabe9d0e4ad08e605d57a0c10f9d13e0e7283ea50",
+            "collectionName": "Candy Collective: Genesis Collection"
+        },
+        {
+            "collectionAddress": "0xef1a89cbfabe59397ffda11fc5df293e9bc5db90",
+            "collectionName": "Based Ghouls"
+        },
+        {
+            "collectionAddress": "0x0a1bbd57033f57e7b6743621b79fcb9eb2ce3676",
+            "collectionName": "QXJ0IEJsb2NrcyBQdXJnYXRvcnk="
+        },
+        {
+            "collectionAddress": "0xdcd6d4a557ff208f01d4c2b5bf829078622c37c5",
+            "collectionName": "Alpha Wolves DAO"
+        },
+        {
+            "collectionAddress": "0x55700cd2e91f39bc56f589b346dac12a7907ea08",
+            "collectionName": "Travel Tiger Club"
+        },
+        {
+            "collectionAddress": "0x31385d3520bced94f77aae104b406994d8f2168c",
+            "collectionName": "BASTARD GAN PUNKS V2"
+        },
+        {
+            "collectionAddress": "0xedc3ad89f7b0963fe23d714b34185713706b815b",
+            "collectionName": "Project Godjira Gen 2"
+        },
+        {
+            "collectionAddress": "0xc9d8f15803c645e98b17710a0b6593f097064bef",
+            "collectionName": "Flyfish Club"
+        },
+        {
+            "collectionAddress": "0xc7d84b7d4a04abcb9ade97b8af212423f51d2aea",
+            "collectionName": "GEMMA"
+        },
+        {
+            "collectionAddress": "0x884ba86faa29745b6c40b7098567a393e91335cf",
+            "collectionName": "Saved Souls"
+        },
+        {
+            "collectionAddress": "0x9ada21a8bc6c33b49a089cfc1c24545d2a27cd81",
+            "collectionName": "Project Godjira Genesis"
+        },
+        {
+            "collectionAddress": "0x0277600c9afafc3f109b195139cda21a997a091f",
+            "collectionName": "Crazy Frens"
+        },
+        {
+            "collectionAddress": "0x9a534628b4062e123ce7ee2222ec20b86e16ca8f",
+            "collectionName": "MekaVerse"
+        },
+        {
+            "collectionAddress": "0xaabc3aef1ce0d23eeaabfc7c6cd9043fcebf7400",
+            "collectionName": "DigiDaigaku Dragon Eggs"
+        },
+        {
+            "collectionAddress": "0x44d19b72d0767451e758a270a0aaaadad3e36d4c",
+            "collectionName": "Big Hugs"
+        },
+        {
+            "collectionAddress": "0xd2df37a48162eeb6520e0be975d7693fd72d5316",
+            "collectionName": "Mask of ZEE"
+        },
+        {
+            "collectionAddress": "0x42f1654b8eeb80c96471451b1106b63d0b1a9fe1",
+            "collectionName": "Chubbiverse Frens"
+        },
+        {
+            "collectionAddress": "0x10cdcb5a80e888ec9e9154439e86b911f684da7b",
+            "collectionName": "FVCK_AVATAR//"
+        },
+        {
+            "collectionAddress": "0xb4e570232d3e55d2ee850047639dc74da83c7067",
+            "collectionName": "The Band Bears"
+        },
+        {
+            "collectionAddress": "0xccc1825cf04cae4d497b202d1434ec0f79ee535f",
+            "collectionName": "10KTF Kagami"
+        },
+        {
+            "collectionAddress": "0xc31085b262b3d57c649f8747e4f083685697176e",
+            "collectionName": "Impostors Genesis UFOs"
+        },
+        {
+            "collectionAddress": "0x8fc0d90f2c45a5e7f94904075c952e0943cfccfd",
+            "collectionName": "Pixelady Maker"
+        },
+        {
+            "collectionAddress": "0x696115768bbef67be8bd408d760332a7efbee92d",
+            "collectionName": "LinksDAO"
+        },
+        {
+            "collectionAddress": "0x3b3ee1931dc30c1957379fac9aba94d1c48a5405",
+            "collectionName": "Foundation (FND)"
+        },
+        {
+            "collectionAddress": "0x45c67b2b81067911de611e11fc5c7a4605ca4162",
+            "collectionName": "byteGANs"
+        },
+        {
+            "collectionAddress": "0x6c952af158ec8d0fd94908e389c084394d9aebbb",
+            "collectionName": "Ether Capsules"
+        },
+        {
+            "collectionAddress": "0x160c404b2b49cbc3240055ceaee026df1e8497a0",
+            "collectionName": "PXN: Ghost Division"
+        },
+        {
+            "collectionAddress": "0x7f36182dee28c45de6072a34d29855bae76dbe2f",
+            "collectionName": "Wolf Game"
+        },
+        {
+            "collectionAddress": "0x6976af8b25c97a090769fa97ca9359c891353f61",
+            "collectionName": "Sanshi"
+        },
+        {
+            "collectionAddress": "0x67d9417c9c3c250f61a83c7e8658dac487b56b09",
+            "collectionName": "Phanta Bear"
+        },
+        {
+            "collectionAddress": "0x020cdc4775366ae436f13a7d333143432e884934",
+            "collectionName": "ATEM Membership Cards"
+        },
+        {
+            "collectionAddress": "0x49c3fb5ed059e3960898ede11cd9a0151460c3b8",
+            "collectionName": "Elev8 Member Pass"
+        },
+        {
+            "collectionAddress": "0x8a939fd297fab7388d6e6c634eee3c863626be57",
+            "collectionName": "TRAITORS open edition by XCOPY"
+        },
+        {
+            "collectionAddress": "0x5d0cbec362643f04fb7a37d04ffa8a66e0adaa54",
+            "collectionName": "Citizen Capital"
+        },
+        {
+            "collectionAddress": "0x35e1402fa69c60851ea8b86f04d823ff41796a51",
+            "collectionName": "ZodiacCapsule"
+        },
+        {
+            "collectionAddress": "0x6e9da81ce622fb65abf6a8d8040e460ff2543add",
+            "collectionName": "Gutter Dogs"
+        },
+        {
+            "collectionAddress": "0xd07597b64b4878add0965bb1727247ced90c6ce8",
+            "collectionName": "Inhabitants: DOTs"
+        },
+        {
+            "collectionAddress": "0x3598fff0f78dd8b497e12a3ad91febcfc8f49d9e",
+            "collectionName": "Private Jet Pyjama Party"
+        },
+        {
+            "collectionAddress": "0xd4b7d9bb20fa20ddada9ecef8a7355ca983cccb1",
+            "collectionName": "Quirkies Originals"
+        },
+        {
+            "collectionAddress": "0x09f66a094a0070ebddefa192a33fa5d75b59d46b",
+            "collectionName": "YAYO NFT"
+        },
+        {
+            "collectionAddress": "0xd2f668a8461d6761115daf8aeb3cdf5f40c532c6",
+            "collectionName": "Karafuru"
+        },
+        {
+            "collectionAddress": "0xf87e31492faf9a91b02ee0deaad50d51d56d5d4d",
+            "collectionName": "Decentraland"
+        },
+        {
+            "collectionAddress": "0x60bb1e2aa1c9acafb4d34f71585d7e959f387769",
+            "collectionName": "Art Gobblers"
+        },
+        {
+            "collectionAddress": "0xec7f8a34b97ac65caad3841659f2cd54285a3950",
+            "collectionName": "Impostors Genesis Pets"
+        },
+        {
+            "collectionAddress": "0x183368d767b299681fdf660233e39f9f8cf8be3a",
+            "collectionName": "Synthetic Dreams"
+        },
+        {
+            "collectionAddress": "0xb18380485f7ba9c23deb729bedd3a3499dbd4449",
+            "collectionName": "SmallBrosNFT"
+        },
+        {
+            "collectionAddress": "0x3acce66cd37518a6d77d9ea3039e00b3a2955460",
+            "collectionName": "WonderPals"
+        },
+        {
+            "collectionAddress": "0xe47e5dcde8e14e874d2711e786bb34ae6980bef8",
+            "collectionName": "Meta Monopoly"
+        },
+        {
+            "collectionAddress": "0x1dc454ee1fd63f3d792aeee9d331c05d9c62b20a",
+            "collectionName": "OnChain Buccaneers (OCB)"
+        },
+        {
+            "collectionAddress": "0xb7abcc333209f3e8af129ab99ee2a470a2ac5bae",
+            "collectionName": "MegaForce Sentinels"
+        },
+        {
+            "collectionAddress": "0x9e0726da41f0ee941dd17db1fbcb3a37bd103dfb",
+            "collectionName": "Dreamy Penguins"
+        },
+        {
+            "collectionAddress": "0x0f4129e27b759f7ca4ad854dd41b961a073fe089",
+            "collectionName": "OVERWORLD - SUPPORTER KEYS"
+        },
+        {
+            "collectionAddress": "0x0f2c03d7240346c17ace551715c95210e7418d9e",
+            "collectionName": "Forge Day 0 Badges"
+        },
+        {
+            "collectionAddress": "0x67405cadb820c2d89b8d6da3e42ef6a39089c831",
+            "collectionName": "Element Pass Genesis"
+        },
+        {
+            "collectionAddress": "0xbca47158ecd586ca4cdddaa5bd5e38d4f1e677b2",
+            "collectionName": "Silks Thoroughbred Racehorses"
+        },
+        {
+            "collectionAddress": "0x477f885f6333317f5b2810ecc8afadc7d5b69dd2",
+            "collectionName": "YuGiYn"
+        },
+        {
+            "collectionAddress": "0xd1ad8ebfb0fb6306962e48260cf1e8062eb28cfa",
+            "collectionName": "AlfaDAO Access Cards"
+        },
+        {
+            "collectionAddress": "0x52e66ca968010d064938a8099a172cbaaf08c125",
+            "collectionName": "The Orbs by BT"
+        },
+        {
+            "collectionAddress": "0xdd012153e008346591153fff28b0dd6724f0c256",
+            "collectionName": "Beeple Spring Collection"
+        },
+        {
+            "collectionAddress": "0xad9fd7cb4fc7a0fbce08d64068f60cbde22ed34c",
+            "collectionName": "VOX Series 1"
+        },
+        {
+            "collectionAddress": "0x4b3406a41399c7fd2ba65cbc93697ad9e7ea61e5",
+            "collectionName": "LOSTPOETS POET"
+        },
+        {
+            "collectionAddress": "0x86c10d10eca1fca9daf87a279abccabe0063f247",
+            "collectionName": "Cool Pets"
+        },
+        {
+            "collectionAddress": "0xbbb62c4b8ed027530ce5f6663d1a2aa8a7e8cacf",
+            "collectionName": "RarePass: Genesis"
+        },
+        {
+            "collectionAddress": "0xb948f35c1c35206a5fb23b77f9e52a01b793c909",
+            "collectionName": "FUTR One By Mintify"
+        },
+        {
+            "collectionAddress": "0x1eac83297bb95e32f3f881bdd707b3a9304acc08",
+            "collectionName": "TreeNFT"
+        },
+        {
+            "collectionAddress": "0xdfea2b364db868b1d2601d6b833d74db4de94460",
+            "collectionName": "REMNANTS"
+        },
+        {
+            "collectionAddress": "0x3bf99d504e67a977f88b417ab68d34915f3a1209",
+            "collectionName": "HENI: Damien Hirst - The Empresses"
+        },
+        {
+            "collectionAddress": "0xbfe47d6d4090940d1c7a0066b63d23875e3e2ac5",
+            "collectionName": "SchizoPosters"
+        },
+        {
+            "collectionAddress": "0xf0d2d631a24db247f5eb0421fa3e6a169c72565f",
+            "collectionName": "Hedgies by dYdX"
+        },
+        {
+            "collectionAddress": "0x13251ce31ac3330067c3acaf4bb3339dff765c76",
+            "collectionName": "OUTER Spaceship"
+        },
+        {
+            "collectionAddress": "0x998715a4ed2c41bbf4c9181120bb5857627816aa",
+            "collectionName": "NEOSTACKEY"
+        },
+        {
+            "collectionAddress": "0x1a178cfd768f74b3308cbca9998c767f4e5b2cf8",
+            "collectionName": "Wilder Beasts"
+        },
+        {
+            "collectionAddress": "0xec64d881dbfd5871320e465562d913bdc25ce8fe",
+            "collectionName": "The Chimpsons Official"
+        },
+        {
+            "collectionAddress": "0x7999bd176e85ecefa67c9939ab431c9719aede2c",
+            "collectionName": "Raw Primitives"
+        },
+        {
+            "collectionAddress": "0x4ca8dc8d6468a57dcf42254e5266a3a66e82b4c1",
+            "collectionName": "Burn Ghost Bounty Box"
+        },
+        {
+            "collectionAddress": "0x469823c7b84264d1bafbcd6010e9cdf1cac305a3",
+            "collectionName": "Crypto Bull Society"
+        },
+        {
+            "collectionAddress": "0x2c88aa0956bc9813505d73575f653f69ada60923",
+            "collectionName": "Land"
+        },
+        {
+            "collectionAddress": "0x3acefd60d589187bc437a5dd455ef1688f722dd5",
+            "collectionName": "Springfield Apes by Rino Russo"
+        },
+        {
+            "collectionAddress": "0x561636cd583876c594a403908cd056546d8dd9df",
+            "collectionName": "Retro Arcade Collection"
+        },
+        {
+            "collectionAddress": "0x96be46c50e882dbd373081d08e0cde2b055adf6c",
+            "collectionName": "ASMAIFAAllStarsCharacter"
+        },
+        {
+            "collectionAddress": "0xd92e44ac213b9ebda0178e1523cc0ce177b7fa96",
+            "collectionName": "Beeple Round 2 Open Edition"
+        },
+        {
+            "collectionAddress": "0xe6160325a53de4deca66e3d88d7e4f25040acce0",
+            "collectionName": "NFT Sensei Lifetime Access"
+        },
+        {
+            "collectionAddress": "0x4b10701bfd7bfedc47d50562b76b436fbb5bdb3b",
+            "collectionName": "Lil Nouns"
+        },
+        {
+            "collectionAddress": "0x5116edd4ac94d6aeb54b5a1533ca51a7e0c86807",
+            "collectionName": "Station3 Patron"
+        },
+        {
+            "collectionAddress": "0xc73b17179bf0c59cd5860bb25247d1d1092c1088",
+            "collectionName": "QQL Mint Pass"
+        },
+        {
+            "collectionAddress": "0x5ab21ec0bfa0b29545230395e3adaca7d552c948",
+            "collectionName": "PUNKS Comic"
+        },
+        {
+            "collectionAddress": "0x3f705da685dbae723850951c9081f545052d1ad2",
+            "collectionName": "zkMon by Polychain Monsters x Modulus Labs"
+        },
+        {
+            "collectionAddress": "0xaad35c2dadbe77f97301617d82e661776c891fa9",
+            "collectionName": "Akutars"
+        },
+        {
+            "collectionAddress": "0x9d9ae1ad49be9b085fef04b9c835d484a6d099e3",
+            "collectionName": "Proof of Narnian NFT"
+        },
+        {
+            "collectionAddress": "0x4d9175cb34c87b8346848a5030998e5a83fcc90a",
+            "collectionName": "Tolteca Pepes"
+        },
+        {
+            "collectionAddress": "0x8442dd3e5529063b43c69212d64d5ad67b726ea6",
+            "collectionName": "Goons"
+        },
+        {
+            "collectionAddress": "0x1b1bff222999bcd6fd07b64d7880e6a95d54acaa",
+            "collectionName": "LAYC"
+        },
+        {
+            "collectionAddress": "0x0f77625b76e3831914d47a5034323290f9ce8a9e",
+            "collectionName": "[ Ledger ] Market \u001a Black-on-Black Nano X"
+        },
+        {
+            "collectionAddress": "0x2308742aa28cc460522ff855d24a365f99deba7b",
+            "collectionName": "FLUF World: Buzzies"
+        },
+        {
+            "collectionAddress": "0x58cff419613c00a4828f774df8c2ca134dea97ce",
+            "collectionName": "DeBox Guardians Penguin"
+        },
+        {
+            "collectionAddress": "0x8e7b93896242299defc4860f3c093dc3ebf90a96",
+            "collectionName": "Treeangles by nix.eth"
+        },
+        {
+            "collectionAddress": "0x31d45de84fde2fb36575085e05754a4932dd5170",
+            "collectionName": "Rare Apepes"
+        },
+        {
+            "collectionAddress": "0x056bd39f301ca675df4514cc05bc2d7417599de6",
+            "collectionName": "Synchronicity"
+        },
+        {
+            "collectionAddress": "0x475bfaa1848591ae0e6ab69600f48d828f61a80e",
+            "collectionName": "Everdome Genesis Collection"
+        },
+        {
+            "collectionAddress": "0x2c65a26ad00e75a879e1b977f73e0c8a89905f8a",
+            "collectionName": "Joker Smoker by DirtyRobot"
+        },
+        {
+            "collectionAddress": "0x0246eef374585352de5ba4c095eb0bc136392109",
+            "collectionName": "EON RIFT Genesis"
+        },
+        {
+            "collectionAddress": "0x271142d962b65e7939e1d55e7fca03910c829498",
+            "collectionName": "Springfield Punks Treehouse of Horror"
+        },
+        {
+            "collectionAddress": "0xd0f0d5e036d1f4c6524e0b58cb52f85b03a76e09",
+            "collectionName": "Moonie Moo Genesis"
+        },
+        {
+            "collectionAddress": "0xb10b88218e288cda2218d8b4cc81899ee5af4600",
+            "collectionName": "Utility Wen"
+        },
+        {
+            "collectionAddress": "0xffa60cd831374f40358de1aa0489123935a8287d",
+            "collectionName": "InfiniGods - The Elder Gods"
+        },
+        {
+            "collectionAddress": "0x597d757f8502f1fe8e7dd6fc7fe884a51c5ae2b9",
+            "collectionName": "Live Like A Cat -neko no youni ikiru-"
+        },
+        {
+            "collectionAddress": "0x1554f51f18f8e3fbe83e4442420e40efc57ff446",
+            "collectionName": "Pop Art Cats"
+        },
+        {
+            "collectionAddress": "0x191be5ee5a857c1cfdf76023f2b89a44cdaba008",
+            "collectionName": "DeBox Guardians Cobra"
+        },
+        {
+            "collectionAddress": "0xb5c747561a185a146f83cfff25bdfd2455b31ff4",
+            "collectionName": "Boss Beauties"
+        },
+        {
+            "collectionAddress": "0x1f7c16fce4fc894143afb5545bf04f676bf7dcf3",
+            "collectionName": "CyberKongz Genkai"
+        },
+        {
+            "collectionAddress": "0xca7ca7bcc765f77339be2d648ba53ce9c8a262bd",
+            "collectionName": "tubby cats by tubby collective"
+        },
+        {
+            "collectionAddress": "0xe3589ae55bbd7697c76c510a5335eb31d972a17e",
+            "collectionName": "Broadside"
+        },
+        {
+            "collectionAddress": "0x203393330560cf43893ae7051d1b787844f13080",
+            "collectionName": "Volted Dragons Sailors Club - VDSC"
+        },
+        {
+            "collectionAddress": "0xdfb29501b42f63a947ddc5249f185d6bcbe6986f",
+            "collectionName": "ROTA Official"
+        },
+        {
+            "collectionAddress": "0x986aea67c7d6a15036e18678065eb663fc5be883",
+            "collectionName": "Nifty League DEGENs"
+        },
+        {
+            "collectionAddress": "0x1d9a1491924c1847e669dafde86341ad92a87fe2",
+            "collectionName": "AltLayer OG Badge NFT"
+        },
+        {
+            "collectionAddress": "0x00880deed700869c0419922a9657b425590fb012",
+            "collectionName": "Opepunk by Doy"
+        },
+        {
+            "collectionAddress": "0x205a10c241ca38918d3790c89f16675cc46d10a9",
+            "collectionName": "Distortion"
+        },
+        {
+            "collectionAddress": "0x77654e7e579b3c817a3672c1c66c050058b92b85",
+            "collectionName": "TCG Dragon Cave Club"
+        },
+        {
+            "collectionAddress": "0x6632a9d63e142f17a668064d41a21193b49b41a0",
+            "collectionName": "Prime Ape Planet"
+        },
+        {
+            "collectionAddress": "0xf845e3d7ae916ca50c7db40808e9cc579b5f6705",
+            "collectionName": "Astrobot Society by Token Metrics"
+        },
+        {
+            "collectionAddress": "0x5bd815fd6c096bab38b4c6553cfce3585194dff9",
+            "collectionName": "The Art of Seasons"
+        },
+        {
+            "collectionAddress": "0x9e629d779be89783263d4c4a765c38eb3f18671c",
+            "collectionName": "Baby Bears"
+        },
+        {
+            "collectionAddress": "0x80416304142fa37929f8a4eee83ee7d2dac12d7c",
+            "collectionName": "Generativemasks"
+        },
+        {
+            "collectionAddress": "0x1b894ad527896027bced83e1bdbfef1f8b057b1b",
+            "collectionName": "DFA: Keys"
+        },
+        {
+            "collectionAddress": "0x7bad7d55f82d237dbc24d7cd627ed13889e3f9f3",
+            "collectionName": "DeBox Guardians Eagle"
+        },
+        {
+            "collectionAddress": "0xc3f8a0f5841abff777d3eefa5047e8d413a1c9ab",
+            "collectionName": "Merge"
+        },
+        {
+            "collectionAddress": "0x5298c6d5ac0f2964bbb27f496a8193ce78e8a8e6",
+            "collectionName": "TheEnigma"
+        },
+        {
+            "collectionAddress": "0x64a1c0937728d8d2fa8cd81ef61a9c860b7362db",
+            "collectionName": "KILLABITS"
+        },
+        {
+            "collectionAddress": "0x8e9f3c6883993a7a69c37213f2eb9a17450ad6d3",
+            "collectionName": "Neo Tokyo: Outer Identities"
+        },
+        {
+            "collectionAddress": "0xdbdef48f7546e279cf9253b6559f0573ea392e36",
+            "collectionName": "vVv Season 1"
+        },
+        {
+            "collectionAddress": "0xa3f7250306dbb856d8d312f93029be73343939af",
+            "collectionName": "The Sad Times NFT"
+        },
+        {
+            "collectionAddress": "0xd2fdfb3aae284f9f7308c596aa2eb6dc8af599ee",
+            "collectionName": "Undeads Zombies"
+        },
+        {
+            "collectionAddress": "0xa0b9356bee63d2488e6d1146e90c4a85fa5fb9a1",
+            "collectionName": "Everdome Lands"
+        },
+        {
+            "collectionAddress": "0x9ff1acabb7e9d4daf9f1458b9138066fa0cccd3f",
+            "collectionName": "Halo Wallet Genesis Pass"
+        },
+        {
+            "collectionAddress": "0xaa462106da447c0440a4be29614c19387a59a331",
+            "collectionName": "ENS Maxis"
+        },
+        {
+            "collectionAddress": "0x575ec01a9e70bf3e192a774eb265c46ec993e4cc",
+            "collectionName": "FLUF World: EGGs"
+        },
+        {
+            "collectionAddress": "0x5c2c9094bb47c6fee89abd4a6126fb3fb39de923",
+            "collectionName": "DigiDaigaku Super Villains"
+        },
+        {
+            "collectionAddress": "0xb7ec7bbd2d2193b47027247fc666fb342d23c4b5",
+            "collectionName": "Mirage Gallery Curated"
+        },
+        {
+            "collectionAddress": "0x3248e8ba90facc4fdd3814518c14f8cc4d980e4b",
+            "collectionName": "3Landers"
+        },
+        {
+            "collectionAddress": "0x3702f4c46785bbd947d59a2516ac1ea30f2babf2",
+            "collectionName": "GalaxyFightClub"
+        },
+        {
+            "collectionAddress": "0x8bf3a40ea2337e6e4f6e540680ea6390cb3b4e11",
+            "collectionName": "Highrise LAND"
+        },
+        {
+            "collectionAddress": "0x75e46bdc52d4a2064dc8850ee0f52ee93bfe337c",
+            "collectionName": "QUADHASH : SAZA"
+        },
+        {
+            "collectionAddress": "0xa6b37067252a222e19067a92490edba11933964c",
+            "collectionName": "Gotta Get Gurt"
+        },
+        {
+            "collectionAddress": "0xaadba140ae5e4c8a9ef0cc86ea3124b446e3e46a",
+            "collectionName": "MutantCats"
+        },
+        {
+            "collectionAddress": "0x77e2545d1d63856e22ce82e3d6f2a3b2077232bf",
+            "collectionName": "CamelsNFTio"
+        },
+        {
+            "collectionAddress": "0x46ac8540d698167fcbb9e846511beb8cf8af9bd8",
+            "collectionName": "Quantum Art"
+        },
+        {
+            "collectionAddress": "0x582048c4077a34e7c3799962f1f8c5342a3f4b12",
+            "collectionName": "Shinsei Galverse Official"
+        },
+        {
+            "collectionAddress": "0x803888d3963eb1892faaf192f93b53212da5dfdf",
+            "collectionName": "God Like"
+        },
+        {
+            "collectionAddress": "0xaaf03a65cbd8f01b512cd8d530a675b3963de255",
+            "collectionName": "The Seekers"
+        },
+        {
+            "collectionAddress": "0xe106c63e655df0e300b78336af587f300cff9e76",
+            "collectionName": "OxyaOriginProject"
+        },
+        {
+            "collectionAddress": "0x5755ab845ddeab27e1cfce00cd629b2e135acc3d",
+            "collectionName": "Larva Lads"
+        },
+        {
+            "collectionAddress": "0x703e54bb5e5e03db13678af8fd6357348fa35d15",
+            "collectionName": "Fatzuki"
+        },
+        {
+            "collectionAddress": "0x4b61413d4392c806e6d0ff5ee91e6073c21d6430",
+            "collectionName": "MURI by Haus"
+        },
+        {
+            "collectionAddress": "0x8f1b132e9fd2b9a2b210baa186bf1ae650adf7ac",
+            "collectionName": "Quirklings"
+        },
+        {
+            "collectionAddress": "0xaf40b66072fe00cacf5a25cd1b7f1688cde20f2f",
+            "collectionName": "Fold by rudxane"
+        },
+        {
+            "collectionAddress": "0x33389a58360b6085a9ff1f7821d5b81304d703e4",
+            "collectionName": "FEWOCiOUS x FewoWorld: Fewos"
+        },
+        {
+            "collectionAddress": "0x932261f9fc8da46c4a22e31b45c4de60623848bf",
+            "collectionName": "Zerion DNA 1.0"
+        },
+        {
+            "collectionAddress": "0x2cf6be9aac1c7630d5a23af88c28275c70eb8819",
+            "collectionName": "Bulls & Apes Project - Genesis"
+        },
+        {
+            "collectionAddress": "0xfb10b1717c92e9cc2d634080c3c337808408d9e1",
+            "collectionName": "MetaHeroCore"
+        },
+        {
+            "collectionAddress": "0x0e42ffbac75bcc30cd0015f8aaa608539ba35fbb",
+            "collectionName": "Mind the Gap by MountVitruvius"
+        },
+        {
+            "collectionAddress": "0x858df9f84c73e01c55a2dfb95825401242a65d64",
+            "collectionName": "Shadow Wolves"
+        },
+        {
+            "collectionAddress": "0x248139afb8d3a2e16154fbe4fb528a3a214fd8e7",
+            "collectionName": "Boki - NFT"
+        },
+        {
+            "collectionAddress": "0x33c6eec1723b12c46732f7ab41398de45641fa42",
+            "collectionName": "[ Ledger ] Market Pass - Genesis Edition"
+        },
+        {
+            "collectionAddress": "0x76236b6f13f687d0bbedbbce0e30e9f07d071c1c",
+            "collectionName": "Real Vision Pro Crypto Genesis Collection"
+        },
+        {
+            "collectionAddress": "0x258aeac01672e6857972707fc129a6a39d09758b",
+            "collectionName": "Cryptowalkers"
+        },
+        {
+            "collectionAddress": "0xbd275ce24f32d6ce4e9d9519c55abe9bc0ed7fcf",
+            "collectionName": "BYOPills"
+        },
+        {
+            "collectionAddress": "0xb75f09b4340aeb85cd5f2dd87d31751edc11ed39",
+            "collectionName": "Genesis Box"
+        },
+        {
+            "collectionAddress": "0x6d1b09ae12adeaa3aa5d6b574dbcfaf7343a0b04",
+            "collectionName": "Space Eggs Official"
+        },
+        {
+            "collectionAddress": "0x71d1e9741da1e25ffd377be56d133359492b9c3b",
+            "collectionName": "Seedworld Vanguards"
+        },
+        {
+            "collectionAddress": "0x9c57d0278199c931cf149cc769f37bb7847091e7",
+            "collectionName": "Sipher INU"
+        },
+        {
+            "collectionAddress": "0xe3c783d9647d72f7f13ace64892630e7e33bc968",
+            "collectionName": "FF6000"
+        },
+        {
+            "collectionAddress": "0x71ba34871ffe7068eaa6b3f5d6ad5469da8ce71a",
+            "collectionName": "Worried Meerkats"
+        },
+        {
+            "collectionAddress": "0xbda2481db91fc0f942ed3f53de378ba45ba9d17e",
+            "collectionName": "Farmer"
+        },
+        {
+            "collectionAddress": "0x91047abf3cab8da5a9515c8750ab33b4f1560a7a",
+            "collectionName": "ChainFaces"
+        },
+        {
+            "collectionAddress": "0xb452ff31b35dee74f2fdfd5194b91af1bad07b91",
+            "collectionName": "XBorg NFT"
+        },
+        {
+            "collectionAddress": "0x572e33ffa523865791ab1c26b42a86ac244df784",
+            "collectionName": "10KTF Gucci Grail"
+        },
+        {
+            "collectionAddress": "0x7afeda4c714e1c0a2a1248332c100924506ac8e6",
+            "collectionName": "FVCK_CRYSTAL//"
+        },
+        {
+            "collectionAddress": "0x42dc0cecefbaf8e81d631a75fa212510c347f66b",
+            "collectionName": "BasedHeads"
+        },
+        {
+            "collectionAddress": "0x2c889a24af0d0ec6337db8feb589fa6368491146",
+            "collectionName": "Boo Bears"
+        },
+        {
+            "collectionAddress": "0xf9c362cdd6eeba080dd87845e88512aa0a18c615",
+            "collectionName": "Meta-Legends"
+        },
+        {
+            "collectionAddress": "0x6199a4a9a290b0b77ff2e113abe9d1ad4ab5ac63",
+            "collectionName": "Impostors Materials Box"
+        },
+        {
+            "collectionAddress": "0xf729f878f95548bc7f14b127c96089cf121505f8",
+            "collectionName": "Anata"
+        },
+        {
+            "collectionAddress": "0x07d6b4db5dec392220cd52b026f9b78d9966c661",
+            "collectionName": "GRIDS By Tristan Rettich"
+        },
+        {
+            "collectionAddress": "0xabcdb5710b88f456fed1e99025379e2969f29610",
+            "collectionName": "Radbro Webring"
+        },
+        {
+            "collectionAddress": "0xce8169a6fb6770c0c6d411a734dd6d74bb241097",
+            "collectionName": "Conviction Scrolls"
+        },
+        {
+            "collectionAddress": "0xf199f2aec413cf2babadb7fe17a42abb77399db9",
+            "collectionName": "Tyra Treasures"
+        },
+        {
+            "collectionAddress": "0x720786231ddf158ebd23bd590f73b29bff78d783",
+            "collectionName": "Strands of Solitude by William Mapan"
+        },
+        {
+            "collectionAddress": "0xba12f0041dd2543749ec7f00c996a9d488aa5a21",
+            "collectionName": "BEEBLE WORLD"
+        },
+        {
+            "collectionAddress": "0x8d4100897447d173289560bc85c5c432be4f44e4",
+            "collectionName": "Gray Boys"
+        },
+        {
+            "collectionAddress": "0xd396e2018b67446b134c30a89166487a8b2abd2e",
+            "collectionName": "Fusionist - Quartan Primes"
+        },
+        {
+            "collectionAddress": "0xac5c7493036de60e63eb81c5e9a440b42f47ebf5",
+            "collectionName": "Exosama"
+        },
+        {
+            "collectionAddress": "0x0cfb5d82be2b949e8fa73a656df91821e2ad99fd",
+            "collectionName": "10KTF"
+        },
+        {
+            "collectionAddress": "0xb4a7d131436ed8ec06ad696fa3bf8d23c0ab3acf",
+            "collectionName": "MONGS"
+        },
+        {
+            "collectionAddress": "0xc2cca20b76f5494b1b10774e0d182f10d98b4a51",
+            "collectionName": "DigiDaigaku Baby Dragons"
+        },
+        {
+            "collectionAddress": "0x7db7a0f8971c5d57f1ee44657b447d5d053b6bae",
+            "collectionName": "Kanpai Pandas Infinity Collection"
+        },
+        {
+            "collectionAddress": "0x25c0610a24fe3d229d199d9c55e628b68eb7032f",
+            "collectionName": "0XLBOTS"
+        },
+        {
+            "collectionAddress": "0x950b9476a4de757bb134483029ac4ec17e739e3a",
+            "collectionName": "Gutter Birds"
+        },
+        {
+            "collectionAddress": "0x9f2390fd7b8e9a0721de87bb1f794677b0c7cc6f",
+            "collectionName": "Bit Rot"
+        },
+        {
+            "collectionAddress": "0x61e3d1c26802df805e9fc22dc26342e29ecfe860",
+            "collectionName": "Savage Nation"
+        },
+        {
+            "collectionAddress": "0x177ef8787ceb5d4596b6f011df08c86eb84380dc",
+            "collectionName": "Smilesss"
+        },
+        {
+            "collectionAddress": "0xb55cd21cc18ace8ecb60bff12f1448c9d4babec7",
+            "collectionName": "WAGMI Game Genesis"
+        },
+        {
+            "collectionAddress": "0x8d609bd201beaea7dccbfbd9c22851e23da68691",
+            "collectionName": "DourDarcels"
+        },
+        {
+            "collectionAddress": "0xc0f799a176e10d45fa56c7298d54f813b51fd151",
+            "collectionName": "FunApes NFT"
+        },
+        {
+            "collectionAddress": "0x51f0c1938b0e67cafc7a6fc8eb6edd7fdbe002bc",
+            "collectionName": "Fragments By James Jean"
+        },
+        {
+            "collectionAddress": "0x5a0121a0a21232ec0d024dab9017314509026480",
+            "collectionName": "Finiliar"
+        },
+        {
+            "collectionAddress": "0x5bc0f0911034d23c90c96945d9c072596ee64ed5",
+            "collectionName": "Visions of the Void"
+        },
+        {
+            "collectionAddress": "0x12f28e2106ce8fd8464885b80ea865e98b465149",
+            "collectionName": "BEEPLE - GENESIS COLLECTION"
+        },
+        {
+            "collectionAddress": "0x270edbe355ba17f787503c372464ecbaf3ada61a",
+            "collectionName": "z00tz Anchor Club"
+        },
+        {
+            "collectionAddress": "0x0b22fe0a2995c5389ac093400e52471dca8bb48a",
+            "collectionName": "Little Lemon Friends"
+        },
+        {
+            "collectionAddress": "0x026224a2940bfe258d0dbe947919b62fe321f042",
+            "collectionName": "lobsterdao"
+        },
+        {
+            "collectionAddress": "0x2290995bb9c481306f83bd8f549d9f1c41357444",
+            "collectionName": "Celestial by World"
+        },
+        {
+            "collectionAddress": "0xa471f4da9b79645f4f5358e102c62f59c1329aa5",
+            "collectionName": "beef brothko"
+        },
+        {
+            "collectionAddress": "0x203be535b865b357dbca1aeefcad88a675fd321f",
+            "collectionName": "Carpetdiem"
+        },
+        {
+            "collectionAddress": "0x17b2f2b8927a8f11edfd7a27e153be17d68e69c7",
+            "collectionName": "Neo Tokyo Part 2: Vault Cards"
+        },
+        {
+            "collectionAddress": "0x8918ba30e2e76b503e83d55eb08936b0f979eec4",
+            "collectionName": "Dimension X"
+        },
+        {
+            "collectionAddress": "0xc178994cb9b66307cd62db8b411759dd36d9c2ee",
+            "collectionName": "The Legend of C\u001aCKPUNCH\u001a"
+        },
+        {
+            "collectionAddress": "0x793daf78b74aadf1eda5cc07a558fed932360a60",
+            "collectionName": "Wandernauts"
+        },
+        {
+            "collectionAddress": "0xcb0477d1af5b8b05795d89d59f4667b59eae9244",
+            "collectionName": "Honey Comb"
+        },
+        {
+            "collectionAddress": "0xc101916cd9ddeac5a6f915eed033b1b6e4a637cb",
+            "collectionName": "Zinu's Zombie Mob Secret Society"
+        },
+        {
+            "collectionAddress": "0x543d43f390b7d681513045e8a85707438c463d80",
+            "collectionName": "Webaverse Genesis Pass"
+        },
+        {
+            "collectionAddress": "0x41f20599e9e049004c4d169046eb7023117a6244",
+            "collectionName": "Gutter Clones"
+        },
+        {
+            "collectionAddress": "0x9f9f9003dca13952a409c8cb156f02e242994bd7",
+            "collectionName": "Mushboomers"
+        },
+        {
+            "collectionAddress": "0xea0acbb7449b59bccc5f3d4bc4af882e8afde148",
+            "collectionName": "Impostors Cosmetics Chest"
+        },
+        {
+            "collectionAddress": "0xff98c58fbb5ea3263d68b555029471d5bd8b55a8",
+            "collectionName": "MultiPlanetaryInus PLANET"
+        },
+        {
+            "collectionAddress": "0x1352149cd78d686043b504e7e7d96c5946b0c39c",
+            "collectionName": "Banners NFT"
+        },
+        {
+            "collectionAddress": "0x2f102e69cbce4938cf7fb27adb40fad097a13668",
+            "collectionName": "Rollbots"
+        },
+        {
+            "collectionAddress": "0xeb6c5accafd8515c1b9e4c794bdc41532c5543ec",
+            "collectionName": "Dolce&Gabbana: DGFamily"
+        },
+        {
+            "collectionAddress": "0xce17f8ef13cf67da6eab86e31360102eea8609ff",
+            "collectionName": "MadMeerkatBurrow"
+        },
+        {
+            "collectionAddress": "0xe127ce638293fa123be79c25782a5652581db234",
+            "collectionName": "The Llamas"
+        },
+        {
+            "collectionAddress": "0x620b70123fb810f6c653da7644b5dd0b6312e4d8",
+            "collectionName": "Space Doodles"
+        },
+        {
+            "collectionAddress": "0x5de07ebf22b49289d6cf676a8df9b959fe68db0e",
+            "collectionName": "DeBox Guardians Rabbit Official"
+        },
+        {
+            "collectionAddress": "0x03b8d129a8f6dc62a797b59aa5eebb11ad63dada",
+            "collectionName": "SMOWL"
+        },
+        {
+            "collectionAddress": "0x0fcbd68251819928c8f6d182fc04be733fa94170",
+            "collectionName": "LO-FI PEPE"
+        },
+        {
+            "collectionAddress": "0xd900381f15ca67be1895a3626df210e33c8d7590",
+            "collectionName": "Runi"
+        },
+        {
+            "collectionAddress": "0x0bcc509282a5fb44c32c59e2fa1ce613f51c86a2",
+            "collectionName": "Kandyland"
+        },
+        {
+            "collectionAddress": "0xd532b88607b1877fe20c181cba2550e3bbd6b31c",
+            "collectionName": "SuperNormalbyZipcy"
+        },
+        {
+            "collectionAddress": "0x51bd5948cf84a1041d2720f56ded5e173396fc95",
+            "collectionName": "Wilder Moto"
+        },
+        {
+            "collectionAddress": "0x3f3915fb8769ee456035331bc2f7fbe380f6b4d2",
+            "collectionName": "Createra Genesis Land"
+        },
+        {
+            "collectionAddress": "0xd21818b6052df69eed04e9b2af564b75140aacb7",
+            "collectionName": "AN IMPORTANT MEMORY FOR HUMANITY BY REFIK ANADOL"
+        },
+        {
+            "collectionAddress": "0x099689220846644f87d1137665cded7bf3422747",
+            "collectionName": "Robotos"
+        },
+        {
+            "collectionAddress": "0x1de7abda2d73a01aa8dca505bdcb773841211daf",
+            "collectionName": "Sports Rollbots"
+        },
+        {
+            "collectionAddress": "0xe1b81cd6a494cbca06a8e2055a62c2cf0fa5a8ac",
+            "collectionName": "Kubz Relic"
+        },
+        {
+            "collectionAddress": "0x78a5e2b8c280fa5580fbe1e1ed546183f959d305",
+            "collectionName": "AlphaSharks NFT"
+        },
+        {
+            "collectionAddress": "0xd57474e76c9ebecc01b65a1494f0a1211df7bcd8",
+            "collectionName": "The Dev's NFT"
+        },
+        {
+            "collectionAddress": "0x361a5881f18b968422e9258cb7c1fa53ff4cdd38",
+            "collectionName": "CryptoMories"
+        },
+        {
+            "collectionAddress": "0x7cba74d0b16c8e18a9e48d3b7404d7739bb24f23",
+            "collectionName": "FoxFam"
+        },
+        {
+            "collectionAddress": "0xa08126f5e1ed91a635987071e6ff5eb2aeb67c48",
+            "collectionName": "GalaxyEggs"
+        },
+        {
+            "collectionAddress": "0x6be69b2a9b153737887cfcdca7781ed1511c7e36",
+            "collectionName": "Killer GF"
+        },
+        {
+            "collectionAddress": "0x3df5c619a4926156f966a64e08f863385c21da0e",
+            "collectionName": "HELIX Founder Pass Official"
+        },
+        {
+            "collectionAddress": "0x71d427598cb111217ba2ea1982222c4a25beddfb",
+            "collectionName": "Conviction"
+        },
+        {
+            "collectionAddress": "0x30cdac3871c41a63767247c8d1a2de59f5714e78",
+            "collectionName": "0bits"
+        },
+        {
+            "collectionAddress": "0x448ed3ccf45d0bd5dcfddedd6f70bcef3d151adf",
+            "collectionName": "9 ZONES"
+        },
+        {
+            "collectionAddress": "0xbbe23e96c48030dc5d4906e73c4876c254100d33",
+            "collectionName": "RebelBots"
+        },
+        {
+            "collectionAddress": "0x94638cbf3c54c1f956a5f05cbc0f9afb6822020d",
+            "collectionName": "inbetweeners"
+        },
+        {
+            "collectionAddress": "0x9d6a7159e5accfc6520932f0f81a47e2ffd349a3",
+            "collectionName": "Gents Croquet Club"
+        },
+        {
+            "collectionAddress": "0x8c3c0274c33f263f0a55d129cfc8eaa3667a9e8b",
+            "collectionName": "Ethscriptions"
+        },
+        {
+            "collectionAddress": "0x84ab624180b71093340f9b088fa30d0bc214dfb4",
+            "collectionName": "Being B00"
+        },
+        {
+            "collectionAddress": "0x1c410e4c1701f88a2a504f4506251624e8166419",
+            "collectionName": "Ey3k0n First Edition"
+        },
+        {
+            "collectionAddress": "0x069eeda3395242bd0d382e3ec5738704569b8885",
+            "collectionName": "Drawing with Code by Yazid"
+        },
+        {
+            "collectionAddress": "0xef371a11e6adb9dc3d333dafcb1ff5afbcb6cdc8",
+            "collectionName": "Garbage Friends"
+        },
+        {
+            "collectionAddress": "0xc9cb0fee73f060db66d2693d92d75c825b1afdbf",
+            "collectionName": "First"
+        },
+        {
+            "collectionAddress": "0x13b58991ded462090229427ecbbb7e7f99571a6d",
+            "collectionName": "Kawamii Teens"
+        },
+        {
+            "collectionAddress": "0x0a252663dbcc0b073063d6420a40319e438cfa59",
+            "collectionName": "XENFT by XEN CRYPTO"
+        },
+        {
+            "collectionAddress": "0x219b8ab790decc32444a6600971c7c3718252539",
+            "collectionName": "Sneaky Vampire Syndicate"
+        },
+        {
+            "collectionAddress": "0x28ce223853d123b52c74439b10b43366d73fd3b5",
+            "collectionName": "TGLP Genesis"
+        },
+        {
+            "collectionAddress": "0x5be99338289909d6dbbc57bb791140ef85ccbcab",
+            "collectionName": "hausphases"
+        },
+        {
+            "collectionAddress": "0xb284f375cfe9bf68a5304a3a9a279e9e044fb7c1",
+            "collectionName": "Library Onchain"
+        },
+        {
+            "collectionAddress": "0x8cb05890b7a640341069fb65dd4e070367f4d2e6",
+            "collectionName": "IlluminatiNFT by Truth Labs"
+        },
+        {
+            "collectionAddress": "0xf17bb82b6e9cc0075ae308e406e5198ba7320545",
+            "collectionName": "Bond Bears"
+        },
+        {
+            "collectionAddress": "0x513cd71defc801b9c1aa763db47b5df223da77a2",
+            "collectionName": "OSF"
+        },
+        {
+            "collectionAddress": "0xb2081bf7a25e7bcce263f4a80847f0b6769ded6c",
+            "collectionName": "ApeKun By Tenjin"
+        },
+        {
+            "collectionAddress": "0xe6115ada0452d6c48b292971e656bc07901b53f6",
+            "collectionName": "The Mounts of Seedworld"
+        },
+        {
+            "collectionAddress": "0x02beed1404c69e62b76af6dbdae41bd98bca2eab",
+            "collectionName": "posersnft"
+        },
+        {
+            "collectionAddress": "0xd1a4221358dbbcfb0eb575258ecf8972a700613d",
+            "collectionName": "Tribe Diamonds"
+        },
+        {
+            "collectionAddress": "0xf7d134224a66c6a4ddeb7dee714a280b99044805",
+            "collectionName": "end of sartoshi"
+        },
+        {
+            "collectionAddress": "0x1cfb252575abbb30262b4f8ab7519c111d419964",
+            "collectionName": "Denizens of ZenAcademy"
+        },
+        {
+            "collectionAddress": "0xb6329bd2741c4e5e91e26c4e653db643e74b2b19",
+            "collectionName": "Grails by PROOF Collective"
+        },
+        {
+            "collectionAddress": "0x49c36afa15c7fdbd57ce3d61d80f39b6615a76ef",
+            "collectionName": "3D Invisible Friends"
+        },
+        {
+            "collectionAddress": "0x338866f8ba75bb9d7a00502e11b099a2636c2c18",
+            "collectionName": "Women and Weapons"
+        },
+        {
+            "collectionAddress": "0x6bca6de2dbdc4e0d41f7273011785ea16ba47182",
+            "collectionName": "Muhammad Ali | The Next Legends - Boxers"
+        },
+        {
+            "collectionAddress": "0x1347a97789cd3aa0b11433e8117f55ab640a0451",
+            "collectionName": "Long Lost"
+        },
+        {
+            "collectionAddress": "0x2b982108cc8174b8bca73802470a6cd493473157",
+            "collectionName": "House of cards"
+        },
+        {
+            "collectionAddress": "0x0616a2ef54bad0b37dce41c8d8e35cce17a926f3",
+            "collectionName": "BYOLand"
+        },
+        {
+            "collectionAddress": "0xc3ce480376a6340e0a4cdd3e4843bdc0bc765a45",
+            "collectionName": "CW Females"
+        },
+        {
+            "collectionAddress": "0xe21ebcd28d37a67757b9bc7b290f4c4928a430b1",
+            "collectionName": "The Saudis"
+        },
+        {
+            "collectionAddress": "0xf75fd01d2262b07d92dca7f19bd6a3457060d7db",
+            "collectionName": "Mimic Shhans - Official"
+        },
+        {
+            "collectionAddress": "0x48355ce6ba377d06335be9499feaf735948484bc",
+            "collectionName": "BEANS - Dumb Ways to Die"
+        },
+        {
+            "collectionAddress": "0x96246927030094c22782ec9921f082d024536982",
+            "collectionName": "CREYNIUMS"
+        },
+        {
+            "collectionAddress": "0x3d666422ffd721e3999395c2a25dc880d785a72a",
+            "collectionName": "AnimeLoot"
+        },
+        {
+            "collectionAddress": "0x1485297e942ce64e0870ece60179dfda34b4c625",
+            "collectionName": "Moonrunners Official"
+        },
+        {
+            "collectionAddress": "0xf4a7c105cfdc6aabe9ae65bdf2d0df0a567a7ade",
+            "collectionName": "ARC Stellars"
+        },
+        {
+            "collectionAddress": "0x3abedba3052845ce3f57818032bfa747cded3fca",
+            "collectionName": "Ether Orcs Genesis"
+        },
+        {
+            "collectionAddress": "0x23f0dcecfe50f70d0c87578fd6a14f59900ab5e1",
+            "collectionName": "Cel Mates by Mcbess"
+        },
+        {
+            "collectionAddress": "0x6fc3ad6177b07227647ad6b4ae03cc476541a2a0",
+            "collectionName": "DarkEchelon"
+        },
+        {
+            "collectionAddress": "0x9c80777cae192e5031c38a0d951c55730ecc3f5e",
+            "collectionName": "ZombieClub Token"
+        },
+        {
+            "collectionAddress": "0x7a15b36cb834aea88553de69077d3777460d73ac",
+            "collectionName": "Feral File — Unsupervised"
+        },
+        {
+            "collectionAddress": "0x9bf53d8c65f03d895dacaa776cc960e462ecb599",
+            "collectionName": "Primera by Mitchell and Yun"
+        }
+    ]
+]
