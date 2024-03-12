@@ -9,11 +9,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 interface ICrossDomainMessenger {
     function xDomainMessageSender() external view returns (address);
-    function sendMessage(
-        address _target,
-        bytes calldata _message,
-        uint32 _gasLimit
-    ) external;
+    function sendMessage(address _target, bytes calldata _message, uint32 _gasLimit) external;
 }
 
 contract MOPNLand is ERC721, Ownable, ReentrancyGuard {
@@ -21,11 +17,7 @@ contract MOPNLand is ERC721, Ownable, ReentrancyGuard {
     address public metadataRenderAddress;
     address public mainnetClaimer;
 
-    constructor(
-        address _messenger,
-        address _metadataRenderAddress,
-        address initialOwner
-    ) ERC721("MOPNLAND BLAST", "LAND") Ownable(initialOwner) {
+    constructor(address _messenger, address _metadataRenderAddress, address initialOwner) ERC721("MOPNLAND BLAST", "LAND") Ownable(initialOwner) {
         MESSENGER = ICrossDomainMessenger(_messenger);
         metadataRenderAddress = _metadataRenderAddress;
     }
@@ -38,18 +30,12 @@ contract MOPNLand is ERC721, Ownable, ReentrancyGuard {
         metadataRenderAddress = _metadataRenderAddress;
     }
 
-    function claim(address _sender, uint256[] memory tokenIds) external  {
-        require(
-            msg.sender == address(MESSENGER),
-            "Greeter: Direct sender must be the CrossDomainMessenger"
-        );
+    function claim(address _sender, uint256[] memory tokenIds) external {
+        require(msg.sender == address(MESSENGER), "Direct sender must be the CrossDomainMessenger");
 
-        require(
-            MESSENGER.xDomainMessageSender() == mainnetClaimer,
-            "Greeter: Remote sender must be the other Greeter contract"
-        );
+        require(MESSENGER.xDomainMessageSender() == mainnetClaimer, "Remote sender must be the mainnet claimer contract");
 
-        for(uint256 i = 0; i < tokenIds.length; i++){
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             _mint(_sender, tokenIds[i]);
         }
     }

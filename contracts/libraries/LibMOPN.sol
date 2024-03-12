@@ -99,6 +99,7 @@ library LibMOPN {
         mapping(address => AccountDataStruct) ADs;
         mapping(address => CollectionDataStruct) CDs;
         mapping(uint32 => uint256) Lands;
+        bytes32 whiteListRoot;
     }
 
     function mopnStorage() internal pure returns (MOPNStorage storage ms) {

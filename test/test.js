@@ -126,10 +126,10 @@ describe('DiamondTest', async function () {
   const deployAccountNFT = async (tokenContract, tokenId, coordinate, landId) => {
     const account = await mopnerc6551accounthelper.computeAccount(
       await mopnerc6551accountproxy.address,
+      ethers.utils.hexZeroPad("0x", 32),
       31337,
       tokenContract,
-      tokenId,
-      0
+      tokenId
     );
     console.log("account move", account);
     accounts.push(account);
@@ -141,12 +141,11 @@ describe('DiamondTest', async function () {
         coordinate,
         landId,
         await getMoveToTilesAccounts(coordinate),
-        "0x"
       );
     await tx.wait();
 
     tiles[coordinate] = account;
-    return account;s
+    return account;
   };
 
   const getMoveToTilesAccounts = async (tileCoordinate) => {

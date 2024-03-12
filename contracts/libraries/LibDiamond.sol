@@ -39,6 +39,8 @@ library LibDiamond {
         mapping(bytes4 => bool) supportedInterfaces;
         // owner of the contract
         address contractOwner;
+        // operator of the contract
+        address contractOperator;
     }
 
     function diamondStorage() internal pure returns (DiamondStorage storage ds) {
@@ -61,6 +63,21 @@ library LibDiamond {
 
     function enforceIsContractOwner() internal view {
         require(msg.sender == diamondStorage().contractOwner, "LibDiamond: Must be contract owner");
+    }
+
+    function setContractOperator(address _newOperator) internal {
+        DiamondStorage storage ds = diamondStorage();
+        address previousOperator = ds.contractOperator;
+        ds.contractOperator = _newOperator;
+        emit IERC173.OwnershipTransferred(previousOperator, _newOperator);
+    }
+
+    function contractOperator() internal view returns (address contractOperator_) {
+        contractOperator_ = diamondStorage().contractOperator;
+    }
+
+    function enforceIsContractOperator() internal view {
+        require(msg.sender == diamondStorage().contractOperator, "LibDiamond: Must be contract opearator");
     }
 
     // Internal function version of diamondCut
