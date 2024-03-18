@@ -11,6 +11,9 @@ dependencies:
   '@openzeppelin/contracts':
     specifier: ^5.0.0
     version: 5.0.0
+  '@openzeppelin/merkle-tree':
+    specifier: ^1.0.6
+    version: 1.0.6
   abdk-libraries-solidity:
     specifier: ^3.2.0
     version: 3.2.0
@@ -992,6 +995,13 @@ packages:
 
   /@openzeppelin/contracts@5.0.0:
     resolution: {integrity: sha512-bv2sdS6LKqVVMLI5+zqnNrNU/CA+6z6CmwFXm/MzmOPBRSO5reEJN7z0Gbzvs0/bv/MZZXNklubpwy3v2+azsw==}
+    dev: false
+
+  /@openzeppelin/merkle-tree@1.0.6:
+    resolution: {integrity: sha512-cGWOb2WBWbJhqvupzxjnKAwGLxxAEYPg51sk76yZ5nVe5D03mw7Vx5yo8llaIEqYhP5O39M8QlrNWclgLfKVrA==}
+    dependencies:
+      '@ethersproject/abi': 5.7.0
+      ethereum-cryptography: 1.2.0
     dev: false
 
   /@resolver-engine/core@0.3.3:
@@ -4442,7 +4452,6 @@ packages:
     dependencies:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
-    bundledDependencies: false
 
   /eventemitter3@4.0.4:
     resolution: {integrity: sha512-rlaVLnVxtxvoyLsQQFBx53YmXHDxRIzzTLbdfxqi4yocpSjAxXwkU0cScM5JgSKMqEhrZpnvQ2D9gjylR0AimQ==}

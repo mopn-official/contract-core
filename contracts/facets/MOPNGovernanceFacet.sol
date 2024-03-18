@@ -41,6 +41,12 @@ contract MOPNGovernanceFacet is FacetCommons {
         s.vaultContract = vaultContract_;
     }
 
+    function whiteListRootUpdate(bytes32 root) public {
+        LibDiamond.enforceIsContractOperator();
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
+        s.whiteListRoot = root;
+    }
+
     function createCollectionVault(address collectionAddress) public returns (address) {
         LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         require(s.CDs[collectionAddress].vaultAddress == address(0), "collection vault exist");

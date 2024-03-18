@@ -16,10 +16,12 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract MOPNDiamond is Multicall {
     constructor(address _contractOwner, address _diamondCutFacet) payable {
-        // LibMOPN.BLAST.configureClaimableGas(); //@todo open when deploy real network
-        // LibMOPN.BLAST.configureAutomaticYield();
+        // open when deploy real network
+        LibMOPN.BLAST.configureClaimableGas();
+        LibMOPN.BLAST.configureAutomaticYield();
 
         LibDiamond.setContractOwner(_contractOwner);
+        LibDiamond.setContractOperator(_contractOwner);
 
         // Add the diamondCut external function from the diamondCutFacet
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);

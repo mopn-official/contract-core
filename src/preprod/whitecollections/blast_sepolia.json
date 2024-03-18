@@ -1,0 +1,60 @@
+[
+    [
+        {
+            "collectionAddress": "0xf1c90054fce8109854124b0c5f2c5de2b982b96a",
+            "collectionName": "BLAST x MVHQ Vol.1"
+        },
+        {
+            "collectionAddress": "0x5a310466ede9e4bd9b729535f53eb89e147e0fd7",
+            "collectionName": "OmnichainAdventuresBlastBIGBANG"
+        },
+        {
+            "collectionAddress": "0xd9aeba16bf9c50aba84fb6f934fefda99835da60",
+            "collectionName": "Flexible Return NFT"
+        },
+        {
+            "collectionAddress": "0x1f3886da39c7a0e6c0b769afc2f539d4bb1c0961",
+            "collectionName": "Cyber Bot"
+        },
+        {
+            "collectionAddress": "0x2795b77501e1e408e482ce8ba7da3d03af473d0a",
+            "collectionName": "rBlast(pow)"
+        },
+        {
+            "collectionAddress": "0xe6ba4895f459c2ffcfcaedb6e0d70e4b1a2088e6",
+            "collectionName": "blast testnet"
+        }
+    ],
+    [
+        {
+            "collectionAddress": "0xffba654b7fee5f62ddf85718a86b11982ff3a270",
+            "collectionName": "CyberFinanceNFT"
+        },
+        {
+            "collectionAddress": "0xfb0bb30db0b3f8c9fab114c2025febc5bf277c76",
+            "collectionName": "BlastOff Testnet - BLAST Takeover"
+        },
+        {
+            "collectionAddress": "0x4ca1e5df32a80fefcaced0582e219e9b513d0fac",
+            "collectionName": "BlastScore Landing Badge"
+        },
+        {
+            "collectionAddress": "0xf91e74945b871a9c4c6618b9896e213893c0a02a",
+            "collectionName": "BlastOff IDO Countdown - BLAST Takeover"
+        },
+        {
+            "collectionAddress": "0x17f4e819d548f089ba44df79ff201d1fb97afb27",
+            "collectionName": "Game Cards"
+        }
+    ],
+    [
+        {
+            "collectionAddress": "0xe95ba46fd59aea3ba895709698f2a9d10c0e6560",
+            "collectionName": "BlastScore: \"BLASTED\" Early Bird NFT"
+        },
+        {
+            "collectionAddress": "0x6ea7f2a7666c67a62bd22c98d0b00e5dc4642b17",
+            "collectionName": "Thruster Positions NFT"
+        }
+    ]
+]

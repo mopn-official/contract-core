@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-import "hardhat/console.sol";
-
 import {FacetCommons} from "./FacetCommons.sol";
 import {LibMOPN} from "../libraries/LibMOPN.sol";
 import {Constants} from "contracts/libraries/Constants.sol";
@@ -199,10 +197,10 @@ contract MOPNDataFacet is FacetCommons {
         return
             IERC6551Registry(LibMOPN.mopnStorage().ERC6551Registry).account(
                 LibMOPN.mopnStorage().ERC6551AccountProxy,
+                bytes32(0),
                 block.chainid,
                 params.collectionAddress,
-                params.tokenId,
-                0
+                params.tokenId
             );
     }
 

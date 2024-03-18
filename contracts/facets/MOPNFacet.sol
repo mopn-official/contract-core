@@ -13,6 +13,7 @@ import "../interfaces/IMOPNBomb.sol";
 import "../interfaces/IMOPNToken.sol";
 import "../interfaces/IMOPNLand.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /*
 .___  ___.   ______   .______   .__   __. 
@@ -34,13 +35,25 @@ contract MOPNFacet is Modifiers, FacetCommons {
             if (s.ADs[account].PerMOPNPointMinted == 0) {
                 require(chainId == block.chainid, "not support cross chain account");
                 require(
-                    account == IERC6551Registry(s.ERC6551Registry).account(s.ERC6551AccountProxy, block.chainid, collectionAddress, tokenId, 0),
+                    account ==
+                        IERC6551Registry(s.ERC6551Registry).account(s.ERC6551AccountProxy, bytes32(0), block.chainid, collectionAddress, tokenId),
                     "not a mopn Account Implementation"
                 );
             }
             collectionAddress = collectionAddress_;
         } catch (bytes memory) {
             require(false, "account error");
+        }
+    }
+
+    function collectionWhiteListRegistry(address collectionAddress, uint48 OpenTotalMOPNPoint, bytes32[] memory proof) public {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
+        require(OpenTotalMOPNPoint <= s.TotalMOPNPoints, "your collection is not open yet");
+        bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(collectionAddress, OpenTotalMOPNPoint))));
+        require(MerkleProof.verify(proof, s.whiteListRoot, leaf), "Invalid proof");
+
+        if (s.CDs[collectionAddress].PerMOPNPointMinted == 0) {
+            s.CDs[collectionAddress].PerMOPNPointMinted = s.PerMOPNPointMinted;
         }
     }
 
@@ -52,22 +65,14 @@ contract MOPNFacet is Modifiers, FacetCommons {
         _moveTo(account, tileCoordinate, LandId, tileAccounts, checkAccountQualification(account));
     }
 
-    function moveToNFT(
-        address collectionAddress,
-        uint256 tokenId,
-        uint24 tileCoordinate,
-        uint16 LandId,
-        address[] memory tileAccounts,
-        bytes calldata initData
-    ) external {
+    function moveToNFT(address collectionAddress, uint256 tokenId, uint24 tileCoordinate, uint16 LandId, address[] memory tileAccounts) external {
         LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         address account = IERC6551Registry(s.ERC6551Registry).createAccount(
             s.ERC6551AccountProxy,
+            bytes32(0),
             block.chainid,
             collectionAddress,
-            tokenId,
-            0,
-            initData
+            tokenId
         );
         _moveTo(account, tileCoordinate, LandId, tileAccounts, collectionAddress);
     }
@@ -89,6 +94,8 @@ contract MOPNFacet is Modifiers, FacetCommons {
         require(LibMOPN.tiledistance(tileCoordinate, LibMOPN.tileAtLandCenter(LandId)) < 6, "LandId error");
 
         require(LandId < 10981, "Land Overflow");
+
+        require(s.CDs[collectionAddress].PerMOPNPointMinted > 0, "collection not register white list");
 
         settlePerMOPNPointMinted();
         settleCollectionMT(collectionAddress);
@@ -216,11 +223,6 @@ contract MOPNFacet is Modifiers, FacetCommons {
             s.ADs[tileAccount].Coordinate = 0;
         }
         emit Events.BombUse(account, tileAccount, tileCoordinate);
-    }
-
-    function generateRandomNumber(uint _modulus) public view returns (uint256) {
-        uint256 randomHash = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, block.prevrandao)));
-        return (randomHash % _modulus) + 1;
     }
 
     function getCollectionAgentAssignPercentage(address collectionAddress) public view returns (uint16) {
