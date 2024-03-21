@@ -19,6 +19,10 @@
         {
             "collectionAddress": "0x2795b77501e1e408e482ce8ba7da3d03af473d0a",
             "collectionName": "rBlast(pow)"
+        },
+        {
+            "collectionAddress": "0xe6ba4895f459c2ffcfcaedb6e0d70e4b1a2088e6",
+            "collectionName": "blast testnet"
         }
     ],
     [
