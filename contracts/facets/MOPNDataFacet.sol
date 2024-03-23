@@ -11,7 +11,6 @@ import "../erc6551/interfaces/IERC6551Registry.sol";
 import "../interfaces/IMOPNCollectionVault.sol";
 import "../interfaces/IMOPNBomb.sol";
 import "../interfaces/IMOPNToken.sol";
-import "../interfaces/IMOPNLand.sol";
 
 contract MOPNDataFacet is FacetCommons {
     function MTTotalMinted() public view returns (uint256) {

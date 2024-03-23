@@ -12,7 +12,6 @@ import "../erc6551/interfaces/IERC6551Registry.sol";
 import "../interfaces/IMOPNCollectionVault.sol";
 import "../interfaces/IMOPNBomb.sol";
 import "../interfaces/IMOPNToken.sol";
-import "../interfaces/IMOPNLand.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";

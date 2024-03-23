@@ -16,7 +16,7 @@ const deployed = {
   "MOPNCollectionVault": "0x3817Ee5BfA85d1f895136918B9D77E4304C7D642",
   "MOPNLand": "0xC99764F086BC5B4Cd140E4723414335738916706",
   "MOPNGasVault": "0xbc25d37Cfea02E78DeD904c02081AA0B524d26F2",
-  "DiamondInit": "0x645C1989Be30e0da18E3b0c625a829fB49649Dd5",
+  "DiamondInit": "0x68cA187194073A7949DC9f0160d9e09839A35520",
   "DiamondLoupeFacet": "0x797059Baa33DcFCD613397d6EfD5D3af074B3c3B",
   "OwnershipFacet": "0xdd5c4eE5d59B87b713bD93E6C54C14eb0CDF67D6",
   "MOPNFacet": "0xb12c0b1d96Dc3F4FbD72FE80ace1433c5C500dA0",
@@ -104,14 +104,14 @@ async function deployDiamond () {
     'MOPNDataFacet',
   ]
   const cut = []
-  for (const FacetName of FacetNames) {
-    const facet = await deployContract(FacetName)
-    cut.push({
-      facetAddress: facet.address,
-      action: FacetCutAction.Add,
-      functionSelectors: getSelectors(facet)
-    })
-  }
+  // for (const FacetName of FacetNames) {
+  //   const facet = await deployContract(FacetName)
+  //   cut.push({
+  //     facetAddress: facet.address,
+  //     action: FacetCutAction.Add,
+  //     functionSelectors: getSelectors(facet)
+  //   })
+  // }
 
   // upgrade diamond with facets
   console.log('')
@@ -128,6 +128,8 @@ async function deployDiamond () {
     throw Error(`Diamond upgrade failed: ${tx.hash}`)
   }
   console.log('Completed diamond cut')
+
+  return diamond.address;
 
   console.log('')
   console.log('update erc6551 contract')

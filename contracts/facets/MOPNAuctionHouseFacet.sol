@@ -9,7 +9,6 @@ import {Events} from "../libraries/Events.sol";
 import {LibMOPN} from "../libraries/LibMOPN.sol";
 import "../interfaces/IMOPNBomb.sol";
 import "../interfaces/IMOPNToken.sol";
-import "../interfaces/IMOPNLand.sol";
 import "../interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";

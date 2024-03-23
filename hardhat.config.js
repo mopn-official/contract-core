@@ -54,9 +54,13 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     "blast_sepolia": {
-      url: "https://sepolia.blast.io",
+      url: process.env.BLAST_TEST_URI,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    "blast": {
+      url: process.env.BLAST_TEST_URI,
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    }
   },
   etherscan: {
     apiKey: {
