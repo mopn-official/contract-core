@@ -54,9 +54,13 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     "blast_sepolia": {
-      url: "https://sepolia.blast.io",
+      url: process.env.BLAST_TEST_URI,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    "blast": {
+      url: process.env.BLAST_TEST_URI,
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    }
   },
   etherscan: {
     apiKey: {
@@ -68,8 +72,8 @@ module.exports = {
         network: "blast_sepolia",
         chainId: 168587773,
         urls: {
-          apiURL: "https://api.routescan.io/v2/network/testnet/evm/168587773/etherscan",
-          browserURL: "https://testnet.blastscan.io"
+          apiURL: "https://api-sepolia.blastscan.io/api",
+          browserURL: "https://sepolia.blastscan.io"
         }
       }
     ]

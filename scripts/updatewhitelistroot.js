@@ -14,7 +14,7 @@ async function move() {
 
     const tx = await mopnGovernanceFacet
     .whiteListRootUpdate(
-      "0x165478ba58e167a7fdaec683a9aa48a637b3ed60eb2b67a8b9ee21cc5a0d107b"
+      "0x93d642229078c797eb4bc9c14da264afbe94ef1f9ce5e9fee89888879a251caf"
     );
   await tx.wait();
 }
