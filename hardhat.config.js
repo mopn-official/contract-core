@@ -58,7 +58,7 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     "blast": {
-      url: process.env.BLAST_TEST_URI,
+      url: process.env.BLAST_URI,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     }
   },
@@ -66,7 +66,26 @@ module.exports = {
     apiKey: {
       sepolia: process.env.ETHERSCAN_API_KEY,
       blast_sepolia: process.env.BLASTSCAN_API_KEY, // apiKey is not required, just set a placeholder
-    }
+      blast: process.env.BLASTSCAN_API_KEY
+    },
+    customChains: [
+      {
+        network: "blast_sepolia",
+        chainId: 168587773,
+        urls: {
+          apiURL: "https://api-sepolia.blastscan.io/api",
+          browserURL: "https://sepolia.blastscan.io"
+        }
+      },
+      {
+        network: "blast",
+        chainId: 81457,
+        urls: {
+          apiURL: "https://api.blastscan.io/api",
+          browserURL: "https://blastscan.io"
+        }
+      }
+    ]
   },
   sourcify: {
     enabled: true

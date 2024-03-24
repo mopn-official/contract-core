@@ -6,23 +6,23 @@ const { getSelectors, FacetCutAction } = require('./libraries/diamond.js')
 
 const deployed = {
   "ERC6551Registry": "0x000000006551c19487814612e58FE06813775758",
-  "MOPNERC6551AccountHelper": "0xCcDB391C6Fe158006035B3aA2eb1206D2778d15e",
-  "MOPNERC6551Account": "0xb19b9cc59506046C10EFdB151FBC68F6E3ac0456",
-  "MOPNERC6551AccountProxy": "0x306b9652ADd38A398De97ee577d1E09D8BCD8CeE",
-  "DiamondCutFacet": "0xba7Bf786C4fBCC35EE6Dc427895ad0DeaD6EE1Cf",
-  "MOPNDiamond": "0x038828FA4bFaB1275397ABBAbf54456e76C34083",
-  "MOPNBomb": "0x45231c9668289A0C7C434660146eCF48Ef872F4c",
-  "MOPNToken": "0xD6e06BBcffdf88aa40D1116Afa42EF1457B0029E",
-  "MOPNCollectionVault": "0x3817Ee5BfA85d1f895136918B9D77E4304C7D642",
+  "MOPNERC6551AccountHelper": "0x0ab55a515007c82a60ecD6EF6F149Fa2A6891094",
+  "MOPNERC6551Account": "0x250Cf1c8f112a7872f17C5e8BB5c9E8F0aE55F11",
+  "MOPNERC6551AccountProxy": "0xd6E3AAc6a94259ae9553c94DA78fe601e482815E",
+  "DiamondCutFacet": "0xAb464058d6305233cc71E9c446810B3B997D4E36s",
+  "MOPNDiamond": "0x90205dC32d976C6c36e5c5578b493dea31599a48",
+  "MOPNBomb": "0xf6966EC7D840Cd9861398C97516de0A3Ed69df5d",
+  "MOPNToken": "0x10E6D870D2AF151E69d709252080a930C3ec75FC",
+  "MOPNCollectionVault": "0xAC73c2acfD96908242d408200e5725F29407f2E0",
   "MOPNLand": "0xC99764F086BC5B4Cd140E4723414335738916706",
   "MOPNGasVault": "0xbc25d37Cfea02E78DeD904c02081AA0B524d26F2",
-  "DiamondInit": "0x68cA187194073A7949DC9f0160d9e09839A35520",
-  "DiamondLoupeFacet": "0x797059Baa33DcFCD613397d6EfD5D3af074B3c3B",
-  "OwnershipFacet": "0xdd5c4eE5d59B87b713bD93E6C54C14eb0CDF67D6",
-  "MOPNFacet": "0xb12c0b1d96Dc3F4FbD72FE80ace1433c5C500dA0",
-  "MOPNAuctionHouseFacet": "0x7F17aD55706558D0DC2028aBC1CfBCBF95d2d70b",
-  "MOPNGovernanceFacet": "0x171F4Da1EAd3eC43765eB3f3E55BAa35f1412B53",
-  "MOPNDataFacet": "0xBE76F97a8E5c8B6BC683DADd5dC3d635121a0304"
+  "DiamondInit": "0x3f7E337337257aBfA3BEdbEe15FEaCfda4717E18",
+  "DiamondLoupeFacet": "0xE527e71ebf1a70edD37cD8D034b40B19920De9AF",
+  "OwnershipFacet": "0x780b36471768a0f918f5EA3991cEcB8868c7856a",
+  "MOPNFacet": "0x941Ba91DF46F103C8f60Ee53C866C175529b7d3c",
+  "MOPNAuctionHouseFacet": "0x47c9F5271C658669BcDC4aa612999545d7314F8F",
+  "MOPNGovernanceFacet": "0xDeFae17B347Cf556A977A87Abb86Ae1da83E637c",
+  "MOPNDataFacet": "0xFA6Ecf5c83b0B86c4A177CA73E497fB138b1631f"
 };
 
 async function deployContract(name, params) {
@@ -104,14 +104,14 @@ async function deployDiamond () {
     'MOPNDataFacet',
   ]
   const cut = []
-  // for (const FacetName of FacetNames) {
-  //   const facet = await deployContract(FacetName)
-  //   cut.push({
-  //     facetAddress: facet.address,
-  //     action: FacetCutAction.Add,
-  //     functionSelectors: getSelectors(facet)
-  //   })
-  // }
+  for (const FacetName of FacetNames) {
+    const facet = await deployContract(FacetName)
+    cut.push({
+      facetAddress: facet.address,
+      action: FacetCutAction.Add,
+      functionSelectors: getSelectors(facet)
+    })
+  }
 
   // upgrade diamond with facets
   console.log('')
@@ -129,8 +129,6 @@ async function deployDiamond () {
   }
   console.log('Completed diamond cut')
 
-  return diamond.address;
-
   console.log('')
   console.log('update erc6551 contract')
   const mopn = await ethers.getContractAt('MOPNGovernanceFacet', diamond.address)
@@ -144,7 +142,7 @@ async function deployDiamond () {
 
   console.log('')
   console.log('update mopn contract')
-  tx = await mopn.updateMOPNContracts(mopnbomb.address, mopntoken.address, mopnland.address, mopncollectionvault.address)
+  tx = await mopn.updateMOPNContracts(mopnbomb.address, mopntoken.address, ethers.constants.AddressZero, mopncollectionvault.address)
   console.log('update mopn contract tx: ', tx.hash)
   receipt = await tx.wait()
   if (!receipt.status) {

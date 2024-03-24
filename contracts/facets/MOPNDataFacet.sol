@@ -168,6 +168,11 @@ contract MOPNDataFacet is FacetCommons {
         }
     }
 
+    function getAccountCoordinate(address account) public view returns (uint24) {
+        LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
+        return s.ADs[account].Coordinate;
+    }
+
     function getAccountData(address account) public view returns (LibMOPN.AccountDataOutput memory accountData) {
         LibMOPN.MOPNStorage storage s = LibMOPN.mopnStorage();
         accountData.account = account;

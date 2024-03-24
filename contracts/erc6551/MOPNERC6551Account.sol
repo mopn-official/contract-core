@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import "hardhat/console.sol";
-
 import "./interfaces/IMOPNERC6551Account.sol";
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";

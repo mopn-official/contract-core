@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "hardhat/console.sol";
-
 import "./interfaces/IMOPNCollectionVault.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IMOPNToken.sol";

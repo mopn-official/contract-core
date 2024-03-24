@@ -37,6 +37,7 @@
     "erc721a": "^4.2.3",
     "erc721a-upgradeable": "^4.2.3",
     "hardhat-diamond-abi": "^3.0.1",
-    "hardhat-gas-reporter": "^1.0.9"
+    "hardhat-gas-reporter": "^1.0.9",
+    "node-fetch": "^2.7.0"
   }
 }

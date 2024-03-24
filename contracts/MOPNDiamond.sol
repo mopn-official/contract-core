@@ -62,14 +62,5 @@ contract MOPNDiamond is Multicall {
         }
     }
 
-    receive() external payable {
-        (bool sent, ) = LibMOPN.mopnStorage().gasrecipient.call{value: msg.value}("");
-        require(sent, "Failed to send Ether");
-    }
-
-    function claimMaxGas() external {
-        (, uint256 amount, , ) = LibMOPN.BLAST.readGasParams(address(this));
-        LibMOPN.BLAST.claimMaxGas(address(this), LibMOPN.mopnStorage().gasrecipient);
-        emit Events.ManualClaimGas(msg.sender, amount);
-    }
+    receive() external payable {}
 }

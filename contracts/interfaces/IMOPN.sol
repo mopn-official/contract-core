@@ -63,4 +63,6 @@ interface IMOPN {
     function getCollectionVaultIndex(address collectionAddress) external view returns (uint256);
 
     function getAccountData(address account) external view returns (AccountDataOutput memory accountData);
+
+    function getAccountCoordinate(address account) external view returns (uint24);
 }

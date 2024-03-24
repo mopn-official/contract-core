@@ -51,10 +51,10 @@ async function move() {
 const deployAccountNFT = async (tokenContract, tokenId, coordinate, landId) => {
   const account = await mopnerc6551accounthelper.computeAccount(
     await mopnerc6551accountproxy.address,
+    ethers.utils.hexZeroPad("0x", 32),
     ethers.provider.network.chainId,
     tokenContract,
-    tokenId,
-    0
+    tokenId
   );
   console.log("account move", account);
   accounts.push(account);
@@ -65,7 +65,6 @@ const deployAccountNFT = async (tokenContract, tokenId, coordinate, landId) => {
       coordinate,
       landId,
       await getMoveToTilesAccounts(coordinate),
-      "0x"
     );
   await tx.wait();
 

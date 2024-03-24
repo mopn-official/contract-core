@@ -24,18 +24,19 @@ contract DiamondInit {
     // data to set your own state variables
     function init() external {
         // adding ERC165 data
-        // LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
-        // ds.supportedInterfaces[type(IERC165).interfaceId] = true;
-        // ds.supportedInterfaces[type(IDiamondCut).interfaceId] = true;
-        // ds.supportedInterfaces[type(IDiamondLoupe).interfaceId] = true;
-        // ds.supportedInterfaces[type(IERC173).interfaceId] = true;
+        LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
+        ds.supportedInterfaces[type(IERC165).interfaceId] = true;
+        ds.supportedInterfaces[type(IDiamondCut).interfaceId] = true;
+        ds.supportedInterfaces[type(IDiamondLoupe).interfaceId] = true;
+        ds.supportedInterfaces[type(IERC173).interfaceId] = true;
 
         LibMOPN.MOPNStorage storage ms = LibMOPN.mopnStorage();
         ms.PerMOPNPointMinted = 1;
+        ms.LastTickTimestamp = uint32(block.timestamp);
+        ms.MTOutputPerTimestamp = 5000000;
+        ms.MTStepStartTimestamp = ms.LastTickTimestamp;
+        ms.whiteListRoot = 0xe2509305eed74ea04e6307082ee3f847d9fe929360134ead4be8a18a0c17f920;
 
-        // ms.LastTickTimestamp = uint32(block.timestamp);
-        // ms.MTOutputPerTimestamp = 5000000;
-        // ms.MTStepStartTimestamp = ms.LastTickTimestamp;
-        // ms.gasrecipient = 0xC9ea36e82C647DC36012c586BF16823D598AFC36;
+        // ms.gasrecipient = address(0);
     }
 }

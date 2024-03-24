@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "hardhat/console.sol";
-
+import {IBlast} from "./interfaces/IBlast.sol";
 import "./interfaces/IMOPN.sol";
 import "./interfaces/IERC20Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
@@ -16,6 +15,8 @@ contract MOPNToken is ERC20Burnable, Multicall {
      */
     bytes4 private constant ERC20_RECEIVED = 0x4fc35859;
 
+    IBlast public constant BLAST = IBlast(0x4300000000000000000000000000000000000002);
+
     IMOPN mopn;
 
     modifier onlyMOPN() {
@@ -24,6 +25,9 @@ contract MOPNToken is ERC20Burnable, Multicall {
     }
 
     constructor(address mopn_) ERC20("MOPN Token", "MT") {
+        BLAST.configureClaimableGas();
+        BLAST.configureAutomaticYield();
+
         mopn = IMOPN(mopn_);
     }
 
@@ -72,10 +76,7 @@ contract MOPNToken is ERC20Burnable, Multicall {
         balance += mopn.calcAccountMT(account);
     }
 
-    // function _beforeTokenTransfer(address from, address, uint256) internal virtual override {
-    //     IMOPN.AccountDataOutput memory accountData = mopn.getAccountData(from);
-    //     if (accountData.tileCoordinate > 0) {
-    //         mopn.claimAccountMT(from);
-    //     }
-    // }
+    function claimMaxGas() external {
+        BLAST.claimMaxGas(address(this), address(mopn));
+    }
 }

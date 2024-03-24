@@ -80,4 +80,18 @@ contract MOPNGovernanceFacet is FacetCommons {
                 abi.encode(salt_, collectionAddress_)
             );
     }
+
+    function claimMaxGas() external {
+        (, uint256 amount, , ) = LibMOPN.BLAST.readGasParams(address(this));
+        if (LibMOPN.mopnStorage().gasrecipient != address(0)) {
+            LibMOPN.BLAST.claimMaxGas(address(this), LibMOPN.mopnStorage().gasrecipient);
+            if (address(this).balance > 0) {
+                (bool sent, ) = LibMOPN.mopnStorage().gasrecipient.call{value: address(this).balance}("");
+                require(sent, "Failed to send Ether");
+            }
+        } else {
+            LibMOPN.BLAST.claimMaxGas(address(this), address(this));
+        }
+        emit Events.ManualClaimGas(msg.sender, amount);
+    }
 }

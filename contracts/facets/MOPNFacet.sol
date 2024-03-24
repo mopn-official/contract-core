@@ -95,7 +95,9 @@ contract MOPNFacet is Modifiers, FacetCommons {
 
         require(LandId < 10981, "Land Overflow");
 
-        require(s.CDs[collectionAddress].PerMOPNPointMinted > 0, "collection not register white list");
+        if (s.whitelist) {
+            require(s.CDs[collectionAddress].PerMOPNPointMinted > 0, "collection not register white list");
+        }
 
         settlePerMOPNPointMinted();
         settleCollectionMT(collectionAddress);
